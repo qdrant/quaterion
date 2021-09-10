@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "quaterion"
+version = "0.1.0"
+description = "Metric Learning fine-tuning framework"
+authors = ["generall <andrey@vasnetsov.com>"]
+
+[tool.poetry.dependencies]
+python = ">=3.7,<3.10"
+torch = ">=1.8.2"
+pytorch-lightning = "^1.4.5"
+quaterion-models = { git = "git@github.com:qdrant/quaterion-models.git", branch = "master" }
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

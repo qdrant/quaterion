@@ -366,7 +366,7 @@ testing = ["argcomplete", "hypothesis (>=3.56)", "mock", "nose", "requests", "xm
 
 [[package]]
 name = "pytorch-lightning"
-version = "1.4.5"
+version = "1.4.6"
 description = "PyTorch Lightning is the lightweight PyTorch wrapper for ML researchers. Scale your models. Write less boilerplate."
 category = "main"
 optional = false
@@ -419,7 +419,7 @@ torch = ">=1.8.2"
 type = "git"
 url = "git@github.com:qdrant/quaterion-models.git"
 reference = "master"
-resolved_reference = "ca6d49e1e115b379d428835d397ba24b43e53ed3"
+resolved_reference = "9805297944b52f79a839f927c69e86486970f36f"
 
 [[package]]
 name = "requests"
@@ -937,8 +937,8 @@ pytest = [
     {file = "pytest-6.2.5.tar.gz", hash = "sha256:131b36680866a76e6781d13f101efb86cf674ebb9762eb70d3082b6f29889e89"},
 ]
 pytorch-lightning = [
-    {file = "pytorch-lightning-1.4.5.tar.gz", hash = "sha256:524eca14edcee055d04de537caa2924de36dec4b3f4a2d9d0e35fb944b8ab6aa"},
-    {file = "pytorch_lightning-1.4.5-py3-none-any.whl", hash = "sha256:bc152d6ff01dbfd4499a9b4df06ad1e1d480e9a9a1973c96f7985e65af0feb3c"},
+    {file = "pytorch-lightning-1.4.6.tar.gz", hash = "sha256:dc1db1b3f670b18f0dcbe3ae271f9648227405648b7d95ddfbc870d187464e4f"},
+    {file = "pytorch_lightning-1.4.6-py3-none-any.whl", hash = "sha256:8daf6b3ece65dd3472f6a2c38b211cd3a93563861b52c053b00f4897f67c5fa7"},
 ]
 pyyaml = [
     {file = "PyYAML-5.4.1-cp27-cp27m-macosx_10_9_x86_64.whl", hash = "sha256:3b2b1824fe7112845700f815ff6a489360226a5609b96ec2190a45e62a9fc922"},

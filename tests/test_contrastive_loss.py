@@ -1,11 +1,9 @@
-from unittest import TestCase
-
 import torch
 
 from quaterion.loss.contrastive_loss import ContrastiveLoss
 
 
-class TestContrastiveLoss(TestCase):
+class TestContrastiveLoss:
     def test_forward(self):
         loss = ContrastiveLoss(
             size_average=False
@@ -36,4 +34,4 @@ class TestContrastiveLoss(TestCase):
             labels=labels
         )
 
-        self.assertEqual(loss_res.shape, torch.Size([]))
+        assert loss_res.shape == torch.Size([])

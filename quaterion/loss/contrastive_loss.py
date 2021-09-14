@@ -1,4 +1,5 @@
-from typing import List, Callable, Type
+from typing import Type
+
 from torch import Tensor, relu, LongTensor
 
 from quaterion.loss.metrics import SiameseDistanceMetric

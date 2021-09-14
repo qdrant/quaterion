@@ -11,6 +11,7 @@ pytorch-lightning = "^1.4.5"
 quaterion-models = { git = "git@github.com:qdrant/quaterion-models.git", branch = "master" }
 
 [tool.poetry.dev-dependencies]
+pytest = "^6.2.5"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

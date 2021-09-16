@@ -2,12 +2,10 @@ from typing import Type
 
 import pytorch_lightning as pl
 import torch
-from quaterion_models.encoder import TensorInterchange
-
+from quaterion_models.model import MetricModel
 from torch.optim import Optimizer, Adam
 
 from quaterion.loss.similarity_loss import SimilarityLoss
-from quaterion_models.model import MetricModel
 
 
 class TrainableModel(pl.LightningModule):
@@ -16,24 +14,30 @@ class TrainableModel(pl.LightningModule):
                  model: MetricModel,
                  loss: SimilarityLoss,
                  optimizer_class: Type[Optimizer] = Adam,
-                 optimizer_params: dict = None
+                 optimizer_params: dict = None,
+                 *args, **kwargs
                  ):
-        super().__init__()
-        self.optimizer_class = optimizer_class
-        self.optimizer_params = optimizer_params or {}
-        self.model = model
-        self.loss = loss
+        super().__init__(*args, **kwargs)
+        self._optimizer_class = optimizer_class
+        self._optimizer_params = optimizer_params or {}
+        self._model = model
+        self._loss = loss
 
-    def to_model_device(self, batch: TensorInterchange) -> TensorInterchange:
-        pass
+    @property
+    def model(self):
+        return self._model
+
+    @property
+    def loss(self):
+        return self._loss
 
     def training_step(self, batch, batch_idx, **kwargs) -> torch.Tensor:
         features, targets = batch
-        embeddings = self.model.forward(features)
-        loss = self.loss(embeddings=embeddings, **targets)
+        embeddings = self._model(features)
+        loss = self._loss(embeddings=embeddings, **targets)
         self.log("train_loss", loss)
 
         return loss
 
     def configure_optimizers(self):
-        return self.optimizer_class(self.model.parameters(), **self.optimizer_params)
+        return self._optimizer_class(self._model.parameters(), **self._optimizer_params)

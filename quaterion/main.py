@@ -18,12 +18,23 @@ class Quaterion:
         return features_collate(features), labels
 
     @classmethod
+    def _set_weights_summary(cls, trainer: pl.Trainer):
+        """
+        Select proper level of weight summary details
+        """
+        if not trainer.weights_summary:
+            ModelSummary.MODES['quaterion_default'] = 3
+            trainer.weights_summary = 'quaterion_default'
+
+    @classmethod
     def fit(cls,
             trainable_model: TrainableModel,
             trainer: pl.Trainer,
             train_dataloader: DataLoader,
-            val_dataloader: Optional[DataLoader],
+            val_dataloader: Optional[DataLoader] = None,
             ):
+
+        cls._set_weights_summary(trainer)
 
         if isinstance(train_dataloader, PairsSimilarityDataLoader):
             if isinstance(trainable_model.loss, PairwiseLoss):

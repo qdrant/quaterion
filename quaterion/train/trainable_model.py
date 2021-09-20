@@ -10,34 +10,31 @@ from quaterion.loss.similarity_loss import SimilarityLoss
 
 class TrainableModel(pl.LightningModule):
 
-    def __init__(self,
-                 model: MetricModel,
-                 loss: SimilarityLoss,
-                 optimizer_class: Type[Optimizer] = Adam,
-                 optimizer_params: dict = None,
-                 *args, **kwargs
-                 ):
-        super().__init__(*args, **kwargs)
-        self._optimizer_class = optimizer_class
-        self._optimizer_params = optimizer_params or {}
-        self._model = model
-        self._loss = loss
+    @property
+    def model(self) -> MetricModel:
+        raise NotImplementedError()
 
     @property
-    def model(self):
-        return self._model
+    def loss(self) -> SimilarityLoss:
+        raise NotImplementedError()
 
-    @property
-    def loss(self):
-        return self._loss
+    def process_results(self, embeddings: torch.Tensor, targets: Dict[str, Any]):
+        """
+        Define any additional evaluations of embeddings here.
+
+        :param embeddings: Tensor of batch embeddings, shape: [batch_size x embedding_size]
+        :param targets: Output of batch target collate
+        :return: None
+        """
+        pass
 
     def training_step(self, batch, batch_idx, **kwargs) -> torch.Tensor:
         features, targets = batch
-        embeddings = self._model(features)
-        loss = self._loss(embeddings=embeddings, **targets)
+        embeddings = self.model(features)
+        loss = self.loss(embeddings=embeddings, **targets)
         self.log("train_loss", loss)
+
+        self.process_results(embeddings=embeddings, targets=targets)
 
         return loss
 
-    def configure_optimizers(self):
-        return self._optimizer_class(self._model.parameters(), **self._optimizer_params)

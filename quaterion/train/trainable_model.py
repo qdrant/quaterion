@@ -73,3 +73,13 @@ class TrainableModel(pl.LightningModule):
 
         return loss
 
+    def save_servable(self, path: str):
+        """
+        Save model, independent of Pytorch Lightning.
+
+        :param path: where to save
+        :return: None
+        """
+        self.model.save(path)
+
+

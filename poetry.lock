@@ -417,7 +417,7 @@ torch = ">=1.8.2"
 type = "git"
 url = "git@github.com:qdrant/quaterion-models.git"
 reference = "master"
-resolved_reference = "707f1ef6b32bb134e75f8abf682b1c54c3a63e5e"
+resolved_reference = "b053740ed579ca0e87aa2f25a7e4272ee333c2f2"
 
 [[package]]
 name = "requests"

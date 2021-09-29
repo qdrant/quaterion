@@ -425,7 +425,7 @@ fasttext = ["gensim (>=4.1.2,<5.0.0)"]
 type = "git"
 url = "git@github.com:qdrant/quaterion-models.git"
 reference = "master"
-resolved_reference = "6b517b860093d3596d0c6a509da7249b08af6af7"
+resolved_reference = "ebe3810846ad9d92d1ca6c2895d95d04e17443ef"
 
 [[package]]
 name = "requests"

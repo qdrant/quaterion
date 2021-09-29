@@ -418,11 +418,14 @@ develop = false
 numpy = "^1.21.2"
 torch = ">=1.8.2"
 
+[package.extras]
+fasttext = ["gensim (>=4.1.2,<5.0.0)"]
+
 [package.source]
 type = "git"
 url = "git@github.com:qdrant/quaterion-models.git"
 reference = "master"
-resolved_reference = "1093a8887dec2a610916c593708a86173fe389aa"
+resolved_reference = "6b517b860093d3596d0c6a509da7249b08af6af7"
 
 [[package]]
 name = "requests"

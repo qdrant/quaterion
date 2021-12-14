@@ -2,6 +2,7 @@ from functools import partial
 from typing import Optional, Callable, List, Any
 
 import pytorch_lightning as pl
+from pytorch_lightning.core.memory import ModelSummary
 from torch.utils.data import DataLoader
 
 from quaterion.dataset.similarity_data_loader import PairsSimilarityDataLoader, GroupSimilarityDataLoader

@@ -58,7 +58,7 @@ class Quaterion:
             elif isinstance(trainable_model.loss, PairwiseLoss):
                 raise NotImplementedError("Pair samplers are not implemented yet. Try other loss/data loader")
 
-        if val_dataloader:
+        if val_dataloader is not None:
             val_dataloader.collate_fn = train_dataloader.collate_fn
 
         trainer.fit(

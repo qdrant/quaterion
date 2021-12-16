@@ -69,7 +69,7 @@ class PairsSimilarityDataLoader(DataLoader[SimilarityPairSample]):
         labels = {
             "pairs": torch.LongTensor([[i, i + len(batch)] for i in range(len(batch))]),
             "labels": torch.Tensor([record.score for record in batch]),
-            "subgroup": torch.Tensor([record.subgroup for record in batch] * 2)
+            "subgroups": torch.Tensor([record.subgroup for record in batch] * 2)
         }
         return features, labels
 

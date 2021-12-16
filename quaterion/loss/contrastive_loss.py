@@ -40,7 +40,7 @@ class ContrastiveLoss(PairwiseLoss):
             'size_average': self.size_average
         }
 
-    def forward(self, embeddings: Tensor, pairs: LongTensor, labels: Tensor):
+    def forward(self, embeddings: Tensor, pairs: LongTensor, labels: Tensor, **kwargs):
         rep_anchor = embeddings[pairs[:, 0]]
         rep_other = embeddings[pairs[:, 1]]
         distances = self.distance_metric(rep_anchor, rep_other)

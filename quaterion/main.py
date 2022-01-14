@@ -59,6 +59,8 @@ class Quaterion:
         if val_dataloader is not None:
             val_dataloader.collate_fn = train_dataloader.collate_fn
 
+        trainable_model.cache(train_dataloader, val_dataloader)
+
         trainer.fit(
             model=trainable_model,
             train_dataloaders=train_dataloader,

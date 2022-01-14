@@ -44,11 +44,8 @@ class GpuCacheEncoder(CacheEncoder):
         :param data:
         :return: None
         """
-        if not data:
-            return
-
         inner_collate_fn = self._encoder.get_collate_fn()
-        embeddings = self._encoder(inner_collate_fn(data)).to("cpu")
+        embeddings = self._encoder(inner_collate_fn(data))
         hashes = (hash(obj) for obj in data)
         self.cache.update(dict(zip(hashes, embeddings)))
 

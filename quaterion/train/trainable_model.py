@@ -1,4 +1,5 @@
-from typing import Dict, Any, Union, Optional
+from typing import Dict, Any, Union, Optional, Set
+from loguru import logger
 
 import torch
 import pytorch_lightning as pl
@@ -8,6 +9,12 @@ from quaterion_models.encoder import Encoder
 from quaterion_models.heads.encoder_head import EncoderHead
 from quaterion_models.model import MetricModel
 
+from quaterion.train.encoders import (
+    CacheConfig,
+    CacheType,
+    CpuCacheEncoder,
+    GpuCacheEncoder,
+)
 from quaterion.train.encoders.cache_encoder import CacheEncoder
 from quaterion.loss.similarity_loss import SimilarityLoss
 from quaterion.utils.enums import TrainStage
@@ -18,7 +25,8 @@ class TrainableModel(pl.LightningModule):
         super().__init__(*args, **kwargs)
 
         encoders = self.configure_encoders()
-        encoders = self.configure_caches(encoders)
+        cache_config = self.configure_caches()
+        encoders = self._apply_cache_config(encoders, cache_config)
 
         head = self.configure_head(
             MetricModel.get_encoders_output_size(encoders)
@@ -26,6 +34,76 @@ class TrainableModel(pl.LightningModule):
 
         self._model = MetricModel(encoders=encoders, head=head)
         self._loss = self.configure_loss()
+
+    def _apply_cache_config(
+        self,
+        encoders: Union[Encoder, Dict[str, Encoder]],
+        cache_config: Optional[CacheConfig],
+    ):
+        if not cache_config:
+            return encoders
+
+        if cache_config.mapping:
+            if cache_config.cache_type:
+                logger.warning(
+                    "CacheConfig.cache_type has no effect when mapping is set"
+                )
+
+            possible_cache_encoders: Set[str] = {
+                encoder_name
+                for encoder_name in encoders
+                if encoders[encoder_name].trainable()
+            }
+
+            for encoder_name, cache_type in cache_config.mapping.items():
+                encoder: Optional[Encoder] = encoders.get(encoder_name)
+                if not encoder:
+                    raise KeyError(
+                        f"Can't configure cache for encoder {encoder_name}. "
+                        "Encoder not found"
+                    )
+                encoders[encoder_name] = self._wrap_encoder(
+                    encoder, cache_type, encoder_name
+                )
+                possible_cache_encoders.remove(encoder_name)
+
+            not_cached_encoders = ", ".join(possible_cache_encoders)
+            if not_cached_encoders:
+                logger.info(
+                    f"{not_cached_encoders} haven't been cached, "
+                    "but could be as non-trainable encoders"
+                )
+
+        elif cache_config.cache_type:
+            encoders = self._wrap_encoder(encoders, cache_config.cache_type)
+        else:
+            raise ValueError(
+                "If cache is configured, cache_type or mapping have to be set"
+            )
+
+        return encoders
+
+    def _wrap_encoder(
+        self, encoder: Encoder, cache_type: CacheType, encoder_name: str = ""
+    ) -> Encoder:
+        if encoder.trainable():
+            raise ValueError(
+                f"Can't configure cache for encoder {encoder_name}. "
+                "Encoder must be frozen to cache it"
+            )
+
+        if cache_type == CacheType.AUTO:
+            cache_wrapper = (
+                GpuCacheEncoder
+                if torch.cuda.is_available()
+                else CpuCacheEncoder
+            )
+            encoder = cache_wrapper(encoder)
+        elif cache_type == CacheType.CPU:
+            encoder = CpuCacheEncoder(encoder)
+        elif cache_type == CacheType.GPU:
+            encoder = GpuCacheEncoder(encoder)
+        return encoder
 
     @property
     def model(self) -> MetricModel:
@@ -48,16 +126,14 @@ class TrainableModel(pl.LightningModule):
         """
         raise NotImplementedError()
 
-    def configure_caches(
-        self, encoders: Union[Encoder, Dict[str, Encoder]]
-    ) -> Union[Encoder, Dict[str, Encoder]]:
+    def configure_caches(self) -> Optional[CacheConfig]:
         """
-        Use this function to define which encoders should cache calculated
-        embeddings and what kind of storage they should use.
+        Use this method to define which encoders should cache calculated
+        embeddings and what kind of cache they should use.
 
-        :return: Union[Encoder, Dict[str, Encoder]]
+        :return: CacheConfig
         """
-        return encoders
+        pass
 
     def configure_head(self, input_embedding_size: int) -> EncoderHead:
         """

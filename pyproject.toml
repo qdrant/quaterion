@@ -17,6 +17,7 @@ python = ">=3.7,<3.10"
 torch = ">=1.8.2"
 pytorch-lightning = "^1.5.8"
 quaterion-models = { git = "git@github.com:qdrant/quaterion-models.git", branch = "master" }
+loguru = "^0.5.3"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.5"

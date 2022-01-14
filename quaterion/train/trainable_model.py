@@ -49,7 +49,7 @@ class TrainableModel(pl.LightningModule):
         raise NotImplementedError()
 
     def configure_caches(
-            self, encoders: Union[Encoder, Dict[str, Encoder]]
+        self, encoders: Union[Encoder, Dict[str, Encoder]]
     ) -> Union[Encoder, Dict[str, Encoder]]:
         """
         Use this function to define which encoders should cache calculated
@@ -87,36 +87,45 @@ class TrainableModel(pl.LightningModule):
         """
         pass
 
-    def cache(self, train_dataloader: DataLoader, val_dataloader: Optional[DataLoader], **kwargs) -> None:
+    def cache(
+        self,
+        train_dataloader: DataLoader,
+        val_dataloader: Optional[DataLoader],
+    ) -> None:
         """
         Fill cache for each CacheEncoder
 
         :param train_dataloader:
         :param val_dataloader:
-        :param kwargs: additional arguments to be passed to encoder
         :return: None
         """
-        data = {}
-        for name, encoder in self.model.encoders.items():
-            if isinstance(encoder, CacheEncoder):
-                data[name] = set()
+        cache_encoders = {
+            name: encoder
+            for name, encoder in self.model.encoders.items()
+            if isinstance(encoder, CacheEncoder)
+        }
 
-        if not data:
+        if not cache_encoders:
             return
 
-        for sample in train_dataloader:
-            features, _ = sample
-            for name in data:
-                data[name].update(features[name])
+        def cache_dataloader(dataloader, encoders):
+            for sample in dataloader:
+                features, _ = sample
+                for name, encoder in encoders.items():
+                    batch = []
+                    for feature in features[name]:
+                        if not hasattr(feature, "__hash__"):
+                            raise ValueError(
+                                "Objects intended to be cached have to implement __hash__ method"
+                            )
+                        if hash(feature) not in encoder.cache:
+                            batch.append(feature)
+                    if batch:
+                        encoder.fill_cache(batch)
 
+        cache_dataloader(train_dataloader, cache_encoders)
         val_dataloader = val_dataloader if val_dataloader is not None else []
-        for sample in val_dataloader:
-            features, _ = sample
-            for name in data:
-                data[name].update(features[name])
-
-        for name in data:
-            self.model.encoders[name].fill_cache(tuple(data[name]), **kwargs)
+        cache_dataloader(val_dataloader, cache_encoders)
 
     def training_step(self, batch, batch_idx, **kwargs) -> torch.Tensor:
         stage = TrainStage.TRAIN
@@ -125,14 +134,20 @@ class TrainableModel(pl.LightningModule):
         )
         return loss
 
-    def validation_step(self, batch, batch_idx, **kwargs) -> Optional[torch.Tensor]:
+    def validation_step(
+        self, batch, batch_idx, **kwargs
+    ) -> Optional[torch.Tensor]:
         stage = TrainStage.VALIDATION
-        self._common_step(batch=batch, batch_idx=batch_idx, stage=stage, **kwargs)
+        self._common_step(
+            batch=batch, batch_idx=batch_idx, stage=stage, **kwargs
+        )
         return None
 
     def test_step(self, batch, batch_idx, **kwargs) -> Optional[torch.Tensor]:
         stage = TrainStage.TEST
-        self._common_step(batch=batch, batch_idx=batch_idx, stage=stage, **kwargs)
+        self._common_step(
+            batch=batch, batch_idx=batch_idx, stage=stage, **kwargs
+        )
         return None
 
     def _common_step(self, batch, batch_idx, stage: TrainStage, **kwargs):

@@ -60,19 +60,13 @@ class CacheEncoder(Encoder):
         raise ValueError("Cached encoder does not support loading")
 
     def fill_cache(
-        self,
-        data: Collection[Hashable],
-        batch_size: int = 128,
-        verbose: bool = False,
+        self, data: Collection[Hashable],
     ):
         """
         Applies encoder to data and store results in cache
 
         :param data: collection of hashables to which encoder will be applied
         and the resulting embeddings will be stored in cache
-        :param batch_size: data will be split into batches of batch_size and
-        encoder will be applied to these batches separately
-        :param verbose: enable/disable logging of caching process
         """
         raise NotImplementedError()
 

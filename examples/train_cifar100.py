@@ -70,8 +70,8 @@ class MobilenetV3Encoder(Encoder):
         return 256
 
     def get_collate_fn(self):
-        return lambda x: x
-
+        return lambda batch: ({'default': torch.stack([item.obj for item in batch])}, {'groups': [item.group for item in batch]})
+        
     def forward(self, images):
         return self.encoder.forward(images)
 
@@ -89,12 +89,17 @@ class Model(TrainableModel):
         return SoftmaxEmbeddingsHead(output_groups=self.num_classes, output_size_per_group=1, input_embedding_size=256)
 
     def configure_loss(self):
+        # TODO: Subclass `GroupLoss`` to implement Arcface
         return GroupLoss()
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.model.parameters(), lr=self.lr)
         return optimizer
 
+    def _common_step(self, batch, batch_idx, stage, **kwargs):
+        batch = batch['default']
+        return super()._common_step(batch, batch_idx, stage, **kwargs)
+        
 
 model = Model()
 train_dataloader = GroupSimilarityDataLoader(

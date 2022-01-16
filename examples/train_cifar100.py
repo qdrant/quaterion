@@ -6,11 +6,12 @@ import torch.nn as nn
 import torch.nn.functional as F
 import pytorch_lightning as pl
 from quaterion import (Quaterion, TrainableModel)
-from quaterion.loss.group_loss import GroupLoss
+from quaterion.loss.arcface_loss import ArcfaceLoss
+from quaterion.loss.softmax_loss import SoftmaxLoss
 from quaterion.dataset.similarity_data_loader import (
     SimilarityGroupSample, GroupSimilarityDataLoader)
 from quaterion_models.encoder import Encoder
-from quaterion_models.heads.softmax_head import SoftmaxEmbeddingsHead
+from quaterion_models.heads.empty_head import EmptyHead
 
 try:
     import torchvision
@@ -70,14 +71,14 @@ class MobilenetV3Encoder(Encoder):
         return 256
 
     def get_collate_fn(self):
-        return lambda batch: ({'default': torch.stack([item.obj for item in batch])}, {'groups': [item.group for item in batch]})
-        
+        return lambda batch: ({'default': torch.stack([item.obj for item in batch])}, {'groups': torch.LongTensor([item.group for item in batch])})
+
     def forward(self, images):
         return self.encoder.forward(images)
 
 
 class Model(TrainableModel):
-    def __init__(self, num_classes=100, lr=3e-5):
+    def __init__(self, num_classes=100, lr=1e-5):
         self.num_classes = num_classes
         self.lr = lr
         super().__init__()
@@ -86,25 +87,27 @@ class Model(TrainableModel):
         return MobilenetV3Encoder()
 
     def configure_head(self, input_embedding_size):
-        return SoftmaxEmbeddingsHead(output_groups=self.num_classes, output_size_per_group=1, input_embedding_size=256)
+        return EmptyHead(input_embedding_size)
 
     def configure_loss(self):
-        # TODO: Subclass `GroupLoss`` to implement Arcface
-        return GroupLoss()
+        return ArcfaceLoss(256, self.num_classes)
 
     def configure_optimizers(self):
-        optimizer = torch.optim.Adam(self.model.parameters(), lr=self.lr)
+        optimizer = torch.optim.Adam([
+            {'params': self.model.parameters(), 'lr': self.lr},
+            {'params': self.loss.parameters(), 'lr': self.lr * 10.}
+        ])
         return optimizer
 
     def _common_step(self, batch, batch_idx, stage, **kwargs):
         batch = batch['default']
         return super()._common_step(batch, batch_idx, stage, **kwargs)
-        
+
 
 model = Model()
 train_dataloader = GroupSimilarityDataLoader(
     CIFAR100Dataset(), batch_size=128, shuffle=True)
-trainer = pl.Trainer(gpus=1, num_nodes=1, max_epochs=30)
+trainer = pl.Trainer(gpus=1, num_nodes=1, max_epochs=15)
 
 Quaterion.fit(
     trainable_model=model,

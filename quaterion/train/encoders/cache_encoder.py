@@ -1,4 +1,4 @@
-from typing import Collection, Hashable
+from typing import Collection, Hashable, Any
 
 from torch import Tensor
 
@@ -11,6 +11,7 @@ class CacheEncoder(Encoder):
             raise ValueError("Trainable encoder can't be cached")
         super().__init__()
         self._encoder = encoder
+        self.cache_filled = False
 
     def trainable(self) -> bool:
         return False
@@ -21,6 +22,18 @@ class CacheEncoder(Encoder):
         """
         return self._encoder.embedding_size()
 
+    def cache_collate(self, batch: Collection[Any]) -> TensorInterchange:
+        """
+        Retrieve calculated embeddings if cache has been already filled,
+        otherwise calculate embeddings from scratch
+
+        :return: Ready for inference embeddings
+        """
+        if self.cache_filled:
+            return self._encoder.get_key_collate_fn()(batch)
+        else:
+            return self._encoder.get_collate_fn()(batch)
+
     def get_collate_fn(self) -> CollateFnType:
         """
         Provides function that converts raw data batch into suitable model
@@ -28,7 +41,7 @@ class CacheEncoder(Encoder):
 
         :return: Model input
         """
-        return self._encoder.get_collate_fn()
+        return self.cache_collate
 
     def forward(self, batch: TensorInterchange) -> Tensor:
         """

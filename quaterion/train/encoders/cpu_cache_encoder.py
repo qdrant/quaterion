@@ -1,4 +1,4 @@
-from typing import Hashable, Collection
+from typing import Tuple, Union
 
 import torch
 from torch import Tensor
@@ -20,35 +20,32 @@ class CpuCacheEncoder(CacheEncoder):
         :return: embeddings, shape: [batch_size x embedding_size]
         """
         device = next(self.parameters(), torch.Tensor(0)).device
-        return torch.stack([self.cache[hash(value)] for value in batch]).to(device)
-
-    def dummy_collate(
-        self, batch: Collection[Hashable]
-    ) -> Collection[Hashable]:
-        """
-        Collate function designed for proper cache usage
-
-        :param batch:
-        :return: Collection[Hashable]
-        """
-        return batch
+        return torch.stack([self.cache[value] for value in batch]).to(device)
 
     def get_collate_fn(self) -> CollateFnType:
-        return self.dummy_collate
+        """
+        Provides function that converts raw data batch into suitable model
+        input
 
-    def fill_cache(self, data: Collection[Hashable]) -> None:
+        :return: Model input
+        """
+        return self.cache_collate
+
+    def fill_cache(
+        self, data: Tuple[Union[str, int], TensorInterchange]
+    ) -> None:
         """
         Apply wrapped encoder to data and store it on cpu
 
         Data being split into batches of batch size to accelerate encoding
 
-        :param data:
+        :param data: keys for mapping and batch of data to be passed to encoder
         :return: None
         """
-        inner_collate_fn = self._encoder.get_collate_fn()
-        embeddings = self._encoder(inner_collate_fn(data)).to("cpu")
-        hashes = (hash(obj) for obj in data)
-        self.cache.update(dict(zip(hashes, embeddings)))
+        keys, batch = data
+        embeddings = self._encoder(batch).to("cpu")
+        self.cache.update(dict(zip(keys, embeddings)))
 
     def reset_cache(self) -> None:
         self.cache.clear()
+        self.cache_filled = False

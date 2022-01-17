@@ -188,20 +188,14 @@ class TrainableModel(pl.LightningModule):
             for sample in dataloader:
                 features, _ = sample
                 for name, encoder in encoders.items():
-                    batch = []
-                    for feature in features[name]:
-                        if not hasattr(feature, "__hash__"):
-                            raise ValueError(
-                                "Objects intended to be cached have to implement __hash__ method"
-                            )
-                        if hash(feature) not in encoder.cache:
-                            batch.append(feature)
-                    if batch:
-                        encoder.fill_cache(batch)
+                    encoder.fill_cache(features[name])
 
         cache_dataloader(train_dataloader, cache_encoders)
         val_dataloader = val_dataloader if val_dataloader is not None else []
         cache_dataloader(val_dataloader, cache_encoders)
+
+        for encoder_name in cache_encoders:
+            self.model.encoders[encoder_name].cache_filled = True
 
     def training_step(self, batch, batch_idx, **kwargs) -> torch.Tensor:
         stage = TrainStage.TRAIN

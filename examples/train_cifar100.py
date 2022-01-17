@@ -1,22 +1,23 @@
 import os
+from typing import Dict, Union
 
+import pytorch_lightning as pl
 import torch
-from torch.utils.data import (Dataset, DataLoader)
 import torch.nn as nn
 import torch.nn.functional as F
-import pytorch_lightning as pl
-from quaterion import (Quaterion, TrainableModel)
-from quaterion.loss.arcface_loss import ArcfaceLoss
-from quaterion.loss.softmax_loss import SoftmaxLoss
+from quaterion import Quaterion, TrainableModel
 from quaterion.dataset.similarity_data_loader import (
-    SimilarityGroupSample, GroupSimilarityDataLoader)
-from quaterion_models.encoder import Encoder
-from quaterion_models.heads.empty_head import EmptyHead
+    GroupSimilarityDataLoader, SimilarityGroupSample)
+from quaterion.loss.arcface_loss import ArcfaceLoss
+from quaterion.loss.similarity_loss import SimilarityLoss
+from quaterion_models.encoder import CollateFnType, Encoder
+from quaterion_models.heads.empty_head import EmptyHead, EncoderHead
+from torch.utils.data import DataLoader, Dataset
 
 try:
     import torchvision
-    import torchvision.transforms as transforms
     import torchvision.datasets as datasets
+    import torchvision.transforms as transforms
 except ImportError:
     import sys
     print("You need to install torchvision for this example")
@@ -24,7 +25,7 @@ except ImportError:
 
 
 class CIFAR100Dataset(Dataset):
-    def __init__(self, train=True):
+    def __init__(self, train: bool = True):
         super().__init__()
         self.mean = [0.4914, 0.4822, 0.4465]
         self.std = [0.2023, 0.1994, 0.2010]
@@ -48,69 +49,69 @@ class CIFAR100Dataset(Dataset):
         self.data = datasets.CIFAR100(
             root=self.path, train=train, download=True, transform=transform)
 
-    def __getitem__(self, index):
+    def __getitem__(self, index: int) -> SimilarityGroupSample:
         image, label = self.data[index]
         return SimilarityGroupSample(obj=image, group=label)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.data)
 
 
 class MobilenetV3Encoder(Encoder):
-    def __init__(self):
+    def __init__(self, embedding_size: int):
         super().__init__()
         self.encoder = torchvision.models.mobilenet_v3_small(pretrained=True)
         self.encoder.classifier = nn.Sequential(
-            nn.Linear(576, 256)
+            nn.Linear(576, embedding_size)
         )
 
-    def trainable(self):
+        self._embedding_size = embedding_size
+
+    def trainable(self) -> bool:
         return True
 
-    def embedding_size(self):
-        return 256
+    def embedding_size(self) -> int:
+        return self._embedding_size
 
-    def get_collate_fn(self):
-        return lambda batch: ({'default': torch.stack([item.obj for item in batch])}, {'groups': torch.LongTensor([item.group for item in batch])})
+    def get_collate_fn(self) -> CollateFnType:
+        return lambda batch: torch.stack(batch)
 
     def forward(self, images):
         return self.encoder.forward(images)
 
 
 class Model(TrainableModel):
-    def __init__(self, num_classes=100, lr=1e-5):
-        self.num_classes = num_classes
-        self.lr = lr
+    def __init__(self, embedding_size: int = 128, num_groups: int = 100, lr: float = 1e-5):
+        self._embedding_size = embedding_size
+        self._num_groups = num_groups
+        self._lr = lr
         super().__init__()
 
-    def configure_encoders(self):
-        return MobilenetV3Encoder()
+    def configure_encoders(self) -> Union[Encoder, Dict[str, Encoder]]:
+        return MobilenetV3Encoder(self._embedding_size)
 
-    def configure_head(self, input_embedding_size):
+    def configure_head(self, input_embedding_size) -> EncoderHead:
         return EmptyHead(input_embedding_size)
 
-    def configure_loss(self):
-        return ArcfaceLoss(256, self.num_classes)
+    def configure_loss(self) -> SimilarityLoss:
+        return ArcfaceLoss(self._embedding_size, self._num_groups)
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam([
-            {'params': self.model.parameters(), 'lr': self.lr},
-            {'params': self.loss.parameters(), 'lr': self.lr * 10.}
+            {'params': self.model.parameters(), 'lr': self._lr},
+            {'params': self.loss.parameters(), 'lr': self._lr * 10.}
         ])
         return optimizer
-
-    def _common_step(self, batch, batch_idx, stage, **kwargs):
-        batch = batch['default']
-        return super()._common_step(batch, batch_idx, stage, **kwargs)
 
 
 model = Model()
 train_dataloader = GroupSimilarityDataLoader(
-    CIFAR100Dataset(), batch_size=128, shuffle=True)
+    CIFAR100Dataset(train=True), batch_size=128, shuffle=True)
+
 trainer = pl.Trainer(gpus=1, num_nodes=1, max_epochs=15)
 
 Quaterion.fit(
     trainable_model=model,
     trainer=trainer,
-    train_dataloader=train_dataloader
+    train_dataloader=train_dataloader,
 )

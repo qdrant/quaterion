@@ -49,8 +49,6 @@ class Quaterion:
                     features_collate=trainable_model.model.get_collate_fn(),
                     labels_collate=train_dataloader.__class__.collate_fn,
                 )
-
-                train_dataloader.collate_fn = trainable_model.model.get_collate_fn()
             elif isinstance(trainable_model.loss, PairwiseLoss):
                 raise NotImplementedError(
                     "Pair samplers are not implemented yet. Try other loss/data loader"

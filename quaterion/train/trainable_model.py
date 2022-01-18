@@ -1,4 +1,4 @@
-from typing import Dict, Any, Union, Optional, Set
+from typing import Dict, Any, Union, Optional, Set, Callable, Hashable
 from loguru import logger
 
 import torch
@@ -7,8 +7,7 @@ import pytorch_lightning as pl
 from torch.utils.data import DataLoader
 from quaterion_models.encoder import Encoder
 from quaterion_models.heads.encoder_head import EncoderHead
-from quaterion_models.model import MetricModel
-
+from quaterion_models.model import MetricModel, DEFAULT_ENCODER_KEY
 from quaterion.train.encoders import (
     CacheConfig,
     CacheType,
@@ -79,7 +78,9 @@ class TrainableModel(pl.LightningModule):
                 )
 
         elif cache_config.cache_type:
-            encoders = self._wrap_encoder(encoders, cache_config.cache_type)
+            encoders = self._wrap_encoder(
+                encoders, cache_config.cache_type, DEFAULT_ENCODER_KEY
+            )
         else:
             raise ValueError(
                 "If cache is configured, cache_type or mapping have to be set"
@@ -108,11 +109,11 @@ class TrainableModel(pl.LightningModule):
         elif cache_type == CacheType.GPU:
             encoder = GpuCacheEncoder(encoder)
 
-        key_extractor = self.cache_config.key_extractors.get(
-            encoder_name
-        )
+        key_extractor: Optional[
+            Callable[[Any], Hashable]
+        ] = self.cache_config.key_extractors.get(encoder_name)
         if key_extractor:
-            encoder.configure_(key_extractor)
+            encoder.configure_key_extractor(key_extractor)
 
         return encoder
 

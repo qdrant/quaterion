@@ -27,6 +27,7 @@ except ImportError:
 class CIFAR100Dataset(Dataset):
     def __init__(self, train: bool = True):
         super().__init__()
+        # Mean and std values taken from https://github.com/LJY-HY/cifar_pytorch-lightning/blob/master/datasets/CIFAR.py#L43
         self.mean = [0.4914, 0.4822, 0.4465]
         self.std = [0.2023, 0.1994, 0.2010]
         self.path = os.path.join(os.path.expanduser(

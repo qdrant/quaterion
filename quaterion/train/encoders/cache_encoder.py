@@ -1,4 +1,4 @@
-from typing import Collection, Hashable, Any
+from typing import Collection, Hashable, Any, List, Callable, Union, Tuple
 
 from torch import Tensor
 
@@ -22,17 +22,41 @@ class CacheEncoder(Encoder):
         """
         return self._encoder.embedding_size()
 
-    def cache_collate(self, batch: Collection[Any]) -> TensorInterchange:
+    def key_extractor(self, obj: Any) -> Hashable:
         """
-        Retrieve calculated embeddings if cache has been already filled,
-        otherwise calculate embeddings from scratch
+        Generate hashable from batch object
+        :return: Key for cache
+        """
+        return hash(obj)
 
-        :return: Ready for inference embeddings
+    def key_collate_fn(self, batch: Collection[Any]) -> List[Hashable]:
         """
+        Convert batch of raw data into list of keys for cache
+        :return: List of keys for cache
+        """
+        return [self.key_extractor(value) for value in batch]
+
+    def configure_key_extractor(
+        self, key_extractor_fn: Callable[[Any], Hashable]
+    ) -> None:
+        """
+        Override default `key_extractor` implementation with provided one
+        """
+        setattr(self, "key_extractor", key_extractor_fn)
+
+    def cache_collate(
+        self, batch: Collection[Any]
+    ) -> Union[List[Hashable], Tuple[Hashable, TensorInterchange]]:
+        """
+        Converts raw data batch into suitable model input and keys for caching
+
+        :return: Tuple of keys and according model input
+        """
+        keys: List[Hashable] = self.key_collate_fn(batch)
         if self.cache_filled:
-            return self._encoder.get_key_collate_fn()(batch)
-        else:
-            return self._encoder.get_collate_fn()(batch)
+            return keys
+        values: TensorInterchange = self._encoder.get_collate_fn()(batch)
+        return keys, values
 
     def get_collate_fn(self) -> CollateFnType:
         """

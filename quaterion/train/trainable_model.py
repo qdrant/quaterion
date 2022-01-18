@@ -25,8 +25,8 @@ class TrainableModel(pl.LightningModule):
         super().__init__(*args, **kwargs)
 
         encoders = self.configure_encoders()
-        cache_config = self.configure_caches()
-        encoders = self._apply_cache_config(encoders, cache_config)
+        self.cache_config = self.configure_caches()
+        encoders = self._apply_cache_config(encoders, self.cache_config)
 
         head = self.configure_head(
             MetricModel.get_encoders_output_size(encoders)
@@ -39,7 +39,11 @@ class TrainableModel(pl.LightningModule):
         self,
         encoders: Union[Encoder, Dict[str, Encoder]],
         cache_config: Optional[CacheConfig],
-    ):
+    ) -> Union[Encoder, Dict[str, Encoder]]:
+        """
+        Applies received cache configuration for cached encoders, remain
+        non-cached encoders as is
+        """
         if not cache_config:
             return encoders
 
@@ -62,7 +66,7 @@ class TrainableModel(pl.LightningModule):
                         f"Can't configure cache for encoder {encoder_name}. "
                         "Encoder not found"
                     )
-                encoders[encoder_name] = self._wrap_encoder(
+                encoders[encoder_name]: CacheEncoder = self._wrap_encoder(
                     encoder, cache_type, encoder_name
                 )
                 possible_cache_encoders.remove(encoder_name)
@@ -103,6 +107,13 @@ class TrainableModel(pl.LightningModule):
             encoder = CpuCacheEncoder(encoder)
         elif cache_type == CacheType.GPU:
             encoder = GpuCacheEncoder(encoder)
+
+        key_extractor = self.cache_config.key_extractors.get(
+            encoder_name
+        )
+        if key_extractor:
+            encoder.configure_(key_extractor)
+
         return encoder
 
     @property
@@ -130,6 +141,31 @@ class TrainableModel(pl.LightningModule):
         """
         Use this method to define which encoders should cache calculated
         embeddings and what kind of cache they should use.
+
+        Examples:
+
+        >>> CacheConfig(CacheType.AUTO)
+        CacheConfig(cache_type=<CacheType.AUTO: 'auto'>, mapping={}, key_extractors={})
+
+        >>> cache_config = CacheConfig(
+...     mapping={"text_encoder": CacheType.GPU, "image_encoder": CacheType.CPU}
+... )
+        CacheConfig(
+            cache_type=None,
+            mapping={
+                'text_encoder': <CacheType.GPU: 'gpu'>,
+                'image_encoder': <CacheType.CPU: 'cpu'>
+            },
+            key_extractors={}
+        )
+        >>> CacheConfig(
+...     cache_type=CacheType.AUTO,
+...     key_extractors={"default": lambda obj: hash(obj)}
+... )
+        CacheConfig(
+            cache_type=CacheType.AUTO,
+            key_extractors={"default": lambda obj: hash(obj)}
+        )
 
         :return: CacheConfig
         """
@@ -194,6 +230,7 @@ class TrainableModel(pl.LightningModule):
         val_dataloader = val_dataloader if val_dataloader is not None else []
         cache_dataloader(val_dataloader, cache_encoders)
 
+        # Once cache is filled, collate functions return only keys for cache
         for encoder_name in cache_encoders:
             self.model.encoders[encoder_name].cache_filled = True
 

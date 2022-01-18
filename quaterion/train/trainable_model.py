@@ -1,31 +1,27 @@
-from typing import Dict, Any, Union, Optional, Set, Callable, Hashable
-from loguru import logger
+from typing import Dict, Any, Union, Optional
 
 import torch
 import pytorch_lightning as pl
 
-from torch.utils.data import DataLoader
 from quaterion_models.encoder import Encoder
 from quaterion_models.heads.encoder_head import EncoderHead
-from quaterion_models.model import MetricModel, DEFAULT_ENCODER_KEY
+from quaterion_models.model import MetricModel
 from quaterion.train.encoders import (
     CacheConfig,
     CacheType,
-    CpuCacheEncoder,
-    GpuCacheEncoder,
 )
-from quaterion.train.encoders.cache_encoder import CacheEncoder
 from quaterion.loss.similarity_loss import SimilarityLoss
 from quaterion.utils.enums import TrainStage
+from quaterion.train.cache_mixin import CacheMixin
 
 
-class TrainableModel(pl.LightningModule):
+class TrainableModel(pl.LightningModule, CacheMixin):
     def __init__(self, *args: Any, **kwargs: Any):
         super().__init__(*args, **kwargs)
 
         encoders = self.configure_encoders()
         self.cache_config = self.configure_caches()
-        encoders = self._apply_cache_config(encoders, self.cache_config)
+        encoders = self.apply_cache_config(encoders, self.cache_config)
 
         head = self.configure_head(
             MetricModel.get_encoders_output_size(encoders)
@@ -33,89 +29,6 @@ class TrainableModel(pl.LightningModule):
 
         self._model = MetricModel(encoders=encoders, head=head)
         self._loss = self.configure_loss()
-
-    def _apply_cache_config(
-        self,
-        encoders: Union[Encoder, Dict[str, Encoder]],
-        cache_config: Optional[CacheConfig],
-    ) -> Union[Encoder, Dict[str, Encoder]]:
-        """
-        Applies received cache configuration for cached encoders, remain
-        non-cached encoders as is
-        """
-        if not cache_config:
-            return encoders
-
-        if cache_config.mapping:
-            if cache_config.cache_type:
-                logger.warning(
-                    "CacheConfig.cache_type has no effect when mapping is set"
-                )
-
-            possible_cache_encoders: Set[str] = {
-                encoder_name
-                for encoder_name in encoders
-                if encoders[encoder_name].trainable()
-            }
-
-            for encoder_name, cache_type in cache_config.mapping.items():
-                encoder: Optional[Encoder] = encoders.get(encoder_name)
-                if not encoder:
-                    raise KeyError(
-                        f"Can't configure cache for encoder {encoder_name}. "
-                        "Encoder not found"
-                    )
-                encoders[encoder_name]: CacheEncoder = self._wrap_encoder(
-                    encoder, cache_type, encoder_name
-                )
-                possible_cache_encoders.remove(encoder_name)
-
-            not_cached_encoders = ", ".join(possible_cache_encoders)
-            if not_cached_encoders:
-                logger.info(
-                    f"{not_cached_encoders} haven't been cached, "
-                    "but could be as non-trainable encoders"
-                )
-
-        elif cache_config.cache_type:
-            encoders = self._wrap_encoder(
-                encoders, cache_config.cache_type, DEFAULT_ENCODER_KEY
-            )
-        else:
-            raise ValueError(
-                "If cache is configured, cache_type or mapping have to be set"
-            )
-
-        return encoders
-
-    def _wrap_encoder(
-        self, encoder: Encoder, cache_type: CacheType, encoder_name: str = ""
-    ) -> Encoder:
-        if encoder.trainable():
-            raise ValueError(
-                f"Can't configure cache for encoder {encoder_name}. "
-                "Encoder must be frozen to cache it"
-            )
-
-        if cache_type == CacheType.AUTO:
-            cache_wrapper = (
-                GpuCacheEncoder
-                if torch.cuda.is_available()
-                else CpuCacheEncoder
-            )
-            encoder = cache_wrapper(encoder)
-        elif cache_type == CacheType.CPU:
-            encoder = CpuCacheEncoder(encoder)
-        elif cache_type == CacheType.GPU:
-            encoder = GpuCacheEncoder(encoder)
-
-        key_extractor: Optional[
-            Callable[[Any], Hashable]
-        ] = self.cache_config.key_extractors.get(encoder_name)
-        if key_extractor:
-            encoder.configure_key_extractor(key_extractor)
-
-        return encoder
 
     @property
     def model(self) -> MetricModel:
@@ -199,41 +112,6 @@ class TrainableModel(pl.LightningModule):
         :return: None
         """
         pass
-
-    def cache(
-        self,
-        train_dataloader: DataLoader,
-        val_dataloader: Optional[DataLoader],
-    ) -> None:
-        """
-        Fill cache for each CacheEncoder
-
-        :param train_dataloader:
-        :param val_dataloader:
-        :return: None
-        """
-        cache_encoders = {
-            name: encoder
-            for name, encoder in self.model.encoders.items()
-            if isinstance(encoder, CacheEncoder)
-        }
-
-        if not cache_encoders:
-            return
-
-        def cache_dataloader(dataloader, encoders):
-            for sample in dataloader:
-                features, _ = sample
-                for name, encoder in encoders.items():
-                    encoder.fill_cache(features[name])
-
-        cache_dataloader(train_dataloader, cache_encoders)
-        val_dataloader = val_dataloader if val_dataloader is not None else []
-        cache_dataloader(val_dataloader, cache_encoders)
-
-        # Once cache is filled, collate functions return only keys for cache
-        for encoder_name in cache_encoders:
-            self.model.encoders[encoder_name].cache_filled = True
 
     def training_step(self, batch, batch_idx, **kwargs) -> torch.Tensor:
         stage = TrainStage.TRAIN

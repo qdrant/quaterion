@@ -16,7 +16,10 @@ from quaterion.train.trainable_model import TrainableModel
 class Quaterion:
     @classmethod
     def combiner_collate_fn(
-        cls, batch: List[Any], features_collate: Callable, labels_collate: Callable
+        cls,
+        batch: List[Any],
+        features_collate: Callable,
+        labels_collate: Callable,
     ):
         features, labels = labels_collate(batch)
         return features_collate(features), labels
@@ -56,6 +59,10 @@ class Quaterion:
 
         if val_dataloader is not None:
             val_dataloader.collate_fn = train_dataloader.collate_fn
+
+        trainable_model.cache(
+            trainable_model.model.encoders, train_dataloader, val_dataloader
+        )
 
         trainer.fit(
             model=trainable_model,

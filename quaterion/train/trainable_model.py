@@ -1,21 +1,31 @@
 from typing import Dict, Any, Union, Optional
 
-import pytorch_lightning as pl
 import torch
+import pytorch_lightning as pl
+
 from quaterion_models.encoder import Encoder
 from quaterion_models.heads.encoder_head import EncoderHead
 from quaterion_models.model import MetricModel
-
+from quaterion.train.encoders import (
+    CacheConfig,
+    CacheType,
+)
 from quaterion.loss.similarity_loss import SimilarityLoss
 from quaterion.utils.enums import TrainStage
+from quaterion.train.cache_mixin import CacheMixin
 
 
-class TrainableModel(pl.LightningModule):
+class TrainableModel(pl.LightningModule, CacheMixin):
     def __init__(self, *args: Any, **kwargs: Any):
         super().__init__(*args, **kwargs)
 
         encoders = self.configure_encoders()
-        head = self.configure_head(MetricModel.get_encoders_output_size(encoders))
+        self.cache_config = self.configure_caches()
+        encoders = self.apply_cache_config(encoders, self.cache_config)
+
+        head = self.configure_head(
+            MetricModel.get_encoders_output_size(encoders)
+        )
 
         self._model = MetricModel(encoders=encoders, head=head)
         self._loss = self.configure_loss()
@@ -40,6 +50,45 @@ class TrainableModel(pl.LightningModule):
         :return: Instance of the `Encoder` or dict of instances
         """
         raise NotImplementedError()
+
+    def configure_caches(self) -> Optional[CacheConfig]:
+        """
+        Use this method to define which encoders should cache calculated
+        embeddings and what kind of cache they should use.
+
+        Examples:
+
+        >>> CacheConfig(CacheType.AUTO)
+        CacheConfig(
+            cache_type=<CacheType.AUTO: 'auto'>,
+            mapping={},
+            key_extractors={}
+        )
+
+        >>> cache_config = CacheConfig(
+...     mapping={"text_encoder": CacheType.GPU, "image_encoder": CacheType.CPU}
+... )
+        CacheConfig(
+            cache_type=None,
+            mapping={
+                'text_encoder': <CacheType.GPU: 'gpu'>,
+                'image_encoder': <CacheType.CPU: 'cpu'>
+            },
+            key_extractors={}
+        )
+        >>> CacheConfig(
+...     cache_type=CacheType.AUTO,
+...     key_extractors={"default": lambda obj: hash(obj)}
+... )
+        CacheConfig(
+            cache_type=<CacheType.AUTO: 'auto'>,
+            mapping={},
+            key_extractors={'default': <function <lambda> at 0x106bc90e0>}
+        )
+
+        :return: CacheConfig
+        """
+        pass
 
     def configure_head(self, input_embedding_size: int) -> EncoderHead:
         """
@@ -76,13 +125,21 @@ class TrainableModel(pl.LightningModule):
         )
         return loss
 
-    def validation_step(self, batch, batch_idx, **kwargs) -> Optional[torch.Tensor]:
+    def validation_step(
+        self, batch, batch_idx, **kwargs
+    ) -> Optional[torch.Tensor]:
         stage = TrainStage.VALIDATION
-        self._common_step(batch=batch, batch_idx=batch_idx, stage=stage, **kwargs)
+        self._common_step(
+            batch=batch, batch_idx=batch_idx, stage=stage, **kwargs
+        )
+        return None
 
     def test_step(self, batch, batch_idx, **kwargs) -> Optional[torch.Tensor]:
         stage = TrainStage.TEST
-        self._common_step(batch=batch, batch_idx=batch_idx, stage=stage, **kwargs)
+        self._common_step(
+            batch=batch, batch_idx=batch_idx, stage=stage, **kwargs
+        )
+        return None
 
     def _common_step(self, batch, batch_idx, stage: TrainStage, **kwargs):
         features, targets = batch

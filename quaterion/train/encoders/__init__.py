@@ -1,12 +1,10 @@
 from .cache_encoder import CacheEncoder
-from .cpu_cache_encoder import CpuCacheEncoder
-from .gpu_cache_encoder import GpuCacheEncoder
+from .in_memory_cache_encoder import InMemoryCacheEncoder
 from .cache_config import CacheConfig, CacheType
 
 __all__ = [
-    "CacheEncoder",
-    "CpuCacheEncoder",
-    "GpuCacheEncoder",
     "CacheConfig",
-    "CacheType"
+    "CacheType",
+    "CacheEncoder",
+    "InMemoryCacheEncoder",
 ]

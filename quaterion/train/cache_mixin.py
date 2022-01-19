@@ -1,8 +1,8 @@
 from typing import Union, Dict, Optional, Set, Any, Callable, Hashable
 
-import torch
-from torch.utils.data import DataLoader
+import torch.cuda
 from loguru import logger
+from torch.utils.data import DataLoader
 from quaterion_models.encoder import Encoder
 from quaterion_models.model import DEFAULT_ENCODER_KEY
 
@@ -10,8 +10,7 @@ from quaterion.train.encoders import (
     CacheConfig,
     CacheEncoder,
     CacheType,
-    GpuCacheEncoder,
-    CpuCacheEncoder,
+    InMemoryCacheEncoder,
 )
 
 
@@ -38,7 +37,7 @@ class CacheMixin:
             possible_cache_encoders: Set[str] = {
                 encoder_name
                 for encoder_name in encoders
-                if encoders[encoder_name].trainable()
+                if not encoders[encoder_name].trainable()
             }
 
             for encoder_name, cache_type in cache_config.mapping.items():
@@ -48,6 +47,7 @@ class CacheMixin:
                         f"Can't configure cache for encoder {encoder_name}. "
                         "Encoder not found"
                     )
+                cls._check_cuda(cache_type, encoder_name)
                 key_extractor: Optional[
                     Callable[[Any], Hashable]
                 ] = cache_config.key_extractors.get(encoder_name)
@@ -66,14 +66,12 @@ class CacheMixin:
                 )
 
         elif cache_config.cache_type:
-            key_extractor = cache_config.key_extractors.get(
-                DEFAULT_ENCODER_KEY
-            )
+            encoder_name = DEFAULT_ENCODER_KEY
+
+            cls._check_cuda(cache_config.cache_type, encoder_name)
+            key_extractor = cache_config.key_extractors.get(encoder_name)
             encoders = cls.wrap_encoder(
-                encoders,
-                cache_config.cache_type,
-                key_extractor,
-                DEFAULT_ENCODER_KEY,
+                encoders, cache_config.cache_type, key_extractor, encoder_name,
             )
         else:
             raise ValueError(
@@ -81,6 +79,14 @@ class CacheMixin:
             )
 
         return encoders
+
+    @staticmethod
+    def _check_cuda(cache_type, encoder_name):
+        if cache_type == CacheType.GPU and not torch.cuda.is_available():
+            raise ValueError(
+                f"`CacheType.GPU` has been chosen for `{encoder_name}` "
+                "encoder, but cuda is not available"
+            )
 
     @staticmethod
     def wrap_encoder(
@@ -95,17 +101,7 @@ class CacheMixin:
                 "Encoder must be frozen to cache it"
             )
 
-        if cache_type == CacheType.AUTO:
-            cache_wrapper = (
-                GpuCacheEncoder
-                if torch.cuda.is_available()
-                else CpuCacheEncoder
-            )
-            encoder = cache_wrapper(encoder)
-        elif cache_type == CacheType.CPU:
-            encoder = CpuCacheEncoder(encoder)
-        elif cache_type == CacheType.GPU:
-            encoder = GpuCacheEncoder(encoder)
+        encoder = InMemoryCacheEncoder(encoder, cache_type)
 
         if key_extractor:
             encoder.configure_key_extractor(key_extractor)

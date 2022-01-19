@@ -20,7 +20,9 @@ class ArcfaceLoss(GroupLoss):
     Additive Angular Margin Loss as defined in https://arxiv.org/abs/1801.07698
     """
 
-    def __init__(self, embedding_size: int, num_groups: int, s: float = 64., m: float = 0.5):
+    def __init__(
+        self, embedding_size: int, num_groups: int, s: float = 64.0, m: float = 0.5
+    ):
         """
         :param embedding_size: Output dimension of the encoder.
         :param num_groups: Number of groups in the dataset.
@@ -30,8 +32,7 @@ class ArcfaceLoss(GroupLoss):
         """
         super(GroupLoss, self).__init__()
 
-        self.kernel = nn.Parameter(
-            torch.FloatTensor(embedding_size, num_groups))
+        self.kernel = nn.Parameter(torch.FloatTensor(embedding_size, num_groups))
         nn.init.normal_(self.kernel, std=0.01)
         self.s = s
         self.m = m
@@ -54,8 +55,9 @@ class ArcfaceLoss(GroupLoss):
         index = torch.where(groups != -1)[0]
 
         # Shape: (batch_size, num_groups)
-        m_hot = torch.zeros(index.size()[0], cos_theta.size()[
-                            1], device=cos_theta.device)
+        m_hot = torch.zeros(
+            index.size()[0], cos_theta.size()[1], device=cos_theta.device
+        )
         m_hot.scatter_(1, groups[index, None], self.m)
         cos_theta.acos_()
         cos_theta[index] += m_hot

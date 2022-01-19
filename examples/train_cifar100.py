@@ -7,7 +7,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 from quaterion import Quaterion, TrainableModel
 from quaterion.dataset.similarity_data_loader import (
-    GroupSimilarityDataLoader, SimilarityGroupSample)
+    GroupSimilarityDataLoader,
+    SimilarityGroupSample,
+)
 from quaterion.loss.arcface_loss import ArcfaceLoss
 from quaterion.loss.similarity_loss import SimilarityLoss
 from quaterion_models.encoder import CollateFnType, Encoder
@@ -20,6 +22,7 @@ try:
     import torchvision.transforms as transforms
 except ImportError:
     import sys
+
     print("You need to install torchvision for this example")
     sys.exit(1)
 
@@ -30,25 +33,26 @@ class CIFAR100Dataset(Dataset):
         # Mean and std values taken from https://github.com/LJY-HY/cifar_pytorch-lightning/blob/master/datasets/CIFAR.py#L43
         self.mean = [0.4914, 0.4822, 0.4465]
         self.std = [0.2023, 0.1994, 0.2010]
-        self.path = os.path.join(os.path.expanduser(
-            '~'), 'torchvision', 'datasets')
+        self.path = os.path.join(os.path.expanduser("~"), "torchvision", "datasets")
 
         if train:
-            transform = transforms.Compose([
-                transforms.RandomCrop(32, padding=4),
-                transforms.RandomHorizontalFlip(),
-                transforms.ToTensor(),
-                transforms.Normalize(self.mean, self.std)
-            ])
+            transform = transforms.Compose(
+                [
+                    transforms.RandomCrop(32, padding=4),
+                    transforms.RandomHorizontalFlip(),
+                    transforms.ToTensor(),
+                    transforms.Normalize(self.mean, self.std),
+                ]
+            )
 
         else:
-            transform = transforms.Compose([
-                transforms.ToTensor(),
-                transforms.Normalize(self.mean, self.std)
-            ])
+            transform = transforms.Compose(
+                [transforms.ToTensor(), transforms.Normalize(self.mean, self.std)]
+            )
 
         self.data = datasets.CIFAR100(
-            root=self.path, train=train, download=True, transform=transform)
+            root=self.path, train=train, download=True, transform=transform
+        )
 
     def __getitem__(self, index: int) -> SimilarityGroupSample:
         image, label = self.data[index]
@@ -62,9 +66,7 @@ class MobilenetV3Encoder(Encoder):
     def __init__(self, embedding_size: int):
         super().__init__()
         self.encoder = torchvision.models.mobilenet_v3_small(pretrained=True)
-        self.encoder.classifier = nn.Sequential(
-            nn.Linear(576, embedding_size)
-        )
+        self.encoder.classifier = nn.Sequential(nn.Linear(576, embedding_size))
 
         self._embedding_size = embedding_size
 
@@ -82,7 +84,9 @@ class MobilenetV3Encoder(Encoder):
 
 
 class Model(TrainableModel):
-    def __init__(self, embedding_size: int = 128, num_groups: int = 100, lr: float = 1e-5):
+    def __init__(
+        self, embedding_size: int = 128, num_groups: int = 100, lr: float = 1e-5
+    ):
         self._embedding_size = embedding_size
         self._num_groups = num_groups
         self._lr = lr
@@ -98,16 +102,19 @@ class Model(TrainableModel):
         return ArcfaceLoss(self._embedding_size, self._num_groups)
 
     def configure_optimizers(self):
-        optimizer = torch.optim.Adam([
-            {'params': self.model.parameters(), 'lr': self._lr},
-            {'params': self.loss.parameters(), 'lr': self._lr * 10.}
-        ])
+        optimizer = torch.optim.Adam(
+            [
+                {"params": self.model.parameters(), "lr": self._lr},
+                {"params": self.loss.parameters(), "lr": self._lr * 10.0},
+            ]
+        )
         return optimizer
 
 
 model = Model()
 train_dataloader = GroupSimilarityDataLoader(
-    CIFAR100Dataset(train=True), batch_size=128, shuffle=True)
+    CIFAR100Dataset(train=True), batch_size=128, shuffle=True
+)
 
 trainer = pl.Trainer(gpus=1, num_nodes=1, max_epochs=15)
 

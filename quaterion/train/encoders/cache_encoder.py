@@ -30,7 +30,7 @@ class CacheEncoder(Encoder):
         return (
             hash(obj)
             if not isinstance(obj, dict)
-            else hash(tuple(obj.items()))
+            else hash(tuple(sorted(obj.items())))
         )
 
     def key_collate_fn(self, batch: Collection[Any]) -> List[Hashable]:

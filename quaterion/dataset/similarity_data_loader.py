@@ -26,9 +26,10 @@ class SimilarityPairSample:
         ]
         ```
     """
+
     obj_a: Any
     obj_b: Any
-    score: float
+    score: float = 0.0
     # Consider all examples outside this group as negative samples.
     # By default, all samples belong to group 0 - therefore other samples could
     # not be used as negative examples.
@@ -57,6 +58,7 @@ class SimilarityGroupSample:
         leonard_nimoy_2.jpg,209
         ```
     """
+
     obj: Any
     group: int
 
@@ -64,12 +66,13 @@ class SimilarityGroupSample:
 class PairsSimilarityDataLoader(DataLoader[SimilarityPairSample]):
     @classmethod
     def collate_fn(cls, batch: List[SimilarityPairSample]):
-        features = [record.obj_a for record in batch] \
-                   + [record.obj_b for record in batch]
+        features = [record.obj_a for record in batch] + [
+            record.obj_b for record in batch
+        ]
         labels = {
             "pairs": torch.LongTensor([[i, i + len(batch)] for i in range(len(batch))]),
             "labels": torch.Tensor([record.score for record in batch]),
-            "subgroups": torch.Tensor([record.subgroup for record in batch] * 2)
+            "subgroups": torch.Tensor([record.subgroup for record in batch] * 2),
         }
         return features, labels
 
@@ -78,7 +81,5 @@ class GroupSimilarityDataLoader(DataLoader[SimilarityGroupSample]):
     @classmethod
     def collate_fn(cls, batch: List[SimilarityGroupSample]):
         features = [record.obj for record in batch]
-        labels = {
-            "groups": torch.LongTensor([record.group for record in batch])
-        }
+        labels = {"groups": torch.LongTensor([record.group for record in batch])}
         return features, labels

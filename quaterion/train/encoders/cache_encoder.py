@@ -27,7 +27,11 @@ class CacheEncoder(Encoder):
         Generate hashable from batch object
         :return: Key for cache
         """
-        return hash(obj)
+        return (
+            hash(obj)
+            if not isinstance(obj, dict)
+            else hash(tuple(obj.items()))
+        )
 
     def key_collate_fn(self, batch: Collection[Any]) -> List[Hashable]:
         """

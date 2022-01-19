@@ -59,7 +59,11 @@ class TrainableModel(pl.LightningModule, CacheMixin):
         Examples:
 
         >>> CacheConfig(CacheType.AUTO)
-        CacheConfig(cache_type=<CacheType.AUTO: 'auto'>, mapping={}, key_extractors={})
+        CacheConfig(
+            cache_type=<CacheType.AUTO: 'auto'>,
+            mapping={},
+            key_extractors={}
+        )
 
         >>> cache_config = CacheConfig(
 ...     mapping={"text_encoder": CacheType.GPU, "image_encoder": CacheType.CPU}
@@ -77,8 +81,9 @@ class TrainableModel(pl.LightningModule, CacheMixin):
 ...     key_extractors={"default": lambda obj: hash(obj)}
 ... )
         CacheConfig(
-            cache_type=CacheType.AUTO,
-            key_extractors={"default": lambda obj: hash(obj)}
+            cache_type=<CacheType.AUTO: 'auto'>,
+            mapping={},
+            key_extractors={'default': <function <lambda> at 0x106bc90e0>}
         )
 
         :return: CacheConfig

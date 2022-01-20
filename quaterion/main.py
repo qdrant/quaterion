@@ -4,12 +4,11 @@ from typing import Optional, Callable, List, Any
 import pytorch_lightning as pl
 from torch.utils.data import DataLoader
 
-from quaterion.dataset.similarity_data_loader import (
+from quaterion.dataset import (
     PairsSimilarityDataLoader,
     GroupSimilarityDataLoader,
 )
-from quaterion.loss.group_loss import GroupLoss
-from quaterion.loss.pairwise_loss import PairwiseLoss
+from quaterion.loss import GroupLoss, PairwiseLoss
 from quaterion.train.trainable_model import TrainableModel
 
 

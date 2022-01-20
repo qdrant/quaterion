@@ -6,14 +6,11 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from quaterion import Quaterion, TrainableModel
-from quaterion.dataset.similarity_data_loader import (
-    GroupSimilarityDataLoader,
-    SimilarityGroupSample,
-)
-from quaterion.loss.arcface_loss import ArcfaceLoss
-from quaterion.loss.similarity_loss import SimilarityLoss
-from quaterion_models.encoder import CollateFnType, Encoder
-from quaterion_models.heads.empty_head import EmptyHead, EncoderHead
+from quaterion.dataset import GroupSimilarityDataLoader, SimilarityGroupSample
+from quaterion.loss import ArcfaceLoss, SimilarityLoss
+from quaterion_models.encoders import Encoder
+from quaterion_models.heads import EmptyHead, EncoderHead
+from quaterion_models.types import CollateFnType
 from torch.utils.data import DataLoader, Dataset
 
 try:

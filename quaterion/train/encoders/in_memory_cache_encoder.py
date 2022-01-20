@@ -2,7 +2,8 @@ from typing import Tuple, Union
 
 import torch
 from torch import Tensor
-from quaterion_models.encoder import Encoder, TensorInterchange, CollateFnType
+from quaterion_models.encoder import Encoder
+from quaterion_models.types import TensorInterchange, CollateFnType
 
 from quaterion.train.encoders.cache_config import CacheType
 from quaterion.train.encoders.cache_encoder import CacheEncoder
@@ -17,9 +18,7 @@ class InMemoryCacheEncoder(CacheEncoder):
     @staticmethod
     def resolve_cache_type(cache_type: CacheType) -> CacheType:
         if cache_type == CacheType.AUTO:
-            cache_type = (
-                CacheType.GPU if torch.cuda.is_available() else CacheType.CPU
-            )
+            cache_type = CacheType.GPU if torch.cuda.is_available() else CacheType.CPU
         return cache_type
 
     @property
@@ -33,9 +32,7 @@ class InMemoryCacheEncoder(CacheEncoder):
         :param batch: processed batch
         :return: embeddings, shape: [batch_size x embedding_size]
         """
-        embeddings = torch.stack(
-                [self.cache[value] for value in batch]
-            )
+        embeddings = torch.stack([self.cache[value] for value in batch])
         if self.cache_type == CacheType.CPU:
             device = next(self.parameters(), torch.Tensor(0)).device
             embeddings = embeddings.to(device)
@@ -50,9 +47,7 @@ class InMemoryCacheEncoder(CacheEncoder):
         """
         return self.cache_collate
 
-    def fill_cache(
-        self, data: Tuple[Union[str, int], TensorInterchange]
-    ) -> None:
+    def fill_cache(self, data: Tuple[Union[str, int], TensorInterchange]) -> None:
         """
         Apply wrapped encoder to data and store it on corresponding device
 
@@ -62,7 +57,7 @@ class InMemoryCacheEncoder(CacheEncoder):
         keys, batch = data
         embeddings = self._encoder(batch)
         if self.cache_type == CacheType.CPU:
-            embeddings = embeddings.to('cpu')
+            embeddings = embeddings.to("cpu")
         self.cache.update(dict(zip(keys, embeddings)))
 
     def reset_cache(self) -> None:

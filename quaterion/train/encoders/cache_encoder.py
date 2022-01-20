@@ -2,7 +2,8 @@ from typing import Collection, Hashable, Any, List, Callable, Union, Tuple
 
 from torch import Tensor
 
-from quaterion_models.encoder import Encoder, CollateFnType, TensorInterchange
+from quaterion_models.encoders import Encoder
+from quaterion_models.types import CollateFnType, TensorInterchange
 
 
 class CacheEncoder(Encoder):
@@ -28,9 +29,7 @@ class CacheEncoder(Encoder):
         :return: Key for cache
         """
         return (
-            hash(obj)
-            if not isinstance(obj, dict)
-            else hash(tuple(sorted(obj.items())))
+            hash(obj) if not isinstance(obj, dict) else hash(tuple(sorted(obj.items())))
         )
 
     def key_collate_fn(self, batch: Collection[Any]) -> List[Hashable]:
@@ -94,14 +93,15 @@ class CacheEncoder(Encoder):
         """
         CachedEncoder classes wrap already instantiated encoders and don't
         provide loading support.
-        
+
         :param input_path:
         :return:
         """
         raise ValueError("Cached encoder does not support loading")
 
     def fill_cache(
-        self, data: Collection[Hashable],
+        self,
+        data: Collection[Hashable],
     ):
         """
         Applies encoder to data and store results in cache

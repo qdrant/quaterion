@@ -21,4 +21,4 @@ class SiameseDistanceMetric:
 
     @staticmethod
     def dot_product_distance(x: Tensor, y: Tensor) -> Tensor:
-        return - torch.einsum('id,jd->j', x, y)
+        return -torch.einsum("id,jd->j", x, y)

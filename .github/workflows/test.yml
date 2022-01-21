@@ -22,7 +22,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip poetry
-          poetry install -E d
+          poetry install -E
 
       - name: Unit tests
         run: |

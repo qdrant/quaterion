@@ -26,4 +26,4 @@ jobs:
 
       - name: Unit tests
         run: |
-          pytest --cov=.
+          poetry run pytest

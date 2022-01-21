@@ -450,25 +450,18 @@ python-versions = ">=3.6"
 
 [[package]]
 name = "quaterion-models"
-version = "0.1.0"
+version = "0.1.1"
 description = "The collection of building blocks building fine-tunable metric learning models"
 category = "main"
 optional = false
 python-versions = ">=3.7,<3.10"
-develop = false
 
 [package.dependencies]
-numpy = "^1.21.2"
+numpy = ">=1.21.2,<2.0.0"
 torch = ">=1.8.2"
 
 [package.extras]
 fasttext = ["gensim (>=4.1.2,<5.0.0)"]
-
-[package.source]
-type = "git"
-url = "https://${GITHUB_TOKEN}@github.com/qdrant/quaterion-models.git"
-reference = "master"
-resolved_reference = "4a66c6fd5be07e34232a1f4f3daa63129d59bcfd"
 
 [[package]]
 name = "requests"
@@ -689,7 +682,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7,<3.10"
-content-hash = "305d9f2abab83c85ff22955551465fbaec84c1a46610a9b14f39c0a14205c958"
+content-hash = "aa010794ece5fa87208d7316173c7543104d63efb2de2e59120897593a2df73d"
 
 [metadata.files]
 absl-py = [
@@ -1179,7 +1172,10 @@ pyyaml = [
     {file = "PyYAML-6.0-cp39-cp39-win_amd64.whl", hash = "sha256:b3d267842bf12586ba6c734f89d1f5b871df0273157918b0ccefa29deb05c21c"},
     {file = "PyYAML-6.0.tar.gz", hash = "sha256:68fb519c14306fec9720a2a5b45bc9f0c8d1b9c72adf45c37baedfcd949c35a2"},
 ]
-quaterion-models = []
+quaterion-models = [
+    {file = "quaterion-models-0.1.1.tar.gz", hash = "sha256:6592a64f83d5fc549e473d1b3b19e8d7f8aad4c26fdf92fed3b50a2ea15443c1"},
+    {file = "quaterion_models-0.1.1-py3-none-any.whl", hash = "sha256:da781d8af63929ffd6566eb275391c0f09d43edafedcc67c246f85e97eb6c400"},
+]
 requests = [
     {file = "requests-2.27.1-py2.py3-none-any.whl", hash = "sha256:f22fa1e554c9ddfd16e6e41ac79759e17be9e492b3587efa038054674760e72d"},
     {file = "requests-2.27.1.tar.gz", hash = "sha256:68d7c56fd5a8999887728ef304a6d12edc7be74f1cfa47714fc8b414525c9a61"},

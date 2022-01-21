@@ -3,7 +3,7 @@ from typing import Union, Dict, Optional, Set, Any, Callable, Hashable
 import torch.cuda
 from loguru import logger
 from torch.utils.data import DataLoader
-from quaterion_models.encoder import Encoder
+from quaterion_models.encoders import Encoder
 from quaterion_models.model import DEFAULT_ENCODER_KEY
 
 from quaterion.train.encoders import (
@@ -110,9 +110,7 @@ class CacheMixin:
 
     @staticmethod
     def cache(
-        encoders,
-        train_dataloader: DataLoader,
-        val_dataloader: Optional[DataLoader],
+        encoders, train_dataloader: DataLoader, val_dataloader: Optional[DataLoader],
     ) -> None:
         """
         Fill cache for each CacheEncoder

@@ -2,7 +2,7 @@ from typing import Tuple, Union
 
 import torch
 from torch import Tensor
-from quaterion_models.encoder import Encoder
+from quaterion_models.encoders import Encoder
 from quaterion_models.types import TensorInterchange, CollateFnType
 
 from quaterion.train.encoders.cache_config import CacheType

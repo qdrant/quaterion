@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "quaterion"
-version = "0.1.0"
+version = "0.1.1"
 description = "Metric Learning fine-tuning framework"
 authors = ["generall <andrey@vasnetsov.com>"]
 packages = [
@@ -16,7 +16,7 @@ keywords = ["framework", "metric-learning", "similarity", "deep-learning", "pyto
 python = ">=3.7,<3.10"
 torch = ">=1.8.2"
 pytorch-lightning = "^1.5.8"
-quaterion-models = { git = "git@github.com:qdrant/quaterion-models.git", branch = "master" }
+quaterion-models = "0.1.1"
 loguru = "^0.5.3"
 
 [tool.poetry.dev-dependencies]

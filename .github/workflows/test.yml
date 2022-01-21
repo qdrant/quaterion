@@ -26,4 +26,5 @@ jobs:
 
       - name: Unit tests
         run: |
+          poetry add setuptools="59.5.0"
           poetry run pytest

@@ -13,6 +13,4 @@ class CacheType(str, Enum):
 class CacheConfig:
     cache_type: Optional[CacheType] = None
     mapping: Dict[str, CacheType] = field(default_factory=dict)
-    key_extractors: Dict[str, Callable[[Any], Hashable]] = field(
-        default_factory=dict
-    )
+    key_extractors: Dict[str, Callable[[Any], Hashable]] = field(default_factory=dict)

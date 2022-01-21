@@ -25,10 +25,12 @@ class ContrastiveLoss(PairwiseLoss):
     def metric_class(cls) -> Type:
         return SiameseDistanceMetric
 
-    def __init__(self,
-                 distance_metric_name: str = "cosine_distance",
-                 margin: float = 1.0,
-                 size_average: bool = True):
+    def __init__(
+        self,
+        distance_metric_name: str = "cosine_distance",
+        margin: float = 1.0,
+        size_average: bool = True,
+    ):
         super(ContrastiveLoss, self).__init__(distance_metric_name=distance_metric_name)
         self.margin = margin
         self.size_average = size_average
@@ -36,8 +38,8 @@ class ContrastiveLoss(PairwiseLoss):
     def get_config_dict(self):
         return {
             **super().get_config_dict(),
-            'margin': self.margin,
-            'size_average': self.size_average
+            "margin": self.margin,
+            "size_average": self.size_average,
         }
 
     def forward(self, embeddings: Tensor, pairs: LongTensor, labels: Tensor, **kwargs):
@@ -45,5 +47,7 @@ class ContrastiveLoss(PairwiseLoss):
         rep_other = embeddings[pairs[:, 1]]
         distances = self.distance_metric(rep_anchor, rep_other)
         losses = 0.5 * (
-                labels.float() * distances.pow(2) + (1 - labels).float() * relu(self.margin - distances).pow(2))
+            labels.float() * distances.pow(2)
+            + (1 - labels).float() * relu(self.margin - distances).pow(2)
+        )
         return losses.mean() if self.size_average else losses.sum()

@@ -148,7 +148,7 @@ class CacheMixin:
                 pin_memory=dataloader.pin_memory,
                 timeout=dataloader.timeout,
                 worker_init_fn=dataloader.worker_init_fn,
-                prefetch_factor=dataloader.prefetch_factor
+                prefetch_factor=dataloader.prefetch_factor,
             )
             for sample in cache_dl:
                 features, _ = sample

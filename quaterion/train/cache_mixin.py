@@ -129,6 +129,7 @@ class CacheMixin:
         encoders,
         train_dataloader: DataLoader,
         val_dataloader: Optional[DataLoader],
+        cache_config: CacheConfig,
     ) -> None:
         """
         Fill cache for each CacheEncoder
@@ -136,6 +137,7 @@ class CacheMixin:
         :param encoders: MetricModel
         :param train_dataloader:
         :param val_dataloader:
+        :param cache_config:
         :return: None
         """
         cache_encoders = {
@@ -148,7 +150,17 @@ class CacheMixin:
             return
 
         def cache_dataloader(dataloader):
-            for sample in dataloader:
+            cache_dl = DataLoader(
+                dataset=dataloader.dataset,
+                batch_size=cache_config.batch_size,
+                collate_fn=dataloader.collate_fn,
+                num_workers=dataloader.num_workers,
+                pin_memory=dataloader.pin_memory,
+                timeout=dataloader.timeout,
+                worker_init_fn=dataloader.worker_init_fn,
+                prefetch_factor=dataloader.prefetch_factor,
+            )
+            for sample in cache_dl:
                 features, _ = sample
                 for name, encoder in cache_encoders.items():
                     encoder.fill_cache(features[name])

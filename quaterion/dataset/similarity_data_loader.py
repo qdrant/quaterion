@@ -126,13 +126,9 @@ class PairsSimilarityDataLoader(SimilarityDataloader[SimilarityPairSample]):
             record.obj_b for record in batch
         ]
         labels = {
-            "pairs": torch.LongTensor(
-                [[i, i + len(batch)] for i in range(len(batch))]
-            ),
+            "pairs": torch.LongTensor([[i, i + len(batch)] for i in range(len(batch))]),
             "labels": torch.Tensor([record.score for record in batch]),
-            "subgroups": torch.Tensor(
-                [record.subgroup for record in batch] * 2
-            ),
+            "subgroups": torch.Tensor([record.subgroup for record in batch] * 2),
         }
         return features, labels
 
@@ -157,9 +153,7 @@ class GroupSimilarityDataLoader(SimilarityDataloader[SimilarityGroupSample]):
     @classmethod
     def collate_fn(cls, batch: List[SimilarityGroupSample]):
         features = [record.obj for record in batch]
-        labels = {
-            "groups": torch.LongTensor([record.group for record in batch])
-        }
+        labels = {"groups": torch.LongTensor([record.group for record in batch])}
         return features, labels
 
     @classmethod

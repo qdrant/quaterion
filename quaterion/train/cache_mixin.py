@@ -67,7 +67,10 @@ class CacheMixin:
                 ] = cache_config.key_extractors.get(encoder_name)
 
                 encoders[encoder_name]: CacheEncoder = cls.wrap_encoder(
-                    encoder, cache_type, key_extractor, encoder_name,
+                    encoder,
+                    cache_type,
+                    key_extractor,
+                    encoder_name,
                 )
 
                 possible_cache_encoders.remove(encoder_name)
@@ -85,7 +88,10 @@ class CacheMixin:
             cls._check_cuda(cache_config.cache_type, encoder_name)
             key_extractor = cache_config.key_extractors.get(encoder_name)
             encoders = cls.wrap_encoder(
-                encoders, cache_config.cache_type, key_extractor, encoder_name,
+                encoders,
+                cache_config.cache_type,
+                key_extractor,
+                encoder_name,
             )
         else:
             raise ValueError(
@@ -137,9 +143,7 @@ class CacheMixin:
     def cache(
         cls,
         encoders,
-        train_dataloader: Union[
-            PairsSimilarityDataLoader, GroupSimilarityDataLoader
-        ],
+        train_dataloader: Union[PairsSimilarityDataLoader, GroupSimilarityDataLoader],
         val_dataloader: Optional[
             Union[PairsSimilarityDataLoader, GroupSimilarityDataLoader]
         ],
@@ -207,6 +211,4 @@ class CacheMixin:
 
         for dataloader in dataloaders:
             if dataloader is not None:
-                dataloader.multiprocessing_context = (
-                    cls.CACHE_MULTIPROCESSING_CONTEXT
-                )
+                dataloader.multiprocessing_context = cls.CACHE_MULTIPROCESSING_CONTEXT

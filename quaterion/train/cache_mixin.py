@@ -4,10 +4,15 @@ from typing import Union, Dict, Optional, Set, Any, Callable, Hashable
 
 import torch.cuda
 from loguru import logger
+from quaterion_models.types import CollateFnType
 from torch.utils.data import DataLoader
 from quaterion_models.encoders import Encoder
 from quaterion_models.model import DEFAULT_ENCODER_KEY
 
+from quaterion.dataset import (
+    PairsSimilarityDataLoader,
+    GroupSimilarityDataLoader,
+)
 from quaterion.train.encoders import (
     CacheConfig,
     CacheEncoder,
@@ -62,10 +67,7 @@ class CacheMixin:
                 ] = cache_config.key_extractors.get(encoder_name)
 
                 encoders[encoder_name]: CacheEncoder = cls.wrap_encoder(
-                    encoder,
-                    cache_type,
-                    key_extractor,
-                    encoder_name,
+                    encoder, cache_type, key_extractor, encoder_name,
                 )
 
                 possible_cache_encoders.remove(encoder_name)
@@ -83,10 +85,7 @@ class CacheMixin:
             cls._check_cuda(cache_config.cache_type, encoder_name)
             key_extractor = cache_config.key_extractors.get(encoder_name)
             encoders = cls.wrap_encoder(
-                encoders,
-                cache_config.cache_type,
-                key_extractor,
-                encoder_name,
+                encoders, cache_config.cache_type, key_extractor, encoder_name,
             )
         else:
             raise ValueError(
@@ -124,11 +123,27 @@ class CacheMixin:
         return encoder
 
     @classmethod
+    def compatibility_check(cls, dataloader):
+        if not (
+            isinstance(dataloader, PairsSimilarityDataLoader)
+            or isinstance(dataloader, GroupSimilarityDataLoader)
+        ):
+            raise TypeError(
+                "Cache currently supports only instances of "
+                "PairsSimilarityDataloader or GroupSimilarityDataloader"
+            )
+
+    @classmethod
     def cache(
         cls,
         encoders,
-        train_dataloader: DataLoader,
-        val_dataloader: Optional[DataLoader],
+        train_dataloader: Union[
+            PairsSimilarityDataLoader, GroupSimilarityDataLoader
+        ],
+        val_dataloader: Optional[
+            Union[PairsSimilarityDataLoader, GroupSimilarityDataLoader]
+        ],
+        collate_fn: CollateFnType,
         cache_config: CacheConfig,
     ) -> None:
         """
@@ -137,6 +152,7 @@ class CacheMixin:
         :param encoders: MetricModel
         :param train_dataloader:
         :param val_dataloader:
+        :param collate_fn: CollateFnType
         :param cache_config:
         :return: None
         """
@@ -149,11 +165,14 @@ class CacheMixin:
         if not cache_encoders:
             return
 
+        cls.compatibility_check(train_dataloader)
+        train_dataloader.set_model_collate_fn(collate_fn)
+
         def cache_dataloader(dataloader):
             cache_dl = DataLoader(
                 dataset=dataloader.dataset,
                 batch_size=cache_config.batch_size,
-                collate_fn=dataloader.collate_fn,
+                collate_fn=dataloader.cache_collate_fn,
                 num_workers=dataloader.num_workers,
                 pin_memory=dataloader.pin_memory,
                 timeout=dataloader.timeout,
@@ -161,15 +180,17 @@ class CacheMixin:
                 prefetch_factor=dataloader.prefetch_factor,
             )
             for sample in cache_dl:
-                features, _ = sample
+                if not sample:  # all batch objects are already in cache
+                    continue
                 for name, encoder in cache_encoders.items():
-                    encoder.fill_cache(features[name])
+                    encoder.fill_cache(sample[name])
 
         cls.switch_multiprocessing_context(train_dataloader)
         cache_dataloader(train_dataloader)
 
         if val_dataloader is not None:
             cls.switch_multiprocessing_context(val_dataloader)
+            val_dataloader.set_model_collate_fn(collate_fn)
             cache_dataloader(val_dataloader)
 
         # Once cache is filled, collate functions return only keys for cache
@@ -186,4 +207,6 @@ class CacheMixin:
 
         for dataloader in dataloaders:
             if dataloader is not None:
-                dataloader.multiprocessing_context = cls.CACHE_MULTIPROCESSING_CONTEXT
+                dataloader.multiprocessing_context = (
+                    cls.CACHE_MULTIPROCESSING_CONTEXT
+                )

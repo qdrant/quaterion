@@ -1,3 +1,5 @@
+import multiprocessing as mp
+
 from typing import Union, Dict, Optional, Set, Any, Callable, Hashable
 
 import torch.cuda
@@ -15,6 +17,13 @@ from quaterion.train.encoders import (
 
 
 class CacheMixin:
+    # Child processes need to derive randomized `PYTHONHASHSEED` value from
+    # parent process. It is only done with `fork` start method.
+    # `fork` start method is presented on Unix systems and it is the
+    # default for them, except macOS. Therefore, we set `fork` method
+    # explicitly and cache is not supported on Windows.
+    CACHE_MULTIPROCESSING_CONTEXT = "fork"
+
     @classmethod
     def apply_cache_config(
         cls,
@@ -114,8 +123,9 @@ class CacheMixin:
 
         return encoder
 
-    @staticmethod
+    @classmethod
     def cache(
+        cls,
         encoders,
         train_dataloader: DataLoader,
         val_dataloader: Optional[DataLoader],
@@ -143,10 +153,25 @@ class CacheMixin:
                 for name, encoder in cache_encoders.items():
                     encoder.fill_cache(features[name])
 
+        cls.switch_multiprocessing_context(train_dataloader)
         cache_dataloader(train_dataloader)
-        val_dataloader = val_dataloader if val_dataloader is not None else []
-        cache_dataloader(val_dataloader)
+
+        if val_dataloader is not None:
+            cls.switch_multiprocessing_context(val_dataloader)
+            cache_dataloader(val_dataloader)
 
         # Once cache is filled, collate functions return only keys for cache
         for encoder_name in cache_encoders:
             encoders[encoder_name].cache_filled = True
+
+    @classmethod
+    def switch_multiprocessing_context(cls, *dataloaders):
+        if cls.CACHE_MULTIPROCESSING_CONTEXT not in mp.get_all_start_methods():
+            raise OSError(
+                f"Cache can't be used. {cls.CACHE_MULTIPROCESSING_CONTEXT} "
+                "multiprocessing context is not available on current OS"
+            )
+
+        for dataloader in dataloaders:
+            if dataloader is not None:
+                dataloader.multiprocessing_context = cls.CACHE_MULTIPROCESSING_CONTEXT

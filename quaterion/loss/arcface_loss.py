@@ -39,7 +39,7 @@ class ArcfaceLoss(GroupLoss):
 
     def forward(self, embeddings, groups):
         """
-        :param embeddings: Shape: (batch_size, vector_length) - Output embeddings from the encoder. Shape:
+        :param embeddings: Shape: (batch_size, vector_length) - Output embeddings from the encoder.
         :param groups: Shape: (batch_size,) - Group ids associated with embeddings.
         :return: Zero-size tensor.
         """

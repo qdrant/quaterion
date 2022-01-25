@@ -1,7 +1,7 @@
 import json
 import random
 import os
-from typing import Dict, Union, List
+from typing import Dict, Union, List, Any
 
 import pytorch_lightning as pl
 import torch
@@ -44,9 +44,7 @@ class StartupsDataset(Dataset):
 
     def __getitem__(self, index: int) -> SimilarityGroupSample:
         item = self.data[index]
-        return SimilarityGroupSample(
-            obj=item["description"], group=self._label2idx[item["industry"]]
-        )
+        return SimilarityGroupSample(obj=item, group=self._label2idx[item["industry"]])
 
     def __len__(self) -> int:
         return len(self.data)
@@ -71,8 +69,13 @@ class StartupEncoder(Encoder):
     def get_collate_fn(self) -> CollateFnType:
         return self.extract_texts
 
-    def extract_texts(self, batch: List[str]):
-        return batch
+    def extract_texts(self, batch: List[Union[str, Dict[str, Any]]]):
+        if isinstance(batch[0], str):
+            return batch
+        elif isinstance(batch[0], Dict):
+            return [item["description"] for item in batch]
+        else:
+            raise TypeError("Expecting list of strings or dicts as inputs")
 
     def forward(self, inputs):
         return self.encoder.encode(

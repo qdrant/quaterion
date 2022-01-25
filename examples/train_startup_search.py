@@ -1,7 +1,7 @@
 import json
 import random
 import os
-from typing import Dict, Union
+from typing import Dict, Union, List
 
 import pytorch_lightning as pl
 import torch
@@ -69,7 +69,10 @@ class StartupEncoder(Encoder):
         return self.encoder.get_sentence_embedding_dimension()
 
     def get_collate_fn(self) -> CollateFnType:
-        return lambda batch: batch
+        return self.extract_texts
+
+    def extract_texts(self, batch: List[str]):
+        return batch
 
     def forward(self, inputs):
         return self.encoder.encode(

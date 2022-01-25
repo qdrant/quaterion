@@ -1,3 +1,4 @@
+import argparse
 import json
 import random
 import os
@@ -30,9 +31,8 @@ random.seed(42)
 
 
 class StartupsDataset(Dataset):
-    def __init__(self, max_samples: int = 500):
+    def __init__(self, path: str, max_samples: int = 500):
         super().__init__()
-        path: str = os.path.join(os.path.dirname(__file__), "data", "startups.jsonl")
         with open(path, "r", encoding="utf8") as f:
             lines = f.readlines()[:max_samples]
             random.shuffle(lines)
@@ -122,7 +122,18 @@ class Model(TrainableModel):
         return optimizer
 
 
-dataset = StartupsDataset(max_samples=640)
+ap = argparse.ArgumentParser()
+ap.add_argument(
+    "--dataset", "-d", help="Path to dataset file", default="web_summit_startups.jsonl "
+)
+args = ap.parse_args()
+
+if not os.path.exists(args.dataset):
+    raise IOError(
+        f"Could not find dataset in {args.dataset}. Download it from https://storage.googleapis.com/dataset-startup-search/websummit-2021/web_summit_startups.jsonl"
+    )
+
+dataset = StartupsDataset(path=args.dataset, max_samples=640)
 
 model = Model(num_groups=dataset.get_num_industries(), lr=3e-5)
 

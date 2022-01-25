@@ -6,6 +6,8 @@ from typing import Any, List, Generic
 from torch.utils.data import DataLoader
 from torch.utils.data.dataloader import T_co
 
+from quaterion.train.encoders.cache_encoder import CacheCollateFnType
+
 
 @dataclass
 class SimilarityPairSample:
@@ -68,55 +70,52 @@ class SimilarityDataloader(DataLoader, Generic[T_co]):
     LOCAL_CACHE = set()  # local process cache
 
     @classmethod
-    def model_collate(cls, batch: List[Any]):
-        """
-        Model's collate to retrieve keys and produce input
-        for cache encoders
-        """
-        raise NotImplementedError()
-
-    @classmethod
     def fetch_unique_objects(cls, batch: List[Any]) -> List[Any]:
         """
         Fetch unique objects from batch to avoid calculation of embeddings
         to repeated objects
         """
-        raise NotImplementedError
+        raise NotImplementedError()
 
-    @classmethod
-    def set_model_collate_fn(cls, model_collate_fn):
+    def set_model_collate_fn(
+        self, model_collate_fn: CacheCollateFnType,
+    ):
         """
         Method used to set model's collate to retrieve keys and produce input
         for cache encoders
         """
-        cls.model_collate = model_collate_fn
+        setattr(self, "model_collate", model_collate_fn)
 
-    @classmethod
-    def cache_collate_fn(cls, batch: List[SimilarityPairSample]):
+    def cache_collate_fn(self, batch: List[T_co]):
         """
         Collate used to cache batches without repeated calculations of
         embeddings in current process
         """
-        unique_objects = cls.fetch_unique_objects(batch)
-        samples = cls.model_collate(unique_objects)
+        unique_objects = self.fetch_unique_objects(batch)
+        model_collate = getattr(self, "model_collate", None)
+        if not model_collate:
+            raise AttributeError(
+                "`set_model_collate_fn` must be called before caching"
+            )
+        samples = model_collate(unique_objects)
 
         new_keys = []
         new_objects = []
         for encoder_name in samples:
             keys, _ = samples[encoder_name]
             for ind, key in enumerate(keys):
-                if key not in cls.LOCAL_CACHE:
+                if key not in self.LOCAL_CACHE:
                     new_keys.append(key)
                     new_objects.append(unique_objects[ind])
 
-        cls.LOCAL_CACHE.update(new_keys)
+        self.LOCAL_CACHE.update(new_keys)
 
         if len(new_keys) == len(batch):
             return samples
         elif len(new_keys) == 0:
             return {}
 
-        return cls.model_collate(new_objects)
+        return model_collate(new_objects)
 
 
 class PairsSimilarityDataLoader(SimilarityDataloader[SimilarityPairSample]):
@@ -126,9 +125,13 @@ class PairsSimilarityDataLoader(SimilarityDataloader[SimilarityPairSample]):
             record.obj_b for record in batch
         ]
         labels = {
-            "pairs": torch.LongTensor([[i, i + len(batch)] for i in range(len(batch))]),
+            "pairs": torch.LongTensor(
+                [[i, i + len(batch)] for i in range(len(batch))]
+            ),
             "labels": torch.Tensor([record.score for record in batch]),
-            "subgroups": torch.Tensor([record.subgroup for record in batch] * 2),
+            "subgroups": torch.Tensor(
+                [record.subgroup for record in batch] * 2
+            ),
         }
         return features, labels
 
@@ -142,10 +145,6 @@ class PairsSimilarityDataLoader(SimilarityDataloader[SimilarityPairSample]):
                 unique_objects.append(sample.obj_b)
         return unique_objects
 
-    @classmethod
-    def model_collate(cls, batch):
-        raise NotImplementedError()
-
 
 class GroupSimilarityDataLoader(SimilarityDataloader[SimilarityGroupSample]):
     LOCAL_CACHE = set()
@@ -153,7 +152,9 @@ class GroupSimilarityDataLoader(SimilarityDataloader[SimilarityGroupSample]):
     @classmethod
     def collate_fn(cls, batch: List[SimilarityGroupSample]):
         features = [record.obj for record in batch]
-        labels = {"groups": torch.LongTensor([record.group for record in batch])}
+        labels = {
+            "groups": torch.LongTensor([record.group for record in batch])
+        }
         return features, labels
 
     @classmethod
@@ -163,7 +164,3 @@ class GroupSimilarityDataLoader(SimilarityDataloader[SimilarityGroupSample]):
             if sample.obj not in unique_objects:
                 unique_objects.append(sample.obj)
         return unique_objects
-
-    @classmethod
-    def model_collate(cls, batch):
-        raise NotImplementedError()

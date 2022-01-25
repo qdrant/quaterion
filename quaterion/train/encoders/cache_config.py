@@ -14,4 +14,5 @@ class CacheConfig:
     cache_type: Optional[CacheType] = None
     mapping: Dict[str, CacheType] = field(default_factory=dict)
     key_extractors: Dict[str, Callable[[Any], Hashable]] = field(default_factory=dict)
-    batch_size: int = 32
+    batch_size: Optional[int] = 32
+    num_workers: Optional[int] = None  # if None - inherited from source dl

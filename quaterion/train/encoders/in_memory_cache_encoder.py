@@ -3,10 +3,11 @@ from typing import Tuple, Union
 import torch
 from torch import Tensor
 from quaterion_models.encoders import Encoder
-from quaterion_models.types import TensorInterchange, CollateFnType
+from quaterion_models.types import TensorInterchange
 
 from quaterion.train.encoders.cache_config import CacheType
-from quaterion.train.encoders.cache_encoder import CacheEncoder
+from quaterion.train.encoders.cache_encoder import CacheEncoder, \
+    CacheCollateFnType
 
 
 class InMemoryCacheEncoder(CacheEncoder):
@@ -38,7 +39,7 @@ class InMemoryCacheEncoder(CacheEncoder):
             embeddings = embeddings.to(device)
         return embeddings
 
-    def get_collate_fn(self) -> CollateFnType:
+    def get_collate_fn(self) -> CacheCollateFnType:
         """
         Provides function that converts raw data batch into suitable model
         input

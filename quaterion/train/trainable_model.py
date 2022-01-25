@@ -2,6 +2,10 @@ from typing import Dict, Any, Union, Optional
 
 import torch
 import pytorch_lightning as pl
+from pytorch_lightning.utilities.types import (
+    TRAIN_DATALOADERS,
+    EVAL_DATALOADERS,
+)
 
 from quaterion_models.encoders import Encoder
 from quaterion_models.heads import EncoderHead
@@ -21,9 +25,11 @@ class TrainableModel(pl.LightningModule, CacheMixin):
 
         encoders = self.configure_encoders()
         self.cache_config = self.configure_caches()
-        encoders = self.apply_cache_config(encoders, self.cache_config)
+        encoders = self._apply_cache_config(encoders, self.cache_config)
 
-        head = self.configure_head(MetricModel.get_encoders_output_size(encoders))
+        head = self.configure_head(
+            MetricModel.get_encoders_output_size(encoders)
+        )
 
         self._model = MetricModel(encoders=encoders, head=head)
         self._loss = self.configure_loss()
@@ -123,14 +129,20 @@ class TrainableModel(pl.LightningModule, CacheMixin):
         )
         return loss
 
-    def validation_step(self, batch, batch_idx, **kwargs) -> Optional[torch.Tensor]:
+    def validation_step(
+        self, batch, batch_idx, **kwargs
+    ) -> Optional[torch.Tensor]:
         stage = TrainStage.VALIDATION
-        self._common_step(batch=batch, batch_idx=batch_idx, stage=stage, **kwargs)
+        self._common_step(
+            batch=batch, batch_idx=batch_idx, stage=stage, **kwargs
+        )
         return None
 
     def test_step(self, batch, batch_idx, **kwargs) -> Optional[torch.Tensor]:
         stage = TrainStage.TEST
-        self._common_step(batch=batch, batch_idx=batch_idx, stage=stage, **kwargs)
+        self._common_step(
+            batch=batch, batch_idx=batch_idx, stage=stage, **kwargs
+        )
         return None
 
     def _common_step(self, batch, batch_idx, stage: TrainStage, **kwargs):
@@ -155,3 +167,19 @@ class TrainableModel(pl.LightningModule, CacheMixin):
         :return: None
         """
         self.model.save(path)
+
+    # region anchors
+    # https://github.com/PyTorchLightning/pytorch-lightning/issues/10667
+    def train_dataloader(self) -> TRAIN_DATALOADERS:
+        pass
+
+    def test_dataloader(self) -> EVAL_DATALOADERS:
+        pass
+
+    def val_dataloader(self) -> EVAL_DATALOADERS:
+        pass
+
+    def predict_dataloader(self) -> EVAL_DATALOADERS:
+        pass
+
+    # endregion

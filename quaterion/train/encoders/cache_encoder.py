@@ -3,7 +3,13 @@ from typing import Collection, Hashable, Any, List, Callable, Union, Tuple
 from torch import Tensor
 
 from quaterion_models.encoders import Encoder
-from quaterion_models.types import CollateFnType, TensorInterchange
+from quaterion_models.types import TensorInterchange
+
+
+CacheCollateFnType = Callable[
+    [Collection[Any]],
+    Union[List[Hashable], Tuple[Hashable, TensorInterchange]],
+]
 
 
 class CacheEncoder(Encoder):
@@ -29,7 +35,9 @@ class CacheEncoder(Encoder):
         :return: Key for cache
         """
         return (
-            hash(obj) if not isinstance(obj, dict) else hash(tuple(sorted(obj.items())))
+            hash(obj)
+            if not isinstance(obj, dict)
+            else hash(tuple(sorted(obj.items())))
         )
 
     def key_collate_fn(self, batch: Collection[Any]) -> List[Hashable]:
@@ -61,7 +69,7 @@ class CacheEncoder(Encoder):
         values: TensorInterchange = self._encoder.get_collate_fn()(batch)
         return keys, values
 
-    def get_collate_fn(self) -> CollateFnType:
+    def get_collate_fn(self) -> CacheCollateFnType:
         """
         Provides function that converts raw data batch into suitable model
         input
@@ -100,8 +108,7 @@ class CacheEncoder(Encoder):
         raise ValueError("Cached encoder does not support loading")
 
     def fill_cache(
-        self,
-        data: Collection[Hashable],
+        self, data: Collection[Hashable],
     ):
         """
         Applies encoder to data and store results in cache

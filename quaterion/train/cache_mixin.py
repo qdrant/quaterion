@@ -8,7 +8,6 @@ import torch.cuda
 from loguru import logger
 from torch.utils.data import DataLoader
 from quaterion_models.encoders import Encoder
-from quaterion_models.types import CollateFnType
 from quaterion_models.model import DEFAULT_ENCODER_KEY
 
 from quaterion.dataset import (
@@ -21,6 +20,7 @@ from quaterion.train.encoders import (
     CacheType,
     InMemoryCacheEncoder,
 )
+from quaterion.train.encoders.cache_encoder import CacheCollateFnType
 
 
 class CacheMixin:
@@ -32,7 +32,7 @@ class CacheMixin:
     CACHE_MULTIPROCESSING_CONTEXT = "fork"
 
     @classmethod
-    def apply_cache_config(
+    def _apply_cache_config(
         cls,
         encoders: Union[Encoder, Dict[str, Encoder]],
         cache_config: Optional[CacheConfig],
@@ -68,11 +68,8 @@ class CacheMixin:
                     Callable[[Any], Hashable]
                 ] = cache_config.key_extractors.get(encoder_name)
 
-                encoders[encoder_name]: CacheEncoder = cls.wrap_encoder(
-                    encoder,
-                    cache_type,
-                    key_extractor,
-                    encoder_name,
+                encoders[encoder_name]: CacheEncoder = cls._wrap_encoder(
+                    encoder, cache_type, key_extractor, encoder_name,
                 )
 
                 possible_cache_encoders.remove(encoder_name)
@@ -89,11 +86,8 @@ class CacheMixin:
 
             cls._check_cuda(cache_config.cache_type, encoder_name)
             key_extractor = cache_config.key_extractors.get(encoder_name)
-            encoders = cls.wrap_encoder(
-                encoders,
-                cache_config.cache_type,
-                key_extractor,
-                encoder_name,
+            encoders = cls._wrap_encoder(
+                encoders, cache_config.cache_type, key_extractor, encoder_name,
             )
         else:
             raise ValueError(
@@ -111,7 +105,7 @@ class CacheMixin:
             )
 
     @staticmethod
-    def wrap_encoder(
+    def _wrap_encoder(
         encoder: Encoder,
         cache_type: CacheType,
         key_extractor: Optional[Callable[[Any], Hashable]],
@@ -131,25 +125,16 @@ class CacheMixin:
         return encoder
 
     @classmethod
-    def compatibility_check(cls, dataloader):
-        if not (
-            isinstance(dataloader, PairsSimilarityDataLoader)
-            or isinstance(dataloader, GroupSimilarityDataLoader)
-        ):
-            raise TypeError(
-                "Cache currently supports only instances of "
-                "PairsSimilarityDataloader or GroupSimilarityDataloader"
-            )
-
-    @classmethod
     def cache(
         cls,
         encoders,
-        train_dataloader: Union[PairsSimilarityDataLoader, GroupSimilarityDataLoader],
+        train_dataloader: Union[
+            PairsSimilarityDataLoader, GroupSimilarityDataLoader
+        ],
         val_dataloader: Optional[
             Union[PairsSimilarityDataLoader, GroupSimilarityDataLoader]
         ],
-        collate_fn: CollateFnType,
+        model_collate_fn: CacheCollateFnType,
         cache_config: CacheConfig,
     ) -> None:
         """
@@ -158,7 +143,7 @@ class CacheMixin:
         :param encoders: MetricModel
         :param train_dataloader:
         :param val_dataloader:
-        :param collate_fn: CollateFnType
+        :param model_collate_fn:
         :param cache_config:
         :return: None
         """
@@ -171,45 +156,101 @@ class CacheMixin:
         if not cache_encoders:
             return
 
-        cls.compatibility_check(train_dataloader)
-        train_dataloader.set_model_collate_fn(collate_fn)
-
-        def cache_dataloader(dataloader):
-            cache_dl = DataLoader(
-                dataset=dataloader.dataset,
-                batch_size=cache_config.batch_size,
-                collate_fn=dataloader.cache_collate_fn,
-                num_workers=dataloader.num_workers,
-                pin_memory=dataloader.pin_memory,
-                timeout=dataloader.timeout,
-                worker_init_fn=dataloader.worker_init_fn,
-                prefetch_factor=dataloader.prefetch_factor,
-                multiprocessing_context=dataloader.multiprocessing_context,
-            )
-            for sample in cache_dl:
-                if not sample:  # all batch objects are already in cache
-                    continue
-                for name, encoder in cache_encoders.items():
-                    encoder.fill_cache(sample[name])
-
-        cls.switch_multiprocessing_context(train_dataloader)
-        cache_dataloader(train_dataloader)
+        cls._compatibility_check(train_dataloader)
+        train_dataloader.set_model_collate_fn(model_collate_fn)
+        cls._cache_dataloader(train_dataloader, cache_config, cache_encoders)
 
         if val_dataloader is not None:
-            cls.switch_multiprocessing_context(val_dataloader)
-            val_dataloader.set_model_collate_fn(collate_fn)
-            cache_dataloader(val_dataloader)
+            val_dataloader.set_model_collate_fn(model_collate_fn)
+            cls._cache_dataloader(val_dataloader, cache_config, cache_encoders)
 
         # Once cache is filled, collate functions return only keys for cache
         for encoder_name in cache_encoders:
             encoders[encoder_name].cache_filled = True
 
     @classmethod
-    def switch_multiprocessing_context(cls, *dataloaders):
+    def _compatibility_check(cls, dataloader: DataLoader):
+        """
+        Cache compatible only with dataloaders which have an implementation
+        of `cache_collate_fn`
+        """
+        if not hasattr(dataloader, "cache_collate_fn"):
+            raise TypeError(
+                "DataLoader must have an implementation of `cache_collate_fn`"
+                " to be cached."
+            )
+
+    @classmethod
+    def _cache_dataloader(
+        cls,
+        dataloader: DataLoader,
+        cache_config: CacheConfig,
+        cache_encoders: Dict[str, CacheEncoder],
+    ):
+        """
+        Fills cache for provided dataloader, switches multiprocessing context
+        if required
+        """
+        cls._switch_multiprocessing_context(dataloader)
+        num_workers = (
+            cache_config.num_workers
+            if cache_config.num_workers is not None
+            else dataloader.num_workers
+        )
+
+        if num_workers == 0:
+            mp_ctx = None
+        elif dataloader.multiprocessing_context:  # already switched or
+            # set by user
+            mp_ctx = dataloader.multiprocessing_context
+        elif "PYTHONHASHSEED" in os.environ:  # source dataloader has no
+            # mp context set, use default on current OS
+            mp_ctx = mp.get_start_method()
+        else:
+            mp_ctx = cls.CACHE_MULTIPROCESSING_CONTEXT
+            cls._check_mp_context(mp_ctx)
+
+        cache_collate_fn = getattr(dataloader, "cache_collate_fn")
+        cache_dl = DataLoader(
+            dataset=dataloader.dataset,
+            batch_size=cache_config.batch_size,
+            collate_fn=cache_collate_fn,
+            num_workers=num_workers,
+            pin_memory=dataloader.pin_memory,
+            timeout=dataloader.timeout,
+            worker_init_fn=dataloader.worker_init_fn,
+            prefetch_factor=dataloader.prefetch_factor,
+            multiprocessing_context=mp_ctx,
+        )
+
+        for sample in cache_dl:
+            if not sample:  # all batch objects are already in cache
+                continue
+            for name, encoder in cache_encoders.items():
+                encoder.fill_cache(sample[name])
+
+    @classmethod
+    def _switch_multiprocessing_context(cls, dataloader):
         if "PYTHONHASHSEED" in os.environ:
             return
 
-        if mp.get_start_method() != cls.CACHE_MULTIPROCESSING_CONTEXT:
+        if dataloader.num_workers == 0:
+            return
+
+        mp_context = dataloader.multiprocessing_context
+        cls._check_mp_context(mp_context)
+
+        dataloader.multiprocessing_context = cls.CACHE_MULTIPROCESSING_CONTEXT
+
+    @classmethod
+    def _check_mp_context(cls, mp_context):
+        if not mp_context:
+            return
+
+        if not isinstance(mp_context, str):
+            mp_context = mp_context.get_start_method()
+
+        if mp_context != cls.CACHE_MULTIPROCESSING_CONTEXT:
             logger.warning(
                 "Default start method on your OS is not "
                 f"{cls.CACHE_MULTIPROCESSING_CONTEXT}. "
@@ -220,12 +261,10 @@ class CacheMixin:
                 "method.\n"
                 "Possible launch is `PYTHONHASHSEED=0 python3 run.py"
             )
+
         if cls.CACHE_MULTIPROCESSING_CONTEXT not in mp.get_all_start_methods():
             raise OSError(
-                f"Cache can't be used. {cls.CACHE_MULTIPROCESSING_CONTEXT} "
-                "multiprocessing context is not available on current OS"
+                f"Cache can't be used without setting `PYTHONHASHSEED`. "
+                f"{cls.CACHE_MULTIPROCESSING_CONTEXT} multiprocessing context "
+                "is not available on current OS"
             )
-
-        for dataloader in dataloaders:
-            if dataloader is not None:
-                dataloader.multiprocessing_context = cls.CACHE_MULTIPROCESSING_CONTEXT

@@ -11,7 +11,7 @@ from quaterion.dataset.similarity_data_loader import (
     GroupSimilarityDataLoader,
     SimilarityGroupSample,
 )
-from quaterion.loss import ArcfaceLoss, SimilarityLoss
+from quaterion.loss import SoftmaxLoss, SimilarityLoss
 from quaterion_models.types import CollateFnType
 from quaterion_models.encoders import Encoder
 from quaterion_models.heads import GatedHead, EncoderHead
@@ -100,11 +100,10 @@ class Model(TrainableModel):
         return StartupEncoder(self._pretrained_name)
 
     def configure_head(self, input_embedding_size) -> EncoderHead:
-        self._embedding_size = input_embedding_size
-        return GatedHead(self._embedding_size)
+        return GatedHead(input_embedding_size)
 
     def configure_loss(self) -> SimilarityLoss:
-        return ArcfaceLoss(self._embedding_size, self._num_groups, s=20, m=0.3)
+        return SoftmaxLoss(self.model.head.output_size(), self._num_groups)
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(

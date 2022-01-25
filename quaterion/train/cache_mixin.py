@@ -1,12 +1,14 @@
+import os
 import multiprocessing as mp
 
 from typing import Union, Dict, Optional, Set, Any, Callable, Hashable
 
 import torch.cuda
+
 from loguru import logger
-from quaterion_models.types import CollateFnType
 from torch.utils.data import DataLoader
 from quaterion_models.encoders import Encoder
+from quaterion_models.types import CollateFnType
 from quaterion_models.model import DEFAULT_ENCODER_KEY
 
 from quaterion.dataset import (
@@ -67,10 +69,7 @@ class CacheMixin:
                 ] = cache_config.key_extractors.get(encoder_name)
 
                 encoders[encoder_name]: CacheEncoder = cls.wrap_encoder(
-                    encoder,
-                    cache_type,
-                    key_extractor,
-                    encoder_name,
+                    encoder, cache_type, key_extractor, encoder_name,
                 )
 
                 possible_cache_encoders.remove(encoder_name)
@@ -88,10 +87,7 @@ class CacheMixin:
             cls._check_cuda(cache_config.cache_type, encoder_name)
             key_extractor = cache_config.key_extractors.get(encoder_name)
             encoders = cls.wrap_encoder(
-                encoders,
-                cache_config.cache_type,
-                key_extractor,
-                encoder_name,
+                encoders, cache_config.cache_type, key_extractor, encoder_name,
             )
         else:
             raise ValueError(
@@ -143,7 +139,9 @@ class CacheMixin:
     def cache(
         cls,
         encoders,
-        train_dataloader: Union[PairsSimilarityDataLoader, GroupSimilarityDataLoader],
+        train_dataloader: Union[
+            PairsSimilarityDataLoader, GroupSimilarityDataLoader
+        ],
         val_dataloader: Optional[
             Union[PairsSimilarityDataLoader, GroupSimilarityDataLoader]
         ],
@@ -182,6 +180,7 @@ class CacheMixin:
                 timeout=dataloader.timeout,
                 worker_init_fn=dataloader.worker_init_fn,
                 prefetch_factor=dataloader.prefetch_factor,
+                multiprocessing_context=dataloader.multiprocessing_context,
             )
             for sample in cache_dl:
                 if not sample:  # all batch objects are already in cache
@@ -203,6 +202,20 @@ class CacheMixin:
 
     @classmethod
     def switch_multiprocessing_context(cls, *dataloaders):
+        if "PYTHONHASHSEED" in os.environ:
+            return
+
+        if mp.get_start_method() != cls.CACHE_MULTIPROCESSING_CONTEXT:
+            logger.warning(
+                "Default start method on your OS is not "
+                f"{cls.CACHE_MULTIPROCESSING_CONTEXT}. "
+                "Trying to switch it. However "
+                f"{cls.CACHE_MULTIPROCESSING_CONTEXT} may be unsafe or "
+                "unsupported. The most safe option is to launch your process "
+                "with fixed `PYTHONHASHSEED` env and remain `spawn` as start "
+                "method.\n"
+                "Possible launch is `PYTHONHASHSEED=0 python3 run.py"
+            )
         if cls.CACHE_MULTIPROCESSING_CONTEXT not in mp.get_all_start_methods():
             raise OSError(
                 f"Cache can't be used. {cls.CACHE_MULTIPROCESSING_CONTEXT} "
@@ -211,4 +224,6 @@ class CacheMixin:
 
         for dataloader in dataloaders:
             if dataloader is not None:
-                dataloader.multiprocessing_context = cls.CACHE_MULTIPROCESSING_CONTEXT
+                dataloader.multiprocessing_context = (
+                    cls.CACHE_MULTIPROCESSING_CONTEXT
+                )

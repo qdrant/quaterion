@@ -27,9 +27,7 @@ class TrainableModel(pl.LightningModule, CacheMixin):
         self.cache_config = self.configure_caches()
         encoders = self._apply_cache_config(encoders, self.cache_config)
 
-        head = self.configure_head(
-            MetricModel.get_encoders_output_size(encoders)
-        )
+        head = self.configure_head(MetricModel.get_encoders_output_size(encoders))
 
         self._model = MetricModel(encoders=encoders, head=head)
         self._loss = self.configure_loss()
@@ -129,20 +127,14 @@ class TrainableModel(pl.LightningModule, CacheMixin):
         )
         return loss
 
-    def validation_step(
-        self, batch, batch_idx, **kwargs
-    ) -> Optional[torch.Tensor]:
+    def validation_step(self, batch, batch_idx, **kwargs) -> Optional[torch.Tensor]:
         stage = TrainStage.VALIDATION
-        self._common_step(
-            batch=batch, batch_idx=batch_idx, stage=stage, **kwargs
-        )
+        self._common_step(batch=batch, batch_idx=batch_idx, stage=stage, **kwargs)
         return None
 
     def test_step(self, batch, batch_idx, **kwargs) -> Optional[torch.Tensor]:
         stage = TrainStage.TEST
-        self._common_step(
-            batch=batch, batch_idx=batch_idx, stage=stage, **kwargs
-        )
+        self._common_step(batch=batch, batch_idx=batch_idx, stage=stage, **kwargs)
         return None
 
     def _common_step(self, batch, batch_idx, stage: TrainStage, **kwargs):

@@ -78,7 +78,8 @@ class SimilarityDataloader(DataLoader, Generic[T_co]):
         raise NotImplementedError()
 
     def set_model_collate_fn(
-        self, model_collate_fn: CacheCollateFnType,
+        self,
+        model_collate_fn: CacheCollateFnType,
     ):
         """
         Method used to set model's collate to retrieve keys and produce input
@@ -94,9 +95,7 @@ class SimilarityDataloader(DataLoader, Generic[T_co]):
         unique_objects = self.fetch_unique_objects(batch)
         model_collate = getattr(self, "model_collate", None)
         if not model_collate:
-            raise AttributeError(
-                "`set_model_collate_fn` must be called before caching"
-            )
+            raise AttributeError("`set_model_collate_fn` must be called before caching")
         samples = model_collate(unique_objects)
 
         new_keys = []
@@ -125,13 +124,9 @@ class PairsSimilarityDataLoader(SimilarityDataloader[SimilarityPairSample]):
             record.obj_b for record in batch
         ]
         labels = {
-            "pairs": torch.LongTensor(
-                [[i, i + len(batch)] for i in range(len(batch))]
-            ),
+            "pairs": torch.LongTensor([[i, i + len(batch)] for i in range(len(batch))]),
             "labels": torch.Tensor([record.score for record in batch]),
-            "subgroups": torch.Tensor(
-                [record.subgroup for record in batch] * 2
-            ),
+            "subgroups": torch.Tensor([record.subgroup for record in batch] * 2),
         }
         return features, labels
 
@@ -152,9 +147,7 @@ class GroupSimilarityDataLoader(SimilarityDataloader[SimilarityGroupSample]):
     @classmethod
     def collate_fn(cls, batch: List[SimilarityGroupSample]):
         features = [record.obj for record in batch]
-        labels = {
-            "groups": torch.LongTensor([record.group for record in batch])
-        }
+        labels = {"groups": torch.LongTensor([record.group for record in batch])}
         return features, labels
 
     @classmethod

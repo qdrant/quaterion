@@ -6,8 +6,7 @@ from quaterion_models.encoders import Encoder
 from quaterion_models.types import TensorInterchange
 
 from quaterion.train.encoders.cache_config import CacheType
-from quaterion.train.encoders.cache_encoder import CacheEncoder, \
-    CacheCollateFnType
+from quaterion.train.encoders.cache_encoder import CacheEncoder, CacheCollateFnType
 
 
 class InMemoryCacheEncoder(CacheEncoder):

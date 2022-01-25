@@ -35,9 +35,7 @@ class CacheEncoder(Encoder):
         :return: Key for cache
         """
         return (
-            hash(obj)
-            if not isinstance(obj, dict)
-            else hash(tuple(sorted(obj.items())))
+            hash(obj) if not isinstance(obj, dict) else hash(tuple(sorted(obj.items())))
         )
 
     def key_collate_fn(self, batch: Collection[Any]) -> List[Hashable]:
@@ -108,7 +106,8 @@ class CacheEncoder(Encoder):
         raise ValueError("Cached encoder does not support loading")
 
     def fill_cache(
-        self, data: Collection[Hashable],
+        self,
+        data: Collection[Hashable],
     ):
         """
         Applies encoder to data and store results in cache

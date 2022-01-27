@@ -60,7 +60,10 @@ class Quaterion:
             val_dataloader.collate_fn = train_dataloader.collate_fn
 
         trainable_model.cache(
-            trainable_model.model.encoders, train_dataloader, val_dataloader
+            trainable_model.model.encoders,
+            train_dataloader,
+            val_dataloader,
+            trainable_model.cache_config,
         )
 
         trainer.fit(

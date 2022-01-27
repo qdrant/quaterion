@@ -53,9 +53,11 @@ class CacheDataLoader(SimilarityDataLoader):
                     encoder_batches[encoder_name].append(obj)
                     self.seen_objects[encoder_name].add(obj_key)
 
-        new_batch = dict(
-            (encoder_name, collate(encoder_batches[encoder_name]))
-            for encoder_name, collate in self.cached_encoders_collate_fns.items()
-        )
+        new_batch = {}
+        for encoder_name, collate in self.cached_encoders_collate_fns.items():
+            encoder_batch = encoder_batches[encoder_name]
+            new_batch[encoder_name] = (
+                collate(encoder_batch) if encoder_batch else None
+            )
 
         return new_batch

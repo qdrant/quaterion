@@ -1,26 +1,22 @@
-import os
 import multiprocessing as mp
-
+import os
 from typing import Union, Dict, Optional, Set, Any, Callable, Hashable
 
 import torch.cuda
-
 from loguru import logger
-from torch.utils.data import DataLoader
 from quaterion_models.encoders import Encoder
 from quaterion_models.model import DEFAULT_ENCODER_KEY
+from torch.utils.data import DataLoader
 
-from quaterion.dataset import (
-    PairsSimilarityDataLoader,
-    GroupSimilarityDataLoader,
-)
+from quaterion.dataset.cache_data_loader import CacheDataLoader
+from quaterion.dataset.similarity_data_loader import SimilarityDataLoader
 from quaterion.train.encoders import (
     CacheConfig,
     CacheEncoder,
     CacheType,
     InMemoryCacheEncoder,
 )
-from quaterion.train.encoders.cache_encoder import CacheCollateFnType
+from quaterion.train.encoders.cache_encoder import KeyExtractorType
 
 
 class CacheMixin:
@@ -33,9 +29,9 @@ class CacheMixin:
 
     @classmethod
     def _apply_cache_config(
-        cls,
-        encoders: Union[Encoder, Dict[str, Encoder]],
-        cache_config: Optional[CacheConfig],
+            cls,
+            encoders: Union[Encoder, Dict[str, Encoder]],
+            cache_config: Optional[CacheConfig],
     ) -> Union[Encoder, Dict[str, Encoder]]:
         """
         Applies received cache configuration for cached encoders, remain
@@ -112,10 +108,10 @@ class CacheMixin:
 
     @staticmethod
     def _wrap_encoder(
-        encoder: Encoder,
-        cache_type: CacheType,
-        key_extractor: Optional[Callable[[Any], Hashable]],
-        encoder_name: str = "",
+            encoder: Encoder,
+            cache_type: CacheType,
+            key_extractor: Optional[KeyExtractorType],
+            encoder_name: str = "",
     ) -> Encoder:
         if encoder.trainable():
             raise ValueError(
@@ -123,23 +119,17 @@ class CacheMixin:
                 "Encoder must be frozen to cache it"
             )
 
-        encoder = InMemoryCacheEncoder(encoder, cache_type)
-
-        if key_extractor:
-            encoder.configure_key_extractor(key_extractor)
+        encoder = InMemoryCacheEncoder(encoder, key_extractor, cache_type)
 
         return encoder
 
     @classmethod
     def cache(
-        cls,
-        encoders,
-        train_dataloader: Union[PairsSimilarityDataLoader, GroupSimilarityDataLoader],
-        val_dataloader: Optional[
-            Union[PairsSimilarityDataLoader, GroupSimilarityDataLoader]
-        ],
-        model_collate_fn: CacheCollateFnType,
-        cache_config: CacheConfig,
+            cls,
+            encoders,
+            train_dataloader: SimilarityDataLoader,
+            val_dataloader: Optional[SimilarityDataLoader],
+            cache_config: CacheConfig,
     ) -> None:
         """
         Fill cache for each CacheEncoder
@@ -147,7 +137,6 @@ class CacheMixin:
         :param encoders: MetricModel
         :param train_dataloader:
         :param val_dataloader:
-        :param model_collate_fn:
         :param cache_config:
         :return: None
         """
@@ -161,11 +150,9 @@ class CacheMixin:
             return
 
         cls._compatibility_check(train_dataloader)
-        train_dataloader.set_model_collate_fn(model_collate_fn)
         cls._cache_dataloader(train_dataloader, cache_config, cache_encoders)
 
         if val_dataloader is not None:
-            val_dataloader.set_model_collate_fn(model_collate_fn)
             cls._cache_dataloader(val_dataloader, cache_config, cache_encoders)
 
         # Once cache is filled, collate functions return only keys for cache
@@ -178,18 +165,17 @@ class CacheMixin:
         Cache compatible only with dataloaders which have an implementation
         of `cache_collate_fn`
         """
-        if not hasattr(dataloader, "cache_collate_fn"):
+        if not isinstance(dataloader, SimilarityDataLoader):
             raise TypeError(
-                "DataLoader must have an implementation of `cache_collate_fn`"
-                " to be cached."
+                "DataLoader must be SimilarityDataLoader "
             )
 
     @classmethod
     def _cache_dataloader(
-        cls,
-        dataloader: DataLoader,
-        cache_config: CacheConfig,
-        cache_encoders: Dict[str, CacheEncoder],
+            cls,
+            dataloader: SimilarityDataLoader,
+            cache_config: CacheConfig,
+            cache_encoders: Dict[str, CacheEncoder],
     ):
         """
         Fills cache for provided dataloader, switches multiprocessing context
@@ -214,11 +200,18 @@ class CacheMixin:
             mp_ctx = cls.CACHE_MULTIPROCESSING_CONTEXT
             cls._check_mp_context(mp_ctx)
 
-        cache_collate_fn = getattr(dataloader, "cache_collate_fn")
-        cache_dl = DataLoader(
+        cache_dl = CacheDataLoader(
+            key_extractors=dict(
+                (encoder_name, cache_encoder.key_extractor)
+                for encoder_name, cache_encoder in cache_encoders.items()
+            ),
+            cached_encoders_collate_fns=dict(
+                (encoder_name, cache_encoder.get_collate_fn())
+                for encoder_name, cache_encoder in cache_encoders.items()
+            ),
+            unique_objects_extractor=dataloader.fetch_unique_objects,
             dataset=dataloader.dataset,
             batch_size=cache_config.batch_size,
-            collate_fn=cache_collate_fn,
             num_workers=num_workers,
             pin_memory=dataloader.pin_memory,
             timeout=dataloader.timeout,
@@ -227,14 +220,15 @@ class CacheMixin:
             multiprocessing_context=mp_ctx,
         )
 
-        for sample in cache_dl:
-            if not sample:  # all batch objects are already in cache
-                continue
-            for name, encoder in cache_encoders.items():
-                encoder.fill_cache(sample[name])
+        for cache_batch in cache_dl:
+            for encoder_name, encoder in cache_encoders.items():
+                encoder_samples = cache_batch.get(encoder_name)
+                if not encoder_samples:
+                    continue
+                encoder.fill_cache(encoder_samples)
 
     @classmethod
-    def _switch_multiprocessing_context(cls, dataloader):
+    def _switch_multiprocessing_context(cls, dataloader: SimilarityDataLoader):
         if "PYTHONHASHSEED" in os.environ:
             return
 

@@ -4,9 +4,8 @@ from typing import Optional, Callable, List, Any
 import pytorch_lightning as pl
 from torch.utils.data import DataLoader
 
-from quaterion.dataset import (
-    PairsSimilarityDataLoader,
-    GroupSimilarityDataLoader,
+from quaterion.dataset.similarity_data_loader import (
+    PairsSimilarityDataLoader, GroupSimilarityDataLoader
 )
 from quaterion.loss import GroupLoss, PairwiseLoss
 from quaterion.train.trainable_model import TrainableModel
@@ -64,7 +63,6 @@ class Quaterion:
             trainable_model.model.encoders,
             train_dataloader,
             val_dataloader,
-            trainable_model.model.get_collate_fn(),
             trainable_model.cache_config,
         )
 

@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import List, Any, Generic, Dict, Callable
+from typing import List, Any, Dict, Callable
 from torch.utils.data.dataloader import T_co
 from torch.utils.data import Dataset
 

@@ -4,11 +4,13 @@ import torch
 from torch.utils.data import DataLoader
 from torch.utils.data.dataloader import T_co
 
-from quaterion.dataset.similarity_samples import SimilarityPairSample, SimilarityGroupSample
+from quaterion.dataset.similarity_samples import (
+    SimilarityPairSample,
+    SimilarityGroupSample,
+)
 
 
 class SimilarityDataLoader(DataLoader, Generic[T_co]):
-
     @classmethod
     def fetch_unique_objects(cls, batch: List[Any]) -> List[Any]:
         """

@@ -29,9 +29,9 @@ class CacheMixin:
 
     @classmethod
     def _apply_cache_config(
-            cls,
-            encoders: Union[Encoder, Dict[str, Encoder]],
-            cache_config: Optional[CacheConfig],
+        cls,
+        encoders: Union[Encoder, Dict[str, Encoder]],
+        cache_config: Optional[CacheConfig],
     ) -> Union[Encoder, Dict[str, Encoder]]:
         """
         Applies received cache configuration for cached encoders, remain
@@ -108,10 +108,10 @@ class CacheMixin:
 
     @staticmethod
     def _wrap_encoder(
-            encoder: Encoder,
-            cache_type: CacheType,
-            key_extractor: Optional[KeyExtractorType],
-            encoder_name: str = "",
+        encoder: Encoder,
+        cache_type: CacheType,
+        key_extractor: Optional[KeyExtractorType],
+        encoder_name: str = "",
     ) -> Encoder:
         if encoder.trainable():
             raise ValueError(
@@ -125,11 +125,11 @@ class CacheMixin:
 
     @classmethod
     def cache(
-            cls,
-            encoders,
-            train_dataloader: SimilarityDataLoader,
-            val_dataloader: Optional[SimilarityDataLoader],
-            cache_config: CacheConfig,
+        cls,
+        encoders,
+        train_dataloader: SimilarityDataLoader,
+        val_dataloader: Optional[SimilarityDataLoader],
+        cache_config: CacheConfig,
     ) -> None:
         """
         Fill cache for each CacheEncoder
@@ -166,16 +166,14 @@ class CacheMixin:
         of `cache_collate_fn`
         """
         if not isinstance(dataloader, SimilarityDataLoader):
-            raise TypeError(
-                "DataLoader must be SimilarityDataLoader "
-            )
+            raise TypeError("DataLoader must be SimilarityDataLoader ")
 
     @classmethod
     def _cache_dataloader(
-            cls,
-            dataloader: SimilarityDataLoader,
-            cache_config: CacheConfig,
-            cache_encoders: Dict[str, CacheEncoder],
+        cls,
+        dataloader: SimilarityDataLoader,
+        cache_config: CacheConfig,
+        cache_encoders: Dict[str, CacheEncoder],
     ):
         """
         Fills cache for provided dataloader, switches multiprocessing context

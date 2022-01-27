@@ -8,14 +8,13 @@ from quaterion.train.encoders.cache_encoder import KeyExtractorType, CacheCollat
 
 
 class CacheDataLoader(SimilarityDataLoader):
-
     def __init__(
-            self,
-            key_extractors: Dict[str, KeyExtractorType],
-            cached_encoders_collate_fns: Dict[str, CacheCollateFnType],
-            unique_objects_extractor: Callable[[List[Any]], List[Any]],
-            dataset: Dataset[T_co],
-            **kwargs
+        self,
+        key_extractors: Dict[str, KeyExtractorType],
+        cached_encoders_collate_fns: Dict[str, CacheCollateFnType],
+        unique_objects_extractor: Callable[[List[Any]], List[Any]],
+        dataset: Dataset[T_co],
+        **kwargs
     ):
         super().__init__(dataset, collate_fn=self.cache_collate_fn, **kwargs)
         self.unique_objects_extractor = unique_objects_extractor

@@ -5,7 +5,8 @@ import pytorch_lightning as pl
 from torch.utils.data import DataLoader
 
 from quaterion.dataset.similarity_data_loader import (
-    PairsSimilarityDataLoader, GroupSimilarityDataLoader
+    PairsSimilarityDataLoader,
+    GroupSimilarityDataLoader,
 )
 from quaterion.loss import GroupLoss, PairwiseLoss
 from quaterion.train.trainable_model import TrainableModel

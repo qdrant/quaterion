@@ -6,11 +6,20 @@ from quaterion_models.encoders import Encoder
 from quaterion_models.types import TensorInterchange
 
 from quaterion.train.encoders.cache_config import CacheType
-from quaterion.train.encoders.cache_encoder import CacheEncoder, CacheCollateFnType, KeyExtractorType
+from quaterion.train.encoders.cache_encoder import (
+    CacheEncoder,
+    CacheCollateFnType,
+    KeyExtractorType,
+)
 
 
 class InMemoryCacheEncoder(CacheEncoder):
-    def __init__(self, encoder: Encoder, key_extractor: KeyExtractorType = None, cache_type=CacheType.AUTO):
+    def __init__(
+        self,
+        encoder: Encoder,
+        key_extractor: KeyExtractorType = None,
+        cache_type=CacheType.AUTO,
+    ):
         super().__init__(encoder, key_extractor)
         self.cache = {}
         self._cache_type = self.resolve_cache_type(cache_type)

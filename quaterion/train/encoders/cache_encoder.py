@@ -20,7 +20,9 @@ class CacheEncoder(Encoder):
         super().__init__()
         self._encoder = encoder
         self.cache_filled = False
-        self.key_extractor = key_extractor if key_extractor is not None else self.default_key_extractor
+        self.key_extractor = (
+            key_extractor if key_extractor is not None else self.default_key_extractor
+        )
 
     def trainable(self) -> bool:
         return False

@@ -45,8 +45,6 @@ class PairsSimilarityDataLoader(SimilarityDataLoader[SimilarityPairSample]):
 
 
 class GroupSimilarityDataLoader(SimilarityDataLoader[SimilarityGroupSample]):
-    LOCAL_CACHE = set()
-
     @classmethod
     def collate_fn(cls, batch: List[SimilarityGroupSample]):
         features = [record.obj for record in batch]

@@ -56,8 +56,6 @@ class CacheDataLoader(SimilarityDataLoader):
         new_batch = {}
         for encoder_name, collate in self.cached_encoders_collate_fns.items():
             encoder_batch = encoder_batches[encoder_name]
-            new_batch[encoder_name] = (
-                collate(encoder_batch) if encoder_batch else None
-            )
+            new_batch[encoder_name] = collate(encoder_batch) if encoder_batch else None
 
         return new_batch

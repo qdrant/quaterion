@@ -4,6 +4,7 @@ from torch import Tensor, relu, LongTensor
 
 from quaterion.loss.metrics import SiameseDistanceMetric
 from quaterion.loss.pairwise_loss import PairwiseLoss
+from quaterion.utils import max_value_of_dtype
 
 
 class ContrastiveLoss(PairwiseLoss):
@@ -31,7 +32,7 @@ class ContrastiveLoss(PairwiseLoss):
         margin: float = 1.0,
         size_average: bool = True,
     ):
-        super(ContrastiveLoss, self).__init__(distance_metric_name=distance_metric_name)
+        super().__init__(distance_metric_name=distance_metric_name)
         self.margin = margin
         self.size_average = size_average
 
@@ -42,12 +43,49 @@ class ContrastiveLoss(PairwiseLoss):
             "size_average": self.size_average,
         }
 
-    def forward(self, embeddings: Tensor, pairs: LongTensor, labels: Tensor, **kwargs):
+    def forward(
+        self,
+        embeddings: Tensor,
+        pairs: LongTensor,
+        labels: Tensor,
+        subgroups: Tensor,
+        **kwargs
+    ):
         rep_anchor = embeddings[pairs[:, 0]]
         rep_other = embeddings[pairs[:, 1]]
         distances = self.distance_metric(rep_anchor, rep_other)
-        losses = 0.5 * (
-            labels.float() * distances.pow(2)
-            + (1 - labels).float() * relu(self.margin - distances).pow(2)
+        negative_distances_impact = 0.0
+
+        if len(subgroups.unique()) > 1:
+            embeddings_count = embeddings.shape[0]
+            subgroup_matrix: Tensor = subgroups.repeat(embeddings_count, 1)
+            comp_matrix: Tensor = subgroup_matrix != subgroup_matrix.T
+            # a matrix to take into account only distances to negative
+            # examples, i.e. from examples which don't belong to current
+            # subgroup
+
+            distance_matrix = self.distance_metric(
+                embeddings, embeddings, matrix=True
+            )
+            distance_matrix[~comp_matrix] = max_value_of_dtype(
+                distance_matrix.dtype
+            )
+            negative_distances, _ = distance_matrix.min(
+                dim=1
+            )  # find negative examples
+            # which are the closest to positive ones
+            neg_dist_to_anchors = negative_distances[pairs[:, 0]]
+            neg_dist_to_other = negative_distances[pairs[:, 1]]
+            negative_distances_impact = relu(
+                self.margin - neg_dist_to_anchors
+            ).pow(2) + relu(self.margin - neg_dist_to_other).pow(2)
+
+        losses = (
+            0.5
+            * (
+                labels.float() * distances.pow(2)
+                + (1 - labels).float() * relu(self.margin - distances).pow(2)
+            )
+            + negative_distances_impact
         )
         return losses.mean() if self.size_average else losses.sum()

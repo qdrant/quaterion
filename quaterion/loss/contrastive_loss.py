@@ -64,21 +64,15 @@ class ContrastiveLoss(PairwiseLoss):
             # examples, i.e. from examples which don't belong to current
             # subgroup
 
-            distance_matrix = self.distance_metric(
-                embeddings, embeddings, matrix=True
-            )
-            distance_matrix[~comp_matrix] = max_value_of_dtype(
-                distance_matrix.dtype
-            )
-            negative_distances, _ = distance_matrix.min(
-                dim=1
-            )  # find negative examples
+            distance_matrix = self.distance_metric(embeddings, embeddings, matrix=True)
+            distance_matrix[~comp_matrix] = max_value_of_dtype(distance_matrix.dtype)
+            negative_distances, _ = distance_matrix.min(dim=1)  # find negative examples
             # which are the closest to positive ones
             neg_dist_to_anchors = negative_distances[pairs[:, 0]]
             neg_dist_to_other = negative_distances[pairs[:, 1]]
-            negative_distances_impact = relu(
-                self.margin - neg_dist_to_anchors
-            ).pow(2) + relu(self.margin - neg_dist_to_other).pow(2)
+            negative_distances_impact = relu(self.margin - neg_dist_to_anchors).pow(
+                2
+            ) + relu(self.margin - neg_dist_to_other).pow(2)
 
         losses = (
             0.5

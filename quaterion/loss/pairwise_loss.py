@@ -5,9 +5,7 @@ from quaterion.loss.similarity_loss import SimilarityLoss
 
 class PairwiseLoss(SimilarityLoss):
     def __init__(self, distance_metric_name: str = "cosine_distance"):
-        super(PairwiseLoss, self).__init__(
-            distance_metric_name=distance_metric_name
-        )
+        super(PairwiseLoss, self).__init__(distance_metric_name=distance_metric_name)
 
     def forward(
         self,

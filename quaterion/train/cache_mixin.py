@@ -196,6 +196,7 @@ class CacheMixin:
         # Once cache is filled, collate functions return only keys for cache
         for encoder_name in cache_encoders:
             encoders[encoder_name].cache_filled = True
+        logger.info("Caching has been successfully finished")
 
     @classmethod
     def _compatibility_check(cls, dataloader: DataLoader):
@@ -302,6 +303,8 @@ class CacheModel(pl.LightningModule):
     def __init__(self, encoders):
         super().__init__()
         self.encoders = encoders
+        for key, encoder in self.encoders.items():
+            self.add_module(key, encoder)
         self.fake_param = [Parameter(torch.Tensor(1))]
 
     def configure_optimizers(self):
@@ -316,6 +319,9 @@ class CacheModel(pl.LightningModule):
 
     def training_step(self, train_batch, batch_idx):
         self._cache_step(train_batch)
+        fake_loss = torch.Tensor(1)
+        fake_loss.requires_grad = True
+        return fake_loss
 
     def validation_step(self, val_batch, batch_idx):
         self._cache_step(val_batch)

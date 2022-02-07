@@ -175,7 +175,6 @@ class CacheMixin:
                 val_dataloader, cache_config, cache_encoders
             )
 
-
         _fit_loop = trainer.fit_loop
         _val_loop = trainer.validate_loop
 
@@ -192,7 +191,9 @@ class CacheMixin:
         fit_loop.connect(epoch_loop=training_epoch_loop)
         trainer.fit_loop = fit_loop
         loss_to_log = [cb.monitor for cb in trainer.early_stopping_callbacks]
-        trainer.fit(CacheModel(cache_encoders, loss_to_log), train_dataloader, val_dataloader)
+        trainer.fit(
+            CacheModel(cache_encoders, loss_to_log), train_dataloader, val_dataloader
+        )
         trainer.fit_loop = _fit_loop
 
         # Once cache is filled, collate functions return only keys for cache
@@ -304,7 +305,9 @@ class CacheMixin:
 class CacheModel(pl.LightningModule):
     def __init__(self, encoders, loss_to_log="validation_loss"):
         super().__init__()
-        self.loss_to_log = loss_to_log if isinstance(loss_to_log, list) else [loss_to_log]
+        self.loss_to_log = (
+            loss_to_log if isinstance(loss_to_log, list) else [loss_to_log]
+        )
         self.encoders = encoders
         for key, encoder in self.encoders.items():
             self.add_module(key, encoder)

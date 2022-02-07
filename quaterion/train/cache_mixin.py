@@ -1,10 +1,26 @@
-import multiprocessing as mp
 import os
-from typing import Union, Dict, Optional, Set, Any, Callable, Hashable
+import multiprocessing as mp
 
-import pytorch_lightning as pl
+from typing import (
+    Union,
+    Dict,
+    Optional,
+    Set,
+    Any,
+    Callable,
+    Hashable,
+    List,
+    Iterable,
+    Tuple,
+)
+
 import torch.cuda
+import pytorch_lightning as pl
+
 from loguru import logger
+from torch.nn import Parameter
+from torch.optim import Adam, Optimizer
+from torch.utils.data import DataLoader
 from pytorch_lightning.loops import (
     FitLoop,
     TrainingEpochLoop,
@@ -17,11 +33,10 @@ from pytorch_lightning.utilities.types import (
 )
 from quaterion_models.encoders import Encoder
 from quaterion_models.model import DEFAULT_ENCODER_KEY
-from torch.nn import Parameter
-from torch.optim import Adam
-from torch.utils.data import DataLoader
+from quaterion_models.types import TensorInterchange
 
 from quaterion.dataset.cache_data_loader import CacheDataLoader
+from quaterion.train.encoders.cache_encoder import KeyExtractorType
 from quaterion.dataset.similarity_data_loader import SimilarityDataLoader
 from quaterion.train.encoders import (
     CacheConfig,
@@ -29,15 +44,9 @@ from quaterion.train.encoders import (
     CacheType,
     InMemoryCacheEncoder,
 )
-from quaterion.train.encoders.cache_encoder import KeyExtractorType
 
 
 class CacheMixin:
-    # Child processes need to derive randomized `PYTHONHASHSEED` value from
-    # parent process. It is only done with `fork` start method.
-    # `fork` start method is presented on Unix systems and it is the
-    # default for them, except macOS. Therefore, we set `fork` method
-    # explicitly and cache is not supported on Windows.
     CACHE_MULTIPROCESSING_CONTEXT = "fork"
 
     @classmethod
@@ -46,9 +55,26 @@ class CacheMixin:
         encoders: Union[Encoder, Dict[str, Encoder]],
         cache_config: Optional[CacheConfig],
     ) -> Union[Encoder, Dict[str, Encoder]]:
-        """
-        Applies received cache configuration for cached encoders, remain
+        """Applies received cache configuration for cached encoders, remain
         non-cached encoders as is
+
+        Args:
+            encoders: all model's encoders
+            cache_config: CacheConfig instance defined in `configure_cache`
+                method of the model
+
+        Returns:
+            Union[Encoder, Dict[str, encoder]]: encoder or dict of encoders
+                which were wrapped into CacheEncoder instances according to
+                received cache config.
+                Result type depends on the way encoder was defined in the
+                model: with or without explicit mapping
+
+        Raises:
+            KeyError: encoder's name in cache config is not in model's
+                encoders
+            ValueError: if CacheConfig instance does not have some of required
+                options set. E.g. not `mapping` nor `cache_type` being set
         """
         if not cache_config:
             return encoders
@@ -78,10 +104,7 @@ class CacheMixin:
                 ] = cache_config.key_extractors.get(encoder_name)
 
                 encoders[encoder_name]: CacheEncoder = cls._wrap_encoder(
-                    encoder,
-                    cache_type,
-                    key_extractor,
-                    encoder_name,
+                    encoder, cache_type, key_extractor, encoder_name,
                 )
 
                 possible_cache_encoders.remove(encoder_name)
@@ -99,10 +122,7 @@ class CacheMixin:
             cls._check_cuda(cache_config.cache_type, encoder_name)
             key_extractor = cache_config.key_extractors.get(encoder_name)
             encoders = cls._wrap_encoder(
-                encoders,
-                cache_config.cache_type,
-                key_extractor,
-                encoder_name,
+                encoders, cache_config.cache_type, key_extractor, encoder_name,
             )
         else:
             raise ValueError(
@@ -112,7 +132,21 @@ class CacheMixin:
         return encoders
 
     @staticmethod
-    def _check_cuda(cache_type, encoder_name):
+    def _check_cuda(cache_type: CacheType, encoder_name: str) -> None:
+        """
+        If encoder is supposed to use GPU as tensor's storage, then cuda
+        has to be available, otherwise raises ValueError
+
+        Args:
+            cache_type: cache type for encoder
+            encoder_name: name of cache encoder
+
+        Returns:
+            None
+
+        Raises:
+            ValueError: If cuda is not available
+        """
         if cache_type == CacheType.GPU and not torch.cuda.is_available():
             raise ValueError(
                 f"`CacheType.GPU` has been chosen for `{encoder_name}` "
@@ -125,7 +159,23 @@ class CacheMixin:
         cache_type: CacheType,
         key_extractor: Optional[KeyExtractorType],
         encoder_name: str = "",
-    ) -> Encoder:
+    ) -> CacheEncoder:
+        """Wrap encoder into CacheEncoder instance.
+
+        Args:
+            encoder: raw model's encoder
+            cache_type: cache type of tensor storage
+            key_extractor: function to obtain hashable values for complex
+                object which can't be hashed with standard means
+            encoder_name: name of encoder to be wrapped
+
+        Returns:
+            CacheEncoder: wrapped encoder
+
+        Raises:
+            ValueError: if encoder layers are not frozen. Cache can be applied
+                only to fully frozen encoders' outputs.
+        """
         if encoder.trainable():
             raise ValueError(
                 f"Can't configure cache for encoder {encoder_name}. "
@@ -140,21 +190,25 @@ class CacheMixin:
     def cache(
         cls,
         trainer: pl.Trainer,
-        encoders,
+        encoders: Dict[str, Encoder],
         train_dataloader: SimilarityDataLoader,
         val_dataloader: Optional[SimilarityDataLoader],
         cache_config: CacheConfig,
     ) -> None:
-        """
-        Fill cache for each CacheEncoder
+        """Filling cache for model's cache encoders.
 
-        :param trainer:
-        :param encoders:
-        :param train_dataloader:
-        :param val_dataloader:
-        :param cache_config:
+        Args:
+            trainer: performs one training epoch to cache encoders outputs.
+                Preserve all encapsulated pytorch-lightning logic such as
+                device managing etc.
+            encoders: mapping of model's encoders and their names
+            train_dataloader: model's train dataloader
+            val_dataloader: model's val dataloader
+            cache_config: cache config instance to configure cache batch size
+                and num of workers to use for caching
 
-        :return: None
+        Returns:
+            None
         """
         cache_encoders = {
             name: encoder
@@ -175,13 +229,41 @@ class CacheMixin:
                 val_dataloader, cache_config, cache_encoders
             )
 
+        cls._fill_cache(
+            trainer, cache_encoders, train_dataloader, val_dataloader
+        )
+
+        # Once cache is filled, collate functions return only keys for cache
+        for encoder_name in cache_encoders:
+            encoders[encoder_name].cache_filled = True
+        logger.info("Caching has been successfully finished")
+
+    @classmethod
+    def _fill_cache(
+        cls,
+        trainer: pl.Trainer,
+        cache_encoders: Dict[str, CacheEncoder],
+        train_dataloader: SimilarityDataLoader,
+        val_dataloader: SimilarityDataLoader,
+    ) -> None:
+        """Fills cache and restores trainer state for further training process.
+
+        Args:
+            trainer: performs one training and validation epoch
+            cache_encoders: mapping of encoders to cache input
+            train_dataloader: model's train dataloader
+            val_dataloader: model's val dataloader
+
+        Returns:
+            None
+        """
+        # store configured fit and validate loops to restore them for training
+        # process after cache
         _fit_loop = trainer.fit_loop
         _val_loop = trainer.validate_loop
 
-        fit_loop = FitLoop(
-            min_epochs=1,
-            max_epochs=1,
-        )
+        # Mimic fit loop configuration from trainer
+        fit_loop = FitLoop(min_epochs=1, max_epochs=1,)
         training_epoch_loop = TrainingEpochLoop()
         training_batch_loop = TrainingBatchLoop()
         training_validation_loop = EvaluationLoop()
@@ -190,22 +272,33 @@ class CacheMixin:
         )
         fit_loop.connect(epoch_loop=training_epoch_loop)
         trainer.fit_loop = fit_loop
+        # if EarlyStopping callbacks are specified, then we need to log metrics
+        # or losses that are monitored by ES callbacks, or they will raise an
+        # error after validation epoch ends.
         loss_to_log = [cb.monitor for cb in trainer.early_stopping_callbacks]
+        # The actual caching
         trainer.fit(
-            CacheModel(cache_encoders, loss_to_log), train_dataloader, val_dataloader
+            CacheModel(cache_encoders, loss_to_log),
+            train_dataloader,
+            val_dataloader,
         )
         trainer.fit_loop = _fit_loop
 
-        # Once cache is filled, collate functions return only keys for cache
-        for encoder_name in cache_encoders:
-            encoders[encoder_name].cache_filled = True
-        logger.info("Caching has been successfully finished")
-
     @classmethod
-    def _compatibility_check(cls, dataloader: DataLoader):
-        """
-        Cache compatible only with dataloaders which have an implementation
-        of `cache_collate_fn`
+    def _compatibility_check(cls, dataloader: DataLoader) -> None:
+        """Checks whether dataloader type.
+
+        To be used in caching, dataloader has to have an implementation of
+        `cache_collate_fn`. Currently, only `SimilarityDataLoader` has it.
+
+        Args:
+            dataloader: DataLoader
+
+        Returns:
+            None
+
+        Raises:
+            TypeError: if dataloader is not instance of SimilarityDataLoader
         """
         if not isinstance(dataloader, SimilarityDataLoader):
             raise TypeError("DataLoader must be SimilarityDataLoader ")
@@ -217,9 +310,30 @@ class CacheMixin:
         cache_config: CacheConfig,
         cache_encoders: Dict[str, CacheEncoder],
     ) -> CacheDataLoader:
-        """
-        Fills cache for provided dataloader, switches multiprocessing context
-        if required
+        """Wrap dataloader for caching.
+
+        Child processes need to derive randomized `PYTHONHASHSEED` value from
+        parent process to obtain the same hash values. It is only done with
+        `fork` start method.
+        `fork` start method is presented on Unix systems, and it is the default
+        for them, except macOS. Therefore, we set `fork` method explicitly.
+
+        If dataloader is not supposed to use child process, nothing being done.
+        If multiprocessing_context was set by user, it is being untouched and
+        can lead to errors.
+        If `PYTHONHASHSEED` is set explicitly then multiprocessing_context
+        won't be switched.
+        Cache can be used on Windows only in case when `PYTHONHASHSEED` is set
+        explicitly.
+
+        Args:
+            dataloader: dataloader to be wrapped
+            cache_config: cache config to retrieve num of workers and batch
+                size
+            cache_encoders: encoders to set key extractors and collate_fns
+
+        Returns:
+            CacheDataLoader: wrapped dataloader
         """
         cls._switch_multiprocessing_context(dataloader)
         num_workers = (
@@ -240,6 +354,9 @@ class CacheMixin:
             mp_ctx = cls.CACHE_MULTIPROCESSING_CONTEXT
             cls._check_mp_context(mp_ctx)
 
+        # We need to reduce random sampling and repeated calculations to
+        # make cache as fast as possible. Thus, we recreate dataloader
+        # and set batch size explicitly.
         cache_dl = CacheDataLoader(
             key_extractors=dict(
                 (encoder_name, cache_encoder.key_extractor)
@@ -262,20 +379,53 @@ class CacheMixin:
         return cache_dl
 
     @classmethod
-    def _switch_multiprocessing_context(cls, dataloader: SimilarityDataLoader):
+    def _switch_multiprocessing_context(
+        cls, dataloader: SimilarityDataLoader
+    ) -> None:
+        """Switch dataloader multiprocessing context.
+
+        Do nothing if dataloader is not supposed to use child processes or
+        `PYTHONHASHSEED` has been set explicitly by user.
+
+        Args:
+            dataloader: dataloader to check and switch multiprocessing context
+
+        Returns:
+            None
+        """
         if "PYTHONHASHSEED" in os.environ:
             return
 
         if dataloader.num_workers == 0:
             return
 
-        mp_context = dataloader.multiprocessing_context
+        mp_context: Optional[
+            Union[str, mp.context.BaseContext]
+        ] = dataloader.multiprocessing_context
         cls._check_mp_context(mp_context)
 
         dataloader.multiprocessing_context = cls.CACHE_MULTIPROCESSING_CONTEXT
 
     @classmethod
-    def _check_mp_context(cls, mp_context):
+    def _check_mp_context(
+        cls, mp_context: Optional[Union[str, mp.context.BaseContext]]
+    ) -> None:
+        """Check if multiprocessing context is compatible with cache.
+
+        Emits warning if current multiprocessing context start method does not
+        coincide with one required by cache.
+
+        Args:
+            mp_context: some dataloader's multiprocessing context
+
+        Returns:
+            None
+
+        Raises:
+            OSError: Raise OSError if OS does not support process start method
+            required by cache. Currently, this start method is `fork` which is
+            not supported by Windows.
+        """
         if not mp_context:
             return
 
@@ -303,20 +453,50 @@ class CacheMixin:
 
 
 class CacheModel(pl.LightningModule):
-    def __init__(self, encoders, loss_to_log="validation_loss"):
+    """Mock model for convenient caching.
+
+    This class is required to make caching process similar to the training of
+    the genuine model and inherit and use the same trainer instance. It allows
+    avoiding of messing with device managing stuff and more.
+    """
+
+    def __init__(
+        self, encoders: Dict[str, CacheEncoder], loss_to_log: List[str]
+    ):
         super().__init__()
-        self.loss_to_log = (
-            loss_to_log if isinstance(loss_to_log, list) else [loss_to_log]
-        )
+        self.loss_to_log = loss_to_log
         self.encoders = encoders
         for key, encoder in self.encoders.items():
             self.add_module(key, encoder)
+        # training is not really happening here because all encoders are
+        # frozen, but optimizer need something to optimize.
         self.fake_param = [Parameter(torch.Tensor(1))]
 
-    def configure_optimizers(self):
+    def configure_optimizers(self) -> Optimizer:
+        """Anchor required by pl.LightningModule
+
+        We mimic optimization of `self.fake_param`
+
+        Returns:
+            Optimizer: idiomatic implementation can return more types, but
+            we stick with it for the sake of simplicity
+        """
         return Adam(self.fake_param)
 
-    def _cache_step(self, batch):
+    def _cache_step(
+        self, batch: Dict[str, Tuple[Iterable[Hashable], TensorInterchange]]
+    ) -> torch.Tensor:
+        """Caches batch of input.
+
+        Args:
+            batch: batch of collated data. Contains mapping, where key is
+                encoder's name, value is tuple of key used in cache and
+                according items, which are ready to be processed by specific
+                encoder.
+
+        Returns:
+            torch.Tensor: loss mock
+        """
         for encoder_name, encoder in self.encoders.items():
             encoder_samples = batch.get(encoder_name)
             if not encoder_samples:
@@ -330,6 +510,8 @@ class CacheModel(pl.LightningModule):
         return fake_loss
 
     def training_step(self, train_batch, batch_idx):
+        # it is better to return something from trainer step otherwise we'll
+        # get a warning in the log
         return self._cache_step(train_batch)
 
     def validation_step(self, val_batch, batch_idx):

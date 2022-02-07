@@ -78,7 +78,10 @@ class CacheMixin:
                 ] = cache_config.key_extractors.get(encoder_name)
 
                 encoders[encoder_name]: CacheEncoder = cls._wrap_encoder(
-                    encoder, cache_type, key_extractor, encoder_name,
+                    encoder,
+                    cache_type,
+                    key_extractor,
+                    encoder_name,
                 )
 
                 possible_cache_encoders.remove(encoder_name)
@@ -96,7 +99,10 @@ class CacheMixin:
             cls._check_cuda(cache_config.cache_type, encoder_name)
             key_extractor = cache_config.key_extractors.get(encoder_name)
             encoders = cls._wrap_encoder(
-                encoders, cache_config.cache_type, key_extractor, encoder_name,
+                encoders,
+                cache_config.cache_type,
+                key_extractor,
+                encoder_name,
             )
         else:
             raise ValueError(
@@ -172,7 +178,10 @@ class CacheMixin:
         _fit_loop = trainer.fit_loop
         _val_loop = trainer.validate_loop
 
-        fit_loop = FitLoop(min_epochs=1, max_epochs=1,)
+        fit_loop = FitLoop(
+            min_epochs=1,
+            max_epochs=1,
+        )
         training_epoch_loop = TrainingEpochLoop()
         training_batch_loop = TrainingBatchLoop()
         training_validation_loop = EvaluationLoop()
@@ -181,9 +190,7 @@ class CacheMixin:
         )
         fit_loop.connect(epoch_loop=training_epoch_loop)
         trainer.fit_loop = fit_loop
-        trainer.fit(
-            CacheModel(cache_encoders), train_dataloader, val_dataloader
-        )
+        trainer.fit(CacheModel(cache_encoders), train_dataloader, val_dataloader)
         trainer.fit_loop = _fit_loop
 
         # Once cache is filled, collate functions return only keys for cache

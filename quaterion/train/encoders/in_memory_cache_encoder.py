@@ -16,6 +16,7 @@ from quaterion.train.encoders.cache_encoder import (
 
 class InMemoryCacheEncoder(CacheEncoder):
     """CacheEncoder which is able to store tensors on CPU or GPU"""
+
     def __init__(
         self,
         encoder: Encoder,
@@ -40,9 +41,7 @@ class InMemoryCacheEncoder(CacheEncoder):
             CacheType
         """
         if cache_type == CacheType.AUTO:
-            cache_type = (
-                CacheType.GPU if torch.cuda.is_available() else CacheType.CPU
-            )
+            cache_type = CacheType.GPU if torch.cuda.is_available() else CacheType.CPU
         return cache_type
 
     @property
@@ -73,9 +72,7 @@ class InMemoryCacheEncoder(CacheEncoder):
         """
         return self.cache_collate
 
-    def fill_cache(
-        self, data: Tuple[Iterable[Hashable], TensorInterchange]
-    ) -> None:
+    def fill_cache(self, data: Tuple[Iterable[Hashable], TensorInterchange]) -> None:
         """Apply wrapped encoder to data and store processed data on
         corresponding device.
 

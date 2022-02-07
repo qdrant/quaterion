@@ -2,6 +2,7 @@ from functools import partial
 from typing import Optional, Callable, List, Any
 
 import pytorch_lightning as pl
+
 from torch.utils.data import DataLoader
 
 from quaterion.dataset.similarity_data_loader import (
@@ -61,6 +62,7 @@ class Quaterion:
             val_dataloader.collate_fn = train_dataloader.collate_fn
 
         trainable_model.cache(
+            trainer,
             trainable_model.model.encoders,
             train_dataloader,
             val_dataloader,

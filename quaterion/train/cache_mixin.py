@@ -2,10 +2,23 @@ import multiprocessing as mp
 import os
 from typing import Union, Dict, Optional, Set, Any, Callable, Hashable
 
+import pytorch_lightning as pl
 import torch.cuda
 from loguru import logger
+from pytorch_lightning.loops import (
+    FitLoop,
+    TrainingEpochLoop,
+    TrainingBatchLoop,
+    EvaluationLoop,
+)
+from pytorch_lightning.utilities.types import (
+    TRAIN_DATALOADERS,
+    EVAL_DATALOADERS,
+)
 from quaterion_models.encoders import Encoder
 from quaterion_models.model import DEFAULT_ENCODER_KEY
+from torch.nn import Parameter
+from torch.optim import Adam
 from torch.utils.data import DataLoader
 
 from quaterion.dataset.cache_data_loader import CacheDataLoader
@@ -65,10 +78,7 @@ class CacheMixin:
                 ] = cache_config.key_extractors.get(encoder_name)
 
                 encoders[encoder_name]: CacheEncoder = cls._wrap_encoder(
-                    encoder,
-                    cache_type,
-                    key_extractor,
-                    encoder_name,
+                    encoder, cache_type, key_extractor, encoder_name,
                 )
 
                 possible_cache_encoders.remove(encoder_name)
@@ -86,10 +96,7 @@ class CacheMixin:
             cls._check_cuda(cache_config.cache_type, encoder_name)
             key_extractor = cache_config.key_extractors.get(encoder_name)
             encoders = cls._wrap_encoder(
-                encoders,
-                cache_config.cache_type,
-                key_extractor,
-                encoder_name,
+                encoders, cache_config.cache_type, key_extractor, encoder_name,
             )
         else:
             raise ValueError(
@@ -126,6 +133,7 @@ class CacheMixin:
     @classmethod
     def cache(
         cls,
+        trainer: pl.Trainer,
         encoders,
         train_dataloader: SimilarityDataLoader,
         val_dataloader: Optional[SimilarityDataLoader],
@@ -134,10 +142,12 @@ class CacheMixin:
         """
         Fill cache for each CacheEncoder
 
-        :param encoders: MetricModel
+        :param trainer:
+        :param encoders:
         :param train_dataloader:
         :param val_dataloader:
         :param cache_config:
+
         :return: None
         """
         cache_encoders = {
@@ -150,10 +160,31 @@ class CacheMixin:
             return
 
         cls._compatibility_check(train_dataloader)
-        cls._cache_dataloader(train_dataloader, cache_config, cache_encoders)
+        train_dataloader = cls._wrap_cache_dataloader(
+            train_dataloader, cache_config, cache_encoders
+        )
 
         if val_dataloader is not None:
-            cls._cache_dataloader(val_dataloader, cache_config, cache_encoders)
+            val_dataloader = cls._wrap_cache_dataloader(
+                val_dataloader, cache_config, cache_encoders
+            )
+
+        _fit_loop = trainer.fit_loop
+        _val_loop = trainer.validate_loop
+
+        fit_loop = FitLoop(min_epochs=1, max_epochs=1,)
+        training_epoch_loop = TrainingEpochLoop()
+        training_batch_loop = TrainingBatchLoop()
+        training_validation_loop = EvaluationLoop()
+        training_epoch_loop.connect(
+            batch_loop=training_batch_loop, val_loop=training_validation_loop
+        )
+        fit_loop.connect(epoch_loop=training_epoch_loop)
+        trainer.fit_loop = fit_loop
+        trainer.fit(
+            CacheModel(cache_encoders), train_dataloader, val_dataloader
+        )
+        trainer.fit_loop = _fit_loop
 
         # Once cache is filled, collate functions return only keys for cache
         for encoder_name in cache_encoders:
@@ -169,12 +200,12 @@ class CacheMixin:
             raise TypeError("DataLoader must be SimilarityDataLoader ")
 
     @classmethod
-    def _cache_dataloader(
+    def _wrap_cache_dataloader(
         cls,
         dataloader: SimilarityDataLoader,
         cache_config: CacheConfig,
         cache_encoders: Dict[str, CacheEncoder],
-    ):
+    ) -> CacheDataLoader:
         """
         Fills cache for provided dataloader, switches multiprocessing context
         if required
@@ -217,13 +248,7 @@ class CacheMixin:
             prefetch_factor=dataloader.prefetch_factor,
             multiprocessing_context=mp_ctx,
         )
-
-        for cache_batch in cache_dl:
-            for encoder_name, encoder in cache_encoders.items():
-                encoder_samples = cache_batch.get(encoder_name)
-                if not encoder_samples:
-                    continue
-                encoder.fill_cache(encoder_samples)
+        return cache_dl
 
     @classmethod
     def _switch_multiprocessing_context(cls, dataloader: SimilarityDataLoader):
@@ -264,3 +289,41 @@ class CacheMixin:
                 f"{cls.CACHE_MULTIPROCESSING_CONTEXT} multiprocessing context "
                 "is not available on current OS"
             )
+
+
+class CacheModel(pl.LightningModule):
+    def __init__(self, encoders):
+        super().__init__()
+        self.encoders = encoders
+        self.fake_param = [Parameter(torch.Tensor(1))]
+
+    def configure_optimizers(self):
+        return Adam(self.fake_param)
+
+    def _cache_step(self, batch):
+        for encoder_name, encoder in self.encoders.items():
+            encoder_samples = batch.get(encoder_name)
+            if not encoder_samples:
+                continue
+            encoder.fill_cache(encoder_samples)
+
+    def training_step(self, train_batch, batch_idx):
+        self._cache_step(train_batch)
+
+    def validation_step(self, val_batch, batch_idx):
+        self._cache_step(val_batch)
+
+    # region anchors
+    def train_dataloader(self) -> TRAIN_DATALOADERS:
+        pass
+
+    def test_dataloader(self) -> EVAL_DATALOADERS:
+        pass
+
+    def val_dataloader(self) -> EVAL_DATALOADERS:
+        pass
+
+    def predict_dataloader(self) -> EVAL_DATALOADERS:
+        pass
+
+    # endregion

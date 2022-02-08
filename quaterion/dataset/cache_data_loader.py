@@ -8,6 +8,14 @@ from quaterion.train.encoders.cache_encoder import KeyExtractorType, CacheCollat
 
 
 class CacheDataLoader(SimilarityDataLoader):
+    """DataLoader used to provide convenient way of caching.
+
+    Provides a way to avoid repeated calculations in the context of current
+    process.
+    Fetches unique objects from batch and then store results in local cache for
+    further reuse.
+
+    """
     def __init__(
         self,
         key_extractors: Dict[str, KeyExtractorType],
@@ -24,6 +32,14 @@ class CacheDataLoader(SimilarityDataLoader):
 
     @classmethod
     def fetch_unique_objects(cls, batch: List[Any]) -> List[Any]:
+        """Fetches unique objects across batch to avoid repeated calculations.
+
+        Args:
+            batch: batch of raw data
+
+        Returns:
+            List[Any]: batch of unique objects
+        """
         pass
 
     def cache_collate_fn(self, batch: List[T_co]):

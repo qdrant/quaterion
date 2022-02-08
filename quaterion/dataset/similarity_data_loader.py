@@ -27,14 +27,18 @@ class PairsSimilarityDataLoader(SimilarityDataLoader[SimilarityPairSample]):
             record.obj_b for record in batch
         ]
         labels = {
-            "pairs": torch.LongTensor([[i, i + len(batch)] for i in range(len(batch))]),
+            "pairs": torch.LongTensor(
+                [[i, i + len(batch)] for i in range(len(batch))]
+            ),
             "labels": torch.Tensor([record.score for record in batch]),
-            "subgroups": torch.Tensor([record.subgroup for record in batch] * 2),
+            "subgroups": torch.Tensor(
+                [record.subgroup for record in batch] * 2
+            ),
         }
         return features, labels
 
     @classmethod
-    def fetch_unique_objects(cls, batch):
+    def fetch_unique_objects(cls, batch: List[SimilarityPairSample]):
         unique_objects = []
         for sample in batch:
             if sample.obj_a not in unique_objects:
@@ -48,11 +52,15 @@ class GroupSimilarityDataLoader(SimilarityDataLoader[SimilarityGroupSample]):
     @classmethod
     def collate_fn(cls, batch: List[SimilarityGroupSample]):
         features = [record.obj for record in batch]
-        labels = {"groups": torch.LongTensor([record.group for record in batch])}
+        labels = {
+            "groups": torch.LongTensor([record.group for record in batch])
+        }
         return features, labels
 
     @classmethod
-    def fetch_unique_objects(cls, batch: List[Any]) -> List[Any]:
+    def fetch_unique_objects(
+        cls, batch: List[SimilarityGroupSample]
+    ) -> List[SimilarityGroupSample]:
         unique_objects = []
         for sample in batch:
             if sample.obj not in unique_objects:

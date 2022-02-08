@@ -19,9 +19,7 @@ from quaterion.eval.metrics import (
     ],
 )
 def test_retrieval_reciprocal_rank_2d(rrk_preds, rrk_targets, expected):
-    assert torch.equal(
-        retrieval_reciprocal_rank_2d(rrk_preds, rrk_targets), expected
-    )
+    assert torch.equal(retrieval_reciprocal_rank_2d(rrk_preds, rrk_targets), expected)
 
 
 @pytest.mark.parametrize(

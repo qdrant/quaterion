@@ -16,6 +16,7 @@ class CacheDataLoader(SimilarityDataLoader):
     further reuse.
 
     """
+
     def __init__(
         self,
         key_extractors: Dict[str, KeyExtractorType],

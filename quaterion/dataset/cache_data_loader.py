@@ -25,6 +25,12 @@ class CacheDataLoader(SimilarityDataLoader):
         dataset: Dataset[T_co],
         **kwargs
     ):
+        # We use `pl.trainer.predict` to fill cache, but it recreates
+        # dataloader instance internally. Trainer does it by collecting current
+        # instance's `**kwargs` and creating a brand-new object of dataloader.
+        # `**kwargs` contains `collate_fn` key which is duplicated with ours
+        # and raises a TypeError: multiple values for keyword argument.
+        kwargs.pop('collate_fn', None)
         super().__init__(dataset, collate_fn=self.cache_collate_fn, **kwargs)
         self.unique_objects_extractor = unique_objects_extractor
         self.cached_encoders_collate_fns = cached_encoders_collate_fns

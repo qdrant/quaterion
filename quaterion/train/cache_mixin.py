@@ -18,8 +18,6 @@ import torch.cuda
 import pytorch_lightning as pl
 
 from loguru import logger
-from torch.nn import Parameter
-from torch.optim import Adam, Optimizer
 from torch.utils.data import DataLoader
 from pytorch_lightning.loops import (
     FitLoop,
@@ -104,10 +102,7 @@ class CacheMixin:
                 ] = cache_config.key_extractors.get(encoder_name)
 
                 encoders[encoder_name]: CacheEncoder = cls._wrap_encoder(
-                    encoder,
-                    cache_type,
-                    key_extractor,
-                    encoder_name,
+                    encoder, cache_type, key_extractor, encoder_name,
                 )
 
                 possible_cache_encoders.remove(encoder_name)
@@ -125,10 +120,7 @@ class CacheMixin:
             cls._check_cuda(cache_config.cache_type, encoder_name)
             key_extractor = cache_config.key_extractors.get(encoder_name)
             encoders = cls._wrap_encoder(
-                encoders,
-                cache_config.cache_type,
-                key_extractor,
-                encoder_name,
+                encoders, cache_config.cache_type, key_extractor, encoder_name,
             )
         else:
             raise ValueError(
@@ -235,11 +227,13 @@ class CacheMixin:
                 val_dataloader, cache_config, cache_encoders
             )
 
-        cls._fill_cache(trainer, cache_encoders, train_dataloader, val_dataloader)
+        cls._fill_cache(
+            trainer, cache_encoders, train_dataloader, val_dataloader
+        )
 
         # Once cache is filled, collate functions return only keys for cache
-        for encoder_name in cache_encoders:
-            encoders[encoder_name].cache_filled = True
+        for encoder in cache_encoders.values():
+            encoder.cache_filled = True
         logger.info("Caching has been successfully finished")
 
     @classmethod
@@ -267,10 +261,7 @@ class CacheMixin:
         _val_loop = trainer.validate_loop
 
         # Mimic fit loop configuration from trainer
-        fit_loop = FitLoop(
-            min_epochs=1,
-            max_epochs=1,
-        )
+        fit_loop = FitLoop(min_epochs=1, max_epochs=1,)
         training_epoch_loop = TrainingEpochLoop()
         training_batch_loop = TrainingBatchLoop()
         training_validation_loop = EvaluationLoop()
@@ -279,15 +270,10 @@ class CacheMixin:
         )
         fit_loop.connect(epoch_loop=training_epoch_loop)
         trainer.fit_loop = fit_loop
-        # if EarlyStopping callbacks are specified, then we need to log metrics
-        # or losses that are monitored by ES callbacks, or they will raise an
-        # error after validation epoch ends.
-        loss_to_log = [cb.monitor for cb in trainer.early_stopping_callbacks]
+
         # The actual caching
-        trainer.fit(
-            CacheModel(cache_encoders, loss_to_log),
-            train_dataloader,
-            val_dataloader,
+        trainer.predict(
+            CacheModel(cache_encoders,), [train_dataloader, val_dataloader],
         )
         trainer.fit_loop = _fit_loop
 
@@ -386,7 +372,9 @@ class CacheMixin:
         return cache_dl
 
     @classmethod
-    def _switch_multiprocessing_context(cls, dataloader: SimilarityDataLoader) -> None:
+    def _switch_multiprocessing_context(
+        cls, dataloader: SimilarityDataLoader
+    ) -> None:
         """Switch dataloader multiprocessing context.
 
         Do nothing if dataloader is not supposed to use child processes or
@@ -465,30 +453,20 @@ class CacheModel(pl.LightningModule):
     avoiding of messing with device managing stuff and more.
     """
 
-    def __init__(self, encoders: Dict[str, CacheEncoder], loss_to_log: List[str]):
+    def __init__(
+        self, encoders: Dict[str, CacheEncoder],
+    ):
         super().__init__()
-        self.loss_to_log = loss_to_log
         self.encoders = encoders
         for key, encoder in self.encoders.items():
             self.add_module(key, encoder)
-        # training is not really happening here because all encoders are
-        # frozen, but optimizer need something to optimize.
-        self.fake_param = [Parameter(torch.Tensor(1))]
 
-    def configure_optimizers(self) -> Optimizer:
-        """Anchor required by pl.LightningModule
-
-        We mimic optimization of `self.fake_param`
-
-        Returns:
-            Optimizer: idiomatic implementation can return more types, but
-            we stick with it for the sake of simplicity
-        """
-        return Adam(self.fake_param)
-
-    def _cache_step(
-        self, batch: Dict[str, Tuple[Iterable[Hashable], TensorInterchange]]
-    ) -> torch.Tensor:
+    def predict_step(
+        self,
+        batch: Dict[str, Tuple[Iterable[Hashable], TensorInterchange]],
+        batch_idx: int,
+        dataloader_idx: Optional[int] = None,
+    ):
         """Caches batch of input.
 
         Args:
@@ -496,7 +474,8 @@ class CacheModel(pl.LightningModule):
                 encoder's name, value is tuple of key used in cache and
                 according items, which are ready to be processed by specific
                 encoder.
-
+            batch_idx: Index of current batch
+            dataloader_idx: Index of the current dataloader
         Returns:
             torch.Tensor: loss mock
         """
@@ -505,20 +484,6 @@ class CacheModel(pl.LightningModule):
             if not encoder_samples:
                 continue
             encoder.fill_cache(encoder_samples)
-
-        fake_loss = torch.Tensor(1)
-        fake_loss.requires_grad = True
-        for loss in self.loss_to_log:
-            self.log(loss, fake_loss, logger=False)
-        return fake_loss
-
-    def training_step(self, train_batch, batch_idx):
-        # it is better to return something from trainer step otherwise we'll
-        # get a warning in the log
-        return self._cache_step(train_batch)
-
-    def validation_step(self, val_batch, batch_idx):
-        self._cache_step(val_batch)
 
     # region anchors
     def train_dataloader(self) -> TRAIN_DATALOADERS:

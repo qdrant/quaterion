@@ -494,6 +494,8 @@ class CacheModel(pl.LightningModule):
                 continue
             encoder.fill_cache(encoder_samples)
 
+        return torch.Tensor([1])
+
     # region anchors
     def train_dataloader(self) -> TRAIN_DATALOADERS:
         pass

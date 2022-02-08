@@ -3,16 +3,26 @@ from typing import Collection, Hashable, Any, List, Callable, Union, Tuple
 from torch import Tensor
 
 from quaterion_models.encoders import Encoder
-from quaterion_models.types import CollateFnType, TensorInterchange
+from quaterion_models.types import TensorInterchange
+
+KeyExtractorType = Callable[[Any], Hashable]
+
+CacheCollateFnType = Callable[
+    [Collection[Any]],
+    Union[List[Hashable], Tuple[Hashable, TensorInterchange]],
+]
 
 
 class CacheEncoder(Encoder):
-    def __init__(self, encoder: Encoder):
+    def __init__(self, encoder: Encoder, key_extractor: KeyExtractorType = None):
         if encoder.trainable():
             raise ValueError("Trainable encoder can't be cached")
         super().__init__()
         self._encoder = encoder
         self.cache_filled = False
+        self.key_extractor = (
+            key_extractor if key_extractor is not None else self.default_key_extractor
+        )
 
     def trainable(self) -> bool:
         return False
@@ -23,7 +33,8 @@ class CacheEncoder(Encoder):
         """
         return self._encoder.embedding_size()
 
-    def key_extractor(self, obj: Any) -> Hashable:
+    @classmethod
+    def default_key_extractor(cls, obj: Any) -> Hashable:
         """
         Generate hashable from batch object
         :return: Key for cache
@@ -39,14 +50,6 @@ class CacheEncoder(Encoder):
         """
         return [self.key_extractor(value) for value in batch]
 
-    def configure_key_extractor(
-        self, key_extractor_fn: Callable[[Any], Hashable]
-    ) -> None:
-        """
-        Override default `key_extractor` implementation with provided one
-        """
-        setattr(self, "key_extractor", key_extractor_fn)
-
     def cache_collate(
         self, batch: Collection[Any]
     ) -> Union[List[Hashable], Tuple[Hashable, TensorInterchange]]:
@@ -61,7 +64,7 @@ class CacheEncoder(Encoder):
         values: TensorInterchange = self._encoder.get_collate_fn()(batch)
         return keys, values
 
-    def get_collate_fn(self) -> CollateFnType:
+    def get_collate_fn(self) -> CacheCollateFnType:
         """
         Provides function that converts raw data batch into suitable model
         input

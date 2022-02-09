@@ -9,12 +9,16 @@ class SiameseDistanceMetric:
     """
 
     @staticmethod
-    def euclidean(x: Tensor, y: Tensor) -> Tensor:
-        return pairwise_distance(x, y, p=2)
+    def euclidean(x: Tensor, y: Tensor, matrix=False) -> Tensor:
+        if not matrix:
+            return pairwise_distance(x, y, p=2)
+        raise NotImplementedError()
 
     @staticmethod
-    def manhattan(x: Tensor, y: Tensor) -> Tensor:
-        return pairwise_distance(x, y, p=1)
+    def manhattan(x: Tensor, y: Tensor, matrix=False) -> Tensor:
+        if not matrix:
+            return pairwise_distance(x, y, p=1)
+        raise NotImplementedError()
 
     @staticmethod
     def cosine_distance(x: Tensor, y: Tensor, matrix=False) -> Tensor:
@@ -22,7 +26,7 @@ class SiameseDistanceMetric:
             return 1 - cosine_similarity(x, y)
 
         x_norm = F.normalize(x, p=2, dim=1)
-        y_norm = F.normalize(y.transpose(0, 1), p=2, dim=1)
+        y_norm = F.normalize(y, p=2, dim=1).transpose(0, 1)
         return 1 - torch.mm(x_norm, y_norm)
 
     @staticmethod

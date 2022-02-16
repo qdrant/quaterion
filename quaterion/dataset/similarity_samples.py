@@ -34,13 +34,13 @@ class SimilarityPairSample:
 
 @dataclass
 class SimilarityGroupSample:
-    """
-    Represent groups of similar objects all of which should match with one-another within the group.
+    """Represent groups of similar objects all of which should match with one-another
+        within the group.
 
-    Example:
-        Faces dataset. All pictures of a single person should have single unique group id.
-        In this case NN will learn to match all pictures within the group closer to each-other, but
-        pictures from different groups - further.
+    Examples:
+        Faces dataset. All pictures of a single person should have single unique group
+        id. In this case NN will learn to match all pictures within the group closer to
+        each-other, but pictures from different groups - further.
 
         ```csv
         file_name,group_id

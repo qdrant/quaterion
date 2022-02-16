@@ -73,14 +73,10 @@ class InMemoryCacheEncoder(CacheEncoder):
         return self.cache_collate
 
     def fill_cache(self, data: Tuple[Iterable[Hashable], TensorInterchange]) -> None:
-        """Apply wrapped encoder to data and store processed data on
-        corresponding device.
+        """Apply wrapped encoder to data and store embeddings on corresponding device.
 
         Args:
             data: Tuple of keys and batches suitable for encoder
-
-        Returns:
-            None
         """
         keys, batch = data
         embeddings = self._encoder(batch)
@@ -89,10 +85,6 @@ class InMemoryCacheEncoder(CacheEncoder):
         self.cache.update(dict(zip(keys, embeddings)))
 
     def reset_cache(self) -> None:
-        """Resets cache.
-
-        Returns:
-            None
-        """
+        """Resets cache."""
         self.cache.clear()
         self.cache_filled = False

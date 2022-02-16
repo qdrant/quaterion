@@ -1,10 +1,16 @@
 from collections import defaultdict
-from typing import List, Any, Dict, Callable
-from torch.utils.data.dataloader import T_co
+from typing import List, Any, Dict, Callable, Optional
+
 from torch.utils.data import Dataset
+from torch.utils.data.dataloader import T_co
+
 
 from quaterion.dataset.similarity_data_loader import SimilarityDataLoader
-from quaterion.train.encoders.cache_encoder import KeyExtractorType, CacheCollateFnType
+from quaterion.train.encoders.cache_encoder import (
+    KeyExtractorType,
+    CacheCollateFnType,
+    CacheCollateReturnType,
+)
 
 
 class CacheDataLoader(SimilarityDataLoader):
@@ -12,9 +18,14 @@ class CacheDataLoader(SimilarityDataLoader):
 
     Provides a way to avoid repeated calculations in the context of current
     process.
-    Fetches unique objects from batch and then store results in local cache for
-    further reuse.
 
+    Args:
+        key_extractors: extract hashable keys for cache
+        cached_encoders_collate_fns: mapping of encoders' collate functions returning
+            pairs of keys and values while in caching, and only keys otherwise
+        unique_objects_extractor: function to extract unique objects from batch
+        dataset: dataset object to load data from
+        **kwargs: key-word arguments to be passed to dataloader's `__init__`
     """
 
     def __init__(
@@ -38,24 +49,26 @@ class CacheDataLoader(SimilarityDataLoader):
         self.seen_objects = defaultdict(set)
 
     @classmethod
-    def fetch_unique_objects(cls, batch: List[Any]) -> List[Any]:
+    def fetch_unique_objects(cls, batch: List[T_co]) -> List[Any]:
         """Fetches unique objects across batch to avoid repeated calculations.
 
         Args:
             batch: batch of raw data
 
         Returns:
-            List[Any]: batch of unique objects
+            List[Any]: list of unique objects
         """
         pass
 
-    def cache_collate_fn(self, batch: List[T_co]):
+    def cache_collate_fn(
+        self, batch: List[T_co]
+    ) -> Dict[str, Optional[CacheCollateReturnType]]:
         """
         Collate used to cache batches without repeated calculations of
-        embeddings in current process
+        embeddings in the current process
 
         Args:
-            batch:
+            batch: batch of raw data
 
         Returns:
             Example:
@@ -65,7 +78,7 @@ class CacheDataLoader(SimilarityDataLoader):
             }
             ```
         """
-        unique_objects = self.unique_objects_extractor(batch)
+        unique_objects: List[Any] = self.unique_objects_extractor(batch)
 
         encoder_batches = defaultdict(list)
         for obj in unique_objects:

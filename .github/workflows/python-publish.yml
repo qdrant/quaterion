@@ -1,5 +1,7 @@
 # This workflow will upload a Python Package using Twine when a release is created
 # For more information see: https://help.github.com/en/actions/language-and-framework-guides/using-python-with-github-actions#publishing-to-package-registries
+# It will also auto-generate API docs
+# and push them to the repository.
 
 # This workflow uses actions that are not certified by GitHub.
 # They are provided by a third-party and are governed by
@@ -40,3 +42,14 @@ jobs:
       with:
         user: __token__
         password: ${{ secrets.PYPI_API_TOKEN }}
+
+      - name: Generate docs
+        run: |
+          poetry run pdoc3 -f --html -o ./docs quaterion
+          git config --global user.name 'qdrant'
+          git config --global user.email 'qdrant@users.noreply.github.com'
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
+          git checkout master
+          git add ./docs/
+          git commit -am "docs: auto-generate docs with pdoc3"
+          git push

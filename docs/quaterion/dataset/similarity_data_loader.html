@@ -1,0 +1,1210 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.10.0" />
+<title>quaterion.dataset.similarity_data_loader API documentation</title>
+<meta name="description" content="" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>quaterion.dataset.similarity_data_loader</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">from typing import Any, List, Generic, Dict, Tuple
+
+import torch
+from torch.utils.data import DataLoader
+from torch.utils.data.dataloader import T_co
+
+from quaterion.dataset.similarity_samples import (
+    SimilarityPairSample,
+    SimilarityGroupSample,
+)
+
+
+class SimilarityDataLoader(DataLoader, Generic[T_co]):
+    @classmethod
+    def fetch_unique_objects(cls, batch: List[Any]) -&gt; List[Any]:
+        &#34;&#34;&#34;Fetch unique objects to avoid calculation of repeated objects embeddings.
+
+        Args:
+            batch: batch of raw data
+
+        Returns:
+            List[Any]: list of unique objects
+
+        &#34;&#34;&#34;
+        raise NotImplementedError()
+
+
+class PairsSimilarityDataLoader(SimilarityDataLoader[SimilarityPairSample]):
+    @classmethod
+    def collate_fn(
+        cls, batch: List[SimilarityPairSample]
+    ) -&gt; Tuple[List[Any], Dict[str, torch.Tensor]]:
+        &#34;&#34;&#34;Collate function for SimilarityPairSamples objects.
+
+        Extract features from pairs and collects them in list.
+        Construct labels dict with `pairs`, `labels` and `subgroups`.
+
+        Args:
+            batch: List of SimilarityPairSample objects
+
+        Returns:
+            Tuple[List[Any], Dict[str, torch.Tensor]]: tuple of features and labels
+
+        Examples:
+            ```
+            PairsSimilarityDataLoader.collate_fn(
+                [
+                    SimilarityPairSample(
+                        obj_a=&#34;1st_pair_1st_obj&#34;, obj_b=&#34;1st_pair_2nd_obj&#34;, score=1.0,
+                    ),
+                    SimilarityPairSample(
+                        obj_a=&#34;2nd_pair_1st_obj&#34;,
+                        obj_b=&#34;2nd_pair_2nd_obj&#34;,
+                        score=0.0,
+                        subgroup=1
+                    ),
+                ]
+            )
+
+            # result
+            (
+                # features
+                [
+                    &#39;1st_pair_1st_obj&#39;,
+                    &#39;2nd_pair_1st_obj&#39;,
+                    &#39;1st_pair_2nd_obj&#39;,
+                    &#39;2nd_pair_2nd_obj&#39;
+                ],
+                # labels
+                {
+                    &#39;labels&#39;: tensor([1., 0.]),
+                    &#39;pairs&#39;: tensor([[0, 2], [1, 3]]),
+                    &#39;subgroups&#39;: tensor([0., 1., 0., 1.])
+                }
+            )
+            ```
+        &#34;&#34;&#34;
+        features = [record.obj_a for record in batch] + [
+            record.obj_b for record in batch
+        ]
+        labels = {
+            &#34;pairs&#34;: torch.LongTensor([[i, i + len(batch)] for i in range(len(batch))]),
+            &#34;labels&#34;: torch.Tensor([record.score for record in batch]),
+            &#34;subgroups&#34;: torch.Tensor([record.subgroup for record in batch] * 2),
+        }
+        return features, labels
+
+    @classmethod
+    def fetch_unique_objects(cls, batch: List[SimilarityPairSample]) -&gt; List[Any]:
+        &#34;&#34;&#34;Fetch unique objects from SimilarityPairSample batch.
+
+        Collect unique `obj_a` and `obj_b` from samples in a batch.
+
+        Args:
+            batch: List of SimilarityPairSample&#39;s
+
+        Returns:
+            List[Any]: list of unique `obj_a` and `obj_b` in batch
+        &#34;&#34;&#34;
+        unique_objects = []
+        for sample in batch:
+            if sample.obj_a not in unique_objects:
+                unique_objects.append(sample.obj_a)
+            if sample.obj_b not in unique_objects:
+                unique_objects.append(sample.obj_b)
+        return unique_objects
+
+
+class GroupSimilarityDataLoader(SimilarityDataLoader[SimilarityGroupSample]):
+    @classmethod
+    def collate_fn(
+        cls, batch: List[SimilarityGroupSample]
+    ) -&gt; Tuple[List[Any], Dict[str, torch.Tensor]]:
+        &#34;&#34;&#34;Collate function for SimilarityGroupSamples objects.
+
+        Extract features from pairs and collects them in list.
+        Construct labels dict with `groups`.
+
+        Args:
+            batch: List of SimilarityGroupSample objects
+
+        Returns:
+            Tuple[List[Any], Dict[str, torch.Tensor]]: tuple of features and
+                labels
+
+        Examples:
+            ```
+            GroupSimilarityDataLoader.collate_fn(
+                [
+                    SimilarityGroupSample(
+                        obj=&#34;orange&#34;,
+                        group=0,
+                    ),
+                    SimilarityGroupSample(
+                        obj=&#34;lemon&#34;,
+                        group=0,
+                    ),
+                    SimilarityGroupSample(
+                        obj=&#34;apple&#34;,
+                        group=1,
+                    )
+                ]
+            )
+
+            # result
+            (
+                # features
+                [&#39;orange&#39;, &#39;lemon&#39;, &#39;apple&#39;],
+                # labels
+                {&#39;groups&#39;: tensor([0, 0, 1])}
+            )
+            ```
+        &#34;&#34;&#34;
+        features = [record.obj for record in batch]
+        labels = {&#34;groups&#34;: torch.LongTensor([record.group for record in batch])}
+        return features, labels
+
+    @classmethod
+    def fetch_unique_objects(cls, batch: List[SimilarityGroupSample]) -&gt; List[Any]:
+        &#34;&#34;&#34;Fetch unique objects from SimilarityGroupSample batch.
+
+        Collect unique `obj` from samples in a batch.
+
+        Args:
+            batch: List of SimilarityGroupSample&#39;s
+
+        Returns:
+            List[Any]: list of unique `obj` in batch
+        &#34;&#34;&#34;
+        unique_objects = []
+        for sample in batch:
+            if sample.obj not in unique_objects:
+                unique_objects.append(sample.obj)
+        return unique_objects</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="quaterion.dataset.similarity_data_loader.GroupSimilarityDataLoader"><code class="flex name class">
+<span>class <span class="ident">GroupSimilarityDataLoader</span></span>
+<span>(</span><span>dataset: torch.utils.data.dataset.Dataset[+T_co], batch_size: Optional[int] = 1, shuffle: bool = False, sampler: Optional[torch.utils.data.sampler.Sampler] = None, batch_sampler: Optional[torch.utils.data.sampler.Sampler[typing.Sequence]] = None, num_workers: int = 0, collate_fn: Optional[Callable[[List[~T]], Any]] = None, pin_memory: bool = False, drop_last: bool = False, timeout: float = 0, worker_init_fn: Optional[Callable[[int], None]] = None, multiprocessing_context=None, generator=None, *, prefetch_factor: int = 2, persistent_workers: bool = False)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Data loader. Combines a dataset and a sampler, and provides an iterable over
+the given dataset.</p>
+<p>The :class:<code>~torch.utils.data.DataLoader</code> supports both map-style and
+iterable-style datasets with single- or multi-process loading, customizing
+loading order and optional automatic batching (collation) and memory pinning.</p>
+<p>See :py:mod:<code>torch.utils.data</code> documentation page for more details.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>dataset</code></strong> :&ensp;<code>Dataset</code></dt>
+<dd>dataset from which to load the data.</dd>
+<dt><strong><code>batch_size</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>how many samples per batch to load
+(default: <code>1</code>).</dd>
+<dt><strong><code>shuffle</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>set to <code>True</code> to have the data reshuffled
+at every epoch (default: <code>False</code>).</dd>
+<dt><strong><code>sampler</code></strong> :&ensp;<code>Sampler</code> or <code>Iterable</code>, optional</dt>
+<dd>defines the strategy to draw
+samples from the dataset. Can be any <code>Iterable</code> with <code>__len__</code>
+implemented. If specified, :attr:<code>shuffle</code> must not be specified.</dd>
+<dt><strong><code>batch_sampler</code></strong> :&ensp;<code>Sampler</code> or <code>Iterable</code>, optional</dt>
+<dd>like :attr:<code>sampler</code>, but
+returns a batch of indices at a time. Mutually exclusive with
+:attr:<code>batch_size</code>, :attr:<code>shuffle</code>, :attr:<code>sampler</code>,
+and :attr:<code>drop_last</code>.</dd>
+<dt><strong><code>num_workers</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>how many subprocesses to use for data
+loading. <code>0</code> means that the data will be loaded in the main process.
+(default: <code>0</code>)</dd>
+<dt><strong><code>collate_fn</code></strong> :&ensp;<code>callable</code>, optional</dt>
+<dd>merges a list of samples to form a
+mini-batch of Tensor(s).
+Used when using batched loading from a
+map-style dataset.</dd>
+<dt><strong><code>pin_memory</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>If <code>True</code>, the data loader will copy Tensors
+into CUDA pinned memory before returning them.
+If your data elements
+are a custom type, or your :attr:<code>collate_fn</code> returns a batch that is a custom type,
+see the example below.</dd>
+<dt><strong><code>drop_last</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>set to <code>True</code> to drop the last incomplete batch,
+if the dataset size is not divisible by the batch size. If <code>False</code> and
+the size of dataset is not divisible by the batch size, then the last batch
+will be smaller. (default: <code>False</code>)</dd>
+<dt><strong><code>timeout</code></strong> :&ensp;<code>numeric</code>, optional</dt>
+<dd>if positive, the timeout value for collecting a batch
+from workers. Should always be non-negative. (default: <code>0</code>)</dd>
+<dt><strong><code>worker_init_fn</code></strong> :&ensp;<code>callable</code>, optional</dt>
+<dd>If not <code>None</code>, this will be called on each
+worker subprocess with the worker id (an int in <code>[0, num_workers - 1]</code>) as
+input, after seeding and before data loading. (default: <code>None</code>)</dd>
+<dt><strong><code>generator</code></strong> :&ensp;<code>torch.Generator</code>, optional</dt>
+<dd>If not <code>None</code>, this RNG will be used
+by RandomSampler to generate random indexes and multiprocessing to generate
+<code>base_seed</code> for workers. (default: <code>None</code>)</dd>
+<dt><strong><code>prefetch_factor</code></strong> :&ensp;<code>int</code>, optional<code>, keyword-only arg</code></dt>
+<dd>Number of samples loaded
+in advance by each worker. <code>2</code> means there will be a total of
+2 * num_workers samples prefetched across all workers. (default: <code>2</code>)</dd>
+<dt><strong><code>persistent_workers</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>If <code>True</code>, the data loader will not shutdown
+the worker processes after a dataset has been consumed once. This allows to
+maintain the workers <code>Dataset</code> instances alive. (default: <code>False</code>)</dd>
+</dl>
+<div class="admonition warning">
+<p class="admonition-title">Warning:&ensp;If the <code>spawn</code> start method is used, :attr:<code>worker_init_fn</code></p>
+<p>cannot be an unpicklable object, e.g., a lambda function. See
+:ref:<code>multiprocessing-best-practices</code> on more details related
+to multiprocessing in PyTorch.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning:&ensp;<code>len(dataloader)</code> heuristic is based on the length of the sampler used.</p>
+<p>When :attr:<code>dataset</code> is an :class:<code>~torch.utils.data.IterableDataset</code>,
+it instead returns an estimate based on <code>len(dataset) / batch_size</code>, with proper
+rounding depending on :attr:<code>drop_last</code>, regardless of multi-process loading
+configurations. This represents the best guess PyTorch can make because PyTorch
+trusts user :attr:<code>dataset</code> code in correctly handling multi-process
+loading to avoid duplicate data.</p>
+<p>However, if sharding results in multiple workers having incomplete last batches,
+this estimate can still be inaccurate, because (1) an otherwise complete batch can
+be broken into multiple ones and (2) more than one batch worth of samples can be
+dropped when :attr:<code>drop_last</code> is set. Unfortunately, PyTorch can not detect such
+cases in general.</p>
+<p>See <code>Dataset Types</code><em> for more details on these two types of datasets and how
+:class:<code>~torch.utils.data.IterableDataset</code> interacts with
+<code>Multi-process data loading</code></em>.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning:&ensp;See :ref:<code>reproducibility</code>, and :ref:<code>dataloader-workers-random-seed</code>, and</p>
+<p>:ref:<code>data-loading-randomness</code> notes for random seed related questions.</p>
+</div></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class GroupSimilarityDataLoader(SimilarityDataLoader[SimilarityGroupSample]):
+    @classmethod
+    def collate_fn(
+        cls, batch: List[SimilarityGroupSample]
+    ) -&gt; Tuple[List[Any], Dict[str, torch.Tensor]]:
+        &#34;&#34;&#34;Collate function for SimilarityGroupSamples objects.
+
+        Extract features from pairs and collects them in list.
+        Construct labels dict with `groups`.
+
+        Args:
+            batch: List of SimilarityGroupSample objects
+
+        Returns:
+            Tuple[List[Any], Dict[str, torch.Tensor]]: tuple of features and
+                labels
+
+        Examples:
+            ```
+            GroupSimilarityDataLoader.collate_fn(
+                [
+                    SimilarityGroupSample(
+                        obj=&#34;orange&#34;,
+                        group=0,
+                    ),
+                    SimilarityGroupSample(
+                        obj=&#34;lemon&#34;,
+                        group=0,
+                    ),
+                    SimilarityGroupSample(
+                        obj=&#34;apple&#34;,
+                        group=1,
+                    )
+                ]
+            )
+
+            # result
+            (
+                # features
+                [&#39;orange&#39;, &#39;lemon&#39;, &#39;apple&#39;],
+                # labels
+                {&#39;groups&#39;: tensor([0, 0, 1])}
+            )
+            ```
+        &#34;&#34;&#34;
+        features = [record.obj for record in batch]
+        labels = {&#34;groups&#34;: torch.LongTensor([record.group for record in batch])}
+        return features, labels
+
+    @classmethod
+    def fetch_unique_objects(cls, batch: List[SimilarityGroupSample]) -&gt; List[Any]:
+        &#34;&#34;&#34;Fetch unique objects from SimilarityGroupSample batch.
+
+        Collect unique `obj` from samples in a batch.
+
+        Args:
+            batch: List of SimilarityGroupSample&#39;s
+
+        Returns:
+            List[Any]: list of unique `obj` in batch
+        &#34;&#34;&#34;
+        unique_objects = []
+        for sample in batch:
+            if sample.obj not in unique_objects:
+                unique_objects.append(sample.obj)
+        return unique_objects</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="quaterion.dataset.similarity_data_loader.SimilarityDataLoader" href="#quaterion.dataset.similarity_data_loader.SimilarityDataLoader">SimilarityDataLoader</a></li>
+<li>torch.utils.data.dataloader.DataLoader</li>
+<li>typing.Generic</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="quaterion.dataset.similarity_data_loader.GroupSimilarityDataLoader.batch_size"><code class="name">var <span class="ident">batch_size</span> : Optional[int]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quaterion.dataset.similarity_data_loader.GroupSimilarityDataLoader.dataset"><code class="name">var <span class="ident">dataset</span> : torch.utils.data.dataset.Dataset[+T_co]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quaterion.dataset.similarity_data_loader.GroupSimilarityDataLoader.drop_last"><code class="name">var <span class="ident">drop_last</span> : bool</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quaterion.dataset.similarity_data_loader.GroupSimilarityDataLoader.num_workers"><code class="name">var <span class="ident">num_workers</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quaterion.dataset.similarity_data_loader.GroupSimilarityDataLoader.pin_memory"><code class="name">var <span class="ident">pin_memory</span> : bool</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quaterion.dataset.similarity_data_loader.GroupSimilarityDataLoader.prefetch_factor"><code class="name">var <span class="ident">prefetch_factor</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quaterion.dataset.similarity_data_loader.GroupSimilarityDataLoader.sampler"><code class="name">var <span class="ident">sampler</span> : torch.utils.data.sampler.Sampler</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quaterion.dataset.similarity_data_loader.GroupSimilarityDataLoader.timeout"><code class="name">var <span class="ident">timeout</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Static methods</h3>
+<dl>
+<dt id="quaterion.dataset.similarity_data_loader.GroupSimilarityDataLoader.collate_fn"><code class="name flex">
+<span>def <span class="ident">collate_fn</span></span>(<span>batch: List[<a title="quaterion.dataset.similarity_samples.SimilarityGroupSample" href="similarity_samples.html#quaterion.dataset.similarity_samples.SimilarityGroupSample">SimilarityGroupSample</a>]) ‑> Tuple[List[Any], Dict[str, torch.Tensor]]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Collate function for SimilarityGroupSamples objects.</p>
+<p>Extract features from pairs and collects them in list.
+Construct labels dict with <code>groups</code>.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>batch</code></strong></dt>
+<dd>List of SimilarityGroupSample objects</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Tuple[List[Any], Dict[str, torch.Tensor]]</code></dt>
+<dd>tuple of features and
+labels</dd>
+</dl>
+<h2 id="examples">Examples</h2>
+<pre><code>GroupSimilarityDataLoader.collate_fn(
+    [
+        SimilarityGroupSample(
+            obj=&quot;orange&quot;,
+            group=0,
+        ),
+        SimilarityGroupSample(
+            obj=&quot;lemon&quot;,
+            group=0,
+        ),
+        SimilarityGroupSample(
+            obj=&quot;apple&quot;,
+            group=1,
+        )
+    ]
+)
+
+# result
+(
+    # features
+    ['orange', 'lemon', 'apple'],
+    # labels
+    {'groups': tensor([0, 0, 1])}
+)
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def collate_fn(
+    cls, batch: List[SimilarityGroupSample]
+) -&gt; Tuple[List[Any], Dict[str, torch.Tensor]]:
+    &#34;&#34;&#34;Collate function for SimilarityGroupSamples objects.
+
+    Extract features from pairs and collects them in list.
+    Construct labels dict with `groups`.
+
+    Args:
+        batch: List of SimilarityGroupSample objects
+
+    Returns:
+        Tuple[List[Any], Dict[str, torch.Tensor]]: tuple of features and
+            labels
+
+    Examples:
+        ```
+        GroupSimilarityDataLoader.collate_fn(
+            [
+                SimilarityGroupSample(
+                    obj=&#34;orange&#34;,
+                    group=0,
+                ),
+                SimilarityGroupSample(
+                    obj=&#34;lemon&#34;,
+                    group=0,
+                ),
+                SimilarityGroupSample(
+                    obj=&#34;apple&#34;,
+                    group=1,
+                )
+            ]
+        )
+
+        # result
+        (
+            # features
+            [&#39;orange&#39;, &#39;lemon&#39;, &#39;apple&#39;],
+            # labels
+            {&#39;groups&#39;: tensor([0, 0, 1])}
+        )
+        ```
+    &#34;&#34;&#34;
+    features = [record.obj for record in batch]
+    labels = {&#34;groups&#34;: torch.LongTensor([record.group for record in batch])}
+    return features, labels</code></pre>
+</details>
+</dd>
+<dt id="quaterion.dataset.similarity_data_loader.GroupSimilarityDataLoader.fetch_unique_objects"><code class="name flex">
+<span>def <span class="ident">fetch_unique_objects</span></span>(<span>batch: List[<a title="quaterion.dataset.similarity_samples.SimilarityGroupSample" href="similarity_samples.html#quaterion.dataset.similarity_samples.SimilarityGroupSample">SimilarityGroupSample</a>]) ‑> List[Any]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Fetch unique objects from SimilarityGroupSample batch.</p>
+<p>Collect unique <code>obj</code> from samples in a batch.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>batch</code></strong></dt>
+<dd>List of SimilarityGroupSample's</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>List[Any]</code></dt>
+<dd>list of unique <code>obj</code> in batch</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def fetch_unique_objects(cls, batch: List[SimilarityGroupSample]) -&gt; List[Any]:
+    &#34;&#34;&#34;Fetch unique objects from SimilarityGroupSample batch.
+
+    Collect unique `obj` from samples in a batch.
+
+    Args:
+        batch: List of SimilarityGroupSample&#39;s
+
+    Returns:
+        List[Any]: list of unique `obj` in batch
+    &#34;&#34;&#34;
+    unique_objects = []
+    for sample in batch:
+        if sample.obj not in unique_objects:
+            unique_objects.append(sample.obj)
+    return unique_objects</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="quaterion.dataset.similarity_data_loader.PairsSimilarityDataLoader"><code class="flex name class">
+<span>class <span class="ident">PairsSimilarityDataLoader</span></span>
+<span>(</span><span>dataset: torch.utils.data.dataset.Dataset[+T_co], batch_size: Optional[int] = 1, shuffle: bool = False, sampler: Optional[torch.utils.data.sampler.Sampler] = None, batch_sampler: Optional[torch.utils.data.sampler.Sampler[typing.Sequence]] = None, num_workers: int = 0, collate_fn: Optional[Callable[[List[~T]], Any]] = None, pin_memory: bool = False, drop_last: bool = False, timeout: float = 0, worker_init_fn: Optional[Callable[[int], None]] = None, multiprocessing_context=None, generator=None, *, prefetch_factor: int = 2, persistent_workers: bool = False)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Data loader. Combines a dataset and a sampler, and provides an iterable over
+the given dataset.</p>
+<p>The :class:<code>~torch.utils.data.DataLoader</code> supports both map-style and
+iterable-style datasets with single- or multi-process loading, customizing
+loading order and optional automatic batching (collation) and memory pinning.</p>
+<p>See :py:mod:<code>torch.utils.data</code> documentation page for more details.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>dataset</code></strong> :&ensp;<code>Dataset</code></dt>
+<dd>dataset from which to load the data.</dd>
+<dt><strong><code>batch_size</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>how many samples per batch to load
+(default: <code>1</code>).</dd>
+<dt><strong><code>shuffle</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>set to <code>True</code> to have the data reshuffled
+at every epoch (default: <code>False</code>).</dd>
+<dt><strong><code>sampler</code></strong> :&ensp;<code>Sampler</code> or <code>Iterable</code>, optional</dt>
+<dd>defines the strategy to draw
+samples from the dataset. Can be any <code>Iterable</code> with <code>__len__</code>
+implemented. If specified, :attr:<code>shuffle</code> must not be specified.</dd>
+<dt><strong><code>batch_sampler</code></strong> :&ensp;<code>Sampler</code> or <code>Iterable</code>, optional</dt>
+<dd>like :attr:<code>sampler</code>, but
+returns a batch of indices at a time. Mutually exclusive with
+:attr:<code>batch_size</code>, :attr:<code>shuffle</code>, :attr:<code>sampler</code>,
+and :attr:<code>drop_last</code>.</dd>
+<dt><strong><code>num_workers</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>how many subprocesses to use for data
+loading. <code>0</code> means that the data will be loaded in the main process.
+(default: <code>0</code>)</dd>
+<dt><strong><code>collate_fn</code></strong> :&ensp;<code>callable</code>, optional</dt>
+<dd>merges a list of samples to form a
+mini-batch of Tensor(s).
+Used when using batched loading from a
+map-style dataset.</dd>
+<dt><strong><code>pin_memory</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>If <code>True</code>, the data loader will copy Tensors
+into CUDA pinned memory before returning them.
+If your data elements
+are a custom type, or your :attr:<code>collate_fn</code> returns a batch that is a custom type,
+see the example below.</dd>
+<dt><strong><code>drop_last</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>set to <code>True</code> to drop the last incomplete batch,
+if the dataset size is not divisible by the batch size. If <code>False</code> and
+the size of dataset is not divisible by the batch size, then the last batch
+will be smaller. (default: <code>False</code>)</dd>
+<dt><strong><code>timeout</code></strong> :&ensp;<code>numeric</code>, optional</dt>
+<dd>if positive, the timeout value for collecting a batch
+from workers. Should always be non-negative. (default: <code>0</code>)</dd>
+<dt><strong><code>worker_init_fn</code></strong> :&ensp;<code>callable</code>, optional</dt>
+<dd>If not <code>None</code>, this will be called on each
+worker subprocess with the worker id (an int in <code>[0, num_workers - 1]</code>) as
+input, after seeding and before data loading. (default: <code>None</code>)</dd>
+<dt><strong><code>generator</code></strong> :&ensp;<code>torch.Generator</code>, optional</dt>
+<dd>If not <code>None</code>, this RNG will be used
+by RandomSampler to generate random indexes and multiprocessing to generate
+<code>base_seed</code> for workers. (default: <code>None</code>)</dd>
+<dt><strong><code>prefetch_factor</code></strong> :&ensp;<code>int</code>, optional<code>, keyword-only arg</code></dt>
+<dd>Number of samples loaded
+in advance by each worker. <code>2</code> means there will be a total of
+2 * num_workers samples prefetched across all workers. (default: <code>2</code>)</dd>
+<dt><strong><code>persistent_workers</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>If <code>True</code>, the data loader will not shutdown
+the worker processes after a dataset has been consumed once. This allows to
+maintain the workers <code>Dataset</code> instances alive. (default: <code>False</code>)</dd>
+</dl>
+<div class="admonition warning">
+<p class="admonition-title">Warning:&ensp;If the <code>spawn</code> start method is used, :attr:<code>worker_init_fn</code></p>
+<p>cannot be an unpicklable object, e.g., a lambda function. See
+:ref:<code>multiprocessing-best-practices</code> on more details related
+to multiprocessing in PyTorch.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning:&ensp;<code>len(dataloader)</code> heuristic is based on the length of the sampler used.</p>
+<p>When :attr:<code>dataset</code> is an :class:<code>~torch.utils.data.IterableDataset</code>,
+it instead returns an estimate based on <code>len(dataset) / batch_size</code>, with proper
+rounding depending on :attr:<code>drop_last</code>, regardless of multi-process loading
+configurations. This represents the best guess PyTorch can make because PyTorch
+trusts user :attr:<code>dataset</code> code in correctly handling multi-process
+loading to avoid duplicate data.</p>
+<p>However, if sharding results in multiple workers having incomplete last batches,
+this estimate can still be inaccurate, because (1) an otherwise complete batch can
+be broken into multiple ones and (2) more than one batch worth of samples can be
+dropped when :attr:<code>drop_last</code> is set. Unfortunately, PyTorch can not detect such
+cases in general.</p>
+<p>See <code>Dataset Types</code><em> for more details on these two types of datasets and how
+:class:<code>~torch.utils.data.IterableDataset</code> interacts with
+<code>Multi-process data loading</code></em>.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning:&ensp;See :ref:<code>reproducibility</code>, and :ref:<code>dataloader-workers-random-seed</code>, and</p>
+<p>:ref:<code>data-loading-randomness</code> notes for random seed related questions.</p>
+</div></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class PairsSimilarityDataLoader(SimilarityDataLoader[SimilarityPairSample]):
+    @classmethod
+    def collate_fn(
+        cls, batch: List[SimilarityPairSample]
+    ) -&gt; Tuple[List[Any], Dict[str, torch.Tensor]]:
+        &#34;&#34;&#34;Collate function for SimilarityPairSamples objects.
+
+        Extract features from pairs and collects them in list.
+        Construct labels dict with `pairs`, `labels` and `subgroups`.
+
+        Args:
+            batch: List of SimilarityPairSample objects
+
+        Returns:
+            Tuple[List[Any], Dict[str, torch.Tensor]]: tuple of features and labels
+
+        Examples:
+            ```
+            PairsSimilarityDataLoader.collate_fn(
+                [
+                    SimilarityPairSample(
+                        obj_a=&#34;1st_pair_1st_obj&#34;, obj_b=&#34;1st_pair_2nd_obj&#34;, score=1.0,
+                    ),
+                    SimilarityPairSample(
+                        obj_a=&#34;2nd_pair_1st_obj&#34;,
+                        obj_b=&#34;2nd_pair_2nd_obj&#34;,
+                        score=0.0,
+                        subgroup=1
+                    ),
+                ]
+            )
+
+            # result
+            (
+                # features
+                [
+                    &#39;1st_pair_1st_obj&#39;,
+                    &#39;2nd_pair_1st_obj&#39;,
+                    &#39;1st_pair_2nd_obj&#39;,
+                    &#39;2nd_pair_2nd_obj&#39;
+                ],
+                # labels
+                {
+                    &#39;labels&#39;: tensor([1., 0.]),
+                    &#39;pairs&#39;: tensor([[0, 2], [1, 3]]),
+                    &#39;subgroups&#39;: tensor([0., 1., 0., 1.])
+                }
+            )
+            ```
+        &#34;&#34;&#34;
+        features = [record.obj_a for record in batch] + [
+            record.obj_b for record in batch
+        ]
+        labels = {
+            &#34;pairs&#34;: torch.LongTensor([[i, i + len(batch)] for i in range(len(batch))]),
+            &#34;labels&#34;: torch.Tensor([record.score for record in batch]),
+            &#34;subgroups&#34;: torch.Tensor([record.subgroup for record in batch] * 2),
+        }
+        return features, labels
+
+    @classmethod
+    def fetch_unique_objects(cls, batch: List[SimilarityPairSample]) -&gt; List[Any]:
+        &#34;&#34;&#34;Fetch unique objects from SimilarityPairSample batch.
+
+        Collect unique `obj_a` and `obj_b` from samples in a batch.
+
+        Args:
+            batch: List of SimilarityPairSample&#39;s
+
+        Returns:
+            List[Any]: list of unique `obj_a` and `obj_b` in batch
+        &#34;&#34;&#34;
+        unique_objects = []
+        for sample in batch:
+            if sample.obj_a not in unique_objects:
+                unique_objects.append(sample.obj_a)
+            if sample.obj_b not in unique_objects:
+                unique_objects.append(sample.obj_b)
+        return unique_objects</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="quaterion.dataset.similarity_data_loader.SimilarityDataLoader" href="#quaterion.dataset.similarity_data_loader.SimilarityDataLoader">SimilarityDataLoader</a></li>
+<li>torch.utils.data.dataloader.DataLoader</li>
+<li>typing.Generic</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="quaterion.dataset.similarity_data_loader.PairsSimilarityDataLoader.batch_size"><code class="name">var <span class="ident">batch_size</span> : Optional[int]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quaterion.dataset.similarity_data_loader.PairsSimilarityDataLoader.dataset"><code class="name">var <span class="ident">dataset</span> : torch.utils.data.dataset.Dataset[+T_co]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quaterion.dataset.similarity_data_loader.PairsSimilarityDataLoader.drop_last"><code class="name">var <span class="ident">drop_last</span> : bool</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quaterion.dataset.similarity_data_loader.PairsSimilarityDataLoader.num_workers"><code class="name">var <span class="ident">num_workers</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quaterion.dataset.similarity_data_loader.PairsSimilarityDataLoader.pin_memory"><code class="name">var <span class="ident">pin_memory</span> : bool</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quaterion.dataset.similarity_data_loader.PairsSimilarityDataLoader.prefetch_factor"><code class="name">var <span class="ident">prefetch_factor</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quaterion.dataset.similarity_data_loader.PairsSimilarityDataLoader.sampler"><code class="name">var <span class="ident">sampler</span> : torch.utils.data.sampler.Sampler</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quaterion.dataset.similarity_data_loader.PairsSimilarityDataLoader.timeout"><code class="name">var <span class="ident">timeout</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Static methods</h3>
+<dl>
+<dt id="quaterion.dataset.similarity_data_loader.PairsSimilarityDataLoader.collate_fn"><code class="name flex">
+<span>def <span class="ident">collate_fn</span></span>(<span>batch: List[<a title="quaterion.dataset.similarity_samples.SimilarityPairSample" href="similarity_samples.html#quaterion.dataset.similarity_samples.SimilarityPairSample">SimilarityPairSample</a>]) ‑> Tuple[List[Any], Dict[str, torch.Tensor]]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Collate function for SimilarityPairSamples objects.</p>
+<p>Extract features from pairs and collects them in list.
+Construct labels dict with <code>pairs</code>, <code>labels</code> and <code>subgroups</code>.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>batch</code></strong></dt>
+<dd>List of SimilarityPairSample objects</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Tuple[List[Any], Dict[str, torch.Tensor]]</code></dt>
+<dd>tuple of features and labels</dd>
+</dl>
+<h2 id="examples">Examples</h2>
+<pre><code>PairsSimilarityDataLoader.collate_fn(
+    [
+        SimilarityPairSample(
+            obj_a=&quot;1st_pair_1st_obj&quot;, obj_b=&quot;1st_pair_2nd_obj&quot;, score=1.0,
+        ),
+        SimilarityPairSample(
+            obj_a=&quot;2nd_pair_1st_obj&quot;,
+            obj_b=&quot;2nd_pair_2nd_obj&quot;,
+            score=0.0,
+            subgroup=1
+        ),
+    ]
+)
+
+# result
+(
+    # features
+    [
+        '1st_pair_1st_obj',
+        '2nd_pair_1st_obj',
+        '1st_pair_2nd_obj',
+        '2nd_pair_2nd_obj'
+    ],
+    # labels
+    {
+        'labels': tensor([1., 0.]),
+        'pairs': tensor([[0, 2], [1, 3]]),
+        'subgroups': tensor([0., 1., 0., 1.])
+    }
+)
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def collate_fn(
+    cls, batch: List[SimilarityPairSample]
+) -&gt; Tuple[List[Any], Dict[str, torch.Tensor]]:
+    &#34;&#34;&#34;Collate function for SimilarityPairSamples objects.
+
+    Extract features from pairs and collects them in list.
+    Construct labels dict with `pairs`, `labels` and `subgroups`.
+
+    Args:
+        batch: List of SimilarityPairSample objects
+
+    Returns:
+        Tuple[List[Any], Dict[str, torch.Tensor]]: tuple of features and labels
+
+    Examples:
+        ```
+        PairsSimilarityDataLoader.collate_fn(
+            [
+                SimilarityPairSample(
+                    obj_a=&#34;1st_pair_1st_obj&#34;, obj_b=&#34;1st_pair_2nd_obj&#34;, score=1.0,
+                ),
+                SimilarityPairSample(
+                    obj_a=&#34;2nd_pair_1st_obj&#34;,
+                    obj_b=&#34;2nd_pair_2nd_obj&#34;,
+                    score=0.0,
+                    subgroup=1
+                ),
+            ]
+        )
+
+        # result
+        (
+            # features
+            [
+                &#39;1st_pair_1st_obj&#39;,
+                &#39;2nd_pair_1st_obj&#39;,
+                &#39;1st_pair_2nd_obj&#39;,
+                &#39;2nd_pair_2nd_obj&#39;
+            ],
+            # labels
+            {
+                &#39;labels&#39;: tensor([1., 0.]),
+                &#39;pairs&#39;: tensor([[0, 2], [1, 3]]),
+                &#39;subgroups&#39;: tensor([0., 1., 0., 1.])
+            }
+        )
+        ```
+    &#34;&#34;&#34;
+    features = [record.obj_a for record in batch] + [
+        record.obj_b for record in batch
+    ]
+    labels = {
+        &#34;pairs&#34;: torch.LongTensor([[i, i + len(batch)] for i in range(len(batch))]),
+        &#34;labels&#34;: torch.Tensor([record.score for record in batch]),
+        &#34;subgroups&#34;: torch.Tensor([record.subgroup for record in batch] * 2),
+    }
+    return features, labels</code></pre>
+</details>
+</dd>
+<dt id="quaterion.dataset.similarity_data_loader.PairsSimilarityDataLoader.fetch_unique_objects"><code class="name flex">
+<span>def <span class="ident">fetch_unique_objects</span></span>(<span>batch: List[<a title="quaterion.dataset.similarity_samples.SimilarityPairSample" href="similarity_samples.html#quaterion.dataset.similarity_samples.SimilarityPairSample">SimilarityPairSample</a>]) ‑> List[Any]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Fetch unique objects from SimilarityPairSample batch.</p>
+<p>Collect unique <code>obj_a</code> and <code>obj_b</code> from samples in a batch.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>batch</code></strong></dt>
+<dd>List of SimilarityPairSample's</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>List[Any]</code></dt>
+<dd>list of unique <code>obj_a</code> and <code>obj_b</code> in batch</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def fetch_unique_objects(cls, batch: List[SimilarityPairSample]) -&gt; List[Any]:
+    &#34;&#34;&#34;Fetch unique objects from SimilarityPairSample batch.
+
+    Collect unique `obj_a` and `obj_b` from samples in a batch.
+
+    Args:
+        batch: List of SimilarityPairSample&#39;s
+
+    Returns:
+        List[Any]: list of unique `obj_a` and `obj_b` in batch
+    &#34;&#34;&#34;
+    unique_objects = []
+    for sample in batch:
+        if sample.obj_a not in unique_objects:
+            unique_objects.append(sample.obj_a)
+        if sample.obj_b not in unique_objects:
+            unique_objects.append(sample.obj_b)
+    return unique_objects</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="quaterion.dataset.similarity_data_loader.SimilarityDataLoader"><code class="flex name class">
+<span>class <span class="ident">SimilarityDataLoader</span></span>
+<span>(</span><span>dataset: torch.utils.data.dataset.Dataset[+T_co], batch_size: Optional[int] = 1, shuffle: bool = False, sampler: Optional[torch.utils.data.sampler.Sampler] = None, batch_sampler: Optional[torch.utils.data.sampler.Sampler[typing.Sequence]] = None, num_workers: int = 0, collate_fn: Optional[Callable[[List[~T]], Any]] = None, pin_memory: bool = False, drop_last: bool = False, timeout: float = 0, worker_init_fn: Optional[Callable[[int], None]] = None, multiprocessing_context=None, generator=None, *, prefetch_factor: int = 2, persistent_workers: bool = False)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Data loader. Combines a dataset and a sampler, and provides an iterable over
+the given dataset.</p>
+<p>The :class:<code>~torch.utils.data.DataLoader</code> supports both map-style and
+iterable-style datasets with single- or multi-process loading, customizing
+loading order and optional automatic batching (collation) and memory pinning.</p>
+<p>See :py:mod:<code>torch.utils.data</code> documentation page for more details.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>dataset</code></strong> :&ensp;<code>Dataset</code></dt>
+<dd>dataset from which to load the data.</dd>
+<dt><strong><code>batch_size</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>how many samples per batch to load
+(default: <code>1</code>).</dd>
+<dt><strong><code>shuffle</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>set to <code>True</code> to have the data reshuffled
+at every epoch (default: <code>False</code>).</dd>
+<dt><strong><code>sampler</code></strong> :&ensp;<code>Sampler</code> or <code>Iterable</code>, optional</dt>
+<dd>defines the strategy to draw
+samples from the dataset. Can be any <code>Iterable</code> with <code>__len__</code>
+implemented. If specified, :attr:<code>shuffle</code> must not be specified.</dd>
+<dt><strong><code>batch_sampler</code></strong> :&ensp;<code>Sampler</code> or <code>Iterable</code>, optional</dt>
+<dd>like :attr:<code>sampler</code>, but
+returns a batch of indices at a time. Mutually exclusive with
+:attr:<code>batch_size</code>, :attr:<code>shuffle</code>, :attr:<code>sampler</code>,
+and :attr:<code>drop_last</code>.</dd>
+<dt><strong><code>num_workers</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>how many subprocesses to use for data
+loading. <code>0</code> means that the data will be loaded in the main process.
+(default: <code>0</code>)</dd>
+<dt><strong><code>collate_fn</code></strong> :&ensp;<code>callable</code>, optional</dt>
+<dd>merges a list of samples to form a
+mini-batch of Tensor(s).
+Used when using batched loading from a
+map-style dataset.</dd>
+<dt><strong><code>pin_memory</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>If <code>True</code>, the data loader will copy Tensors
+into CUDA pinned memory before returning them.
+If your data elements
+are a custom type, or your :attr:<code>collate_fn</code> returns a batch that is a custom type,
+see the example below.</dd>
+<dt><strong><code>drop_last</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>set to <code>True</code> to drop the last incomplete batch,
+if the dataset size is not divisible by the batch size. If <code>False</code> and
+the size of dataset is not divisible by the batch size, then the last batch
+will be smaller. (default: <code>False</code>)</dd>
+<dt><strong><code>timeout</code></strong> :&ensp;<code>numeric</code>, optional</dt>
+<dd>if positive, the timeout value for collecting a batch
+from workers. Should always be non-negative. (default: <code>0</code>)</dd>
+<dt><strong><code>worker_init_fn</code></strong> :&ensp;<code>callable</code>, optional</dt>
+<dd>If not <code>None</code>, this will be called on each
+worker subprocess with the worker id (an int in <code>[0, num_workers - 1]</code>) as
+input, after seeding and before data loading. (default: <code>None</code>)</dd>
+<dt><strong><code>generator</code></strong> :&ensp;<code>torch.Generator</code>, optional</dt>
+<dd>If not <code>None</code>, this RNG will be used
+by RandomSampler to generate random indexes and multiprocessing to generate
+<code>base_seed</code> for workers. (default: <code>None</code>)</dd>
+<dt><strong><code>prefetch_factor</code></strong> :&ensp;<code>int</code>, optional<code>, keyword-only arg</code></dt>
+<dd>Number of samples loaded
+in advance by each worker. <code>2</code> means there will be a total of
+2 * num_workers samples prefetched across all workers. (default: <code>2</code>)</dd>
+<dt><strong><code>persistent_workers</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>If <code>True</code>, the data loader will not shutdown
+the worker processes after a dataset has been consumed once. This allows to
+maintain the workers <code>Dataset</code> instances alive. (default: <code>False</code>)</dd>
+</dl>
+<div class="admonition warning">
+<p class="admonition-title">Warning:&ensp;If the <code>spawn</code> start method is used, :attr:<code>worker_init_fn</code></p>
+<p>cannot be an unpicklable object, e.g., a lambda function. See
+:ref:<code>multiprocessing-best-practices</code> on more details related
+to multiprocessing in PyTorch.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning:&ensp;<code>len(dataloader)</code> heuristic is based on the length of the sampler used.</p>
+<p>When :attr:<code>dataset</code> is an :class:<code>~torch.utils.data.IterableDataset</code>,
+it instead returns an estimate based on <code>len(dataset) / batch_size</code>, with proper
+rounding depending on :attr:<code>drop_last</code>, regardless of multi-process loading
+configurations. This represents the best guess PyTorch can make because PyTorch
+trusts user :attr:<code>dataset</code> code in correctly handling multi-process
+loading to avoid duplicate data.</p>
+<p>However, if sharding results in multiple workers having incomplete last batches,
+this estimate can still be inaccurate, because (1) an otherwise complete batch can
+be broken into multiple ones and (2) more than one batch worth of samples can be
+dropped when :attr:<code>drop_last</code> is set. Unfortunately, PyTorch can not detect such
+cases in general.</p>
+<p>See <code>Dataset Types</code><em> for more details on these two types of datasets and how
+:class:<code>~torch.utils.data.IterableDataset</code> interacts with
+<code>Multi-process data loading</code></em>.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning:&ensp;See :ref:<code>reproducibility</code>, and :ref:<code>dataloader-workers-random-seed</code>, and</p>
+<p>:ref:<code>data-loading-randomness</code> notes for random seed related questions.</p>
+</div></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class SimilarityDataLoader(DataLoader, Generic[T_co]):
+    @classmethod
+    def fetch_unique_objects(cls, batch: List[Any]) -&gt; List[Any]:
+        &#34;&#34;&#34;Fetch unique objects to avoid calculation of repeated objects embeddings.
+
+        Args:
+            batch: batch of raw data
+
+        Returns:
+            List[Any]: list of unique objects
+
+        &#34;&#34;&#34;
+        raise NotImplementedError()</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>torch.utils.data.dataloader.DataLoader</li>
+<li>typing.Generic</li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="quaterion.dataset.cache_data_loader.CacheDataLoader" href="cache_data_loader.html#quaterion.dataset.cache_data_loader.CacheDataLoader">CacheDataLoader</a></li>
+<li><a title="quaterion.dataset.similarity_data_loader.GroupSimilarityDataLoader" href="#quaterion.dataset.similarity_data_loader.GroupSimilarityDataLoader">GroupSimilarityDataLoader</a></li>
+<li><a title="quaterion.dataset.similarity_data_loader.PairsSimilarityDataLoader" href="#quaterion.dataset.similarity_data_loader.PairsSimilarityDataLoader">PairsSimilarityDataLoader</a></li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="quaterion.dataset.similarity_data_loader.SimilarityDataLoader.batch_size"><code class="name">var <span class="ident">batch_size</span> : Optional[int]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quaterion.dataset.similarity_data_loader.SimilarityDataLoader.dataset"><code class="name">var <span class="ident">dataset</span> : torch.utils.data.dataset.Dataset[+T_co]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quaterion.dataset.similarity_data_loader.SimilarityDataLoader.drop_last"><code class="name">var <span class="ident">drop_last</span> : bool</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quaterion.dataset.similarity_data_loader.SimilarityDataLoader.num_workers"><code class="name">var <span class="ident">num_workers</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quaterion.dataset.similarity_data_loader.SimilarityDataLoader.pin_memory"><code class="name">var <span class="ident">pin_memory</span> : bool</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quaterion.dataset.similarity_data_loader.SimilarityDataLoader.prefetch_factor"><code class="name">var <span class="ident">prefetch_factor</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quaterion.dataset.similarity_data_loader.SimilarityDataLoader.sampler"><code class="name">var <span class="ident">sampler</span> : torch.utils.data.sampler.Sampler</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="quaterion.dataset.similarity_data_loader.SimilarityDataLoader.timeout"><code class="name">var <span class="ident">timeout</span> : float</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Static methods</h3>
+<dl>
+<dt id="quaterion.dataset.similarity_data_loader.SimilarityDataLoader.fetch_unique_objects"><code class="name flex">
+<span>def <span class="ident">fetch_unique_objects</span></span>(<span>batch: List[Any]) ‑> List[Any]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Fetch unique objects to avoid calculation of repeated objects embeddings.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>batch</code></strong></dt>
+<dd>batch of raw data</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>List[Any]</code></dt>
+<dd>list of unique objects</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@classmethod
+def fetch_unique_objects(cls, batch: List[Any]) -&gt; List[Any]:
+    &#34;&#34;&#34;Fetch unique objects to avoid calculation of repeated objects embeddings.
+
+    Args:
+        batch: batch of raw data
+
+    Returns:
+        List[Any]: list of unique objects
+
+    &#34;&#34;&#34;
+    raise NotImplementedError()</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="quaterion.dataset" href="index.html">quaterion.dataset</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="quaterion.dataset.similarity_data_loader.GroupSimilarityDataLoader" href="#quaterion.dataset.similarity_data_loader.GroupSimilarityDataLoader">GroupSimilarityDataLoader</a></code></h4>
+<ul class="">
+<li><code><a title="quaterion.dataset.similarity_data_loader.GroupSimilarityDataLoader.batch_size" href="#quaterion.dataset.similarity_data_loader.GroupSimilarityDataLoader.batch_size">batch_size</a></code></li>
+<li><code><a title="quaterion.dataset.similarity_data_loader.GroupSimilarityDataLoader.collate_fn" href="#quaterion.dataset.similarity_data_loader.GroupSimilarityDataLoader.collate_fn">collate_fn</a></code></li>
+<li><code><a title="quaterion.dataset.similarity_data_loader.GroupSimilarityDataLoader.dataset" href="#quaterion.dataset.similarity_data_loader.GroupSimilarityDataLoader.dataset">dataset</a></code></li>
+<li><code><a title="quaterion.dataset.similarity_data_loader.GroupSimilarityDataLoader.drop_last" href="#quaterion.dataset.similarity_data_loader.GroupSimilarityDataLoader.drop_last">drop_last</a></code></li>
+<li><code><a title="quaterion.dataset.similarity_data_loader.GroupSimilarityDataLoader.fetch_unique_objects" href="#quaterion.dataset.similarity_data_loader.GroupSimilarityDataLoader.fetch_unique_objects">fetch_unique_objects</a></code></li>
+<li><code><a title="quaterion.dataset.similarity_data_loader.GroupSimilarityDataLoader.num_workers" href="#quaterion.dataset.similarity_data_loader.GroupSimilarityDataLoader.num_workers">num_workers</a></code></li>
+<li><code><a title="quaterion.dataset.similarity_data_loader.GroupSimilarityDataLoader.pin_memory" href="#quaterion.dataset.similarity_data_loader.GroupSimilarityDataLoader.pin_memory">pin_memory</a></code></li>
+<li><code><a title="quaterion.dataset.similarity_data_loader.GroupSimilarityDataLoader.prefetch_factor" href="#quaterion.dataset.similarity_data_loader.GroupSimilarityDataLoader.prefetch_factor">prefetch_factor</a></code></li>
+<li><code><a title="quaterion.dataset.similarity_data_loader.GroupSimilarityDataLoader.sampler" href="#quaterion.dataset.similarity_data_loader.GroupSimilarityDataLoader.sampler">sampler</a></code></li>
+<li><code><a title="quaterion.dataset.similarity_data_loader.GroupSimilarityDataLoader.timeout" href="#quaterion.dataset.similarity_data_loader.GroupSimilarityDataLoader.timeout">timeout</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="quaterion.dataset.similarity_data_loader.PairsSimilarityDataLoader" href="#quaterion.dataset.similarity_data_loader.PairsSimilarityDataLoader">PairsSimilarityDataLoader</a></code></h4>
+<ul class="">
+<li><code><a title="quaterion.dataset.similarity_data_loader.PairsSimilarityDataLoader.batch_size" href="#quaterion.dataset.similarity_data_loader.PairsSimilarityDataLoader.batch_size">batch_size</a></code></li>
+<li><code><a title="quaterion.dataset.similarity_data_loader.PairsSimilarityDataLoader.collate_fn" href="#quaterion.dataset.similarity_data_loader.PairsSimilarityDataLoader.collate_fn">collate_fn</a></code></li>
+<li><code><a title="quaterion.dataset.similarity_data_loader.PairsSimilarityDataLoader.dataset" href="#quaterion.dataset.similarity_data_loader.PairsSimilarityDataLoader.dataset">dataset</a></code></li>
+<li><code><a title="quaterion.dataset.similarity_data_loader.PairsSimilarityDataLoader.drop_last" href="#quaterion.dataset.similarity_data_loader.PairsSimilarityDataLoader.drop_last">drop_last</a></code></li>
+<li><code><a title="quaterion.dataset.similarity_data_loader.PairsSimilarityDataLoader.fetch_unique_objects" href="#quaterion.dataset.similarity_data_loader.PairsSimilarityDataLoader.fetch_unique_objects">fetch_unique_objects</a></code></li>
+<li><code><a title="quaterion.dataset.similarity_data_loader.PairsSimilarityDataLoader.num_workers" href="#quaterion.dataset.similarity_data_loader.PairsSimilarityDataLoader.num_workers">num_workers</a></code></li>
+<li><code><a title="quaterion.dataset.similarity_data_loader.PairsSimilarityDataLoader.pin_memory" href="#quaterion.dataset.similarity_data_loader.PairsSimilarityDataLoader.pin_memory">pin_memory</a></code></li>
+<li><code><a title="quaterion.dataset.similarity_data_loader.PairsSimilarityDataLoader.prefetch_factor" href="#quaterion.dataset.similarity_data_loader.PairsSimilarityDataLoader.prefetch_factor">prefetch_factor</a></code></li>
+<li><code><a title="quaterion.dataset.similarity_data_loader.PairsSimilarityDataLoader.sampler" href="#quaterion.dataset.similarity_data_loader.PairsSimilarityDataLoader.sampler">sampler</a></code></li>
+<li><code><a title="quaterion.dataset.similarity_data_loader.PairsSimilarityDataLoader.timeout" href="#quaterion.dataset.similarity_data_loader.PairsSimilarityDataLoader.timeout">timeout</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="quaterion.dataset.similarity_data_loader.SimilarityDataLoader" href="#quaterion.dataset.similarity_data_loader.SimilarityDataLoader">SimilarityDataLoader</a></code></h4>
+<ul class="">
+<li><code><a title="quaterion.dataset.similarity_data_loader.SimilarityDataLoader.batch_size" href="#quaterion.dataset.similarity_data_loader.SimilarityDataLoader.batch_size">batch_size</a></code></li>
+<li><code><a title="quaterion.dataset.similarity_data_loader.SimilarityDataLoader.dataset" href="#quaterion.dataset.similarity_data_loader.SimilarityDataLoader.dataset">dataset</a></code></li>
+<li><code><a title="quaterion.dataset.similarity_data_loader.SimilarityDataLoader.drop_last" href="#quaterion.dataset.similarity_data_loader.SimilarityDataLoader.drop_last">drop_last</a></code></li>
+<li><code><a title="quaterion.dataset.similarity_data_loader.SimilarityDataLoader.fetch_unique_objects" href="#quaterion.dataset.similarity_data_loader.SimilarityDataLoader.fetch_unique_objects">fetch_unique_objects</a></code></li>
+<li><code><a title="quaterion.dataset.similarity_data_loader.SimilarityDataLoader.num_workers" href="#quaterion.dataset.similarity_data_loader.SimilarityDataLoader.num_workers">num_workers</a></code></li>
+<li><code><a title="quaterion.dataset.similarity_data_loader.SimilarityDataLoader.pin_memory" href="#quaterion.dataset.similarity_data_loader.SimilarityDataLoader.pin_memory">pin_memory</a></code></li>
+<li><code><a title="quaterion.dataset.similarity_data_loader.SimilarityDataLoader.prefetch_factor" href="#quaterion.dataset.similarity_data_loader.SimilarityDataLoader.prefetch_factor">prefetch_factor</a></code></li>
+<li><code><a title="quaterion.dataset.similarity_data_loader.SimilarityDataLoader.sampler" href="#quaterion.dataset.similarity_data_loader.SimilarityDataLoader.sampler">sampler</a></code></li>
+<li><code><a title="quaterion.dataset.similarity_data_loader.SimilarityDataLoader.timeout" href="#quaterion.dataset.similarity_data_loader.SimilarityDataLoader.timeout">timeout</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</footer>
+</body>
+</html>

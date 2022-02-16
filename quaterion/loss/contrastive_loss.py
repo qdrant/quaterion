@@ -57,23 +57,35 @@ class ContrastiveLoss(PairwiseLoss):
         negative_distances_impact = 0.0
 
         if len(subgroups.unique()) > 1:
-            embeddings_count = embeddings.shape[0]
+            # shape (2 * batch_size, embeddings_size)
+            embeddings_count = embeddings.shape[0]  # `embeddings_count` consists of
+            # number of embeddings for `obj_a` and `obj_b`
+
+            # `subgroups` shape is (embeddings_count,)
+            # shape (embeddings_count, embeddings_count)
             subgroup_matrix: Tensor = subgroups.repeat(embeddings_count, 1)
+            # shape (embeddings_count, embeddings_count)
             comp_matrix: Tensor = subgroup_matrix != subgroup_matrix.T
             # a matrix to take into account only distances to negative
             # examples, i.e. from examples which don't belong to current
             # subgroup
 
+            # shape (embeddings_count, embeddings_count)
             distance_matrix = self.distance_metric(embeddings, embeddings, matrix=True)
             distance_matrix[~comp_matrix] = max_value_of_dtype(distance_matrix.dtype)
+            # shape (embeddings_count, 1)
             negative_distances, _ = distance_matrix.min(dim=1)  # find negative examples
             # which are the closest to positive ones
+            # shape (embeddings_count // 2, 1)
             neg_dist_to_anchors = negative_distances[pairs[:, 0]]
+            # shape (embeddings_count // 2, 1)
             neg_dist_to_other = negative_distances[pairs[:, 1]]
+            # shape (embeddings_count // 2, 1)
             negative_distances_impact = relu(self.margin - neg_dist_to_anchors).pow(
                 2
             ) + relu(self.margin - neg_dist_to_other).pow(2)
 
+        # shape (embeddings_count // 2, 1)
         losses = (
             0.5
             * (

@@ -21,6 +21,7 @@ loguru = "^0.5.3"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.5"
+ipdb = "^0.13.9"
 
 [build-system]
 requires = ["poetry-core>=1.0.0", "setuptools==59.5.0"] # temporary fix for https://github.com/pytorch/pytorch/pull/69904

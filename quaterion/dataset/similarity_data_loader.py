@@ -1,6 +1,7 @@
-from typing import Any, List, Generic, Dict, Tuple
+from typing import Any, List, Generic, Tuple, Dict
 
 import torch
+from torch.utils.data import Dataset
 from torch.utils.data import DataLoader
 from torch.utils.data.dataloader import T_co
 
@@ -11,6 +12,22 @@ from quaterion.dataset.similarity_samples import (
 
 
 class SimilarityDataLoader(DataLoader, Generic[T_co]):
+    @classmethod
+    def pre_collate_fn(cls, batch: List[T_co]) -> Tuple[List[Any], Dict[str, torch.Tensor]]:
+        """
+        Function applied to batch before actual collate.
+        Splits bach into features - arguments of prediction and labels - targets.
+        Encoder-specific `collate_fn`_s will then be applied to feature list only.
+        Loss functions consumes labels from this function without any additional transformations.
+
+        Args:
+            batch: List of records, combined into batch directly from Dataset
+
+        Returns:
+            Lists of Features and List of labels
+        """
+        raise NotImplementedError()
+
     @classmethod
     def fetch_unique_objects(cls, batch: List[Any]) -> List[Any]:
         """Fetch unique objects to avoid calculation of repeated objects embeddings.
@@ -26,9 +43,28 @@ class SimilarityDataLoader(DataLoader, Generic[T_co]):
 
 
 class PairsSimilarityDataLoader(SimilarityDataLoader[SimilarityPairSample]):
+    def __init__(self, dataset: Dataset[SimilarityPairSample], **kwargs):
+        """
+        PairsSimilarityDataLoader is a special version of :class:`~torch.utils.data.DataLoader`
+        which works with similarity groups.
+
+        PairsSimilarityDataLoader will automatically assign dummy collate_fn for debug purposes,
+        it will be overwritten once dataloader is used for training.
+
+        Required collate function should be defined individually for each encoder
+        by overwriting :meth:`~quaterion_models.encoders.encoder.Encoder.get_collate_fn`
+
+        Args:
+            dataset: Dataset which outputs :class:`~quaterion.dataset.similarity_samples.SimilarityGroupSample`
+            **kwargs: Parameters passed directly into :meth:`~torch.utils.data.DataLoader.__init__`
+        """
+        if 'collate_fn' not in kwargs:
+            kwargs['collate_fn'] = self.pre_collate_fn
+        super().__init__(dataset, **kwargs)
+
     @classmethod
-    def collate_fn(
-        cls, batch: List[SimilarityPairSample]
+    def pre_collate_fn(
+            cls, batch: List[SimilarityPairSample]
     ) -> Tuple[List[Any], Dict[str, torch.Tensor]]:
         """Collate function for SimilarityPairSamples objects.
 
@@ -107,9 +143,28 @@ class PairsSimilarityDataLoader(SimilarityDataLoader[SimilarityPairSample]):
 
 
 class GroupSimilarityDataLoader(SimilarityDataLoader[SimilarityGroupSample]):
+    def __init__(self, dataset: Dataset[SimilarityPairSample], **kwargs):
+        """
+        GroupSimilarityDataLoader is a special version of :class:`~torch.utils.data.DataLoader`
+        which works with similarity groups.
+
+        GroupSimilarityDataLoader will automatically assign dummy collate_fn for debug purposes,
+        it will be overwritten once dataloader is used for training.
+
+        Required collate function should be defined individually for each encoder
+        by overwriting :meth:`~quaterion_models.encoders.encoder.Encoder.get_collate_fn`
+
+        Args:
+            dataset: Dataset which outputs :class:`~quaterion.dataset.similarity_samples.SimilarityGroupSample`
+            **kwargs: Parameters passed directly into :meth:`~torch.utils.data.DataLoader.__init__`
+        """
+        if 'collate_fn' not in kwargs:
+            kwargs['collate_fn'] = self.pre_collate_fn
+        super().__init__(dataset, **kwargs)
+
     @classmethod
-    def collate_fn(
-        cls, batch: List[SimilarityGroupSample]
+    def pre_collate_fn(
+            cls, batch: List[SimilarityGroupSample]
     ) -> Tuple[List[Any], Dict[str, torch.Tensor]]:
         """Collate function for SimilarityGroupSamples objects.
 
@@ -125,7 +180,7 @@ class GroupSimilarityDataLoader(SimilarityDataLoader[SimilarityGroupSample]):
 
         Examples:
             ```
-            GroupSimilarityDataLoader.collate_fn(
+            GroupSimilarityDataLoader.pre_collate_fn(
                 [
                     SimilarityGroupSample(
                         obj="orange",

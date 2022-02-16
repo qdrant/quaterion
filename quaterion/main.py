@@ -69,7 +69,7 @@ class Quaterion:
                 train_dataloader.collate_fn = partial(
                     cls.combiner_collate_fn,
                     features_collate=trainable_model.model.get_collate_fn(),
-                    labels_collate=train_dataloader.__class__.collate_fn,
+                    labels_collate=train_dataloader.__class__.pre_collate_fn,
                 )
             elif isinstance(trainable_model.loss, GroupLoss):
                 raise NotImplementedError(
@@ -81,7 +81,7 @@ class Quaterion:
                 train_dataloader.collate_fn = partial(
                     cls.combiner_collate_fn,
                     features_collate=trainable_model.model.get_collate_fn(),
-                    labels_collate=train_dataloader.__class__.collate_fn,
+                    labels_collate=train_dataloader.__class__.pre_collate_fn,
                 )
             elif isinstance(trainable_model.loss, PairwiseLoss):
                 raise NotImplementedError(

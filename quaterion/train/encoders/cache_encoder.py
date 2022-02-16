@@ -27,6 +27,7 @@ class CacheEncoder(Encoder):
         key_extractor: function required to extract hashable key from complicated
             objects which can't be hashed with default key extractor.
     """
+
     def __init__(self, encoder: Encoder, key_extractor: KeyExtractorType = None):
         if encoder.trainable():
             raise ValueError("Trainable encoder can't be cached")

@@ -71,41 +71,41 @@ class TrainableModel(pl.LightningModule, CacheMixin):
     def configure_caches(self) -> Optional[CacheConfig]:
         """Method to provide cache configuration
 
-        Use this method to define which encoders should cache calculated embeddings and
-        what kind of cache they should use.
+                Use this method to define which encoders should cache calculated embeddings and
+                what kind of cache they should use.
 
-        Returns:
-            Optional[CacheConfig]: cache configuration to be applied if provided, None
-                otherwise
-        Examples:
+                Returns:
+                    Optional[CacheConfig]: cache configuration to be applied if provided, None
+                        otherwise
+                Examples:
 
-        >>> CacheConfig(CacheType.AUTO)
-        CacheConfig(
-            cache_type=<CacheType.AUTO: 'auto'>,
-            mapping={},
-            key_extractors={}
-        )
+                >>> CacheConfig(CacheType.AUTO)
+                CacheConfig(
+                    cache_type=<CacheType.AUTO: 'auto'>,
+                    mapping={},
+                    key_extractors={}
+                )
 
-        >>> cache_config = CacheConfig(
-...     mapping={"text_encoder": CacheType.GPU, "image_encoder": CacheType.CPU}
-... )
-        CacheConfig(
-            cache_type=None,
-            mapping={
-                'text_encoder': <CacheType.GPU: 'gpu'>,
-                'image_encoder': <CacheType.CPU: 'cpu'>
-            },
-            key_extractors={}
-        )
-        >>> CacheConfig(
-...     cache_type=CacheType.AUTO,
-...     key_extractors={"default": lambda obj: hash(obj)}
-... )
-        CacheConfig(
-            cache_type=<CacheType.AUTO: 'auto'>,
-            mapping={},
-            key_extractors={'default': <function <lambda> at 0x106bc90e0>}
-        )
+                >>> cache_config = CacheConfig(
+        ...     mapping={"text_encoder": CacheType.GPU, "image_encoder": CacheType.CPU}
+        ... )
+                CacheConfig(
+                    cache_type=None,
+                    mapping={
+                        'text_encoder': <CacheType.GPU: 'gpu'>,
+                        'image_encoder': <CacheType.CPU: 'cpu'>
+                    },
+                    key_extractors={}
+                )
+                >>> CacheConfig(
+        ...     cache_type=CacheType.AUTO,
+        ...     key_extractors={"default": lambda obj: hash(obj)}
+        ... )
+                CacheConfig(
+                    cache_type=<CacheType.AUTO: 'auto'>,
+                    mapping={},
+                    key_extractors={'default': <function <lambda> at 0x106bc90e0>}
+                )
 
         """
         pass

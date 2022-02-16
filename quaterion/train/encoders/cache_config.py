@@ -10,6 +10,7 @@ class CacheType(str, Enum):
     CPU: tensors device is CPU.
     GPU: tensors device is GPU.
     """
+
     AUTO = "auto"
     CPU = "cpu"
     GPU = "gpu"
@@ -30,6 +31,7 @@ class CacheConfig:
     num_workers: num_workers to be used in CacheDataLoader during caching process. It
         does not affect others training stages.
     """
+
     cache_type: Optional[CacheType] = None
     mapping: Dict[str, CacheType] = field(default_factory=dict)
     key_extractors: Dict[str, Callable[[Any], Hashable]] = field(default_factory=dict)

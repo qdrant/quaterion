@@ -113,44 +113,44 @@ class GroupSimilarityDataLoader(SimilarityDataLoader[SimilarityGroupSample]):
     ) -> Tuple[List[Any], Dict[str, torch.Tensor]]:
         """Collate function for SimilarityGroupSamples objects.
 
-            Extract features from pairs and collects them in list.
-            Construct labels dict with `groups`.
+        Extract features from pairs and collects them in list.
+        Construct labels dict with `groups`.
 
-            Args:
-                batch: List of SimilarityGroupSample objects
+        Args:
+            batch: List of SimilarityGroupSample objects
 
-            Returns:
-                Tuple[List[Any], Dict[str, torch.Tensor]]: tuple of features and
-                    labels
+        Returns:
+            Tuple[List[Any], Dict[str, torch.Tensor]]: tuple of features and
+                labels
 
-            Examples:
-                ```
-                GroupSimilarityDataLoader.collate_fn(
-                    [
-                        SimilarityGroupSample(
-                            obj="orange",
-                            group=0,
-                        ),
-                        SimilarityGroupSample(
-                            obj="lemon",
-                            group=0,
-                        ),
-                        SimilarityGroupSample(
-                            obj="apple",
-                            group=1,
-                        )
-                    ]
-                )
+        Examples:
+            ```
+            GroupSimilarityDataLoader.collate_fn(
+                [
+                    SimilarityGroupSample(
+                        obj="orange",
+                        group=0,
+                    ),
+                    SimilarityGroupSample(
+                        obj="lemon",
+                        group=0,
+                    ),
+                    SimilarityGroupSample(
+                        obj="apple",
+                        group=1,
+                    )
+                ]
+            )
 
-                # result
-                (
-                    # features
-                    ['orange', 'lemon', 'apple'],
-                    # labels
-                    {'groups': tensor([0, 0, 1])}
-                )
-                ```
-            """
+            # result
+            (
+                # features
+                ['orange', 'lemon', 'apple'],
+                # labels
+                {'groups': tensor([0, 0, 1])}
+            )
+            ```
+        """
         features = [record.obj for record in batch]
         labels = {"groups": torch.LongTensor([record.group for record in batch])}
         return features, labels

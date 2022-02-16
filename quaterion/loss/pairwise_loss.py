@@ -11,6 +11,7 @@ class PairwiseLoss(SimilarityLoss):
             embeddings. The class SiameseDistanceMetric contains pre-defined metrics
             that can be used.
     """
+
     def __init__(self, distance_metric_name: str = "cosine_distance"):
         super(PairwiseLoss, self).__init__(distance_metric_name=distance_metric_name)
 

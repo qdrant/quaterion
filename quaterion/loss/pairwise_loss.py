@@ -16,7 +16,11 @@ class PairwiseLoss(SimilarityLoss):
         super(PairwiseLoss, self).__init__(distance_metric_name=distance_metric_name)
 
     def forward(
-        self, embeddings: Tensor, pairs: Tensor, labels: Tensor, subgroups: Tensor
+        self,
+        embeddings: Tensor,
+        pairs: Tensor,
+        labels: Tensor,
+        subgroups: Tensor,
     ) -> Tensor:
         """Compute loss value.
 

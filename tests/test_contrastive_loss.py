@@ -16,10 +16,19 @@ class TestContrastiveLoss:
             ]
         )
 
-        pairs = torch.LongTensor([[0, 1], [0, 2], [0, 3], [1, 3], [2, 3]])
+        pairs = torch.LongTensor([[0, 2], [1, 3]])
 
-        labels = torch.Tensor([1, 0, 0, 1, 0])
+        labels = torch.Tensor(
+            [
+                1,
+                0,
+            ]
+        )
 
-        loss_res = loss.forward(embeddings=embeddings, pairs=pairs, labels=labels)
+        subgroups = torch.Tensor([42, 13] * 2)
+
+        target = {"pairs": pairs, "labels": labels, "subgroups": subgroups}
+
+        loss_res = loss.forward(embeddings=embeddings, **target)
 
         assert loss_res.shape == torch.Size([])

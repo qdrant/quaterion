@@ -4,6 +4,14 @@ from quaterion.loss.similarity_loss import SimilarityLoss
 
 
 class PairwiseLoss(SimilarityLoss):
+    """Base class for pairwise losses.
+
+    Args:
+        distance_metric_name: Name of the function, that returns a distance between two
+            embeddings. The class SiameseDistanceMetric contains pre-defined metrics
+            that can be used.
+    """
+
     def __init__(self, distance_metric_name: str = "cosine_distance"):
         super(PairwiseLoss, self).__init__(distance_metric_name=distance_metric_name)
 
@@ -14,12 +22,16 @@ class PairwiseLoss(SimilarityLoss):
         labels: Tensor,
         subgroups: Tensor,
     ) -> Tensor:
-        """
-        :param embeddings: shape: [batch_size x vector_length]
-        :param pairs: shape: [pairs_count, 2] - contains a list of known
-        similarity pairs in batch
-        :param labels: shape: [pairs_count] - similarity of the pair
-        :param subgroups: shape: [pairs_count x 2] - subgroup ids of objects
-        :return:
+        """Compute loss value.
+
+        Args:
+            embeddings: shape: (batch_size, vector_length)
+            pairs: shape: (2 * pairs_count,) - contains a list of known similarity pairs
+                in batch
+            labels: shape: (pairs_count,) - similarity of the pair
+            subgroups: shape: (2 * pairs_count,) - subgroup ids of objects
+
+        Returns:
+            Tensor: zero-size tensor, loss value
         """
         raise NotImplementedError()

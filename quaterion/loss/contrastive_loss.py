@@ -60,12 +60,7 @@ class ContrastiveLoss(PairwiseLoss):
         }
 
     def forward(
-        self,
-        embeddings: Tensor,
-        pairs: LongTensor,
-        labels: Tensor,
-        subgroups: Tensor,
-        **kwargs
+        self, embeddings: Tensor, pairs: LongTensor, labels: Tensor, subgroups: Tensor, **kwargs
     ):
         """Compute loss value.
 
@@ -112,9 +107,9 @@ class ContrastiveLoss(PairwiseLoss):
             # shape (embeddings_count // 2, 1)
             neg_dist_to_other = negative_distances[pairs[:, 1]]
             # shape (embeddings_count // 2, 1)
-            negative_distances_impact = relu(self.margin - neg_dist_to_anchors).pow(
-                2
-            ) + relu(self.margin - neg_dist_to_other).pow(2)
+            negative_distances_impact = relu(self.margin - neg_dist_to_anchors).pow(2) + relu(
+                self.margin - neg_dist_to_other
+            ).pow(2)
 
         # shape (embeddings_count // 2, 1)
         losses = (

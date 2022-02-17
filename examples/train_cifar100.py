@@ -81,9 +81,7 @@ class MobilenetV3Encoder(Encoder):
 
 
 class Model(TrainableModel):
-    def __init__(
-        self, embedding_size: int = 128, num_groups: int = 100, lr: float = 1e-5
-    ):
+    def __init__(self, embedding_size: int = 128, num_groups: int = 100, lr: float = 1e-5):
         self._embedding_size = embedding_size
         self._num_groups = num_groups
         self._lr = lr

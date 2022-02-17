@@ -70,8 +70,4 @@ class SiameseDistanceMetric:
         Returns:
             Tensor: shape (batch_size, 1)
         """
-        return (
-            -torch.einsum("id,jd->ij", x, y)
-            if matrix
-            else -torch.einsum("id,id->i", x, y)
-        )
+        return -torch.einsum("id,jd->ij", x, y) if matrix else -torch.einsum("id,id->i", x, y)

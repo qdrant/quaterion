@@ -69,9 +69,7 @@ class ArcFaceLoss(GroupLoss):
         index = torch.where(groups != -1)[0]
 
         # Shape: (batch_size, num_groups)
-        m_hot = torch.zeros(
-            index.size()[0], cos_theta.size()[1], device=cos_theta.device
-        )
+        m_hot = torch.zeros(index.size()[0], cos_theta.size()[1], device=cos_theta.device)
         m_hot.scatter_(1, groups[index, None], self.margin)
         cos_theta.acos_()
         cos_theta[index] += m_hot

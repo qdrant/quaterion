@@ -138,9 +138,7 @@ class TrainableModel(pl.LightningModule, CacheMixin):
         """
         pass
 
-    def training_step(
-        self, batch: TensorInterchange, batch_idx: int, **kwargs
-    ) -> Tensor:
+    def training_step(self, batch: TensorInterchange, batch_idx: int, **kwargs) -> Tensor:
         """Compute and return the training loss and some additional metrics for e.g.
         the progress bar or logger.
 
@@ -153,9 +151,7 @@ class TrainableModel(pl.LightningModule, CacheMixin):
             Tensor: computed loss value
         """
         stage = TrainStage.TRAIN
-        loss = self._common_step(
-            batch=batch, batch_idx=batch_idx, stage=stage, **kwargs
-        )
+        loss = self._common_step(batch=batch, batch_idx=batch_idx, stage=stage, **kwargs)
         return loss
 
     def validation_step(self, batch, batch_idx, **kwargs) -> Optional[Tensor]:

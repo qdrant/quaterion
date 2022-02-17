@@ -29,9 +29,7 @@ class SimilarityLoss(nn.Module):
         return SiameseDistanceMetric
 
     @classmethod
-    def get_distance_function(
-        cls, function_name: str
-    ) -> Callable[[Tensor, Tensor], Tensor]:
+    def get_distance_function(cls, function_name: str) -> Callable[[Tensor, Tensor], Tensor]:
         """Retrieve distance function from metric class.
 
         Args:

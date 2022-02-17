@@ -78,9 +78,7 @@ class StartupEncoder(Encoder):
             raise TypeError("Expecting list of strings or dicts as inputs")
 
     def forward(self, inputs):
-        return self.encoder.encode(
-            inputs, convert_to_numpy=False, convert_to_tensor=True
-        )
+        return self.encoder.encode(inputs, convert_to_numpy=False, convert_to_tensor=True)
 
     def save(self, output_path: str):
         self.encoder.save(os.path.join(output_path, self._pretrained_name))

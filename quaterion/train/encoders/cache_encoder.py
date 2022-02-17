@@ -64,9 +64,7 @@ class CacheEncoder(Encoder):
         Returns:
              Hashable: Key for cache
         """
-        return (
-            hash(obj) if not isinstance(obj, dict) else hash(tuple(sorted(obj.items())))
-        )
+        return hash(obj) if not isinstance(obj, dict) else hash(tuple(sorted(obj.items())))
 
     def key_collate_fn(self, batch: Collection[Any]) -> List[Hashable]:
         """Convert batch of raw data into list of keys for cache.

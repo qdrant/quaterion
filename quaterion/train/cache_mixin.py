@@ -78,22 +78,17 @@ class CacheMixin:
 
         if cache_config.mapping:
             if cache_config.cache_type:
-                logger.warning(
-                    "CacheConfig.cache_type has no effect when mapping is set"
-                )
+                logger.warning("CacheConfig.cache_type has no effect when mapping is set")
 
             possible_cache_encoders: Set[str] = {
-                encoder_name
-                for encoder_name in encoders
-                if not encoders[encoder_name].trainable()
+                encoder_name for encoder_name in encoders if not encoders[encoder_name].trainable()
             }
 
             for encoder_name, cache_type in cache_config.mapping.items():
                 encoder: Optional[Encoder] = encoders.get(encoder_name)
                 if not encoder:
                     raise KeyError(
-                        f"Can't configure cache for encoder {encoder_name}. "
-                        "Encoder not found"
+                        f"Can't configure cache for encoder {encoder_name}. " "Encoder not found"
                     )
                 cls._check_cuda(cache_type, encoder_name)
                 key_extractor: Optional[
@@ -128,9 +123,7 @@ class CacheMixin:
                 encoder_name,
             )
         else:
-            raise ValueError(
-                "If cache is configured, cache_type or mapping have to be set"
-            )
+            raise ValueError("If cache is configured, cache_type or mapping have to be set")
 
         return encoders
 
@@ -396,9 +389,7 @@ class CacheMixin:
         dataloader.multiprocessing_context = cls.CACHE_MULTIPROCESSING_CONTEXT
 
     @classmethod
-    def _check_mp_context(
-        cls, mp_context: Optional[Union[str, mp.context.BaseContext]]
-    ) -> None:
+    def _check_mp_context(cls, mp_context: Optional[Union[str, mp.context.BaseContext]]) -> None:
         """Check if multiprocessing context is compatible with cache.
 
         Emits warning if current multiprocessing context start method does not

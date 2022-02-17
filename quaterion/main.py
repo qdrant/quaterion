@@ -72,9 +72,7 @@ class Quaterion:
                     labels_collate=train_dataloader.__class__.collate_fn,
                 )
             elif isinstance(trainable_model.loss, GroupLoss):
-                raise NotImplementedError(
-                    "Can't use GroupLoss with PairsSimilarityDataLoader"
-                )
+                raise NotImplementedError("Can't use GroupLoss with PairsSimilarityDataLoader")
 
         if isinstance(train_dataloader, GroupSimilarityDataLoader):
             if isinstance(trainable_model.loss, GroupLoss):
@@ -85,8 +83,7 @@ class Quaterion:
                 )
             elif isinstance(trainable_model.loss, PairwiseLoss):
                 raise NotImplementedError(
-                    "Pair samplers are not implemented yet. "
-                    "Try other loss/data loader"
+                    "Pair samplers are not implemented yet. " "Try other loss/data loader"
                 )
 
         if val_dataloader is not None:

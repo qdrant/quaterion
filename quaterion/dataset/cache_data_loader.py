@@ -60,9 +60,7 @@ class CacheDataLoader(SimilarityDataLoader):
         """
         pass
 
-    def cache_collate_fn(
-        self, batch: List[T_co]
-    ) -> Dict[str, Optional[CacheCollateReturnType]]:
+    def cache_collate_fn(self, batch: List[T_co]) -> Dict[str, Optional[CacheCollateReturnType]]:
         """
         Collate used to cache batches without repeated calculations of
         embeddings in the current process

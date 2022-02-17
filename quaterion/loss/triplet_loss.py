@@ -181,9 +181,11 @@ class TripletLoss(GroupLoss):
         Returns:
             torch.Tensor: Scalar loss value.
         """
+        # Shape: (batch_size, batch_size)
+        dists = _get_distance_matrix(embeddings, squared=self._squared)
+        
         if self._mining == "all":
-            # Shape: (batch_size, batch_size)
-            dists = _get_distance_matrix(embeddings, squared=self._squared)
+
             # Shape: (batch_size, batch_size, 1)
             anchor_positive_dists = dists.unsqueeze(2)
             # Shape: (batch_size, 1, batch_size)
@@ -203,12 +205,9 @@ class TripletLoss(GroupLoss):
 
             # get scalar loss value
             triplet_loss = torch.sum(triplet_loss) / (num_positive_triplets + 1e-16)
-
-            return triplet_loss
-
+            
         else:  # batch-hard triplet mining
-            dists = _get_distance_matrix(embeddings, squared=self._squared)
-
+            
             # get the hardest positive for each anchor
             anchor_positive_mask = _get_anchor_positive_mask(groups).float()
             anchor_positive_dists = (
@@ -235,4 +234,4 @@ class TripletLoss(GroupLoss):
             # get scalar loss value
             triplet_loss = triplet_loss.mean()
 
-            return triplet_loss
+        return triplet_loss

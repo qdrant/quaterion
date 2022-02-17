@@ -40,7 +40,7 @@ def _get_distance_matrix(
 
 
 def _get_triplet_mask(labels: torch.Tensor) -> torch.Tensor:
-    """_Create a 3D mask of valid triplets for the batch-all strategy.
+    """Creates a 3D mask of valid triplets for the batch-all strategy.
 
     A triplet is valid if:
     `labels[i] == labels[j] and labels[i] != labels[k]`
@@ -87,7 +87,7 @@ def _get_triplet_mask(labels: torch.Tensor) -> torch.Tensor:
 
 
 def _get_anchor_positive_mask(labels: torch.Tensor) -> torch.Tensor:
-    """Create a 2D mask of valid anchor-positive pairs.
+    """Creates a 2D mask of valid anchor-positive pairs.
 
     Args:
         labels (torch.Tensor): Labels associated with embeddings in the batch. Shape: (batch_size,)
@@ -111,7 +111,7 @@ def _get_anchor_positive_mask(labels: torch.Tensor) -> torch.Tensor:
 
 
 def _get_anchor_negative_mask(labels: torch.Tensor) -> torch.Tensor:
-    """Create a 2D mask of valid anchor-negative pairs.
+    """Creates a 2D mask of valid anchor-negative pairs.
 
     Args:
         labels (torch.Tensor): Labels associated with embeddings in the batch. Shape: (batch_size,)
@@ -128,7 +128,9 @@ def _get_anchor_negative_mask(labels: torch.Tensor) -> torch.Tensor:
 
 
 class TripletLoss(GroupLoss):
-    """Triplet Loss as defined in https://arxiv.org/abs/1503.03832
+    """Implements Triplet Loss as defined in https://arxiv.org/abs/1503.03832
+
+    It supports batch-all and batch-hard strategies for online triplet mining.
 
     Args:
         margin (float, optional): Margin value to push negative examples

@@ -54,7 +54,7 @@ def _get_triplet_mask(labels: torch.Tensor) -> torch.Tensor:
     """
     # get a mask for distinct indices
     # Shape: (batch_size, batch_size)
-    indices_equal = torch.eye(labels.size()[0]).bool()
+    indices_equal = torch.eye(labels.size()[0]).bool().to(labels.device)
     indices_not_equal = torch.logical_not(indices_equal)
 
     # Shape: (batch_size, batch_size, 1)

@@ -9,7 +9,6 @@ from quaterion_models.encoders import Encoder
 
 
 class FakeEncoder(Encoder):
-
     def __init__(self):
         super().__init__()
 
@@ -19,7 +18,6 @@ class FakeEncoder(Encoder):
             "macaroons ".strip(): torch.tensor([1.0, 0.0, 0.0, 1.0, 0.0, 0.0]),
             "candies   ".strip(): torch.tensor([1.0, 0.0, 1.0, 0.0, 0.0, 0.0]),
             "nutella   ".strip(): torch.tensor([1.0, 1.0, 0.0, 0.0, 0.0, 0.0]),
-
             "lemon     ".strip(): torch.tensor([0.0, 0.0, 0.0, 0.0, 0.0, 1.0]),
             "lime      ".strip(): torch.tensor([0.0, 0.0, 0.0, 0.0, 1.0, 0.0]),
             "orange    ".strip(): torch.tensor([0.0, 0.0, 0.0, 1.0, 0.0, 0.0]),
@@ -45,7 +43,6 @@ class FakeEncoder(Encoder):
 
 
 class TestDataset(Dataset):
-
     def __len__(self):
         return len(self.data)
 
@@ -54,16 +51,27 @@ class TestDataset(Dataset):
 
     def __init__(self):
         self.data = [
-            SimilarityPairSample(obj_a="cheesecake", obj_b="muffins", score=0.9, subgroup=10),
-            SimilarityPairSample(obj_a="cheesecake", obj_b="macaroons", score=0.8, subgroup=10),
-            SimilarityPairSample(obj_a="cheesecake", obj_b="candies", score=0.7, subgroup=10),
-            SimilarityPairSample(obj_a="cheesecake", obj_b="nutella", score=0.6, subgroup=10),
-
+            SimilarityPairSample(
+                obj_a="cheesecake", obj_b="muffins", score=0.9, subgroup=10
+            ),
+            SimilarityPairSample(
+                obj_a="cheesecake", obj_b="macaroons", score=0.8, subgroup=10
+            ),
+            SimilarityPairSample(
+                obj_a="cheesecake", obj_b="candies", score=0.7, subgroup=10
+            ),
+            SimilarityPairSample(
+                obj_a="cheesecake", obj_b="nutella", score=0.6, subgroup=10
+            ),
             # Second query group
             SimilarityPairSample(obj_a="lemon", obj_b="lime", score=0.9, subgroup=11),
             SimilarityPairSample(obj_a="lemon", obj_b="orange", score=0.7, subgroup=11),
-            SimilarityPairSample(obj_a="lemon", obj_b="grapefruit", score=0.6, subgroup=11),
-            SimilarityPairSample(obj_a="lemon", obj_b="mandarin", score=0.6, subgroup=11),
+            SimilarityPairSample(
+                obj_a="lemon", obj_b="grapefruit", score=0.6, subgroup=11
+            ),
+            SimilarityPairSample(
+                obj_a="lemon", obj_b="mandarin", score=0.6, subgroup=11
+            ),
         ]
 
 

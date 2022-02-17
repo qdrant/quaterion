@@ -18,7 +18,7 @@ class IndexingDataset(Dataset[Tuple[Any, T_co]]):
 
     def __getitem__(self, index) -> Tuple[Any, T_co]:
         item = self._dataset.__getitem__(index=index)
-        record_hash = mmh3.hash64(bytes(str(index), 'utf-8'), signed=False)
+        record_hash = mmh3.hash64(bytes(str(index), "utf-8"), signed=False)
         return record_hash, item
 
 
@@ -41,5 +41,7 @@ class IndexingIterableDataset(IterableDataset[Tuple[Any, T_co]]):
             worker_info = (worker_info.id, worker_info.num_workers, worker_info.seed)
 
         for idx, item in enumerate(self._dataset):
-            record_hash = mmh3.hash64(bytes(str((worker_info, idx)), 'utf-8'), signed=False)
+            record_hash = mmh3.hash64(
+                bytes(str((worker_info, idx)), "utf-8"), signed=False
+            )
             yield record_hash, item

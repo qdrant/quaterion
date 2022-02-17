@@ -9,7 +9,8 @@ from quaterion_models.types import TensorInterchange
 
 from quaterion.dataset.similarity_data_loader import (
     PairsSimilarityDataLoader,
-    GroupSimilarityDataLoader, SimilarityDataLoader,
+    GroupSimilarityDataLoader,
+    SimilarityDataLoader,
 )
 from quaterion.loss import GroupLoss, PairwiseLoss
 from quaterion.train.trainable_model import TrainableModel

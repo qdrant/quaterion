@@ -13,7 +13,9 @@ from quaterion.dataset.similarity_samples import (
 
 class SimilarityDataLoader(DataLoader, Generic[T_co]):
     @classmethod
-    def pre_collate_fn(cls, batch: List[T_co]) -> Tuple[List[Any], Dict[str, torch.Tensor]]:
+    def pre_collate_fn(
+        cls, batch: List[T_co]
+    ) -> Tuple[List[Any], Dict[str, torch.Tensor]]:
         """
         Function applied to batch before actual collate.
         Splits bach into features - arguments of prediction and labels - targets.
@@ -58,13 +60,13 @@ class PairsSimilarityDataLoader(SimilarityDataLoader[SimilarityPairSample]):
             dataset: Dataset which outputs :class:`~quaterion.dataset.similarity_samples.SimilarityGroupSample`
             **kwargs: Parameters passed directly into :meth:`~torch.utils.data.DataLoader.__init__`
         """
-        if 'collate_fn' not in kwargs:
-            kwargs['collate_fn'] = self.pre_collate_fn
+        if "collate_fn" not in kwargs:
+            kwargs["collate_fn"] = self.pre_collate_fn
         super().__init__(dataset, **kwargs)
 
     @classmethod
     def pre_collate_fn(
-            cls, batch: List[SimilarityPairSample]
+        cls, batch: List[SimilarityPairSample]
     ) -> Tuple[List[Any], Dict[str, torch.Tensor]]:
         """Collate function for SimilarityPairSamples objects.
 
@@ -158,13 +160,13 @@ class GroupSimilarityDataLoader(SimilarityDataLoader[SimilarityGroupSample]):
             dataset: Dataset which outputs :class:`~quaterion.dataset.similarity_samples.SimilarityGroupSample`
             **kwargs: Parameters passed directly into :meth:`~torch.utils.data.DataLoader.__init__`
         """
-        if 'collate_fn' not in kwargs:
-            kwargs['collate_fn'] = self.pre_collate_fn
+        if "collate_fn" not in kwargs:
+            kwargs["collate_fn"] = self.pre_collate_fn
         super().__init__(dataset, **kwargs)
 
     @classmethod
     def pre_collate_fn(
-            cls, batch: List[SimilarityGroupSample]
+        cls, batch: List[SimilarityGroupSample]
     ) -> Tuple[List[Any], Dict[str, torch.Tensor]]:
         """Collate function for SimilarityGroupSamples objects.
 

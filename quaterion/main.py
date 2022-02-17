@@ -4,23 +4,23 @@ from typing import Optional, Callable, List, Any, Tuple, Dict
 import pytorch_lightning as pl
 
 from torch import Tensor
-from torch.utils.data import DataLoader
 
 from quaterion_models.types import TensorInterchange
 
 from quaterion.dataset.similarity_data_loader import (
     PairsSimilarityDataLoader,
-    GroupSimilarityDataLoader,
+    GroupSimilarityDataLoader, SimilarityDataLoader,
 )
 from quaterion.loss import GroupLoss, PairwiseLoss
 from quaterion.train.trainable_model import TrainableModel
+from quaterion.types.batch import TrainBatch
 
 
 class Quaterion:
     """A dwarf on a giant's shoulders sees farther of the two"""
 
     @classmethod
-    def combiner_collate_fn(
+    def _combiner_collate_fn(
         cls,
         batch: List[Any],
         features_collate: Callable,
@@ -32,13 +32,14 @@ class Quaterion:
             batch: List of raw data
             features_collate: Model's collate function, it is responsible for converting
                 extracted by `labels_collate` features into suitable model input.
-            labels_collate: dataloader's origin collate function. It is responsible for
+            labels_collate: origin collate function of the data loader. It is responsible for
                 extracting features and labels from raw data.
 
         Returns:
             Tuple[TensorInterchange, Dict[str, Tensor]]: Tuple of suitable model's input
                 and labels
         """
+
         features, labels = labels_collate(batch)
         return features_collate(features), labels
 
@@ -47,12 +48,12 @@ class Quaterion:
         cls,
         trainable_model: TrainableModel,
         trainer: pl.Trainer,
-        train_dataloader: DataLoader,
-        val_dataloader: Optional[DataLoader] = None,
+        train_dataloader: SimilarityDataLoader,
+        val_dataloader: Optional[SimilarityDataLoader] = None,
     ):
         """Handle training routine
 
-        Assemble dataloaders, performs caching and whole training process.
+        Assemble data loaders, performs caching and whole training process.
 
         Args:
             trainable_model: model to fit
@@ -67,7 +68,7 @@ class Quaterion:
         if isinstance(train_dataloader, PairsSimilarityDataLoader):
             if isinstance(trainable_model.loss, PairwiseLoss):
                 train_dataloader.collate_fn = partial(
-                    cls.combiner_collate_fn,
+                    cls._combiner_collate_fn,
                     features_collate=trainable_model.model.get_collate_fn(),
                     labels_collate=train_dataloader.__class__.pre_collate_fn,
                 )
@@ -79,7 +80,7 @@ class Quaterion:
         if isinstance(train_dataloader, GroupSimilarityDataLoader):
             if isinstance(trainable_model.loss, GroupLoss):
                 train_dataloader.collate_fn = partial(
-                    cls.combiner_collate_fn,
+                    cls._combiner_collate_fn,
                     features_collate=trainable_model.model.get_collate_fn(),
                     labels_collate=train_dataloader.__class__.pre_collate_fn,
                 )

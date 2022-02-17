@@ -1,11 +1,10 @@
 from collections import defaultdict
-from typing import List, Any, Dict, Callable, Optional
+from typing import List, Any, Dict, Callable, Optional, Tuple
 
+import torch
 from torch.utils.data import Dataset
-from torch.utils.data.dataloader import T_co
+from torch.utils.data.dataloader import T_co, DataLoader
 
-
-from quaterion.dataset.similarity_data_loader import SimilarityDataLoader
 from quaterion.train.encoders.cache_encoder import (
     KeyExtractorType,
     CacheCollateFnType,
@@ -13,7 +12,7 @@ from quaterion.train.encoders.cache_encoder import (
 )
 
 
-class CacheDataLoader(SimilarityDataLoader):
+class CacheDataLoader(DataLoader):
     """DataLoader used to provide convenient way of caching.
 
     Provides a way to avoid repeated calculations in the context of current
@@ -25,7 +24,7 @@ class CacheDataLoader(SimilarityDataLoader):
             pairs of keys and values while in caching, and only keys otherwise
         unique_objects_extractor: function to extract unique objects from batch
         dataset: dataset object to load data from
-        **kwargs: key-word arguments to be passed to dataloader's `__init__`
+        **kwargs: key-word arguments to be passed to data loader's `__init__`
     """
 
     def __init__(
@@ -47,18 +46,6 @@ class CacheDataLoader(SimilarityDataLoader):
         self.cached_encoders_collate_fns = cached_encoders_collate_fns
         self.key_extractors = key_extractors
         self.seen_objects = defaultdict(set)
-
-    @classmethod
-    def fetch_unique_objects(cls, batch: List[T_co]) -> List[Any]:
-        """Fetches unique objects across batch to avoid repeated calculations.
-
-        Args:
-            batch: batch of raw data
-
-        Returns:
-            List[Any]: list of unique objects
-        """
-        pass
 
     def cache_collate_fn(
         self, batch: List[T_co]

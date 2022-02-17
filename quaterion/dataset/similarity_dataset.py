@@ -5,7 +5,7 @@ from torch.utils.data import Dataset
 from quaterion.dataset import SimilarityGroupSample
 
 
-class SimilarityDataset(Dataset[SimilarityGroupSample]):
+class SimilarityGroupDataset(Dataset[SimilarityGroupSample]):
     def __init__(self, dataset: Dataset):
         """
         Simple wrapper class, which converts standard dataset of classification task into

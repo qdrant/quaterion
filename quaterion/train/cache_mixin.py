@@ -240,8 +240,8 @@ class CacheMixin:
         cls,
         trainer: pl.Trainer,
         cache_encoders: Dict[str, CacheEncoder],
-        train_dataloader: SimilarityDataLoader,
-        val_dataloader: SimilarityDataLoader,
+        train_dataloader: DataLoader,
+        val_dataloader: DataLoader,
     ) -> None:
         """Fills cache and restores trainer state for further training process.
 

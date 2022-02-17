@@ -16,8 +16,9 @@ keywords = ["framework", "metric-learning", "similarity", "deep-learning", "pyto
 python = ">=3.7,<3.10"
 torch = ">=1.8.2"
 pytorch-lightning = "^1.5.8"
-quaterion-models = ">=0.1.4"
+quaterion-models = ">=0.1.5"
 loguru = "^0.5.3"
+mmh3 = "^3.0.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.5"

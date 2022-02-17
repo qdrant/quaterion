@@ -2,6 +2,10 @@ from enum import Enum
 from dataclasses import dataclass, field
 from typing import Dict, Optional, Callable, Any, Hashable
 
+# Function to extract hash value from the input object
+# Required if there is no other way to distinguish values for caching
+KeyExtractorType = Callable[[Any], Hashable]
+
 
 class CacheType(str, Enum):
     """Available tensor devices to be used for caching.
@@ -33,7 +37,7 @@ class CacheConfig:
     """
 
     cache_type: Optional[CacheType] = None
-    mapping: Dict[str, CacheType] = field(default_factory=dict)
-    key_extractors: Dict[str, Callable[[Any], Hashable]] = field(default_factory=dict)
     batch_size: Optional[int] = 32
     num_workers: Optional[int] = None  # if None - inherited from source dl
+    key_extractors: Dict[str, KeyExtractorType] = field(default_factory=dict)
+    mapping: Dict[str, CacheType] = field(default_factory=dict)

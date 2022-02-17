@@ -45,11 +45,12 @@ jobs:
 
       - name: Generate docs
         run: |
-          poetry run pdoc3 -f --html -o ./docs quaterion
+          poetry run sphinx-apidoc -f -o docs/source quaterion
+          poetry run sphinx-build docs/source docs/build
           git config --global user.name 'qdrant'
           git config --global user.email 'qdrant@users.noreply.github.com'
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
           git checkout master
           git add ./docs/
-          git commit -am "docs: auto-generate docs with pdoc3"
+          git commit -am "docs: auto-generate docs with psphinx"
           git push

@@ -108,7 +108,9 @@ train_dataloader = GroupSimilarityDataLoader(
     CIFAR100Dataset(train=True), batch_size=128, shuffle=True
 )
 
-trainer = pl.Trainer(gpus=1 if torch.cuda.is_available() else 0, num_nodes=1, max_epochs=10)
+trainer = pl.Trainer(
+    gpus=1 if torch.cuda.is_available() else 0, num_nodes=1, max_epochs=10
+)
 
 Quaterion.fit(
     trainable_model=model,

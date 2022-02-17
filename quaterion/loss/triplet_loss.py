@@ -221,9 +221,7 @@ class TripletLoss(GroupLoss):
             anchor_negative_dists = dists + dists.max(dim=1, keepdim=True)[0] * (
                 1.0 - anchor_negative_mask
             )  # add maximum of each row to invalid pairs
-            hardest_negative_dists = torch.min(
-                anchor_negative_dists, dim=1, keepdim=True
-            )[0]
+            hardest_negative_dists = anchor_negative_dists.min(dim=1, keepdim=True)[0]
 
             # combine hardest positives and hardest negatives
             triplet_loss = torch.maximum(

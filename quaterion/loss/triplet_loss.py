@@ -183,7 +183,7 @@ class TripletLoss(GroupLoss):
         """
         # Shape: (batch_size, batch_size)
         dists = _get_distance_matrix(embeddings, squared=self._squared)
-        
+
         if self._mining == "all":
 
             # Shape: (batch_size, batch_size, 1)
@@ -205,9 +205,9 @@ class TripletLoss(GroupLoss):
 
             # get scalar loss value
             triplet_loss = torch.sum(triplet_loss) / (num_positive_triplets + 1e-16)
-            
+
         else:  # batch-hard triplet mining
-            
+
             # get the hardest positive for each anchor
             anchor_positive_mask = _get_anchor_positive_mask(groups).float()
             anchor_positive_dists = (

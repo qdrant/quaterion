@@ -41,9 +41,15 @@ def _get_distance_matrix(
 def _get_triplet_mask(labels: torch.Tensor) -> torch.Tensor:
     """Creates a 3D mask of valid triplets for the batch-all strategy.
 
-    A triplet is valid if:
+    Given a batch of labels with `shape = (batch_size,)`
+    the number of possible triplets that can be formed is:
+    batch_size^3, i.e. cube of batch_size,
+    which can be represented as a tensor with `shape = (batch_size, batch_size, batch_size)`.
+    However, a triplet is valid if:
     `labels[i] == labels[j] and labels[i] != labels[k]`
-    and `i`, `j` and `k` are distinct.
+    and `i`, `j` and `k` are distinct indices.
+    This function calculates a mask indicating which ones of all the possible triplets
+    are actually valid triplets based on the given criteria above.
 
     Args:
         labels (torch.Tensor): Labels associated with embeddings in the batch. Shape: (batch_size,)

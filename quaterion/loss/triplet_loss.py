@@ -8,7 +8,7 @@ from quaterion.loss.group_loss import GroupLoss
 def _get_distance_matrix(
     embeddings: torch.Tensor, squared: Optional[bool] = True
 ) -> torch.Tensor:
-    """Calculates pairwise Euklidean distances between all the embeddings.
+    """Calculates pairwise Euclidean distances between all the embeddings.
 
     Args:
         embeddings (torch.Tensor): Batch of embeddings. Shape: (batch_size, embedding_dim)
@@ -40,7 +40,7 @@ def _get_distance_matrix(
 
 
 def _get_triplet_mask(labels: torch.Tensor) -> torch.Tensor:
-    """_Create a 3D mask to filter valid triplets for the batch.
+    """_Create a 3D mask of valid triplets for the batch-all strategy.
 
     A triplet is valid if:
     `labels[i] == labels[j] and labels[i] != labels[k]`
@@ -82,6 +82,47 @@ def _get_triplet_mask(labels: torch.Tensor) -> torch.Tensor:
 
     # combine masks
     mask = torch.logical_and(distinct_indices, valid_indices)
+
+    return mask
+
+
+def _get_anchor_positive_mask(labels: torch.Tensor) -> torch.Tensor:
+    """Create a 2D mask of valid anchor-positive pairs.
+
+    Args:
+        labels (torch.Tensor): Labels associated with embeddings in the batch. Shape: (batch_size,)
+
+    Returns:
+        torch.Tensor: Anchor-positive mask. Shape: (batch_size, batch_size)
+    """
+    # get a mask for distinct i and j indices
+    # Shape: (batch_size, batch_size)
+    indices_equal = torch.eye(labels.size()[0]).bool().to(labels.device)
+    indices_not_equal = torch.logical_not(indices_equal)
+
+    # get a mask for labels[i] == labels[j]
+    # Shape: (batch_size, batch_size)
+    labels_equal = labels.unsqueeze(0) == labels.unsqueeze(1)
+
+    # combine masks
+    mask = torch.logical_and(indices_not_equal, labels_equal)
+
+    return mask
+
+
+def _get_anchor_negative_mask(labels: torch.Tensor) -> torch.Tensor:
+    """Create a 2D mask of valid anchor-negative pairs.
+
+    Args:
+        labels (torch.Tensor): Labels associated with embeddings in the batch. Shape: (batch_size,)
+
+    Returns:
+        torch.Tensor: Anchor-negative mask. Shape: (batch_size, batch_size)
+    """
+    # get a mask for labels[i] != labels[k]
+    # Shape: (batch_size, batch_size)
+    labels_equal = labels.unsqueeze(0) == labels.unsqueeze(1)
+    mask = torch.logical_not(labels_equal)
 
     return mask
 
@@ -158,7 +199,33 @@ class TripletLoss(GroupLoss):
 
             return triplet_loss
 
-        else:
-            raise ValueError(
-                "batch-hard strategy has yet to be implemented. Use mining = 'all' for now"
+        else:  # batch-hard triplet mining
+            dists = _get_distance_matrix(embeddings, squared=self._squared)
+
+            # get the hardest positive for each anchor
+            anchor_positive_mask = _get_anchor_positive_mask(groups).float()
+            anchor_positive_dists = (
+                anchor_positive_mask * dists
+            )  # invalid pairs set to 0
+            # Shape: (batch_size, 1)
+            hardest_positive_dists = anchor_positive_dists.max(dim=1, keepdim=True)[0]
+
+            # get the hardest negative for each anchor
+            anchor_negative_mask = _get_anchor_negative_mask(groups).float()
+            anchor_negative_dists = dists + dists.max(dim=1, keepdim=True)[0] * (
+                1.0 - anchor_negative_mask
+            )  # add maximum of each row to invalid pairs
+            hardest_negative_dists = torch.min(
+                anchor_negative_dists, dim=1, keepdim=True
+            )[0]
+
+            # combine hardest positives and hardest negatives
+            triplet_loss = torch.maximum(
+                hardest_positive_dists - hardest_negative_dists + self._margin,
+                torch.tensor(0.0),
             )
+
+            # get scalar loss value
+            triplet_loss = triplet_loss.mean()
+
+            return triplet_loss

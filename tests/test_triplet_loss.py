@@ -28,5 +28,6 @@ class TestTripletLoss:
         loss = TripletLoss(mining="hard")
 
         loss_res = loss.forward(embeddings=self.embeddings, groups=self.groups)
+        print(loss_res)
 
         assert loss_res.shape == torch.Size([])

@@ -2,40 +2,7 @@ from typing import Optional
 
 import torch
 from quaterion.loss.group_loss import GroupLoss
-
-
-def _get_distance_matrix(
-    embeddings: torch.Tensor, squared: Optional[bool] = True
-) -> torch.Tensor:
-    """Calculates pairwise Euclidean distances between all the embeddings.
-
-    Args:
-        embeddings (torch.Tensor): Batch of embeddings. Shape: (batch_size, embedding_dim)
-        squared (bool, optional): Squared Euclidean distance or not. Defaults to True.
-
-    Returns:
-        torch.Tensor: Calculated distance matrix. Shape: (batch_size, batch_size)
-    """
-    # Calculate dot product. Shape: (batch_size, batch_size)
-    dot_product = torch.mm(embeddings, embeddings.transpose(0, 1))
-    # get L2 norm by diagonal. Shape: (batch_size,)
-    square_norm = torch.diagonal(dot_product)
-    # calculate distances. Shape: (batch_size, batch_size)
-    distances = square_norm.unsqueeze(0) - 2.0 * dot_product + square_norm.unsqueeze(1)
-    # get rid of negative distances due to calculation errors
-    distances = torch.maximum(distances, torch.tensor(0.0))
-
-    if not squared:
-        # handle numerical stability
-        mask = (distances == 0.0).float()
-        distances = distances + mask * 1e-16
-
-        distances = torch.sqrt(distances)
-
-        # Undo trick for numerical stability
-        distances = distances * (1.0 - mask)
-
-    return distances
+from quaterion.loss.metrics import SiameseDistanceMetric
 
 
 def _get_triplet_mask(labels: torch.Tensor) -> torch.Tensor:
@@ -182,7 +149,9 @@ class TripletLoss(GroupLoss):
             torch.Tensor: Scalar loss value.
         """
         # Shape: (batch_size, batch_size)
-        dists = _get_distance_matrix(embeddings, squared=self._squared)
+        dists = SiameseDistanceMetric.euclidean(
+            x=embeddings, matrix=True, squared=self._squared
+        )
 
         if self._mining == "all":
 

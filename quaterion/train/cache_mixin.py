@@ -9,7 +9,6 @@ from typing import (
     Any,
     Callable,
     Hashable,
-    List,
     Iterable,
     Tuple,
 )
@@ -137,7 +136,8 @@ class CacheMixin:
 
     @staticmethod
     def _check_cuda(cache_type: CacheType, encoder_name: str) -> None:
-        """
+        """Check cuda availability if GPU was chosen as cached tensors storage.
+
         If encoder is supposed to use GPU as tensor's storage, then cuda
         has to be available, otherwise raises ValueError
 
@@ -145,11 +145,8 @@ class CacheMixin:
             cache_type: cache type for encoder
             encoder_name: name of cache encoder
 
-        Returns:
-            None
-
         Raises:
-            ValueError: If cuda is not available
+            ValueError: If `CacheType.GPU` was passed and cuda is not available
         """
         if cache_type == CacheType.GPU and not torch.cuda.is_available():
             raise ValueError(
@@ -170,7 +167,7 @@ class CacheMixin:
             encoder: raw model's encoder
             cache_type: cache type of tensor storage
             key_extractor: function to obtain hashable values for complex
-                object which can't be hashed with standard means
+                object which can't be hashed with standard means.
             encoder_name: name of encoder to be wrapped
 
         Returns:
@@ -211,8 +208,6 @@ class CacheMixin:
             cache_config: cache config instance to configure cache batch size
                 and num of workers to use for caching
 
-        Returns:
-            None
         """
         cache_encoders = {
             name: encoder
@@ -256,8 +251,6 @@ class CacheMixin:
             train_dataloader: model's train dataloader
             val_dataloader: model's val dataloader
 
-        Returns:
-            None
         """
         # store configured fit and validate loops to restore them for training
         # process after cache
@@ -289,7 +282,7 @@ class CacheMixin:
 
     @classmethod
     def _compatibility_check(cls, dataloader: DataLoader) -> None:
-        """Checks whether dataloader type.
+        """Checks whether dataloader type is cacheable or not.
 
         To be used in caching, dataloader has to have an implementation of
         `cache_collate_fn`. Currently, only `SimilarityDataLoader` has it.
@@ -297,11 +290,8 @@ class CacheMixin:
         Args:
             dataloader: DataLoader
 
-        Returns:
-            None
-
         Raises:
-            TypeError: if dataloader is not instance of SimilarityDataLoader
+            TypeError: if dataloader is not instance of `SimilarityDataLoader`
         """
         if not isinstance(dataloader, SimilarityDataLoader):
             raise TypeError("DataLoader must be SimilarityDataLoader ")
@@ -391,8 +381,6 @@ class CacheMixin:
         Args:
             dataloader: dataloader to check and switch multiprocessing context
 
-        Returns:
-            None
         """
         if "PYTHONHASHSEED" in os.environ:
             return
@@ -418,9 +406,6 @@ class CacheMixin:
 
         Args:
             mp_context: some dataloader's multiprocessing context
-
-        Returns:
-            None
 
         Raises:
             OSError: Raise OSError if OS does not support process start method
@@ -459,12 +444,16 @@ class CacheModel(pl.LightningModule):
     This class is required to make caching process similar to the training of
     the genuine model and inherit and use the same trainer instance. It allows
     avoiding of messing with device managing stuff and more.
+
+    Args:
+        encoders: dict of cache encoders names and corresponding instances to cache
     """
 
     def __init__(
         self,
         encoders: Dict[str, CacheEncoder],
     ):
+
         super().__init__()
         self.encoders = encoders
         for key, encoder in self.encoders.items():

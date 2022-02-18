@@ -1,4 +1,4 @@
-from quaterion.loss.arcface_loss import ArcfaceLoss
+from quaterion.loss.arcface_loss import ArcFaceLoss
 from quaterion.loss.contrastive_loss import ContrastiveLoss
 from quaterion.loss.group_loss import GroupLoss
 from quaterion.loss.metrics import SiameseDistanceMetric

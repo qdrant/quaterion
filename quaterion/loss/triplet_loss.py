@@ -106,10 +106,10 @@ class TripletLoss(GroupLoss):
 
     Args:
         margin (float, optional): Margin value to push negative examples
-        apart. Defaults to `0.5`.
+            apart. Defaults to `0.5`.
         squared (bool, optional): Squared Euclidean distance or not. Defaults to `True`.
         mining (str, optional): Triplet mining strategy. One of
-        `"all"`, `"hard"`. Defaults to `"all"`.
+            `"all"`, `"hard"`. Defaults to `"all"`.
     """
 
     def __init__(

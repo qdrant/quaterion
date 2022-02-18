@@ -198,7 +198,7 @@ class TripletLoss(GroupLoss):
             triplet_loss = mask * triplet_loss
 
             # get rid of easy triplets
-            triplet_loss = torch.maximum(triplet_loss, torch.tensor(0.0))
+            triplet_loss = torch.max(triplet_loss, torch.tensor(0.0))
 
             # get the number of triplets with a positive loss
             num_positive_triplets = torch.sum((triplet_loss > 1e-16).float())
@@ -213,18 +213,18 @@ class TripletLoss(GroupLoss):
             anchor_positive_dists = (
                 anchor_positive_mask * dists
             )  # invalid pairs set to 0
-            # Shape: (batch_size, 1)
-            hardest_positive_dists = anchor_positive_dists.max(dim=1, keepdim=True)[0]
+            # Shape: (batch_size,)
+            hardest_positive_dists = anchor_positive_dists.max(dim=1)[0]
 
             # get the hardest negative for each anchor
             anchor_negative_mask = _get_anchor_negative_mask(groups).float()
             anchor_negative_dists = dists + dists.max(dim=1, keepdim=True)[0] * (
                 1.0 - anchor_negative_mask
             )  # add maximum of each row to invalid pairs
-            hardest_negative_dists = anchor_negative_dists.min(dim=1, keepdim=True)[0]
+            hardest_negative_dists = anchor_negative_dists.min(dim=1)[0]
 
             # combine hardest positives and hardest negatives
-            triplet_loss = torch.maximum(
+            triplet_loss = torch.max(
                 hardest_positive_dists - hardest_negative_dists + self._margin,
                 torch.tensor(0.0),
             )

@@ -15,19 +15,26 @@ class SiameseDistanceMetric:
 
         Args:
             x: shape: (batch_size, ...)
-            y: shape: (batch_size, ...), optional.
-            matrix: if `True` calculate distance matrix over `x`.
+            y: shape: (batch_size, ...), optional
+            matrix: if `True` calculate a distance matrix between `x` and `y` (all-to-all).
+                if `y` it is `None`, it assigns `x` to `y`.
             squared: Squared Euclidean distance or not.
 
         Returns:
             Tensor: shape (batch_size, batch_size) if `matrix` is `True`, (batch_size, 1) otherwise.
         """
-        # TODO: Remove `matrix` and rely only on `if y is not None`
         if not matrix:
+            if y is None:
+                raise ValueError("y cannot be None while matrix is False")
+
             return pairwise_distance(x, y, p=2)
 
         # Calculate dot product. Shape: (batch_size, batch_size)
-        dot_product = torch.mm(x, x.transpose(0, 1))
+        if y is None:
+            y = x
+
+        dot_product = torch.mm(x, y.transpose(0, 1))
+
         # get L2 norm by diagonal. Shape: (batch_size,)
         square_norm = torch.diagonal(dot_product)
         # calculate distances. Shape: (batch_size, batch_size)

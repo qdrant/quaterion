@@ -24,7 +24,7 @@ class SiameseDistanceMetric:
         """
         # TODO: Remove `matrix` and rely only on `if y is not None`
         if not matrix:
-            return pairwise_distance(x, y, p=2 if squared else 1)
+            return pairwise_distance(x, y, p=2)
 
         # Calculate dot product. Shape: (batch_size, batch_size)
         dot_product = torch.mm(x, x.transpose(0, 1))

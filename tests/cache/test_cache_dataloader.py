@@ -79,5 +79,3 @@ class TestDataset(Dataset):
 
 def test_cache_dataloader():
     dataset = IndexingDataset(TestDataset())
-
-

@@ -14,9 +14,9 @@ class InMemoryCacheEncoder(CacheEncoder):
     """CacheEncoder which is able to store tensors on CPU or GPU"""
 
     def __init__(
-            self,
-            encoder: Encoder,
-            cache_type=CacheType.AUTO,
+        self,
+        encoder: Encoder,
+        cache_type=CacheType.AUTO,
     ):
         super().__init__(encoder)
         self.cache = {}

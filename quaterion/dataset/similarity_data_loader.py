@@ -14,7 +14,6 @@ from quaterion.dataset.similarity_samples import (
 
 
 class SimilarityDataLoader(DataLoader, Generic[T_co]):
-
     def __init__(self, dataset: Dataset[SimilarityPairSample], **kwargs):
         """
         SimilarityDataLoader is a special version of :class:`~torch.utils.data.DataLoader`
@@ -70,7 +69,9 @@ class SimilarityDataLoader(DataLoader, Generic[T_co]):
         sample_ids, similarity_samples = list(zip(*batch))
         sample_ids = list(sample_ids)
         labels = cls.collate_labels(similarity_samples)
-        features, feature_ids = cls.flatten_objects(batch=similarity_samples, hash_ids=sample_ids)
+        features, feature_ids = cls.flatten_objects(
+            batch=similarity_samples, hash_ids=sample_ids
+        )
         return feature_ids, features, labels
 
     @classmethod
@@ -87,7 +88,9 @@ class SimilarityDataLoader(DataLoader, Generic[T_co]):
         raise NotImplementedError()
 
     @classmethod
-    def flatten_objects(cls, batch: List[T_co], hash_ids: List[int]) -> Tuple[List[Any], List[int]]:
+    def flatten_objects(
+        cls, batch: List[T_co], hash_ids: List[int]
+    ) -> Tuple[List[Any], List[int]]:
         """Retrieve and enumerate objects from similarity samples.
         Each individual object should be used as input for the encoder.
         Additionally, associates hash_id with each feature,
@@ -105,9 +108,10 @@ class SimilarityDataLoader(DataLoader, Generic[T_co]):
 
 
 class PairsSimilarityDataLoader(SimilarityDataLoader[SimilarityPairSample]):
-
     @classmethod
-    def collate_labels(cls, batch: List[SimilarityPairSample]) -> Dict[str, torch.Tensor]:
+    def collate_labels(
+        cls, batch: List[SimilarityPairSample]
+    ) -> Dict[str, torch.Tensor]:
         """Collate function for labels of SimilarityPairSamples
         Converts labels into tensors, suitable for loss passing directly into loss functions and metric estimators.
 
@@ -149,7 +153,9 @@ class PairsSimilarityDataLoader(SimilarityDataLoader[SimilarityPairSample]):
         return labels
 
     @classmethod
-    def flatten_objects(cls, batch: List[SimilarityPairSample], hash_ids: List[int]) -> Tuple[List[Any], List[int]]:
+    def flatten_objects(
+        cls, batch: List[SimilarityPairSample], hash_ids: List[int]
+    ) -> Tuple[List[Any], List[int]]:
         res_features = []
         res_ids = []
 
@@ -166,9 +172,10 @@ class PairsSimilarityDataLoader(SimilarityDataLoader[SimilarityPairSample]):
 
 
 class GroupSimilarityDataLoader(SimilarityDataLoader[SimilarityGroupSample]):
-
     @classmethod
-    def collate_labels(cls, batch: List[SimilarityGroupSample]) -> Dict[str, torch.Tensor]:
+    def collate_labels(
+        cls, batch: List[SimilarityGroupSample]
+    ) -> Dict[str, torch.Tensor]:
         """Collate function for labels
         Converts labels into tensors, suitable for loss passing directly into loss functions and metric estimators.
 
@@ -194,5 +201,7 @@ class GroupSimilarityDataLoader(SimilarityDataLoader[SimilarityGroupSample]):
         return labels
 
     @classmethod
-    def flatten_objects(cls, batch: List[SimilarityGroupSample], hash_ids: List[int]) -> Tuple[List[Any], List[int]]:
+    def flatten_objects(
+        cls, batch: List[SimilarityGroupSample], hash_ids: List[int]
+    ) -> Tuple[List[Any], List[int]]:
         return [sample.obj for sample in batch], hash_ids

@@ -5,12 +5,7 @@ from quaterion_models.types import CollateFnType
 
 
 class TrainCollater:
-
-    def __init__(
-            self,
-            pre_collate_fn,
-            encoder_collates: Dict[str, CollateFnType]
-    ):
+    def __init__(self, pre_collate_fn, encoder_collates: Dict[str, CollateFnType]):
         """
         Functional object, that aggregates all required information for performing collate on train batches.
         Should be serializable for sending among worker processes.
@@ -22,13 +17,18 @@ class TrainCollater:
         self.pre_collate_fn = pre_collate_fn
         self.encoder_collates = encoder_collates
 
-    def pre_encoder_collate(self, features: List[Any], ids: List[int] = None, encoder_name: str = None):
+    def pre_encoder_collate(
+        self, features: List[Any], ids: List[int] = None, encoder_name: str = None
+    ):
         """
         Default implementation of per-encoder batch preparation, might be overridden
         """
         return features
 
-    def __call__(self, batch: List[Tuple[int, Union[SimilarityPairSample, SimilarityGroupSample]]]):
+    def __call__(
+        self,
+        batch: List[Tuple[int, Union[SimilarityPairSample, SimilarityGroupSample]]],
+    ):
         ids, features, labels = self.pre_collate_fn(batch)
 
         encoder_collate_result = {}

@@ -123,12 +123,12 @@ class TrainableModel(pl.LightningModule, CacheMixin):
         raise NotImplementedError()
 
     def process_results(
-            self,
-            embeddings: Tensor,
-            targets: Dict[str, Any],
-            batch_idx: int,
-            stage: TrainStage,
-            **kwargs,
+        self,
+        embeddings: Tensor,
+        targets: Dict[str, Any],
+        batch_idx: int,
+        stage: TrainStage,
+        **kwargs,
     ):
         """Method to provide any additional evaluations of embeddings.
 
@@ -141,7 +141,7 @@ class TrainableModel(pl.LightningModule, CacheMixin):
         pass
 
     def training_step(
-            self, batch: TensorInterchange, batch_idx: int, **kwargs
+        self, batch: TensorInterchange, batch_idx: int, **kwargs
     ) -> Tensor:
         """Compute and return the training loss and some additional metrics for e.g.
         the progress bar or logger.

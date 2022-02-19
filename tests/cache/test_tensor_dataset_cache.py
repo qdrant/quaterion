@@ -27,5 +27,5 @@ def test_tensor_dataset_cache():
         # print("features", features)
         assert len(features) == 3
         print("labels", labels)
-        assert len(labels['groups']) == 3
+        assert len(labels["groups"]) == 3
         break

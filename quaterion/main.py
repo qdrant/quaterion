@@ -17,11 +17,11 @@ class Quaterion:
 
     @classmethod
     def fit(
-            cls,
-            trainable_model: TrainableModel,
-            trainer: pl.Trainer,
-            train_dataloader: SimilarityDataLoader,
-            val_dataloader: Optional[SimilarityDataLoader] = None,
+        cls,
+        trainable_model: TrainableModel,
+        trainer: pl.Trainer,
+        train_dataloader: SimilarityDataLoader,
+        val_dataloader: Optional[SimilarityDataLoader] = None,
     ):
         """Handle training routine
 
@@ -44,7 +44,7 @@ class Quaterion:
 
         collater = TrainCollater(
             pre_collate_fn=train_dataloader.collate_fn,
-            encoder_collates=encoder_collate_fns
+            encoder_collates=encoder_collate_fns,
         )
 
         if isinstance(train_dataloader, PairsSimilarityDataLoader):

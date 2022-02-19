@@ -48,9 +48,9 @@ class CacheMixin:
 
     @classmethod
     def _apply_cache_config(
-            cls,
-            encoders: Union[Encoder, Dict[str, Encoder]],
-            cache_config: Optional[CacheConfig],
+        cls,
+        encoders: Union[Encoder, Dict[str, Encoder]],
+        cache_config: Optional[CacheConfig],
     ) -> Union[Encoder, Dict[str, Encoder]]:
         """Applies received cache configuration for cached encoders, remain
         non-cached encoders as is
@@ -90,15 +90,10 @@ class CacheMixin:
         cached_encoders = {}
         for encoder_name, encoder in encoders.items():
             cached_encoders[encoder_name] = cls._wrap_encoder(
-                encoder,
-                cache_config=cache_config,
-                encoder_name=encoder_name
+                encoder, cache_config=cache_config, encoder_name=encoder_name
             )
 
-        return {
-            **encoders,
-            **cached_encoders
-        }
+        return {**encoders, **cached_encoders}
 
     @staticmethod
     def _check_cuda(cache_type: CacheType, encoder_name: str) -> None:
@@ -110,10 +105,7 @@ class CacheMixin:
 
     @classmethod
     def _wrap_encoder(
-            cls,
-            encoder: Encoder,
-            cache_config: CacheConfig,
-            encoder_name: str = ""
+        cls, encoder: Encoder, cache_config: CacheConfig, encoder_name: str = ""
     ) -> Encoder:
         """Wrap encoder into CacheEncoder instance if it is required by config.
 
@@ -151,12 +143,12 @@ class CacheMixin:
 
     @classmethod
     def cache(
-            cls,
-            trainer: pl.Trainer,
-            encoders: Dict[str, Encoder],
-            train_dataloader: SimilarityDataLoader,
-            val_dataloader: Optional[SimilarityDataLoader],
-            cache_config: CacheConfig,
+        cls,
+        trainer: pl.Trainer,
+        encoders: Dict[str, Encoder],
+        train_dataloader: SimilarityDataLoader,
+        val_dataloader: Optional[SimilarityDataLoader],
+        cache_config: CacheConfig,
     ) -> None:
         """Filling cache for model's cache encoders.
 
@@ -190,7 +182,9 @@ class CacheMixin:
                 val_dataloader, cache_config, cache_encoders
             )
 
-        cls._fill_cache(trainer, cache_encoders, cache_train_dataloader, cache_val_dataloader)
+        cls._fill_cache(
+            trainer, cache_encoders, cache_train_dataloader, cache_val_dataloader
+        )
 
         # ToDo: post-caching collater
 
@@ -198,11 +192,11 @@ class CacheMixin:
 
     @classmethod
     def _fill_cache(
-            cls,
-            trainer: pl.Trainer,
-            cache_encoders: Dict[str, CacheEncoder],
-            train_dataloader: DataLoader,
-            val_dataloader: DataLoader,
+        cls,
+        trainer: pl.Trainer,
+        cache_encoders: Dict[str, CacheEncoder],
+        train_dataloader: DataLoader,
+        val_dataloader: DataLoader,
     ) -> None:
         """Fills cache and restores trainer state for further training process.
 
@@ -242,10 +236,10 @@ class CacheMixin:
 
     @classmethod
     def _wrap_cache_dataloader(
-            cls,
-            dataloader: SimilarityDataLoader,
-            cache_config: CacheConfig,
-            cache_encoders: Dict[str, CacheEncoder],
+        cls,
+        dataloader: SimilarityDataLoader,
+        cache_config: CacheConfig,
+        cache_encoders: Dict[str, CacheEncoder],
     ) -> DataLoader:
         """Creates dataloader for caching.
 
@@ -302,9 +296,7 @@ class CacheMixin:
         )
 
         cache_dl = DataLoader(
-            dataset=dataloader.dataset,
-            collate_fn=...,  # ToDo: Cache collater
-            **params
+            dataset=dataloader.dataset, collate_fn=..., **params  # ToDo: Cache collater
         )
         return cache_dl
 
@@ -334,7 +326,7 @@ class CacheMixin:
 
     @classmethod
     def _check_mp_context(
-            cls, mp_context: Optional[Union[str, mp.context.BaseContext]]
+        cls, mp_context: Optional[Union[str, mp.context.BaseContext]]
     ) -> None:
         """Check if multiprocessing context is compatible with cache.
 
@@ -387,8 +379,8 @@ class CacheModel(pl.LightningModule):
     """
 
     def __init__(
-            self,
-            encoders: Dict[str, CacheEncoder],
+        self,
+        encoders: Dict[str, CacheEncoder],
     ):
 
         super().__init__()
@@ -397,10 +389,10 @@ class CacheModel(pl.LightningModule):
             self.add_module(key, encoder)
 
     def predict_step(
-            self,
-            batch: Dict[str, Tuple[Iterable[Hashable], TensorInterchange]],
-            batch_idx: int,
-            dataloader_idx: Optional[int] = None,
+        self,
+        batch: Dict[str, Tuple[Iterable[Hashable], TensorInterchange]],
+        batch_idx: int,
+        dataloader_idx: Optional[int] = None,
     ):
         """Caches batch of input.
 

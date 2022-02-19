@@ -7,6 +7,8 @@ from torch.utils.data.dataset import T_co
 from quaterion.dataset import SimilarityPairSample
 from quaterion_models.encoders import Encoder
 
+from quaterion.dataset.indexing_dataset import IndexingDataset
+
 
 class FakeEncoder(Encoder):
     def __init__(self):
@@ -76,4 +78,6 @@ class TestDataset(Dataset):
 
 
 def test_cache_dataloader():
-    dataset = TestDataset()
+    dataset = IndexingDataset(TestDataset())
+
+

@@ -71,41 +71,43 @@ class TrainableModel(pl.LightningModule, CacheMixin):
     def configure_caches(self) -> Optional[CacheConfig]:
         """Method to provide cache configuration
 
-                Use this method to define which encoders should cache calculated embeddings and
-                what kind of cache they should use.
+        Use this method to define which encoders should cache calculated embeddings and
+        what kind of cache they should use.
 
-                Returns:
-                    Optional[CacheConfig]: cache configuration to be applied if provided, None
-                        otherwise
-                Examples:
+        Returns:
+            Optional[CacheConfig]: cache configuration to be applied if provided, None
+                otherwise
+        Examples:
 
-                >>> CacheConfig(CacheType.AUTO)
-                CacheConfig(
-                    cache_type=<CacheType.AUTO: 'auto'>,
-                    mapping={},
-                    key_extractors={}
-                )
+            Do not use cache (default):
+            ```
+            return None
+            ```
 
-                >>> cache_config = CacheConfig(
-        ...     mapping={"text_encoder": CacheType.GPU, "image_encoder": CacheType.CPU}
-        ... )
-                CacheConfig(
-                    cache_type=None,
-                    mapping={
-                        'text_encoder': <CacheType.GPU: 'gpu'>,
-                        'image_encoder': <CacheType.CPU: 'cpu'>
-                    },
-                    key_extractors={}
-                )
-                >>> CacheConfig(
-        ...     cache_type=CacheType.AUTO,
-        ...     key_extractors={"default": lambda obj: hash(obj)}
-        ... )
-                CacheConfig(
-                    cache_type=<CacheType.AUTO: 'auto'>,
-                    mapping={},
-                    key_extractors={'default': <function <lambda> at 0x106bc90e0>}
-                )
+            Configure cache automatically for all non-trainable encoders:
+            ```
+            return CacheConfig(CacheType.AUTO)
+            ```
+
+            Specify cache type for each encoder individually:
+            ```
+            return CacheConfig(mapping={
+                    "text_encoder": CacheType.GPU,  # Store cache in GPU for `text_encoder`
+                    "image_encoder": CacheType.CPU  # Store cache in RAM for `image_encoder`
+                }
+            )
+            ```
+
+            Specify key for cache object disambiguation:
+            ```
+            return CacheConfig(
+                cache_type=CacheType.AUTO,
+                key_extractors={"text_encoder": hash}
+            )
+            ```
+            This function might be useful if you want to provide some more sophisticated way of storing
+             association between cached vectors and original object.
+            Item numbers from dataset will be used by default if key is not specified
 
         """
         pass
@@ -121,12 +123,12 @@ class TrainableModel(pl.LightningModule, CacheMixin):
         raise NotImplementedError()
 
     def process_results(
-        self,
-        embeddings: Tensor,
-        targets: Dict[str, Any],
-        batch_idx: int,
-        stage: TrainStage,
-        **kwargs,
+            self,
+            embeddings: Tensor,
+            targets: Dict[str, Any],
+            batch_idx: int,
+            stage: TrainStage,
+            **kwargs,
     ):
         """Method to provide any additional evaluations of embeddings.
 
@@ -139,7 +141,7 @@ class TrainableModel(pl.LightningModule, CacheMixin):
         pass
 
     def training_step(
-        self, batch: TensorInterchange, batch_idx: int, **kwargs
+            self, batch: TensorInterchange, batch_idx: int, **kwargs
     ) -> Tensor:
         """Compute and return the training loss and some additional metrics for e.g.
         the progress bar or logger.

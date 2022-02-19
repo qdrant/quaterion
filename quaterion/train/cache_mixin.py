@@ -48,9 +48,9 @@ class CacheMixin:
 
     @classmethod
     def _apply_cache_config(
-        cls,
-        encoders: Union[Encoder, Dict[str, Encoder]],
-        cache_config: Optional[CacheConfig],
+            cls,
+            encoders: Union[Encoder, Dict[str, Encoder]],
+            cache_config: Optional[CacheConfig],
     ) -> Union[Encoder, Dict[str, Encoder]]:
         """Applies received cache configuration for cached encoders, remain
         non-cached encoders as is
@@ -76,125 +76,87 @@ class CacheMixin:
         if not cache_config:
             return encoders
 
-        if cache_config.mapping:
-            if cache_config.cache_type:
-                logger.warning(
-                    "CacheConfig.cache_type has no effect when mapping is set"
-                )
-
-            possible_cache_encoders: Set[str] = {
-                encoder_name
-                for encoder_name in encoders
-                if not encoders[encoder_name].trainable()
-            }
-
-            for encoder_name, cache_type in cache_config.mapping.items():
-                encoder: Optional[Encoder] = encoders.get(encoder_name)
-                if not encoder:
-                    raise KeyError(
-                        f"Can't configure cache for encoder {encoder_name}. "
-                        "Encoder not found"
-                    )
-                cls._check_cuda(cache_type, encoder_name)
-                key_extractor: Optional[
-                    Callable[[Any], Hashable]
-                ] = cache_config.key_extractors.get(encoder_name)
-
-                encoders[encoder_name]: CacheEncoder = cls._wrap_encoder(
-                    encoder,
-                    cache_type,
-                    key_extractor,
-                    encoder_name,
-                )
-
-                possible_cache_encoders.remove(encoder_name)
-
-            not_cached_encoders = ", ".join(possible_cache_encoders)
-            if not_cached_encoders:
-                logger.info(
-                    f"{not_cached_encoders} haven't been cached, "
-                    "but could be as non-trainable encoders"
-                )
-
-        elif cache_config.cache_type:
-            encoder_name = DEFAULT_ENCODER_KEY
-
-            cls._check_cuda(cache_config.cache_type, encoder_name)
-            key_extractor = cache_config.key_extractors.get(encoder_name)
-            encoders = cls._wrap_encoder(
-                encoders,
-                cache_config.cache_type,
-                key_extractor,
-                encoder_name,
-            )
-        else:
+        if not cache_config.cache_type and not cache_config.mapping:
             raise ValueError(
                 "If cache is configured, cache_type or mapping have to be set"
             )
 
-        return encoders
+        if isinstance(encoders, Encoder):
+            return cls._wrap_encoder(
+                encoders,
+                cache_config=cache_config,
+            )
+
+        cached_encoders = {}
+        for encoder_name, encoder in encoders.items():
+            cached_encoders[encoder_name] = cls._wrap_encoder(
+                encoder,
+                cache_config=cache_config,
+                encoder_name=encoder_name
+            )
+
+        return {
+            **encoders,
+            **cached_encoders
+        }
 
     @staticmethod
     def _check_cuda(cache_type: CacheType, encoder_name: str) -> None:
-        """Check cuda availability if GPU was chosen as cached tensors storage.
-
-        If encoder is supposed to use GPU as tensor's storage, then cuda
-        has to be available, otherwise raises ValueError
-
-        Args:
-            cache_type: cache type for encoder
-            encoder_name: name of cache encoder
-
-        Raises:
-            ValueError: If `CacheType.GPU` was passed and cuda is not available
-        """
         if cache_type == CacheType.GPU and not torch.cuda.is_available():
             raise ValueError(
                 f"`CacheType.GPU` has been chosen for `{encoder_name}` "
                 "encoder, but cuda is not available"
             )
 
-    @staticmethod
+    @classmethod
     def _wrap_encoder(
-        encoder: Encoder,
-        cache_type: CacheType,
-        key_extractor: Optional[KeyExtractorType],
-        encoder_name: str = "",
-    ) -> CacheEncoder:
-        """Wrap encoder into CacheEncoder instance.
+            cls,
+            encoder: Encoder,
+            cache_config: CacheConfig,
+            encoder_name: str = ""
+    ) -> Encoder:
+        """Wrap encoder into CacheEncoder instance if it is required by config.
 
         Args:
             encoder: raw model's encoder
-            cache_type: cache type of tensor storage
-            key_extractor: function to obtain hashable values for complex
-                object which can't be hashed with standard means.
-            encoder_name: name of encoder to be wrapped
+            cache_config: cache type of tensor storage
 
         Returns:
-            CacheEncoder: wrapped encoder
+            wrapped CacheEncoder or original encoder
 
         Raises:
             ValueError: if encoder layers are not frozen. Cache can be applied
                 only to fully frozen encoders' outputs.
         """
         if encoder.trainable():
-            raise ValueError(
-                f"Can't configure cache for encoder {encoder_name}. "
-                "Encoder must be frozen to cache it"
+            if encoder_name in cache_config.mapping:
+                raise ValueError(
+                    f"Can't configure cache for encoder {encoder_name}. "
+                    "Encoder must be frozen to cache it"
+                )
+            return encoder
+
+        cache_type = cache_config.mapping.get(encoder_name) or cache_config.cache_type
+
+        if cache_type is None:
+            logger.info(
+                f"{encoder_name} haven't been cached, "
+                "but could be as non-trainable encoders"
             )
+            return encoder
 
-        encoder = InMemoryCacheEncoder(encoder, key_extractor, cache_type)
+        cls._check_cuda(cache_type, encoder_name)
 
-        return encoder
+        return InMemoryCacheEncoder(encoder, cache_type)
 
     @classmethod
     def cache(
-        cls,
-        trainer: pl.Trainer,
-        encoders: Dict[str, Encoder],
-        train_dataloader: SimilarityDataLoader,
-        val_dataloader: Optional[SimilarityDataLoader],
-        cache_config: CacheConfig,
+            cls,
+            trainer: pl.Trainer,
+            encoders: Dict[str, Encoder],
+            train_dataloader: SimilarityDataLoader,
+            val_dataloader: Optional[SimilarityDataLoader],
+            cache_config: CacheConfig,
     ) -> None:
         """Filling cache for model's cache encoders.
 
@@ -218,30 +180,29 @@ class CacheMixin:
         if not cache_encoders:
             return
 
-        cls._compatibility_check(train_dataloader)
-        train_dataloader = cls._wrap_cache_dataloader(
+        cache_train_dataloader = cls._wrap_cache_dataloader(
             train_dataloader, cache_config, cache_encoders
         )
 
+        cache_val_dataloader = None
         if val_dataloader is not None:
-            val_dataloader = cls._wrap_cache_dataloader(
+            cache_val_dataloader = cls._wrap_cache_dataloader(
                 val_dataloader, cache_config, cache_encoders
             )
 
-        cls._fill_cache(trainer, cache_encoders, train_dataloader, val_dataloader)
+        cls._fill_cache(trainer, cache_encoders, cache_train_dataloader, cache_val_dataloader)
 
-        # Once cache is filled, collate functions return only keys for cache
-        for encoder in cache_encoders.values():
-            encoder.cache_filled = True
+        # ToDo: post-caching collater
+
         logger.info("Caching has been successfully finished")
 
     @classmethod
     def _fill_cache(
-        cls,
-        trainer: pl.Trainer,
-        cache_encoders: Dict[str, CacheEncoder],
-        train_dataloader: DataLoader,
-        val_dataloader: DataLoader,
+            cls,
+            trainer: pl.Trainer,
+            cache_encoders: Dict[str, CacheEncoder],
+            train_dataloader: DataLoader,
+            val_dataloader: DataLoader,
     ) -> None:
         """Fills cache and restores trainer state for further training process.
 
@@ -255,7 +216,6 @@ class CacheMixin:
         # store configured fit and validate loops to restore them for training
         # process after cache
         _fit_loop = trainer.fit_loop
-        _val_loop = trainer.validate_loop
 
         # Mimic fit loop configuration from trainer
         fit_loop = FitLoop(
@@ -281,29 +241,13 @@ class CacheMixin:
         trainer.fit_loop = _fit_loop
 
     @classmethod
-    def _compatibility_check(cls, dataloader: DataLoader) -> None:
-        """Checks whether dataloader type is cacheable or not.
-
-        To be used in caching, dataloader has to have an implementation of
-        `cache_collate_fn`. Currently, only `SimilarityDataLoader` has it.
-
-        Args:
-            dataloader: DataLoader
-
-        Raises:
-            TypeError: if dataloader is not instance of `SimilarityDataLoader`
-        """
-        if not isinstance(dataloader, SimilarityDataLoader):
-            raise TypeError("DataLoader must be SimilarityDataLoader ")
-
-    @classmethod
     def _wrap_cache_dataloader(
-        cls,
-        dataloader: SimilarityDataLoader,
-        cache_config: CacheConfig,
-        cache_encoders: Dict[str, CacheEncoder],
-    ) -> CacheDataLoader:
-        """Wrap dataloader for caching.
+            cls,
+            dataloader: SimilarityDataLoader,
+            cache_config: CacheConfig,
+            cache_encoders: Dict[str, CacheEncoder],
+    ) -> DataLoader:
+        """Creates dataloader for caching.
 
         Child processes need to derive randomized `PYTHONHASHSEED` value from
         parent process to obtain the same hash values. It is only done with
@@ -326,7 +270,7 @@ class CacheMixin:
             cache_encoders: encoders to set key extractors and collate_fns
 
         Returns:
-            CacheDataLoader: wrapped dataloader
+            CDataLoader: dataloader for caching
         """
         cls._switch_multiprocessing_context(dataloader)
         num_workers = (
@@ -350,24 +294,17 @@ class CacheMixin:
         # We need to reduce random sampling and repeated calculations to
         # make cache as fast as possible. Thus, we recreate dataloader
         # and set batch size explicitly.
-        cache_dl = CacheDataLoader(
-            key_extractors=dict(
-                (encoder_name, cache_encoder.key_extractor)
-                for encoder_name, cache_encoder in cache_encoders.items()
-            ),
-            cached_encoders_collate_fns=dict(
-                (encoder_name, cache_encoder.get_collate_fn())
-                for encoder_name, cache_encoder in cache_encoders.items()
-            ),
-            unique_objects_extractor=dataloader.fetch_unique_objects,
-            dataset=dataloader.dataset,
-            batch_size=cache_config.batch_size,
-            num_workers=num_workers,
-            pin_memory=dataloader.pin_memory,
-            timeout=dataloader.timeout,
-            worker_init_fn=dataloader.worker_init_fn,
-            prefetch_factor=dataloader.prefetch_factor,
+        params = dict(
+            **dataloader.original_params,
             multiprocessing_context=mp_ctx,
+            num_workers=num_workers,
+            batch_size=cache_config.batch_size,
+        )
+
+        cache_dl = DataLoader(
+            dataset=dataloader.dataset,
+            collate_fn=...,  # ToDo: Cache collater
+            **params
         )
         return cache_dl
 
@@ -397,7 +334,7 @@ class CacheMixin:
 
     @classmethod
     def _check_mp_context(
-        cls, mp_context: Optional[Union[str, mp.context.BaseContext]]
+            cls, mp_context: Optional[Union[str, mp.context.BaseContext]]
     ) -> None:
         """Check if multiprocessing context is compatible with cache.
 
@@ -450,8 +387,8 @@ class CacheModel(pl.LightningModule):
     """
 
     def __init__(
-        self,
-        encoders: Dict[str, CacheEncoder],
+            self,
+            encoders: Dict[str, CacheEncoder],
     ):
 
         super().__init__()
@@ -460,10 +397,10 @@ class CacheModel(pl.LightningModule):
             self.add_module(key, encoder)
 
     def predict_step(
-        self,
-        batch: Dict[str, Tuple[Iterable[Hashable], TensorInterchange]],
-        batch_idx: int,
-        dataloader_idx: Optional[int] = None,
+            self,
+            batch: Dict[str, Tuple[Iterable[Hashable], TensorInterchange]],
+            batch_idx: int,
+            dataloader_idx: Optional[int] = None,
     ):
         """Caches batch of input.
 

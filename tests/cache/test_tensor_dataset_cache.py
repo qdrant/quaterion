@@ -16,8 +16,16 @@ def test_tensor_dataset_cache():
     dataset = SimilarityGroupDataset(
         MNIST(tmp_dir_name, download=True, transform=transform)
     )
-    dataloader = GroupSimilarityDataLoader(dataset)
+    dataloader = GroupSimilarityDataLoader(dataset, batch_size=3)
+
+    print("")
 
     for batch in dataloader:
-        print(batch)
+        ids, features, labels = batch
+        print("ids", ids)
+        assert len(ids) == 3
+        # print("features", features)
+        assert len(features) == 3
+        print("labels", labels)
+        assert len(labels['groups']) == 3
         break

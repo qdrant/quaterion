@@ -7,9 +7,9 @@ from torch.utils.data.dataloader import T_co, DataLoader
 
 from quaterion.train.encoders.cache_encoder import (
     KeyExtractorType,
-    CacheCollateFnType,
     CacheCollateReturnType,
 )
+from quaterion_models.types import CollateFnType
 
 
 class CacheDataLoader(DataLoader):
@@ -30,7 +30,7 @@ class CacheDataLoader(DataLoader):
     def __init__(
         self,
         key_extractors: Dict[str, KeyExtractorType],
-        cached_encoders_collate_fns: Dict[str, CacheCollateFnType],
+        cached_encoders_collate_fns: Dict[str, CollateFnType],
         unique_objects_extractor: Callable[[List[Any]], List[Any]],
         dataset: Dataset[T_co],
         **kwargs

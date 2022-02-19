@@ -4,26 +4,21 @@ import torch
 
 from torch import Tensor
 from quaterion_models.encoders import Encoder
-from quaterion_models.types import TensorInterchange
+from quaterion_models.types import TensorInterchange, CollateFnType
 
 from quaterion.train.encoders.cache_config import CacheType
-from quaterion.train.encoders.cache_encoder import (
-    CacheEncoder,
-    CacheCollateFnType,
-    KeyExtractorType,
-)
+from quaterion.train.encoders.cache_encoder import CacheEncoder
 
 
 class InMemoryCacheEncoder(CacheEncoder):
     """CacheEncoder which is able to store tensors on CPU or GPU"""
 
     def __init__(
-        self,
-        encoder: Encoder,
-        key_extractor: KeyExtractorType = None,
-        cache_type=CacheType.AUTO,
+            self,
+            encoder: Encoder,
+            cache_type=CacheType.AUTO,
     ):
-        super().__init__(encoder, key_extractor)
+        super().__init__(encoder)
         self.cache = {}
         self._cache_type = self.resolve_cache_type(cache_type)
 
@@ -63,7 +58,7 @@ class InMemoryCacheEncoder(CacheEncoder):
             embeddings = embeddings.to(device)
         return embeddings
 
-    def get_collate_fn(self) -> CacheCollateFnType:
+    def get_collate_fn(self) -> CollateFnType:
         """Provides function that converts raw data batch into suitable input.
 
         Returns:
@@ -87,4 +82,3 @@ class InMemoryCacheEncoder(CacheEncoder):
     def reset_cache(self) -> None:
         """Resets cache."""
         self.cache.clear()
-        self.cache_filled = False

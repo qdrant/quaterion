@@ -12,7 +12,7 @@ from loguru import logger
 from quaterion_models.encoders import Encoder
 from torch.utils.data import DataLoader
 
-from quaterion.dataset.cache_train_collater import CacheTrainCollater
+from quaterion.train.cache.cache_train_collater import CacheTrainCollater
 from quaterion.dataset.similarity_data_loader import SimilarityDataLoader
 from quaterion.train.cache import (
     CacheConfig,

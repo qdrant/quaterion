@@ -1,4 +1,3 @@
-from quaterion.dataset.cache_data_loader import CacheDataLoader
 from quaterion.dataset.similarity_data_loader import (
     GroupSimilarityDataLoader,
     PairsSimilarityDataLoader,

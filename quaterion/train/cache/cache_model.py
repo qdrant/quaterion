@@ -20,8 +20,8 @@ class CacheModel(pl.LightningModule):
     """
 
     def __init__(
-            self,
-            encoders: Dict[str, CacheEncoder],
+        self,
+        encoders: Dict[str, CacheEncoder],
     ):
 
         super().__init__()
@@ -30,10 +30,10 @@ class CacheModel(pl.LightningModule):
             self.add_module(key, encoder)
 
     def predict_step(
-            self,
-            batch,
-            batch_idx: int,
-            dataloader_idx: Optional[int] = None,
+        self,
+        batch,
+        batch_idx: int,
+        dataloader_idx: Optional[int] = None,
     ):
         """Caches batch of input.
 

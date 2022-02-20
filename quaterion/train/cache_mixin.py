@@ -29,9 +29,9 @@ class CacheMixin:
 
     @classmethod
     def _apply_cache_config(
-            cls,
-            encoders: Union[Encoder, Dict[str, Encoder]],
-            cache_config: Optional[CacheConfig],
+        cls,
+        encoders: Union[Encoder, Dict[str, Encoder]],
+        cache_config: Optional[CacheConfig],
     ) -> Union[Encoder, Dict[str, Encoder]]:
         """Applies received cache configuration for cached encoders, remain
         non-cached encoders as is
@@ -86,7 +86,7 @@ class CacheMixin:
 
     @classmethod
     def _wrap_encoder(
-            cls, encoder: Encoder, cache_config: CacheConfig, encoder_name: str = ""
+        cls, encoder: Encoder, cache_config: CacheConfig, encoder_name: str = ""
     ) -> Encoder:
         """Wrap encoder into CacheEncoder instance if it is required by config.
 
@@ -124,12 +124,12 @@ class CacheMixin:
 
     @classmethod
     def _cache(
-            cls,
-            trainer: pl.Trainer,
-            encoders: Dict[str, Encoder],
-            train_dataloader: SimilarityDataLoader,
-            val_dataloader: Optional[SimilarityDataLoader],
-            cache_config: CacheConfig,
+        cls,
+        trainer: pl.Trainer,
+        encoders: Dict[str, Encoder],
+        train_dataloader: SimilarityDataLoader,
+        val_dataloader: Optional[SimilarityDataLoader],
+        cache_config: CacheConfig,
     ) -> None:
         """Filling cache for model's cache encoders.
 
@@ -151,11 +151,12 @@ class CacheMixin:
         if not cache_encoders:
             return
 
-        if cache_config.key_extractors and not isinstance(cache_config.key_extractors, dict):
+        if cache_config.key_extractors and not isinstance(
+            cache_config.key_extractors, dict
+        ):
             # If only one function specified, use it for all encoders
             key_extractors = {
-                name: cache_config.key_extractors
-                for name in cache_encoders.keys()
+                name: cache_config.key_extractors for name in cache_encoders.keys()
             }
         else:
             key_extractors = cache_config.key_extractors
@@ -163,27 +164,24 @@ class CacheMixin:
         cache_collater = CacheTrainCollater(
             pre_collate_fn=train_dataloader.pre_collate_fn,
             encoder_collates={
-                name: encoder.get_collate_fn()
-                for name, encoder in encoders.items()
+                name: encoder.get_collate_fn() for name, encoder in encoders.items()
             },
             key_extractors=key_extractors,
             cachable_encoders=list(cache_encoders.keys()),
-            mode=CacheMode.FILL
+            mode=CacheMode.FILL,
         )
 
         train_dataloader.collate_fn = cache_collater
 
         cache_train_dataloader = cls._wrap_cache_dataloader(
-            dataloader=train_dataloader,
-            cache_config=cache_config
+            dataloader=train_dataloader, cache_config=cache_config
         )
 
         cache_val_dataloader = None
         if val_dataloader is not None:
             val_dataloader.collate_fn = cache_collater
             cache_val_dataloader = cls._wrap_cache_dataloader(
-                dataloader=val_dataloader,
-                cache_config=cache_config
+                dataloader=val_dataloader, cache_config=cache_config
             )
 
         cls._fill_cache(
@@ -195,11 +193,11 @@ class CacheMixin:
 
     @classmethod
     def _fill_cache(
-            cls,
-            trainer: pl.Trainer,
-            cache_encoders: Dict[str, CacheEncoder],
-            train_dataloader: DataLoader,
-            val_dataloader: DataLoader,
+        cls,
+        trainer: pl.Trainer,
+        cache_encoders: Dict[str, CacheEncoder],
+        train_dataloader: DataLoader,
+        val_dataloader: DataLoader,
     ) -> None:
         """Fills cache and restores trainer state for further training process.
 
@@ -220,9 +218,9 @@ class CacheMixin:
 
     @classmethod
     def _wrap_cache_dataloader(
-            cls,
-            dataloader: SimilarityDataLoader,
-            cache_config: CacheConfig,
+        cls,
+        dataloader: SimilarityDataLoader,
+        cache_config: CacheConfig,
     ) -> DataLoader:
         """Creates dataloader for caching.
 
@@ -277,15 +275,13 @@ class CacheMixin:
             "num_workers": num_workers,
             "batch_size": cache_config.batch_size,
             "shuffle": False,
-            "sampler": None
+            "sampler": None,
         }
 
-        params.pop('collate_fn')  # Explicitly override collate
+        params.pop("collate_fn")  # Explicitly override collate
 
         cache_dl = DataLoader(
-            dataset=dataloader.dataset,
-            collate_fn=dataloader.collate_fn,
-            **params
+            dataset=dataloader.dataset, collate_fn=dataloader.collate_fn, **params
         )
         return cache_dl
 
@@ -315,7 +311,7 @@ class CacheMixin:
 
     @classmethod
     def _check_mp_context(
-            cls, mp_context: Optional[Union[str, mp.context.BaseContext]]
+        cls, mp_context: Optional[Union[str, mp.context.BaseContext]]
     ) -> None:
         """Check if multiprocessing context is compatible with cache.
 

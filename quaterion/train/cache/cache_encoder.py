@@ -12,8 +12,8 @@ CacheCollateReturnType = Union[List[Hashable], Tuple[Hashable, TensorInterchange
 
 
 class CacheMode(str, Enum):
-    FILL = 'fill'
-    TRAIN = 'train'
+    FILL = "fill"
+    TRAIN = "train"
 
 
 class CacheEncoder(Encoder):

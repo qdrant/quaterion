@@ -224,10 +224,10 @@ class TrainableModel(pl.LightningModule, CacheMixin):
         self.model.save(path)
 
     def cache(
-            self,
-            trainer: pl.Trainer,
-            train_dataloader: SimilarityDataLoader,
-            val_dataloader: Optional[SimilarityDataLoader],
+        self,
+        trainer: pl.Trainer,
+        train_dataloader: SimilarityDataLoader,
+        val_dataloader: Optional[SimilarityDataLoader],
     ):
         """
         Fill cachable encoders with embeddings
@@ -237,12 +237,11 @@ class TrainableModel(pl.LightningModule, CacheMixin):
             encoders=self.model.encoders,
             train_dataloader=train_dataloader,
             val_dataloader=val_dataloader,
-            cache_config=self.cache_config
+            cache_config=self.cache_config,
         )
 
     def setup_dataloader(self, dataloader: SimilarityDataLoader):
-        """Update data loader's collate function with encoder-specific collate
-        """
+        """Update data loader's collate function with encoder-specific collate"""
         encoder_collate_fns = dict(
             (key, encoder.get_collate_fn())
             for key, encoder in self.model.encoders.items()

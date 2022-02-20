@@ -9,14 +9,13 @@ from quaterion.train.cache.cache_encoder import CacheMode
 
 
 class CacheTrainCollater(TrainCollater):
-
     def __init__(
-            self,
-            pre_collate_fn,
-            encoder_collates: Dict[str, CollateFnType],
-            key_extractors: Dict[str, KeyExtractorType],
-            cachable_encoders: List[str],
-            mode: CacheMode
+        self,
+        pre_collate_fn,
+        encoder_collates: Dict[str, CollateFnType],
+        key_extractors: Dict[str, KeyExtractorType],
+        cachable_encoders: List[str],
+        mode: CacheMode,
     ):
         super().__init__(pre_collate_fn, encoder_collates)
         self.cachable_encoders = cachable_encoders
@@ -24,7 +23,9 @@ class CacheTrainCollater(TrainCollater):
         self.key_extractors = key_extractors
         self.seen_keys = defaultdict(set)
 
-    def extract_keys(self, ids: List[int], features: List[Any], encoder_name) -> List[Hashable]:
+    def extract_keys(
+        self, ids: List[int], features: List[Any], encoder_name
+    ) -> List[Hashable]:
         """
         If custom `key_extractor` is specified for the encoder - use it instead of sequential number.
         WARN: Do not use default `__hash__` implementation, because `torch.Tensor` does not work properly with it.
@@ -35,13 +36,10 @@ class CacheTrainCollater(TrainCollater):
 
         # Use custom
         key_extractor = self.key_extractors[encoder_name]
-        return [
-            key_extractor(feature)
-            for feature in features
-        ]
+        return [key_extractor(feature) for feature in features]
 
     def pre_encoder_collate(
-            self, features: List[Any], ids: List[int] = None, encoder_name: str = None
+        self, features: List[Any], ids: List[int] = None, encoder_name: str = None
     ):
         """
         Default implementation of per-encoder batch preparation, might be overridden

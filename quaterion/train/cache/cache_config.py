@@ -39,5 +39,7 @@ class CacheConfig:
     cache_type: Optional[CacheType] = CacheType.AUTO
     batch_size: Optional[int] = 32
     num_workers: Optional[int] = None  # if None - inherited from source dl
-    key_extractors: Union[KeyExtractorType, Dict[str, KeyExtractorType]] = field(default_factory=dict)
+    key_extractors: Union[KeyExtractorType, Dict[str, KeyExtractorType]] = field(
+        default_factory=dict
+    )
     mapping: Dict[str, CacheType] = field(default_factory=dict)

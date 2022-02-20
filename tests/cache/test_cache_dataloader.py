@@ -13,7 +13,12 @@ import pytorch_lightning as pl
 from quaterion import TrainableModel
 from quaterion.dataset import SimilarityPairSample, PairsSimilarityDataLoader
 from quaterion.loss import SimilarityLoss, ContrastiveLoss
-from quaterion.train.cache import CacheConfig, CacheType, CacheEncoder, InMemoryCacheEncoder
+from quaterion.train.cache import (
+    CacheConfig,
+    CacheType,
+    CacheEncoder,
+    InMemoryCacheEncoder,
+)
 from quaterion_models.model import DEFAULT_ENCODER_KEY
 
 
@@ -85,7 +90,6 @@ class TestDataset(Dataset):
 
 
 class TestTrainableModel(TrainableModel):
-
     def configure_loss(self) -> SimilarityLoss:
         return ContrastiveLoss()
 
@@ -123,9 +127,7 @@ def test_cache_dataloader():
 
     cache_trainable_model = TestCachableTrainableModel()
     cache_trainable_model.cache(
-        trainer=trainer,
-        train_dataloader=dataloader,
-        val_dataloader=None
+        trainer=trainer, train_dataloader=dataloader, val_dataloader=None
     )
 
     encoder = cache_trainable_model.model.encoders[DEFAULT_ENCODER_KEY]

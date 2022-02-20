@@ -1,3 +1,4 @@
+from enum import Enum
 from typing import Collection, Hashable, Any, List, Callable, Union, Tuple, Iterable
 
 from torch import Tensor
@@ -8,6 +9,11 @@ from quaterion_models.types import TensorInterchange, CollateFnType
 KeyExtractorType = Callable[[Any], Hashable]
 
 CacheCollateReturnType = Union[List[Hashable], Tuple[Hashable, TensorInterchange]]
+
+
+class CacheMode(str, Enum):
+    FILL = 'fill'
+    TRAIN = 'train'
 
 
 class CacheEncoder(Encoder):
@@ -114,11 +120,12 @@ class CacheEncoder(Encoder):
         """
         raise ValueError("Cached encoder does not support loading")
 
-    def fill_cache(self, data: Tuple[Iterable[Hashable], TensorInterchange]) -> None:
+    def fill_cache(self, keys: List[Hashable], data: TensorInterchange) -> None:
         """Apply wrapped encoder to data and store processed data on
         corresponding device.
 
         Args:
+            keys: Hash keys which should be associated with resulting vectors
             data: Tuple of keys and batches suitable for encoder
 
         """

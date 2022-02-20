@@ -5,7 +5,7 @@ import torch
 from torch.utils.data import Dataset
 from torch.utils.data.dataloader import T_co, DataLoader
 
-from quaterion.train.encoders.cache_encoder import (
+from quaterion.train.cache.cache_encoder import (
     KeyExtractorType,
     CacheCollateReturnType,
 )

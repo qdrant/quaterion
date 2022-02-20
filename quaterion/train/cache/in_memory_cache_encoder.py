@@ -1,4 +1,4 @@
-from typing import Tuple, Hashable, Iterable
+from typing import Tuple, Hashable, Iterable, List
 
 import torch
 
@@ -6,8 +6,8 @@ from torch import Tensor
 from quaterion_models.encoders import Encoder
 from quaterion_models.types import TensorInterchange, CollateFnType
 
-from quaterion.train.encoders.cache_config import CacheType
-from quaterion.train.encoders.cache_encoder import CacheEncoder
+from quaterion.train.cache.cache_config import CacheType
+from quaterion.train.cache.cache_encoder import CacheEncoder
 
 
 class InMemoryCacheEncoder(CacheEncoder):
@@ -20,24 +20,8 @@ class InMemoryCacheEncoder(CacheEncoder):
     ):
         super().__init__(encoder)
         self.cache = {}
-        self._cache_type = self.resolve_cache_type(cache_type)
-
-    @staticmethod
-    def resolve_cache_type(cache_type: CacheType) -> CacheType:
-        """Resolve received cache type.
-
-        If cache type is AUTO, then set it cuda if it is available, otherwise
-        use cpu.
-
-        Args:
-            cache_type: cache type to be resolved
-
-        Returns:
-            CacheType
-        """
-        if cache_type == CacheType.AUTO:
-            cache_type = CacheType.GPU if torch.cuda.is_available() else CacheType.CPU
-        return cache_type
+        self._cache_type = cache_type
+        self._original_device = None
 
     @property
     def cache_type(self):
@@ -52,10 +36,12 @@ class InMemoryCacheEncoder(CacheEncoder):
         Returns:
             Tensor: embeddings of shape [batch_size x embedding_size]
         """
-        embeddings = torch.stack([self.cache[value] for value in batch])
-        if self.cache_type == CacheType.CPU:
-            device = next(self.parameters(), torch.Tensor(0)).device
+        embeddings: torch.Tensor = torch.stack([self.cache[value] for value in batch])
+
+        device = next(self.parameters(), torch.Tensor(0)).device
+        if device != embeddings.device:
             embeddings = embeddings.to(device)
+
         return embeddings
 
     def get_collate_fn(self) -> CollateFnType:
@@ -67,16 +53,13 @@ class InMemoryCacheEncoder(CacheEncoder):
         """
         return self.cache_collate
 
-    def fill_cache(self, data: Tuple[Iterable[Hashable], TensorInterchange]) -> None:
-        """Apply wrapped encoder to data and store embeddings on corresponding device.
-
-        Args:
-            data: Tuple of keys and batches suitable for encoder
-        """
-        keys, batch = data
-        embeddings = self._encoder(batch)
+    def fill_cache(self, keys: List[Hashable], data: TensorInterchange) -> None:
+        embeddings = self._encoder(data)
         if self.cache_type == CacheType.CPU:
             embeddings = embeddings.to("cpu")
+        if self.cache_type == CacheType.GPU:
+            # ToDo: Move to which GPU?
+            pass
         self.cache.update(dict(zip(keys, embeddings)))
 
     def reset_cache(self) -> None:

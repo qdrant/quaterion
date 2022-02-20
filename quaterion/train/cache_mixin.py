@@ -1,46 +1,27 @@
-import os
 import multiprocessing as mp
-
+import os
 from typing import (
     Union,
     Dict,
     Optional,
-    Set,
-    Any,
-    Callable,
-    Hashable,
-    Iterable,
-    Tuple,
 )
 
-import torch.cuda
 import pytorch_lightning as pl
-
+import torch.cuda
 from loguru import logger
-from torch.utils.data import DataLoader
-from pytorch_lightning.loops import (
-    FitLoop,
-    TrainingEpochLoop,
-    TrainingBatchLoop,
-    EvaluationLoop,
-)
-from pytorch_lightning.utilities.types import (
-    TRAIN_DATALOADERS,
-    EVAL_DATALOADERS,
-)
 from quaterion_models.encoders import Encoder
-from quaterion_models.model import DEFAULT_ENCODER_KEY
-from quaterion_models.types import TensorInterchange
+from torch.utils.data import DataLoader
 
-from quaterion.dataset.cache_data_loader import CacheDataLoader
-from quaterion.train.encoders.cache_encoder import KeyExtractorType
+from quaterion.dataset.cache_train_collater import CacheTrainCollater
 from quaterion.dataset.similarity_data_loader import SimilarityDataLoader
-from quaterion.train.encoders import (
+from quaterion.train.cache import (
     CacheConfig,
     CacheEncoder,
     CacheType,
     InMemoryCacheEncoder,
 )
+from quaterion.train.cache.cache_encoder import CacheMode
+from quaterion.train.cache.cache_model import CacheModel
 
 
 class CacheMixin:
@@ -48,9 +29,9 @@ class CacheMixin:
 
     @classmethod
     def _apply_cache_config(
-        cls,
-        encoders: Union[Encoder, Dict[str, Encoder]],
-        cache_config: Optional[CacheConfig],
+            cls,
+            encoders: Union[Encoder, Dict[str, Encoder]],
+            cache_config: Optional[CacheConfig],
     ) -> Union[Encoder, Dict[str, Encoder]]:
         """Applies received cache configuration for cached encoders, remain
         non-cached encoders as is
@@ -105,7 +86,7 @@ class CacheMixin:
 
     @classmethod
     def _wrap_encoder(
-        cls, encoder: Encoder, cache_config: CacheConfig, encoder_name: str = ""
+            cls, encoder: Encoder, cache_config: CacheConfig, encoder_name: str = ""
     ) -> Encoder:
         """Wrap encoder into CacheEncoder instance if it is required by config.
 
@@ -142,20 +123,18 @@ class CacheMixin:
         return InMemoryCacheEncoder(encoder, cache_type)
 
     @classmethod
-    def cache(
-        cls,
-        trainer: pl.Trainer,
-        encoders: Dict[str, Encoder],
-        train_dataloader: SimilarityDataLoader,
-        val_dataloader: Optional[SimilarityDataLoader],
-        cache_config: CacheConfig,
+    def _cache(
+            cls,
+            trainer: pl.Trainer,
+            encoders: Dict[str, Encoder],
+            train_dataloader: SimilarityDataLoader,
+            val_dataloader: Optional[SimilarityDataLoader],
+            cache_config: CacheConfig,
     ) -> None:
         """Filling cache for model's cache encoders.
 
         Args:
-            trainer: performs one training epoch to cache encoders outputs.
-                Preserve all encapsulated pytorch-lightning logic such as
-                device managing etc.
+            trainer: Lightning Trainer holds required parameters for model launch (gpu, e.t.c.)
             encoders: mapping of model's encoders and their names
             train_dataloader: model's train dataloader
             val_dataloader: model's val dataloader
@@ -172,31 +151,55 @@ class CacheMixin:
         if not cache_encoders:
             return
 
+        if cache_config.key_extractors and not isinstance(cache_config.key_extractors, dict):
+            # If only one function specified, use it for all encoders
+            key_extractors = {
+                name: cache_config.key_extractors
+                for name in cache_encoders.keys()
+            }
+        else:
+            key_extractors = cache_config.key_extractors
+
+        cache_collater = CacheTrainCollater(
+            pre_collate_fn=train_dataloader.pre_collate_fn,
+            encoder_collates={
+                name: encoder.get_collate_fn()
+                for name, encoder in encoders.items()
+            },
+            key_extractors=key_extractors,
+            cachable_encoders=list(cache_encoders.keys()),
+            mode=CacheMode.FILL
+        )
+
+        train_dataloader.collate_fn = cache_collater
+
         cache_train_dataloader = cls._wrap_cache_dataloader(
-            train_dataloader, cache_config, cache_encoders
+            dataloader=train_dataloader,
+            cache_config=cache_config
         )
 
         cache_val_dataloader = None
         if val_dataloader is not None:
+            val_dataloader.collate_fn = cache_collater
             cache_val_dataloader = cls._wrap_cache_dataloader(
-                val_dataloader, cache_config, cache_encoders
+                dataloader=val_dataloader,
+                cache_config=cache_config
             )
 
         cls._fill_cache(
             trainer, cache_encoders, cache_train_dataloader, cache_val_dataloader
         )
 
-        # ToDo: post-caching collater
-
+        cache_collater.mode = CacheMode.TRAIN
         logger.info("Caching has been successfully finished")
 
     @classmethod
     def _fill_cache(
-        cls,
-        trainer: pl.Trainer,
-        cache_encoders: Dict[str, CacheEncoder],
-        train_dataloader: DataLoader,
-        val_dataloader: DataLoader,
+            cls,
+            trainer: pl.Trainer,
+            cache_encoders: Dict[str, CacheEncoder],
+            train_dataloader: DataLoader,
+            val_dataloader: DataLoader,
     ) -> None:
         """Fills cache and restores trainer state for further training process.
 
@@ -207,24 +210,6 @@ class CacheMixin:
             val_dataloader: model's val dataloader
 
         """
-        # store configured fit and validate loops to restore them for training
-        # process after cache
-        _fit_loop = trainer.fit_loop
-
-        # Mimic fit loop configuration from trainer
-        fit_loop = FitLoop(
-            min_epochs=1,
-            max_epochs=1,
-        )
-        training_epoch_loop = TrainingEpochLoop()
-        training_batch_loop = TrainingBatchLoop()
-        training_validation_loop = EvaluationLoop()
-        training_epoch_loop.connect(
-            batch_loop=training_batch_loop, val_loop=training_validation_loop
-        )
-        fit_loop.connect(epoch_loop=training_epoch_loop)
-        trainer.fit_loop = fit_loop
-
         # The actual caching
         trainer.predict(
             CacheModel(
@@ -232,14 +217,12 @@ class CacheMixin:
             ),
             [train_dataloader, val_dataloader],
         )
-        trainer.fit_loop = _fit_loop
 
     @classmethod
     def _wrap_cache_dataloader(
-        cls,
-        dataloader: SimilarityDataLoader,
-        cache_config: CacheConfig,
-        cache_encoders: Dict[str, CacheEncoder],
+            cls,
+            dataloader: SimilarityDataLoader,
+            cache_config: CacheConfig,
     ) -> DataLoader:
         """Creates dataloader for caching.
 
@@ -288,15 +271,21 @@ class CacheMixin:
         # We need to reduce random sampling and repeated calculations to
         # make cache as fast as possible. Thus, we recreate dataloader
         # and set batch size explicitly.
-        params = dict(
+        params = {
             **dataloader.original_params,
-            multiprocessing_context=mp_ctx,
-            num_workers=num_workers,
-            batch_size=cache_config.batch_size,
-        )
+            "multiprocessing_context": mp_ctx,
+            "num_workers": num_workers,
+            "batch_size": cache_config.batch_size,
+            "shuffle": False,
+            "sampler": None
+        }
+
+        params.pop('collate_fn')  # Explicitly override collate
 
         cache_dl = DataLoader(
-            dataset=dataloader.dataset, collate_fn=..., **params  # ToDo: Cache collater
+            dataset=dataloader.dataset,
+            collate_fn=dataloader.collate_fn,
+            **params
         )
         return cache_dl
 
@@ -326,7 +315,7 @@ class CacheMixin:
 
     @classmethod
     def _check_mp_context(
-        cls, mp_context: Optional[Union[str, mp.context.BaseContext]]
+            cls, mp_context: Optional[Union[str, mp.context.BaseContext]]
     ) -> None:
         """Check if multiprocessing context is compatible with cache.
 
@@ -365,66 +354,3 @@ class CacheMixin:
                 f"{cls.CACHE_MULTIPROCESSING_CONTEXT} multiprocessing context "
                 "is not available on current OS"
             )
-
-
-class CacheModel(pl.LightningModule):
-    """Mock model for convenient caching.
-
-    This class is required to make caching process similar to the training of
-    the genuine model and inherit and use the same trainer instance. It allows
-    avoiding of messing with device managing stuff and more.
-
-    Args:
-        encoders: dict of cache encoders names and corresponding instances to cache
-    """
-
-    def __init__(
-        self,
-        encoders: Dict[str, CacheEncoder],
-    ):
-
-        super().__init__()
-        self.encoders = encoders
-        for key, encoder in self.encoders.items():
-            self.add_module(key, encoder)
-
-    def predict_step(
-        self,
-        batch: Dict[str, Tuple[Iterable[Hashable], TensorInterchange]],
-        batch_idx: int,
-        dataloader_idx: Optional[int] = None,
-    ):
-        """Caches batch of input.
-
-        Args:
-            batch: batch of collated data. Contains mapping, where key is
-                encoder's name, value is tuple of key used in cache and
-                according items, which are ready to be processed by specific
-                encoder.
-            batch_idx: Index of current batch
-            dataloader_idx: Index of the current dataloader
-        Returns:
-            torch.Tensor: loss mock
-        """
-        for encoder_name, encoder in self.encoders.items():
-            encoder_samples = batch.get(encoder_name)
-            if not encoder_samples:
-                continue
-            encoder.fill_cache(encoder_samples)
-
-        return torch.Tensor([1])
-
-    # region anchors
-    def train_dataloader(self) -> TRAIN_DATALOADERS:
-        pass
-
-    def test_dataloader(self) -> EVAL_DATALOADERS:
-        pass
-
-    def val_dataloader(self) -> EVAL_DATALOADERS:
-        pass
-
-    def predict_dataloader(self) -> EVAL_DATALOADERS:
-        pass
-
-    # endregion

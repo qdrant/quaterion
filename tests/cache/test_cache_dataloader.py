@@ -1,13 +1,20 @@
+from typing import Union, Dict, Optional
+
 import torch
+from quaterion_models.encoders import Encoder
+from quaterion_models.heads import EncoderHead, GatedHead
 from quaterion_models.types import TensorInterchange
 from torch import Tensor
 from torch.utils.data import Dataset
 from torch.utils.data.dataset import T_co
 
-from quaterion.dataset import SimilarityPairSample
-from quaterion_models.encoders import Encoder
+import pytorch_lightning as pl
 
-from quaterion.dataset.indexing_dataset import IndexingDataset
+from quaterion import TrainableModel
+from quaterion.dataset import SimilarityPairSample, PairsSimilarityDataLoader
+from quaterion.loss import SimilarityLoss, ContrastiveLoss
+from quaterion.train.cache import CacheConfig, CacheType, CacheEncoder, InMemoryCacheEncoder
+from quaterion_models.model import DEFAULT_ENCODER_KEY
 
 
 class FakeEncoder(Encoder):
@@ -77,5 +84,78 @@ class TestDataset(Dataset):
         ]
 
 
+class TestTrainableModel(TrainableModel):
+
+    def configure_loss(self) -> SimilarityLoss:
+        return ContrastiveLoss()
+
+    def configure_encoders(self) -> Union[Encoder, Dict[str, Encoder]]:
+        return FakeEncoder()
+
+    def configure_head(self, input_embedding_size: int) -> EncoderHead:
+        return GatedHead(input_embedding_size)
+
+    def configure_optimizers(self):
+        return torch.optim.Adam(params=self.model.parameters(), lr=0.001)
+
+
+class TestCachableTrainableModel(TestTrainableModel):
+    def configure_caches(self) -> Optional[CacheConfig]:
+        return CacheConfig()
+
+
 def test_cache_dataloader():
-    dataset = IndexingDataset(TestDataset())
+    batch_size = 3
+
+    dataset = TestDataset()
+    dataloader = PairsSimilarityDataLoader(dataset, batch_size=batch_size)
+
+    batch = next(iter(dataloader))
+
+    ids, features, labels = batch
+
+    print("")
+    print("ids: ", ids)
+    print("features: ", features)
+    print("labels: ", labels)
+
+    trainer = pl.Trainer(logger=False)
+
+    cache_trainable_model = TestCachableTrainableModel()
+    cache_trainable_model.cache(
+        trainer=trainer,
+        train_dataloader=dataloader,
+        val_dataloader=None
+    )
+
+    encoder = cache_trainable_model.model.encoders[DEFAULT_ENCODER_KEY]
+
+    assert isinstance(encoder, InMemoryCacheEncoder)
+    assert len(encoder.cache) == len(dataset.data) * 2
+
+    cached_ids, labels = next(iter(dataloader))
+    print("cached_batch: ", cached_ids)
+
+    # check that batch for cache contains only IDs
+    assert isinstance(cached_ids[DEFAULT_ENCODER_KEY], list)
+    assert len(cached_ids[DEFAULT_ENCODER_KEY]) == batch_size * 2
+    assert isinstance(cached_ids[DEFAULT_ENCODER_KEY][0], int)
+
+    cached_result = cache_trainable_model.model.forward(cached_ids)
+    print("cached_result: ", cached_result)
+
+    # Same, without cache
+    dataloader = PairsSimilarityDataLoader(dataset, batch_size=batch_size)
+
+    trainable_model = TestTrainableModel()
+    trainable_model.setup_dataloader(dataloader)
+
+    features, labels = next(iter(dataloader))
+
+    reference_result = trainable_model.model.forward(features)
+
+    print("reference_result: ", reference_result)
+
+    diff_result = (cached_result - reference_result).sum()
+
+    assert abs(diff_result) < 0.0001

@@ -12,7 +12,10 @@ from quaterion_models.encoders import Encoder
 from quaterion_models.heads import EncoderHead
 from quaterion_models import MetricModel
 from quaterion_models.types import TensorInterchange
-from quaterion.train.encoders import (
+
+from quaterion.dataset import SimilarityDataLoader
+from quaterion.dataset.train_collater import TrainCollater
+from quaterion.train.cache import (
     CacheConfig,
     CacheType,
 )
@@ -219,6 +222,38 @@ class TrainableModel(pl.LightningModule, CacheMixin):
             path: path to save to
         """
         self.model.save(path)
+
+    def cache(
+            self,
+            trainer: pl.Trainer,
+            train_dataloader: SimilarityDataLoader,
+            val_dataloader: Optional[SimilarityDataLoader],
+    ):
+        """
+        Fill cachable encoders with embeddings
+        """
+        self._cache(
+            trainer=trainer,
+            encoders=self.model.encoders,
+            train_dataloader=train_dataloader,
+            val_dataloader=val_dataloader,
+            cache_config=self.cache_config
+        )
+
+    def setup_dataloader(self, dataloader: SimilarityDataLoader):
+        """Update data loader's collate function with encoder-specific collate
+        """
+        encoder_collate_fns = dict(
+            (key, encoder.get_collate_fn())
+            for key, encoder in self.model.encoders.items()
+        )
+
+        collater = TrainCollater(
+            pre_collate_fn=dataloader.collate_fn,
+            encoder_collates=encoder_collate_fns,
+        )
+
+        dataloader.collate_fn = collater
 
     # region anchors
     # https://github.com/PyTorchLightning/pytorch-lightning/issues/10667

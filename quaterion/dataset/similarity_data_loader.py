@@ -48,7 +48,7 @@ class SimilarityDataLoader(DataLoader, Generic[T_co]):
         Returns:
 
         """
-        raise self._original_params
+        return self._original_params
 
     @classmethod
     def pre_collate_fn(cls, batch: List[T_co]):

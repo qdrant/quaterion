@@ -37,16 +37,6 @@ class Quaterion:
                 validation stage
         """
 
-        encoder_collate_fns = dict(
-            (key, encoder.get_collate_fn())
-            for key, encoder in trainable_model.model.encoders.items()
-        )
-
-        collater = TrainCollater(
-            pre_collate_fn=train_dataloader.collate_fn,
-            encoder_collates=encoder_collate_fns,
-        )
-
         if isinstance(train_dataloader, PairsSimilarityDataLoader):
             if not isinstance(trainable_model.loss, PairwiseLoss):
                 raise NotImplementedError(
@@ -60,16 +50,15 @@ class Quaterion:
                     "Try other loss/data loader"
                 )
 
-        train_dataloader.collate_fn = collater
+        trainable_model.setup_dataloader(train_dataloader)
+
         if val_dataloader is not None:
-            val_dataloader.collate_fn = collater
+            val_dataloader.collate_fn = train_dataloader.collate_fn
 
         trainable_model.cache(
-            trainer,
-            trainable_model.model.encoders,
-            train_dataloader,
-            val_dataloader,
-            trainable_model.cache_config,
+            trainer=trainer,
+            train_dataloader=train_dataloader,
+            val_dataloader=val_dataloader,
         )
 
         trainer.fit(

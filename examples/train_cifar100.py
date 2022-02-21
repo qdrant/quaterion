@@ -102,5 +102,7 @@ trainer = pl.Trainer(
 )
 
 Quaterion.fit(
-    trainable_model=model, trainer=trainer, train_dataloader=train_dataloader,
+    trainable_model=model,
+    trainer=trainer,
+    train_dataloader=train_dataloader,
 )

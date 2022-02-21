@@ -18,7 +18,7 @@ class IndexingDataset(Dataset[Tuple[Any, T_co]]):
         if isinstance(self._dataset, Sized):
             return len(self._dataset)
         else:
-            raise NotImplementedError
+            raise NotImplementedError()
 
     def __getitem__(self, index) -> Tuple[Any, T_co]:
         item = self._dataset.__getitem__(index=index)
@@ -34,7 +34,7 @@ class IndexingIterableDataset(IterableDataset[Tuple[Any, T_co]]):
         if isinstance(self._dataset, Sized):
             return len(self._dataset)
         else:
-            raise NotImplementedError
+            raise NotImplementedError()
 
     def __getitem__(self, index) -> Tuple[Any, T_co]:
         return _hashit(index), self._dataset.__getitem__(index)

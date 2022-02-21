@@ -242,10 +242,9 @@ class CacheMixin:
             dataloader: dataloader to be wrapped
             cache_config: cache config to retrieve num of workers and batch
                 size
-            cache_encoders: encoders to set key extractors and collate_fns
 
         Returns:
-            CDataLoader: dataloader for caching
+            DataLoader: dataloader for caching
         """
         cls._switch_multiprocessing_context(dataloader)
         num_workers = (

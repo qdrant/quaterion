@@ -49,19 +49,6 @@ class CacheEncoder(Encoder):
         """
         return self._encoder.embedding_size()
 
-    @classmethod
-    def default_key_extractor(cls, obj: Any) -> Hashable:
-        """Default implementation of key extractor.
-
-        Generate hashable from batch object with built-in hash, also support dicts.
-
-        Returns:
-             Hashable: Key for cache
-        """
-        return (
-            hash(obj) if not isinstance(obj, dict) else hash(tuple(sorted(obj.items())))
-        )
-
     def cache_collate(
         self, batch: Union[Tuple[List[Hashable], List[Any]], List[Hashable]]
     ) -> Union[List[Hashable], Tuple[List[Hashable], TensorInterchange]]:

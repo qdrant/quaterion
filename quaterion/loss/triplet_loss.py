@@ -159,6 +159,7 @@ class TripletLoss(GroupLoss):
             anchor_positive_dists = dists.unsqueeze(2)
             # Shape: (batch_size, 1, batch_size)
             anchor_negative_dists = dists.unsqueeze(1)
+            # All possible triplets: triplet_loss[anchor_id, positive_id, negative_id] 
             # Shape: (batch_size, batch_size, batch_size)
             triplet_loss = anchor_positive_dists - anchor_negative_dists + self._margin
 

@@ -28,7 +28,33 @@ author = "Quaterion Authors"
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ["sphinx.ext.napoleon"]
+extensions = [
+    "sphinx.ext.napoleon",
+    "sphinx.ext.autodoc",
+    "sphinx.ext.viewcode",
+]
+
+autodoc_type_aliases = {
+    'TensorInterchange': 'TensorInterchange',
+    'CollateFnType': 'CollateFnType',
+    'KeyExtractorType': 'KeyExtractorType',
+    'CacheCollateReturnType': 'CacheCollateReturnType',
+    'CacheCollateFnType': 'CacheCollateFnType'
+}
+
+# prevents sphinx from adding full path to type hints
+autodoc_typehints_format = "short"
+
+# moves ``Return type`` to ``Returns``
+napoleon_use_rtype = False
+
+# If true, suppress the module name of the python reference if it can be resolved.
+# Experimental feature:
+# https://www.sphinx-doc.org/en/master/usage/configuration.html#confval-python_use_unqualified_type_names
+python_use_unqualified_type_names = True
+
+# prevents sphinx to add full module path in titles
+add_module_names = False
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]

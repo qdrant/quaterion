@@ -69,7 +69,7 @@ def _get_anchor_positive_mask(labels: torch.Tensor) -> torch.Tensor:
     """
     # get a mask for distinct i and j indices
     # Shape: (batch_size, batch_size)
-    indices_equal = torch.eye(labels.size()[0]).bool().to(labels.device)
+    indices_equal = torch.eye(labels.size()[0], dtype=torch.bool, device=labels.device)
     indices_not_equal = torch.logical_not(indices_equal)
 
     # get a mask for labels[i] == labels[j]

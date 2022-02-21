@@ -27,22 +27,23 @@ class SiameseDistanceMetric:
             if y is None:
                 raise ValueError("y cannot be None while matrix is False")
 
-            return pairwise_distance(x, y, p=2)
+            distances = pairwise_distance(x, y, p=2)
+        else:
 
-        # Calculate dot product. Shape: (batch_size, batch_size)
-        if y is None:
-            y = x
+            # Calculate dot product. Shape: (batch_size, batch_size)
+            if y is None:
+                y = x
 
-        dot_product = torch.mm(x, y.transpose(0, 1))
+            dot_product = torch.mm(x, y.transpose(0, 1))
 
-        # get L2 norm by diagonal. Shape: (batch_size,)
-        square_norm = torch.diagonal(dot_product)
-        # calculate distances. Shape: (batch_size, batch_size)
-        distances = (
-            square_norm.unsqueeze(0) - 2.0 * dot_product + square_norm.unsqueeze(1)
-        )
-        # get rid of negative distances due to calculation errors
-        distances = torch.maximum(distances, torch.tensor(0.0))
+            # get L2 norm by diagonal. Shape: (batch_size,)
+            square_norm = torch.diagonal(dot_product)
+            # calculate distances. Shape: (batch_size, batch_size)
+            distances = (
+                square_norm.unsqueeze(0) - 2.0 * dot_product + square_norm.unsqueeze(1)
+            )
+            # get rid of negative distances due to calculation errors
+            distances = torch.maximum(distances, torch.tensor(0.0))
 
         if not squared:
             # handle numerical stability

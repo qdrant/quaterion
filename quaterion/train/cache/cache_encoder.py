@@ -1,19 +1,19 @@
+from enum import Enum
 from typing import Collection, Hashable, Any, List, Callable, Union, Tuple, Iterable
 
 from torch import Tensor
 
 from quaterion_models.encoders import Encoder
-from quaterion_models.types import TensorInterchange
-
+from quaterion_models.types import TensorInterchange, CollateFnType
 
 KeyExtractorType = Callable[[Any], Hashable]
 
 CacheCollateReturnType = Union[List[Hashable], Tuple[Hashable, TensorInterchange]]
 
-CacheCollateFnType = Callable[
-    [Collection[Any]],
-    CacheCollateReturnType,
-]
+
+class CacheMode(str, Enum):
+    FILL = "fill"
+    TRAIN = "train"
 
 
 class CacheEncoder(Encoder):
@@ -24,19 +24,13 @@ class CacheEncoder(Encoder):
 
     Args:
         encoder: Encoder object to be wrapped.
-        key_extractor: function required to extract hashable key from complicated
-            objects which can't be hashed with default key extractor.
     """
 
-    def __init__(self, encoder: Encoder, key_extractor: KeyExtractorType = None):
+    def __init__(self, encoder: Encoder):
         if encoder.trainable():
             raise ValueError("Trainable encoder can't be cached")
         super().__init__()
         self._encoder = encoder
-        self.cache_filled = False
-        self.key_extractor = (
-            key_extractor if key_extractor is not None else self.default_key_extractor
-        )
 
     def trainable(self) -> bool:
         """Defines if encoder is trainable. This flag affects caching and checkpoint
@@ -55,46 +49,27 @@ class CacheEncoder(Encoder):
         """
         return self._encoder.embedding_size()
 
-    @classmethod
-    def default_key_extractor(cls, obj: Any) -> Hashable:
-        """Default implementation of key extractor.
-
-        Generate hashable from batch object with built-in hash, also support dicts.
-
-        Returns:
-             Hashable: Key for cache
-        """
-        return (
-            hash(obj) if not isinstance(obj, dict) else hash(tuple(sorted(obj.items())))
-        )
-
-    def key_collate_fn(self, batch: Collection[Any]) -> List[Hashable]:
-        """Convert batch of raw data into list of keys for cache.
-
-        Returns:
-             List[Hashable]: List of keys for cache
-        """
-        return [self.key_extractor(value) for value in batch]
-
     def cache_collate(
-        self, batch: Collection[Any]
-    ) -> Union[List[Hashable], Tuple[Hashable, TensorInterchange]]:
+        self, batch: Union[Tuple[List[Hashable], List[Any]], List[Hashable]]
+    ) -> Union[List[Hashable], Tuple[List[Hashable], TensorInterchange]]:
         """Converts raw data batch into suitable model input and keys for caching.
 
         Returns:
-             Union[
-                List[Hashable],
-                Tuple[Hashable, TensorInterchange]
-            ]: Tuple of keys and according model input during caching process, only
-            list of keys after cache has been filled
+            In case only cache keys are provided: return keys
+            If keys and actual features are provided -
+                return result of original collate along with cache keys
         """
-        keys: List[Hashable] = self.key_collate_fn(batch)
-        if self.cache_filled:
-            return keys
-        values: TensorInterchange = self._encoder.get_collate_fn()(batch)
-        return keys, values
+        if isinstance(batch, tuple):
+            # Cache filling phase
+            keys, features = batch
+            collated_features = self._encoder.get_collate_fn()(features)
+            return keys, collated_features
+        else:
+            # Assume training phase.
+            # Only keys are provided here
+            return batch
 
-    def get_collate_fn(self) -> CacheCollateFnType:
+    def get_collate_fn(self) -> CollateFnType:
         """Provides function that converts raw data batch into suitable model input.
 
         Returns:
@@ -132,11 +107,12 @@ class CacheEncoder(Encoder):
         """
         raise ValueError("Cached encoder does not support loading")
 
-    def fill_cache(self, data: Tuple[Iterable[Hashable], TensorInterchange]) -> None:
+    def fill_cache(self, keys: List[Hashable], data: TensorInterchange) -> None:
         """Apply wrapped encoder to data and store processed data on
         corresponding device.
 
         Args:
+            keys: Hash keys which should be associated with resulting vectors
             data: Tuple of keys and batches suitable for encoder
 
         """

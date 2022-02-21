@@ -4,14 +4,14 @@ from typing import Dict, Union
 import pytorch_lightning as pl
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
-from quaterion import Quaterion, TrainableModel
-from quaterion.dataset import GroupSimilarityDataLoader, SimilarityGroupSample
-from quaterion.loss import ArcfaceLoss, SimilarityLoss
 from quaterion_models.encoders import Encoder
 from quaterion_models.heads import EmptyHead, EncoderHead
 from quaterion_models.types import CollateFnType
-from torch.utils.data import DataLoader, Dataset
+from torch.utils.data import Dataset
+
+from quaterion import Quaterion, TrainableModel
+from quaterion.dataset import GroupSimilarityDataLoader, SimilarityGroupSample
+from quaterion.loss import ArcFaceLoss, SimilarityLoss
 
 try:
     import torchvision
@@ -96,7 +96,7 @@ class Model(TrainableModel):
         return EmptyHead(input_embedding_size)
 
     def configure_loss(self) -> SimilarityLoss:
-        return ArcfaceLoss(self._embedding_size, self._num_groups)
+        return ArcFaceLoss(self._embedding_size, self._num_groups)
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(

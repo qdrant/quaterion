@@ -105,36 +105,44 @@ class TripletLoss(GroupLoss):
     It supports batch-all and batch-hard strategies for online triplet mining.
 
     Args:
-        margin (float, optional): Margin value to push negative examples
-            apart. Defaults to `0.5`.
+        margin: Margin value to push negative examples
+            apart. Optional, defaults to `0.5`.
+        distance_metric_name: Name of the distance function. Optional, defaults to `euclidean`.
         squared (bool, optional): Squared Euclidean distance or not. Defaults to `True`.
         mining (str, optional): Triplet mining strategy. One of
-            `"all"`, `"hard"`. Defaults to `"all"`.
+            `"all"`, `"hard"`. Defaults to `"hard"`.
     """
 
     def __init__(
         self,
         margin: Optional[float] = 0.5,
+        distance_metric_name: str = "euclidean",
         squared: Optional[bool] = True,
-        mining: Optional[str] = "all",
+        mining: Optional[str] = "hard",
     ):
-        super(TripletLoss, self).__init__()
+        distance_metrics = ["euclidean", "cosine_distance"]
+        if distance_metric_name not in distance_metrics:
+            raise ValueError(
+                f"Not supported distance metrc for this loss: {distance_metric_name}. Must be one of {', '.join(distance_metrics)}"
+            )
+
         mining_types = ["all", "hard"]
         if mining not in mining_types:
             raise ValueError(
                 f"Unrecognized mining strategy: {mining}. Must be one of {', '.join(mining_types)}"
             )
+        super(TripletLoss, self).__init__(distance_metric_name=distance_metric_name)
 
         self._margin = margin
         self._squared = squared
         self._mining = mining
 
     def get_config_dict(self):
-        return {
-            "margin": self._margin,
-            "squared": self._squared,
-            "mining": self._mining,
-        }
+        config = super().get_config_dict()
+        config.update(
+            {"margin": self._margin, "squared": self._squared, "mining": self._mining,}
+        )
+        return config
 
     def forward(
         self, embeddings: torch.Tensor, groups: torch.LongTensor
@@ -149,8 +157,12 @@ class TripletLoss(GroupLoss):
             torch.Tensor: Scalar loss value.
         """
         # Shape: (batch_size, batch_size)
-        dists = SiameseDistanceMetric.euclidean(
-            x=embeddings, matrix=True, squared=self._squared
+        dists = (
+            SiameseDistanceMetric.euclidean(
+                x=embeddings, matrix=True, squared=self._squared
+            )
+            if self.distance_metric_name == "euclidean"
+            else SiameseDistanceMetric.cosine_distance(x=embeddings, matrix=True)
         )
 
         if self._mining == "all":

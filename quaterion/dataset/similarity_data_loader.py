@@ -13,7 +13,7 @@ from quaterion.dataset.similarity_samples import (
 
 
 class SimilarityDataLoader(DataLoader, Generic[T_co]):
-    def __init__(self, dataset: Dataset[SimilarityPairSample], **kwargs):
+    def __init__(self, dataset: Dataset, **kwargs):
         """
         SimilarityDataLoader is a special version of :class:`~torch.utils.data.DataLoader`
         which works with similarity samples.
@@ -107,6 +107,9 @@ class SimilarityDataLoader(DataLoader, Generic[T_co]):
 
 
 class PairsSimilarityDataLoader(SimilarityDataLoader[SimilarityPairSample]):
+    def __init__(self, dataset: Dataset[SimilarityPairSample], **kwargs):
+        super().__init__(dataset, **kwargs)
+
     @classmethod
     def collate_labels(
         cls, batch: List[SimilarityPairSample]
@@ -171,6 +174,9 @@ class PairsSimilarityDataLoader(SimilarityDataLoader[SimilarityPairSample]):
 
 
 class GroupSimilarityDataLoader(SimilarityDataLoader[SimilarityGroupSample]):
+    def __init__(self, dataset: Dataset[SimilarityGroupSample], **kwargs):
+        super().__init__(dataset, **kwargs)
+
     @classmethod
     def collate_labels(
         cls, batch: List[SimilarityGroupSample]

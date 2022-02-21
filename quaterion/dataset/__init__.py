@@ -7,3 +7,4 @@ from quaterion.dataset.similarity_samples import (
     SimilarityGroupSample,
     SimilarityPairSample,
 )
+from quaterion.dataset.similarity_dataset import SimilarityGroupDataset

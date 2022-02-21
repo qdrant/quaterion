@@ -56,7 +56,7 @@ class FakeEncoder(Encoder):
         return FakeEncoder()
 
 
-class TestDataset(Dataset):
+class FakeDataset(Dataset):
     def __len__(self):
         return len(self.data)
 
@@ -89,7 +89,7 @@ class TestDataset(Dataset):
         ]
 
 
-class TestTrainableModel(TrainableModel):
+class FakeTrainableModel(TrainableModel):
     def configure_loss(self) -> SimilarityLoss:
         return ContrastiveLoss()
 
@@ -103,7 +103,7 @@ class TestTrainableModel(TrainableModel):
         return torch.optim.Adam(params=self.model.parameters(), lr=0.001)
 
 
-class TestCachableTrainableModel(TestTrainableModel):
+class FakeCachableTrainableModel(FakeTrainableModel):
     def configure_caches(self) -> Optional[CacheConfig]:
         return CacheConfig()
 
@@ -111,7 +111,7 @@ class TestCachableTrainableModel(TestTrainableModel):
 def test_cache_dataloader():
     batch_size = 3
 
-    dataset = TestDataset()
+    dataset = FakeDataset()
     dataloader = PairsSimilarityDataLoader(dataset, batch_size=batch_size)
 
     batch = next(iter(dataloader))
@@ -123,9 +123,9 @@ def test_cache_dataloader():
     print("features: ", features)
     print("labels: ", labels)
 
-    trainer = pl.Trainer(logger=False)
+    trainer = pl.Trainer(logger=False, gpus=None)
 
-    cache_trainable_model = TestCachableTrainableModel()
+    cache_trainable_model = FakeCachableTrainableModel()
     cache_trainable_model.cache(
         trainer=trainer, train_dataloader=dataloader, val_dataloader=None
     )
@@ -149,7 +149,7 @@ def test_cache_dataloader():
     # Same, without cache
     dataloader = PairsSimilarityDataLoader(dataset, batch_size=batch_size)
 
-    trainable_model = TestTrainableModel()
+    trainable_model = FakeTrainableModel()
     trainable_model.setup_dataloader(dataloader)
 
     features, labels = next(iter(dataloader))

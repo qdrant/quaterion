@@ -154,7 +154,7 @@ class TripletLoss(GroupLoss):
         )
 
         if self._mining == "all":
-
+            # Calculate loss for all possible triplets first, then filter by group mask
             # Shape: (batch_size, batch_size, 1)
             anchor_positive_dists = dists.unsqueeze(2)
             # Shape: (batch_size, 1, batch_size)

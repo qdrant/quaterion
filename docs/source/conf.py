@@ -35,11 +35,11 @@ extensions = [
 ]
 
 autodoc_type_aliases = {
-    'TensorInterchange': 'TensorInterchange',
-    'CollateFnType': 'CollateFnType',
-    'KeyExtractorType': 'KeyExtractorType',
-    'CacheCollateReturnType': 'CacheCollateReturnType',
-    'CacheCollateFnType': 'CacheCollateFnType'
+    "TensorInterchange": "TensorInterchange",
+    "CollateFnType": "CollateFnType",
+    "KeyExtractorType": "KeyExtractorType",
+    "CacheCollateReturnType": "CacheCollateReturnType",
+    "CacheCollateFnType": "CacheCollateFnType",
 }
 
 # prevents sphinx from adding full path to type hints

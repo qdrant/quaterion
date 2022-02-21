@@ -22,6 +22,7 @@ class MobilenetV3Encoder(Encoder):
     def __init__(self, embedding_size=128):
         super().__init__()
         import torchvision
+
         self.encoder = torchvision.models.mobilenet_v3_small(pretrained=True)
         self.encoder.classifier = nn.Sequential(nn.Linear(576, embedding_size))
 

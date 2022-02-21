@@ -188,9 +188,10 @@ class TripletLoss(GroupLoss):
 
             # get the hardest negative for each anchor
             anchor_negative_mask = _get_anchor_negative_mask(groups).float()
+            # add maximum of each row to invalid pairs to make sure not to count loss values from those indices when we apply minimum function later on
             anchor_negative_dists = dists + dists.max(dim=1, keepdim=True)[0] * (
                 1.0 - anchor_negative_mask
-            )  # add maximum of each row to invalid pairs
+            )
             hardest_negative_dists = anchor_negative_dists.min(dim=1)[0]
 
             # combine hardest positives and hardest negatives

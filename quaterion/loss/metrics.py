@@ -73,22 +73,31 @@ class SiameseDistanceMetric:
         raise NotImplementedError()
 
     @staticmethod
-    def cosine_distance(x: Tensor, y: Tensor, matrix=False) -> Tensor:
+    def cosine_distance(x: Tensor, y: Tensor = None, matrix=False) -> Tensor:
         """Compute cosine distance
 
         Args:
             x: shape: (batch_size, ...)
-            y: shape: (batch_size, ...)
-            matrix: flat to calculate distance matrix (all to all)
+            y: shape: (batch_size, ...), optional
+            matrix: if `True` calculate a distance matrix between `x` and `y` (all-to-all).
+                If `y` is `None`, it assigns `x` to `y`.
         Returns:
-            Tensor: shape (batch_size, 1)
+            Tensor: shape (batch_size, 1) if `matrix` is `False`, (batch_size, batch_size) otherwise.
         """
 
         if not matrix:
+            if y is None:
+                raise ValueError("y cannot be None while matrix is False")
+
             return 1 - cosine_similarity(x, y)
 
         x_norm = F.normalize(x, p=2, dim=1)
-        y_norm = F.normalize(y, p=2, dim=1).transpose(0, 1)
+        if y is None:
+            y = x
+            y_norm = x_norm.transpose(0, 1)
+        else:
+            y_norm = F.normalize(y, p=2, dim=1).transpose(0, 1)
+
         return 1 - torch.mm(x_norm, y_norm)
 
     @staticmethod

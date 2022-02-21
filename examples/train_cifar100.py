@@ -4,13 +4,18 @@ from typing import Dict, Union
 import pytorch_lightning as pl
 import torch
 import torch.nn as nn
+from torch.utils.data import Dataset
 from quaterion import Quaterion, TrainableModel
-from quaterion.dataset import GroupSimilarityDataLoader, SimilarityGroupSample
+from quaterion.dataset import (
+    GroupSimilarityDataLoader,
+    SimilarityGroupSample,
+    SimilarityGroupDataset,
+)
 from quaterion.loss import TripletLoss, SimilarityLoss
-from quaterion_models.encoders import Encoder
 from quaterion_models.heads import EmptyHead, EncoderHead
 from quaterion_models.types import CollateFnType
-from torch.utils.data import Dataset
+from quaterion_models.encoders import Encoder
+
 
 try:
     import torchvision
@@ -23,39 +28,26 @@ except ImportError:
     sys.exit(1)
 
 
-class CIFAR100Dataset(Dataset):
-    def __init__(self, train: bool = True):
-        super().__init__()
-        # Mean and std values taken from https://github.com/LJY-HY/cifar_pytorch-lightning/blob/master/datasets/CIFAR.py#L43
-        self.mean = [0.4914, 0.4822, 0.4465]
-        self.std = [0.2023, 0.1994, 0.2010]
-        self.path = os.path.join(os.path.expanduser("~"), "torchvision", "datasets")
+def get_dataloader():
+    # Mean and std values taken from https://github.com/LJY-HY/cifar_pytorch-lightning/blob/master/datasets/CIFAR.py#L43
+    mean = [0.4914, 0.4822, 0.4465]
+    std = [0.2023, 0.1994, 0.2010]
+    path = os.path.join(os.path.expanduser("~"), "torchvision", "datasets")
 
-        if train:
-            transform = transforms.Compose(
-                [
-                    transforms.RandomCrop(32, padding=4),
-                    transforms.RandomHorizontalFlip(),
-                    transforms.ToTensor(),
-                    transforms.Normalize(self.mean, self.std),
-                ]
-            )
+    transform = transforms.Compose(
+        [
+            transforms.RandomCrop(32, padding=4),
+            transforms.RandomHorizontalFlip(),
+            transforms.ToTensor(),
+            transforms.Normalize(mean, std),
+        ]
+    )
 
-        else:
-            transform = transforms.Compose(
-                [transforms.ToTensor(), transforms.Normalize(self.mean, self.std)]
-            )
-
-        self.data = datasets.CIFAR100(
-            root=self.path, train=train, download=True, transform=transform
-        )
-
-    def __getitem__(self, index: int) -> SimilarityGroupSample:
-        image, label = self.data[index]
-        return SimilarityGroupSample(obj=image, group=label)
-
-    def __len__(self) -> int:
-        return len(self.data)
+    dataset = SimilarityGroupDataset(
+        datasets.CIFAR100(root=path, download=True, transform=transform)
+    )
+    dataloader = GroupSimilarityDataLoader(dataset, batch_size=128, shuffle=True)
+    return dataloader
 
 
 class MobilenetV3Encoder(Encoder):
@@ -72,14 +64,14 @@ class MobilenetV3Encoder(Encoder):
     def embedding_size(self) -> int:
         return self._embedding_size
 
+    def forward(self, images):
+        return self.encoder.forward(images)
+
     def get_collate_fn(self) -> CollateFnType:
         return self._simple_collate_fn
 
     def _simple_collate_fn(self, batch):
         return torch.stack(batch)
-
-    def forward(self, images):
-        return self.encoder.forward(images)
 
 
 class Model(TrainableModel):
@@ -103,9 +95,7 @@ class Model(TrainableModel):
 
 
 model = Model()
-train_dataloader = GroupSimilarityDataLoader(
-    CIFAR100Dataset(train=True), batch_size=128, shuffle=True
-)
+train_dataloader = get_dataloader()
 
 trainer = pl.Trainer(
     gpus=1 if torch.cuda.is_available() else 0, num_nodes=1, max_epochs=10

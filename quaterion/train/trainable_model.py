@@ -12,7 +12,10 @@ from quaterion_models.encoders import Encoder
 from quaterion_models.heads import EncoderHead
 from quaterion_models import MetricModel
 from quaterion_models.types import TensorInterchange
-from quaterion.train.encoders import (
+
+from quaterion.dataset import SimilarityDataLoader
+from quaterion.dataset.train_collater import TrainCollater
+from quaterion.train.cache import (
     CacheConfig,
     CacheType,
 )
@@ -71,41 +74,43 @@ class TrainableModel(pl.LightningModule, CacheMixin):
     def configure_caches(self) -> Optional[CacheConfig]:
         """Method to provide cache configuration
 
-                Use this method to define which encoders should cache calculated embeddings and
-                what kind of cache they should use.
+        Use this method to define which encoders should cache calculated embeddings and
+        what kind of cache they should use.
 
-                Returns:
-                    Optional[CacheConfig]: cache configuration to be applied if provided, None
-                        otherwise
-                Examples:
+        Returns:
+            Optional[CacheConfig]: cache configuration to be applied if provided, None
+                otherwise
+        Examples:
 
-                >>> CacheConfig(CacheType.AUTO)
-                CacheConfig(
-                    cache_type=<CacheType.AUTO: 'auto'>,
-                    mapping={},
-                    key_extractors={}
-                )
+            Do not use cache (default):
+            ```
+            return None
+            ```
 
-                >>> cache_config = CacheConfig(
-        ...     mapping={"text_encoder": CacheType.GPU, "image_encoder": CacheType.CPU}
-        ... )
-                CacheConfig(
-                    cache_type=None,
-                    mapping={
-                        'text_encoder': <CacheType.GPU: 'gpu'>,
-                        'image_encoder': <CacheType.CPU: 'cpu'>
-                    },
-                    key_extractors={}
-                )
-                >>> CacheConfig(
-        ...     cache_type=CacheType.AUTO,
-        ...     key_extractors={"default": lambda obj: hash(obj)}
-        ... )
-                CacheConfig(
-                    cache_type=<CacheType.AUTO: 'auto'>,
-                    mapping={},
-                    key_extractors={'default': <function <lambda> at 0x106bc90e0>}
-                )
+            Configure cache automatically for all non-trainable encoders:
+            ```
+            return CacheConfig(CacheType.AUTO)
+            ```
+
+            Specify cache type for each encoder individually:
+            ```
+            return CacheConfig(mapping={
+                    "text_encoder": CacheType.GPU,  # Store cache in GPU for `text_encoder`
+                    "image_encoder": CacheType.CPU  # Store cache in RAM for `image_encoder`
+                }
+            )
+            ```
+
+            Specify key for cache object disambiguation:
+            ```
+            return CacheConfig(
+                cache_type=CacheType.AUTO,
+                key_extractors={"text_encoder": hash}
+            )
+            ```
+            This function might be useful if you want to provide some more sophisticated way of storing
+             association between cached vectors and original object.
+            Item numbers from dataset will be used by default if key is not specified
 
         """
         pass
@@ -217,6 +222,37 @@ class TrainableModel(pl.LightningModule, CacheMixin):
             path: path to save to
         """
         self.model.save(path)
+
+    def cache(
+        self,
+        trainer: pl.Trainer,
+        train_dataloader: SimilarityDataLoader,
+        val_dataloader: Optional[SimilarityDataLoader],
+    ):
+        """
+        Fill cachable encoders with embeddings
+        """
+        self._cache(
+            trainer=trainer,
+            encoders=self.model.encoders,
+            train_dataloader=train_dataloader,
+            val_dataloader=val_dataloader,
+            cache_config=self.cache_config,
+        )
+
+    def setup_dataloader(self, dataloader: SimilarityDataLoader):
+        """Update data loader's collate function with encoder-specific collate"""
+        encoder_collate_fns = dict(
+            (key, encoder.get_collate_fn())
+            for key, encoder in self.model.encoders.items()
+        )
+
+        collater = TrainCollater(
+            pre_collate_fn=dataloader.collate_fn,
+            encoder_collates=encoder_collate_fns,
+        )
+
+        dataloader.collate_fn = collater
 
     # region anchors
     # https://github.com/PyTorchLightning/pytorch-lightning/issues/10667

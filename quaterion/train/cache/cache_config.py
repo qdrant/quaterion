@@ -1,6 +1,10 @@
 from enum import Enum
 from dataclasses import dataclass, field
-from typing import Dict, Optional, Callable, Any, Hashable
+from typing import Dict, Optional, Callable, Any, Hashable, Union
+
+# Function to extract hash value from the input object
+# Required if there is no other way to distinguish values for caching
+KeyExtractorType = Callable[[Any], Hashable]
 
 
 class CacheType(str, Enum):
@@ -32,8 +36,10 @@ class CacheConfig:
         does not affect others training stages.
     """
 
-    cache_type: Optional[CacheType] = None
-    mapping: Dict[str, CacheType] = field(default_factory=dict)
-    key_extractors: Dict[str, Callable[[Any], Hashable]] = field(default_factory=dict)
+    cache_type: Optional[CacheType] = CacheType.AUTO
     batch_size: Optional[int] = 32
     num_workers: Optional[int] = None  # if None - inherited from source dl
+    key_extractors: Union[KeyExtractorType, Dict[str, KeyExtractorType]] = field(
+        default_factory=dict
+    )
+    mapping: Dict[str, CacheType] = field(default_factory=dict)

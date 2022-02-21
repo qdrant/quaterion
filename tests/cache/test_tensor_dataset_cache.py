@@ -51,13 +51,6 @@ def test_tensor_dataset_cache():
     )
     dataloader = GroupSimilarityDataLoader(dataset, batch_size=4)
 
-    trainer = pl.Trainer(
-        logger=False,
-        max_epochs=1
-    )
+    trainer = pl.Trainer(logger=False, max_epochs=1)
 
-    Quaterion.fit(
-        trainable_model=...,
-        trainer=trainer,
-        train_dataloader=dataloader
-    )
+    Quaterion.fit(trainable_model=..., trainer=trainer, train_dataloader=dataloader)

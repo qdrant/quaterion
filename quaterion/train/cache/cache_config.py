@@ -8,38 +8,39 @@ KeyExtractorType = Callable[[Any], Hashable]
 
 
 class CacheType(str, Enum):
-    """Available tensor devices to be used for caching.
-
-    AUTO: use CUDA if it is available, else use CPU.
-    CPU: tensors device is CPU.
-    GPU: tensors device is GPU.
-    """
+    """Available tensor devices to be used for caching."""
 
     AUTO = "auto"
+    """Use CUDA if it is available, else use CPU."""
+
     CPU = "cpu"
+    """Tensors device is CPU."""
+
     GPU = "gpu"
+    """Tensors device is GPU."""
 
 
 @dataclass
 class CacheConfig:
-    """Class to be used in `configure_cache` of `TrainableModel`.
-
-    cache_type: cache type for single encoder which has no custom name set. In all other
-        cases use `mapping`.
-    mapping: mapping of `encoder_name` to `CacheType`, only specified inhere encoders
-        will be cached, the others will stay untouched.
-    key_extractors: mapping of encoders to key extractor functions required to cache
-        non-hashable objects.
-    batch_size: batch size to be used in CacheDataLoader during caching process. It does
-        not affect others training stages.
-    num_workers: num_workers to be used in CacheDataLoader during caching process. It
-        does not affect others training stages.
-    """
+    """Class to be used in `configure_cache` of `TrainableModel`."""
 
     cache_type: Optional[CacheType] = CacheType.AUTO
-    batch_size: Optional[int] = 32
-    num_workers: Optional[int] = None  # if None - inherited from source dl
+    """Cache type used for cacheable encoders not set in mapping"""
+
+    mapping: Dict[str, CacheType] = field(default_factory=dict)
+    """Mapping of `encoder_name` to `CacheType`"""
+
     key_extractors: Union[KeyExtractorType, Dict[str, KeyExtractorType]] = field(
         default_factory=dict
     )
-    mapping: Dict[str, CacheType] = field(default_factory=dict)
+    """Mapping of encoders to key extractor functions required to cache non-hashable 
+    objects."""
+
+    batch_size: Optional[int] = 32
+    """Batch size to be used in CacheDataLoader during caching process. It does not 
+    affect others training stages."""
+
+    num_workers: Optional[int] = None  # if None - inherited from source dl
+    """Num_workers to be used in CacheDataLoader during caching process. It does not 
+    affect others training stages."""
+

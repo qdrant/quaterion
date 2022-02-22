@@ -52,5 +52,5 @@ jobs:
         git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
         git checkout master
         git add ./docs/
-        git commit -am "docs: auto-generate docs with psphinx"
+        git commit -am "docs: auto-generate docs with sphinx"
         git push

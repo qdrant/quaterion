@@ -12,7 +12,7 @@
 #
 # import os
 # import sys
-
+#
 # sys.path.insert(0, os.path.abspath("../quaterion"))
 
 
@@ -34,16 +34,12 @@ extensions = [
     "sphinx.ext.viewcode",
 ]
 
-autodoc_type_aliases = {
-    "TensorInterchange": "TensorInterchange",
-    "CollateFnType": "CollateFnType",
-    "KeyExtractorType": "KeyExtractorType",
-    "CacheCollateReturnType": "CacheCollateReturnType",
-    "CacheCollateFnType": "CacheCollateFnType",
-}
-
 # prevents sphinx from adding full path to type hints
 autodoc_typehints_format = "short"
+
+# order members by type and not alphabetically, it prevents mixing of class attributes
+# and methods
+autodoc_member_order = 'groupwise'
 
 # moves ``Return type`` to ``Returns``
 napoleon_use_rtype = False
@@ -62,8 +58,7 @@ templates_path = ["_templates"]
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = []
-
+exclude_patterns = ['*cache*']
 
 # -- Options for HTML output -------------------------------------------------
 
@@ -76,3 +71,7 @@ html_theme = "alabaster"
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
+
+html_css_files = [
+    'quaterion.css',
+]

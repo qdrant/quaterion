@@ -34,6 +34,6 @@ class TrainCollater:
         encoder_collate_result = {}
         for encoder_name, collate_fn in self.encoder_collates.items():
             encoder_features = self.pre_encoder_collate(features, ids, encoder_name)
-            encoder_collate_result[encoder_name] = encoder_features
+            encoder_collate_result[encoder_name] = collate_fn(encoder_features)
 
         return encoder_collate_result, labels

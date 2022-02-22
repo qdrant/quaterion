@@ -67,12 +67,6 @@ class MobilenetV3Encoder(Encoder):
     def forward(self, images):
         return self.encoder.forward(images)
 
-    def get_collate_fn(self) -> CollateFnType:
-        return self._simple_collate_fn
-
-    def _simple_collate_fn(self, batch):
-        return torch.stack(batch)
-
 
 class Model(TrainableModel):
     def __init__(self, embedding_size: int = 128, lr: float = 1e-4):
@@ -102,7 +96,5 @@ trainer = pl.Trainer(
 )
 
 Quaterion.fit(
-    trainable_model=model,
-    trainer=trainer,
-    train_dataloader=train_dataloader,
+    trainable_model=model, trainer=trainer, train_dataloader=train_dataloader,
 )

@@ -12,18 +12,9 @@ dt em.sig-param:last-of-type::after {
     white-space: pre;  /* preserve spaces */
 }
 
-/* Provide more vertical space between classes */
-/* Newline after py class */
+/* Provide more vertical space between classes, methods and functions */
 dl.py.class::after, dl.py.method::after, dl.py.function::after {
     content: "\a";
     white-space: pre;  /* preserve spaces */
     line-height: 1.5;
 }
-
-/* Provide more vertical space between methods */
-/* Newline after py method */
-/*dl.py.method::after {*/
-/*    content: "\a";*/
-/*    white-space: pre;  !* preserve spaces *!*/
-/*    line-height: 1.5;*/
-/*}*/

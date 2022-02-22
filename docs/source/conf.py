@@ -39,7 +39,7 @@ autodoc_typehints_format = "short"
 
 # order members by type and not alphabetically, it prevents mixing of class attributes
 # and methods
-autodoc_member_order = 'groupwise'
+autodoc_member_order = "groupwise"
 
 # moves ``Return type`` to ``Returns``
 napoleon_use_rtype = False
@@ -58,7 +58,7 @@ templates_path = ["_templates"]
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ['*cache*']
+exclude_patterns = ["*cache*"]
 
 # -- Options for HTML output -------------------------------------------------
 
@@ -73,5 +73,5 @@ html_theme = "alabaster"
 html_static_path = ["_static"]
 
 html_css_files = [
-    'quaterion.css',
+    "quaterion.css",
 ]

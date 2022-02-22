@@ -257,15 +257,19 @@ class TrainableModel(pl.LightningModule, CacheMixin):
     # region anchors
     # https://github.com/PyTorchLightning/pytorch-lightning/issues/10667
     def train_dataloader(self) -> TRAIN_DATALOADERS:
+        """:meta private:"""
         pass
 
     def test_dataloader(self) -> EVAL_DATALOADERS:
+        """:meta private:"""
         pass
 
     def val_dataloader(self) -> EVAL_DATALOADERS:
+        """:meta private:"""
         pass
 
     def predict_dataloader(self) -> EVAL_DATALOADERS:
+        """:meta private:"""
         pass
 
     # endregion

@@ -17,7 +17,6 @@ from quaterion.dataset import SimilarityDataLoader
 from quaterion.dataset.train_collater import TrainCollater
 from quaterion.train.cache import (
     CacheConfig,
-    CacheType,
 )
 from quaterion.loss import SimilarityLoss
 from quaterion.utils.enums import TrainStage
@@ -65,9 +64,8 @@ class TrainableModel(pl.LightningModule, CacheMixin):
         before training as well as during the checkpoint loading.
 
         Returns:
-             Union[Encoder, Dict[str, Encoder]]: one instance of encoder which will
-                have quaterion_models.model.DEFAULT_ENCODER_KEY, or dict of encoder
-                names and corresponding encoder instances.
+             Union[Encoder, Dict[str, Encoder]]: instance of encoder which will be assigned to
+             `quaterion_models.model.DEFAULT_ENCODER_KEY`, or mapping of names and encoders.
         """
         raise NotImplementedError()
 
@@ -78,39 +76,40 @@ class TrainableModel(pl.LightningModule, CacheMixin):
         what kind of cache they should use.
 
         Returns:
-            Optional[CacheConfig]: cache configuration to be applied if provided, None
-                otherwise
+            Optional[CacheConfig]: cache configuration to be applied if provided, None otherwise
+
         Examples:
 
-            Do not use cache (default):
-            ```
+        `Do not use cache (default)`::
+
             return None
-            ```
 
-            Configure cache automatically for all non-trainable encoders:
-            ```
+        `Configure cache automatically for all non-trainable encoders`::
+
             return CacheConfig(CacheType.AUTO)
-            ```
 
-            Specify cache type for each encoder individually:
-            ```
+        `Specify cache type for each encoder individually`::
+
             return CacheConfig(mapping={
-                    "text_encoder": CacheType.GPU,  # Store cache in GPU for `text_encoder`
-                    "image_encoder": CacheType.CPU  # Store cache in RAM for `image_encoder`
+                    "text_encoder": CacheType.GPU,
+                    # Store cache in GPU for `text_encoder`
+                    "image_encoder": CacheType.CPU
+                    # Store cache in RAM for `image_encoder`
                 }
             )
-            ```
 
-            Specify key for cache object disambiguation:
-            ```
+        `Specify key for cache object disambiguation`::
+
             return CacheConfig(
                 cache_type=CacheType.AUTO,
                 key_extractors={"text_encoder": hash}
             )
-            ```
-            This function might be useful if you want to provide some more sophisticated way of storing
-             association between cached vectors and original object.
-            Item numbers from dataset will be used by default if key is not specified
+
+
+        This function might be useful if you want to provide some more sophisticated way of
+        storing association between cached vectors and original object.
+        Item numbers from dataset
+        will be used by default if key is not specified.
 
         """
         pass

@@ -66,3 +66,5 @@ class Quaterion:
             train_dataloaders=train_dataloader,
             val_dataloaders=val_dataloader,
         )
+
+        trainable_model.unwrap_cache()

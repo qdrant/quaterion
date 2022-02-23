@@ -32,6 +32,10 @@ class CacheEncoder(Encoder):
         super().__init__()
         self._encoder = encoder
 
+    @property
+    def wrapped_encoder(self):
+        return self._encoder
+
     def trainable(self) -> bool:
         """Defines if encoder is trainable. This flag affects caching and checkpoint
         saving of the encoder.

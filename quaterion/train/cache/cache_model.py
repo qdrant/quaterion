@@ -49,7 +49,7 @@ class CacheModel(pl.LightningModule):
             if encoder_name not in features:
                 continue
             keys, encoder_features = features.get(encoder_name)
-            if not encoder_features:
+            if len(keys) == 0:
                 # empty batch possible if all unique object already cached
                 continue
             encoder.fill_cache(keys, encoder_features)

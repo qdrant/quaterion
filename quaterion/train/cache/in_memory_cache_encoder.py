@@ -30,7 +30,7 @@ class InMemoryCacheEncoder(CacheEncoder):
     def cache_type(self):
         return self._cache_type
 
-    def forward(self, batch: TensorInterchange) -> Tensor:
+    def forward(self, batch: "TensorInterchange") -> Tensor:
         """Infer encoder - convert input batch to embeddings
 
         Args:
@@ -47,7 +47,7 @@ class InMemoryCacheEncoder(CacheEncoder):
 
         return embeddings
 
-    def get_collate_fn(self) -> CollateFnType:
+    def get_collate_fn(self) -> "CollateFnType":
         """Provides function that converts raw data batch into suitable input.
 
         Returns:
@@ -56,7 +56,7 @@ class InMemoryCacheEncoder(CacheEncoder):
         """
         return self.cache_collate
 
-    def fill_cache(self, keys: List[Hashable], data: TensorInterchange) -> None:
+    def fill_cache(self, keys: List[Hashable], data: "TensorInterchange") -> None:
         embeddings = self._encoder(data)
         if self.cache_type == CacheType.CPU:
             embeddings = embeddings.to("cpu")

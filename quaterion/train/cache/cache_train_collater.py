@@ -14,8 +14,8 @@ class CacheTrainCollater(TrainCollater):
     def __init__(
         self,
         pre_collate_fn,
-        encoder_collates: Dict[str, CollateFnType],
-        key_extractors: Dict[str, KeyExtractorType],
+        encoder_collates: Dict[str, "CollateFnType"],
+        key_extractors: Dict[str, "KeyExtractorType"],
         cachable_encoders: List[str],
         mode: CacheMode,
     ):

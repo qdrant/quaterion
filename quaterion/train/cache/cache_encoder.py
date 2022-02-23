@@ -8,7 +8,7 @@ from quaterion_models.types import TensorInterchange, CollateFnType
 
 KeyExtractorType = Callable[[Any], Hashable]
 
-CacheCollateReturnType = Union[List[Hashable], Tuple[Hashable, TensorInterchange]]
+CacheCollateReturnType = Union[List[Hashable], Tuple[List[Hashable], "TensorInterchange"]]
 
 
 class CacheMode(str, Enum):
@@ -53,7 +53,7 @@ class CacheEncoder(Encoder):
 
     def cache_collate(
         self, batch: Union[Tuple[List[Hashable], List[Any]], List[Hashable]]
-    ) -> Union[List[Hashable], Tuple[List[Hashable], TensorInterchange]]:
+    ) -> "CacheCollateReturnType":
         """Converts raw data batch into suitable model input and keys for caching.
 
         Returns:
@@ -71,7 +71,7 @@ class CacheEncoder(Encoder):
             # Only keys are provided here
             return batch
 
-    def get_collate_fn(self) -> CollateFnType:
+    def get_collate_fn(self) -> "CollateFnType":
         """Provides function that converts raw data batch into suitable model input.
 
         Returns:
@@ -79,7 +79,7 @@ class CacheEncoder(Encoder):
         """
         return self.cache_collate
 
-    def forward(self, batch: TensorInterchange) -> Tensor:
+    def forward(self, batch: "TensorInterchange") -> Tensor:
         """Infer encoder.
 
         Convert input batch to embeddings
@@ -91,7 +91,7 @@ class CacheEncoder(Encoder):
         """
         raise NotImplementedError()
 
-    def save(self, output_path: str):
+    def save(self, output_path: str) -> None:
         """Persist current state to the provided directory
 
         Args:
@@ -109,7 +109,7 @@ class CacheEncoder(Encoder):
         """
         raise ValueError("Cached encoder does not support loading")
 
-    def fill_cache(self, keys: List[Hashable], data: TensorInterchange) -> None:
+    def fill_cache(self, keys: List[Hashable], data: "TensorInterchange") -> None:
         """Apply wrapped encoder to data and store processed data on
         corresponding device.
 

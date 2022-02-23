@@ -68,7 +68,7 @@ class ContrastiveLoss(PairwiseLoss):
         labels: Tensor,
         subgroups: Tensor,
         **kwargs
-    ):
+    ) -> Tensor:
         """Compute loss value.
 
         Args:

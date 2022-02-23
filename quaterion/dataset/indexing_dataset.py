@@ -15,7 +15,7 @@ class IndexingDataset(Dataset[Tuple[Any, T_co]]):
     def __init__(self, dataset: Dataset[T_co], seed=None):
         self._dataset = dataset
         if seed is None:
-            self.seed = random.randint(0, 2 ** 31)
+            self.seed = random.randint(0, 2**31)
         else:
             self.seed = seed
 
@@ -35,7 +35,7 @@ class IndexingIterableDataset(IterableDataset[Tuple[Any, T_co]]):
     def __init__(self, dataset: IterableDataset[T_co], seed=None):
         self._dataset = dataset
         if seed is None:
-            self.seed = random.randint(0, 2 ** 31)
+            self.seed = random.randint(0, 2**31)
         else:
             self.seed = seed
 

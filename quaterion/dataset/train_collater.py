@@ -13,6 +13,7 @@ class TrainCollater:
         pre_collate_fn:
         encoder_collates:
     """
+
     def __init__(self, pre_collate_fn, encoder_collates: Dict[str, CollateFnType]):
         self.pre_collate_fn = pre_collate_fn
         self.encoder_collates = encoder_collates

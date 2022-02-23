@@ -157,7 +157,8 @@
         <span class="n">distance_metrics</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;euclidean&quot;</span><span class="p">,</span> <span class="s2">&quot;cosine_distance&quot;</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">distance_metric_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">distance_metrics</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Not supported distance metrc for this loss: </span><span class="si">{</span><span class="n">distance_metric_name</span><span class="si">}</span><span class="s2">. Must be one of </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">distance_metrics</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Not supported distance metrc for this loss: </span><span class="si">{</span><span class="n">distance_metric_name</span><span class="si">}</span><span class="s2">. &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Must be one of </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">distance_metrics</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
 
         <span class="n">mining_types</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="s2">&quot;hard&quot;</span><span class="p">]</span>
@@ -238,7 +239,8 @@
 
             <span class="c1"># get the hardest negative for each anchor</span>
             <span class="n">anchor_negative_mask</span> <span class="o">=</span> <span class="n">_get_anchor_negative_mask</span><span class="p">(</span><span class="n">groups</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
-            <span class="c1"># add maximum of each row to invalid pairs to make sure not to count loss values from those indices when we apply minimum function later on</span>
+            <span class="c1"># add maximum of each row to invalid pairs to make sure not to count loss values from</span>
+            <span class="c1"># those indices when we apply minimum function later on</span>
             <span class="n">anchor_negative_dists</span> <span class="o">=</span> <span class="n">dists</span> <span class="o">+</span> <span class="n">dists</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span>
                 <span class="mf">1.0</span> <span class="o">-</span> <span class="n">anchor_negative_mask</span>
             <span class="p">)</span>

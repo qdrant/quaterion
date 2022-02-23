@@ -14,7 +14,7 @@
 # import sys
 #
 # sys.path.insert(0, os.path.abspath("../quaterion"))
-
+from __future__ import annotations
 
 # -- Project information -----------------------------------------------------
 
@@ -54,6 +54,14 @@ add_module_names = False
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
+
+# prevents unfolding type hints
+autodoc_type_aliases = {
+    "KeyExtractorType": "KeyExtractorType",
+    "TensorInterchange": "TensorInterchange",
+    "CacheCollateReturnType": "CacheCollateReturnType",
+    "CollateFnType": "CollateFnType",
+}
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.

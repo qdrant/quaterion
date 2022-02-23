@@ -102,7 +102,7 @@
         <span class="n">labels</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
         <span class="n">subgroups</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span>
-    <span class="p">):</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Compute loss value.</span>
 
 <span class="sd">        Args:</span>
@@ -148,9 +148,9 @@
             <span class="c1"># shape (embeddings_count // 2, 1)</span>
             <span class="n">neg_dist_to_other</span> <span class="o">=</span> <span class="n">negative_distances</span><span class="p">[</span><span class="n">pairs</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]]</span>
             <span class="c1"># shape (embeddings_count // 2, 1)</span>
-            <span class="n">negative_distances_impact</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">margin</span> <span class="o">-</span> <span class="n">neg_dist_to_anchors</span><span class="p">)</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span>
-                <span class="mi">2</span>
-            <span class="p">)</span> <span class="o">+</span> <span class="n">torch</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">margin</span> <span class="o">-</span> <span class="n">neg_dist_to_other</span><span class="p">)</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">negative_distances_impact</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">margin</span> <span class="o">-</span> <span class="n">neg_dist_to_anchors</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">torch</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">margin</span> <span class="o">-</span> <span class="n">neg_dist_to_other</span><span class="p">)</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
 
         <span class="c1"># shape (embeddings_count // 2, 1)</span>
         <span class="n">losses</span> <span class="o">=</span> <span class="p">(</span>

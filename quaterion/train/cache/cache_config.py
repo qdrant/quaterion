@@ -1,7 +1,8 @@
+from __future__ import annotations
+
 from enum import Enum
 from dataclasses import dataclass, field
 from typing import Dict, Optional, Callable, Any, Hashable, Union
-
 
 # Function to extract hash value from the input object
 # Required if there is no other way to distinguish values for caching
@@ -31,7 +32,7 @@ class CacheConfig:
     mapping: Dict[str, CacheType] = field(default_factory=dict)
     """Mapping of `encoder_name` to `CacheType`"""
 
-    key_extractors: Union["KeyExtractorType", Dict[str, "KeyExtractorType"]] = field(
+    key_extractors: Union[KeyExtractorType, Dict[str, KeyExtractorType]] = field(
         default_factory=dict
     )
     """Mapping of encoders to key extractor functions required to cache non-hashable 

@@ -1,11 +1,10 @@
-from typing import Dict, Tuple, Iterable, Hashable, Optional
+from typing import Dict, Optional
 
 import pytorch_lightning as pl
 from pytorch_lightning.utilities.types import TRAIN_DATALOADERS, EVAL_DATALOADERS
 import torch
 
 from quaterion.train.cache import CacheEncoder
-from quaterion_models.types import TensorInterchange
 
 
 class CacheModel(pl.LightningModule):
@@ -41,6 +40,7 @@ class CacheModel(pl.LightningModule):
             batch: Tuple of feature batch and labels batch.
             batch_idx: Index of current batch
             dataloader_idx: Index of the current dataloader
+
         Returns:
             torch.Tensor: loss mock
         """

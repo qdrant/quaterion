@@ -6,8 +6,6 @@ from torch import Tensor
 
 from quaterion.loss.group_loss import GroupLoss
 
-__all__ = ["ArcFaceLoss"]
-
 
 def l2_norm(inputs: torch.Tensor, dim: int = 0) -> torch.Tensor:
     """Apply L2 normalization to tensor

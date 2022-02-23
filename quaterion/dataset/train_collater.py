@@ -5,15 +5,15 @@ from quaterion_models.types import CollateFnType
 
 
 class TrainCollater:
-    def __init__(self, pre_collate_fn, encoder_collates: Dict[str, CollateFnType]):
-        """
-        Functional object, that aggregates all required information for performing collate on train batches.
-        Should be serializable for sending among worker processes.
+    """
+    Functional object, that aggregates all required information for performing collate on train batches.
+    Should be serializable for sending among worker processes.
 
-        Args:
-            pre_collate_fn:
-            encoder_collates:
-        """
+    Args:
+        pre_collate_fn:
+        encoder_collates:
+    """
+    def __init__(self, pre_collate_fn, encoder_collates: Dict[str, CollateFnType]):
         self.pre_collate_fn = pre_collate_fn
         self.encoder_collates = encoder_collates
 

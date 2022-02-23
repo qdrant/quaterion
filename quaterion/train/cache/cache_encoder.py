@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Collection, Hashable, Any, List, Callable, Union, Tuple, Iterable
+from typing import Hashable, Any, List, Callable, Union, Tuple
 
 from torch import Tensor
 

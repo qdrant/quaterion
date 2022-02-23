@@ -8,7 +8,9 @@ from quaterion_models.types import TensorInterchange, CollateFnType
 
 KeyExtractorType = Callable[[Any], Hashable]
 
-CacheCollateReturnType = Union[List[Hashable], Tuple[List[Hashable], "TensorInterchange"]]
+CacheCollateReturnType = Union[
+    List[Hashable], Tuple[List[Hashable], "TensorInterchange"]
+]
 
 
 class CacheMode(str, Enum):

@@ -1,0 +1,449 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>quaterion.train.cache_mixin &#8212; Quaterion  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/quaterion.css" />
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for quaterion.train.cache_mixin</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">multiprocessing</span> <span class="k">as</span> <span class="nn">mp</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Union</span><span class="p">,</span>
+    <span class="n">Dict</span><span class="p">,</span>
+    <span class="n">Optional</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">pytorch_lightning</span> <span class="k">as</span> <span class="nn">pl</span>
+<span class="kn">import</span> <span class="nn">torch.cuda</span>
+<span class="kn">from</span> <span class="nn">loguru</span> <span class="kn">import</span> <span class="n">logger</span>
+<span class="kn">from</span> <span class="nn">quaterion_models.encoders</span> <span class="kn">import</span> <span class="n">Encoder</span>
+<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">DataLoader</span>
+
+<span class="kn">from</span> <span class="nn">quaterion.train.cache.cache_train_collater</span> <span class="kn">import</span> <span class="n">CacheTrainCollater</span>
+<span class="kn">from</span> <span class="nn">quaterion.dataset.similarity_data_loader</span> <span class="kn">import</span> <span class="n">SimilarityDataLoader</span>
+<span class="kn">from</span> <span class="nn">quaterion.train.cache</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CacheConfig</span><span class="p">,</span>
+    <span class="n">CacheEncoder</span><span class="p">,</span>
+    <span class="n">CacheType</span><span class="p">,</span>
+    <span class="n">InMemoryCacheEncoder</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">quaterion.train.cache.cache_encoder</span> <span class="kn">import</span> <span class="n">CacheMode</span>
+<span class="kn">from</span> <span class="nn">quaterion.train.cache.cache_model</span> <span class="kn">import</span> <span class="n">CacheModel</span>
+
+
+<div class="viewcode-block" id="CacheMixin"><a class="viewcode-back" href="../../../quaterion.train.cache_mixin.html#quaterion.train.cache_mixin.CacheMixin">[docs]</a><span class="k">class</span> <span class="nc">CacheMixin</span><span class="p">:</span>
+    <span class="n">CACHE_MULTIPROCESSING_CONTEXT</span> <span class="o">=</span> <span class="s2">&quot;fork&quot;</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_apply_cache_config</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">encoders</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Encoder</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Encoder</span><span class="p">]],</span>
+        <span class="n">cache_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">CacheConfig</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Encoder</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Encoder</span><span class="p">]]:</span>
+        <span class="sd">&quot;&quot;&quot;Applies received cache configuration for cached encoders, remain</span>
+<span class="sd">        non-cached encoders as is</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            encoders: all model&#39;s encoders</span>
+<span class="sd">            cache_config: CacheConfig instance defined in `configure_cache`</span>
+<span class="sd">                method of the model</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Union[Encoder, Dict[str, encoder]]: encoder or dict of encoders</span>
+<span class="sd">                which were wrapped into CacheEncoder instances according to</span>
+<span class="sd">                received cache config.</span>
+<span class="sd">                Result type depends on the way encoder was defined in the</span>
+<span class="sd">                model: with or without explicit mapping</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            KeyError: encoder&#39;s name in cache config is not in model&#39;s</span>
+<span class="sd">                encoders</span>
+<span class="sd">            ValueError: if CacheConfig instance does not have some of required</span>
+<span class="sd">                options set. E.g. not `mapping` nor `cache_type` being set</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">cache_config</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">encoders</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">cache_config</span><span class="o">.</span><span class="n">cache_type</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">cache_config</span><span class="o">.</span><span class="n">mapping</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;If cache is configured, cache_type or mapping have to be set&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">encoders</span><span class="p">,</span> <span class="n">Encoder</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_wrap_encoder</span><span class="p">(</span>
+                <span class="n">encoders</span><span class="p">,</span>
+                <span class="n">cache_config</span><span class="o">=</span><span class="n">cache_config</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="n">cached_encoders</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">encoder_name</span><span class="p">,</span> <span class="n">encoder</span> <span class="ow">in</span> <span class="n">encoders</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">cached_encoders</span><span class="p">[</span><span class="n">encoder_name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_wrap_encoder</span><span class="p">(</span>
+                <span class="n">encoder</span><span class="p">,</span> <span class="n">cache_config</span><span class="o">=</span><span class="n">cache_config</span><span class="p">,</span> <span class="n">encoder_name</span><span class="o">=</span><span class="n">encoder_name</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="o">**</span><span class="n">encoders</span><span class="p">,</span> <span class="o">**</span><span class="n">cached_encoders</span><span class="p">}</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_check_cuda</span><span class="p">(</span><span class="n">cache_type</span><span class="p">:</span> <span class="n">CacheType</span><span class="p">,</span> <span class="n">encoder_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">cache_type</span> <span class="o">==</span> <span class="n">CacheType</span><span class="o">.</span><span class="n">GPU</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;`CacheType.GPU` has been chosen for `</span><span class="si">{</span><span class="n">encoder_name</span><span class="si">}</span><span class="s2">` &quot;</span>
+                <span class="s2">&quot;encoder, but cuda is not available&quot;</span>
+            <span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_wrap_encoder</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span> <span class="n">encoder</span><span class="p">:</span> <span class="n">Encoder</span><span class="p">,</span> <span class="n">cache_config</span><span class="p">:</span> <span class="n">CacheConfig</span><span class="p">,</span> <span class="n">encoder_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Encoder</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Wrap encoder into CacheEncoder instance if it is required by config.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            encoder: raw model&#39;s encoder</span>
+<span class="sd">            cache_config: cache type of tensor storage</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            wrapped CacheEncoder or original encoder</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: if encoder layers are not frozen. Cache can be applied</span>
+<span class="sd">                only to fully frozen encoders&#39; outputs.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">encoder</span><span class="o">.</span><span class="n">trainable</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">encoder_name</span> <span class="ow">in</span> <span class="n">cache_config</span><span class="o">.</span><span class="n">mapping</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Can&#39;t configure cache for encoder </span><span class="si">{</span><span class="n">encoder_name</span><span class="si">}</span><span class="s2">. &quot;</span>
+                    <span class="s2">&quot;Encoder must be frozen to cache it&quot;</span>
+                <span class="p">)</span>
+            <span class="k">return</span> <span class="n">encoder</span>
+
+        <span class="n">cache_type</span> <span class="o">=</span> <span class="n">cache_config</span><span class="o">.</span><span class="n">mapping</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">encoder_name</span><span class="p">)</span> <span class="ow">or</span> <span class="n">cache_config</span><span class="o">.</span><span class="n">cache_type</span>
+
+        <span class="k">if</span> <span class="n">cache_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">encoder_name</span><span class="si">}</span><span class="s2"> haven&#39;t been cached, &quot;</span>
+                <span class="s2">&quot;but could be as non-trainable encoders&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">encoder</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">_check_cuda</span><span class="p">(</span><span class="n">cache_type</span><span class="p">,</span> <span class="n">encoder_name</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">InMemoryCacheEncoder</span><span class="p">(</span><span class="n">encoder</span><span class="p">,</span> <span class="n">cache_type</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_cache</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">trainer</span><span class="p">:</span> <span class="n">pl</span><span class="o">.</span><span class="n">Trainer</span><span class="p">,</span>
+        <span class="n">encoders</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Encoder</span><span class="p">],</span>
+        <span class="n">train_dataloader</span><span class="p">:</span> <span class="n">SimilarityDataLoader</span><span class="p">,</span>
+        <span class="n">val_dataloader</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">SimilarityDataLoader</span><span class="p">],</span>
+        <span class="n">cache_config</span><span class="p">:</span> <span class="n">CacheConfig</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Filling cache for model&#39;s cache encoders.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            trainer: Lightning Trainer holds required parameters for model launch (gpu, e.t.c.)</span>
+<span class="sd">            encoders: mapping of model&#39;s encoders and their names</span>
+<span class="sd">            train_dataloader: model&#39;s train dataloader</span>
+<span class="sd">            val_dataloader: model&#39;s val dataloader</span>
+<span class="sd">            cache_config: cache config instance to configure cache batch size</span>
+<span class="sd">                and num of workers to use for caching</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cache_encoders</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">name</span><span class="p">:</span> <span class="n">encoder</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">encoder</span> <span class="ow">in</span> <span class="n">encoders</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">encoder</span><span class="p">,</span> <span class="n">CacheEncoder</span><span class="p">)</span>
+        <span class="p">}</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">cache_encoders</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="n">cache_config</span><span class="o">.</span><span class="n">key_extractors</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span>
+            <span class="n">cache_config</span><span class="o">.</span><span class="n">key_extractors</span><span class="p">,</span> <span class="nb">dict</span>
+        <span class="p">):</span>
+            <span class="c1"># If only one function specified, use it for all encoders</span>
+            <span class="n">key_extractors</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">name</span><span class="p">:</span> <span class="n">cache_config</span><span class="o">.</span><span class="n">key_extractors</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">cache_encoders</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+            <span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">key_extractors</span> <span class="o">=</span> <span class="n">cache_config</span><span class="o">.</span><span class="n">key_extractors</span>
+
+        <span class="n">cache_collater</span> <span class="o">=</span> <span class="n">CacheTrainCollater</span><span class="p">(</span>
+            <span class="n">pre_collate_fn</span><span class="o">=</span><span class="n">train_dataloader</span><span class="o">.</span><span class="n">pre_collate_fn</span><span class="p">,</span>
+            <span class="n">encoder_collates</span><span class="o">=</span><span class="p">{</span>
+                <span class="n">name</span><span class="p">:</span> <span class="n">encoder</span><span class="o">.</span><span class="n">get_collate_fn</span><span class="p">()</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">encoder</span> <span class="ow">in</span> <span class="n">encoders</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="p">},</span>
+            <span class="n">key_extractors</span><span class="o">=</span><span class="n">key_extractors</span><span class="p">,</span>
+            <span class="n">cachable_encoders</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">cache_encoders</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span>
+            <span class="n">mode</span><span class="o">=</span><span class="n">CacheMode</span><span class="o">.</span><span class="n">FILL</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">train_dataloader</span><span class="o">.</span><span class="n">collate_fn</span> <span class="o">=</span> <span class="n">cache_collater</span>
+
+        <span class="n">cache_train_dataloader</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_wrap_cache_dataloader</span><span class="p">(</span>
+            <span class="n">dataloader</span><span class="o">=</span><span class="n">train_dataloader</span><span class="p">,</span> <span class="n">cache_config</span><span class="o">=</span><span class="n">cache_config</span>
+        <span class="p">)</span>
+
+        <span class="n">cache_val_dataloader</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">val_dataloader</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">val_dataloader</span><span class="o">.</span><span class="n">collate_fn</span> <span class="o">=</span> <span class="n">cache_collater</span>
+            <span class="n">cache_val_dataloader</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_wrap_cache_dataloader</span><span class="p">(</span>
+                <span class="n">dataloader</span><span class="o">=</span><span class="n">val_dataloader</span><span class="p">,</span> <span class="n">cache_config</span><span class="o">=</span><span class="n">cache_config</span>
+            <span class="p">)</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">_fill_cache</span><span class="p">(</span>
+            <span class="n">trainer</span><span class="p">,</span> <span class="n">cache_encoders</span><span class="p">,</span> <span class="n">cache_train_dataloader</span><span class="p">,</span> <span class="n">cache_val_dataloader</span>
+        <span class="p">)</span>
+
+        <span class="n">cache_collater</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="n">CacheMode</span><span class="o">.</span><span class="n">TRAIN</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Caching has been successfully finished&quot;</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_fill_cache</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">trainer</span><span class="p">:</span> <span class="n">pl</span><span class="o">.</span><span class="n">Trainer</span><span class="p">,</span>
+        <span class="n">cache_encoders</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">CacheEncoder</span><span class="p">],</span>
+        <span class="n">train_dataloader</span><span class="p">:</span> <span class="n">DataLoader</span><span class="p">,</span>
+        <span class="n">val_dataloader</span><span class="p">:</span> <span class="n">DataLoader</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Fills cache and restores trainer state for further training process.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            trainer: performs one training and validation epoch</span>
+<span class="sd">            cache_encoders: mapping of encoders to cache input</span>
+<span class="sd">            train_dataloader: model&#39;s train dataloader</span>
+<span class="sd">            val_dataloader: model&#39;s val dataloader</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># The actual caching</span>
+        <span class="n">trainer</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span>
+            <span class="n">CacheModel</span><span class="p">(</span>
+                <span class="n">cache_encoders</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="p">[</span><span class="n">train_dataloader</span><span class="p">,</span> <span class="n">val_dataloader</span><span class="p">],</span>
+        <span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_wrap_cache_dataloader</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">dataloader</span><span class="p">:</span> <span class="n">SimilarityDataLoader</span><span class="p">,</span>
+        <span class="n">cache_config</span><span class="p">:</span> <span class="n">CacheConfig</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Creates dataloader for caching.</span>
+
+<span class="sd">        Child processes need to derive randomized `PYTHONHASHSEED` value from</span>
+<span class="sd">        parent process to obtain the same hash values. It is only done with</span>
+<span class="sd">        `fork` start method.</span>
+<span class="sd">        `fork` start method is presented on Unix systems, and it is the default</span>
+<span class="sd">        for them, except macOS. Therefore, we set `fork` method explicitly.</span>
+
+<span class="sd">        If dataloader is not supposed to use child process, nothing being done.</span>
+<span class="sd">        If multiprocessing_context was set by user, it is being untouched and</span>
+<span class="sd">        can lead to errors.</span>
+<span class="sd">        If `PYTHONHASHSEED` is set explicitly then multiprocessing_context</span>
+<span class="sd">        won&#39;t be switched.</span>
+<span class="sd">        Cache can be used on Windows only in case when `PYTHONHASHSEED` is set</span>
+<span class="sd">        explicitly.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dataloader: dataloader to be wrapped</span>
+<span class="sd">            cache_config: cache config to retrieve num of workers and batch</span>
+<span class="sd">                size</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            DataLoader: dataloader for caching</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">_switch_multiprocessing_context</span><span class="p">(</span><span class="n">dataloader</span><span class="p">)</span>
+        <span class="n">num_workers</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">cache_config</span><span class="o">.</span><span class="n">num_workers</span>
+            <span class="k">if</span> <span class="n">cache_config</span><span class="o">.</span><span class="n">num_workers</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="k">else</span> <span class="n">dataloader</span><span class="o">.</span><span class="n">num_workers</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">num_workers</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">mp_ctx</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="n">dataloader</span><span class="o">.</span><span class="n">multiprocessing_context</span><span class="p">:</span>  <span class="c1"># already switched or</span>
+            <span class="c1"># set by user</span>
+            <span class="n">mp_ctx</span> <span class="o">=</span> <span class="n">dataloader</span><span class="o">.</span><span class="n">multiprocessing_context</span>
+        <span class="k">elif</span> <span class="s2">&quot;PYTHONHASHSEED&quot;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>  <span class="c1"># source dataloader has no</span>
+            <span class="c1"># mp context set, use default on current OS</span>
+            <span class="n">mp_ctx</span> <span class="o">=</span> <span class="n">mp</span><span class="o">.</span><span class="n">get_start_method</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">mp_ctx</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">CACHE_MULTIPROCESSING_CONTEXT</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">_check_mp_context</span><span class="p">(</span><span class="n">mp_ctx</span><span class="p">)</span>
+
+        <span class="c1"># We need to reduce random sampling and repeated calculations to</span>
+        <span class="c1"># make cache as fast as possible. Thus, we recreate dataloader</span>
+        <span class="c1"># and set batch size explicitly.</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="o">**</span><span class="n">dataloader</span><span class="o">.</span><span class="n">original_params</span><span class="p">,</span>
+            <span class="s2">&quot;multiprocessing_context&quot;</span><span class="p">:</span> <span class="n">mp_ctx</span><span class="p">,</span>
+            <span class="s2">&quot;num_workers&quot;</span><span class="p">:</span> <span class="n">num_workers</span><span class="p">,</span>
+            <span class="s2">&quot;batch_size&quot;</span><span class="p">:</span> <span class="n">cache_config</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span>
+            <span class="s2">&quot;shuffle&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s2">&quot;sampler&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="n">params</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;collate_fn&quot;</span><span class="p">)</span>  <span class="c1"># Explicitly override collate</span>
+
+        <span class="n">cache_dl</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span>
+            <span class="n">dataset</span><span class="o">=</span><span class="n">dataloader</span><span class="o">.</span><span class="n">dataset</span><span class="p">,</span> <span class="n">collate_fn</span><span class="o">=</span><span class="n">dataloader</span><span class="o">.</span><span class="n">collate_fn</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">cache_dl</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_switch_multiprocessing_context</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">dataloader</span><span class="p">:</span> <span class="n">SimilarityDataLoader</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Switch dataloader multiprocessing context.</span>
+
+<span class="sd">        Do nothing if dataloader is not supposed to use child processes or</span>
+<span class="sd">        `PYTHONHASHSEED` has been set explicitly by user.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dataloader: dataloader to check and switch multiprocessing context</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s2">&quot;PYTHONHASHSEED&quot;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="n">dataloader</span><span class="o">.</span><span class="n">num_workers</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="n">mp_context</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span>
+            <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">mp</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">BaseContext</span><span class="p">]</span>
+        <span class="p">]</span> <span class="o">=</span> <span class="n">dataloader</span><span class="o">.</span><span class="n">multiprocessing_context</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">_check_mp_context</span><span class="p">(</span><span class="n">mp_context</span><span class="p">)</span>
+
+        <span class="n">dataloader</span><span class="o">.</span><span class="n">multiprocessing_context</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">CACHE_MULTIPROCESSING_CONTEXT</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_check_mp_context</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span> <span class="n">mp_context</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">mp</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">BaseContext</span><span class="p">]]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Check if multiprocessing context is compatible with cache.</span>
+
+<span class="sd">        Emits warning if current multiprocessing context start method does not</span>
+<span class="sd">        coincide with one required by cache.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            mp_context: some dataloader&#39;s multiprocessing context</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            OSError: Raise OSError if OS does not support process start method</span>
+<span class="sd">            required by cache. Currently, this start method is `fork` which is</span>
+<span class="sd">            not supported by Windows.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">mp_context</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mp_context</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">mp_context</span> <span class="o">=</span> <span class="n">mp_context</span><span class="o">.</span><span class="n">get_start_method</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">mp_context</span> <span class="o">!=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">CACHE_MULTIPROCESSING_CONTEXT</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">&quot;Default start method on your OS is not &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">CACHE_MULTIPROCESSING_CONTEXT</span><span class="si">}</span><span class="s2">. &quot;</span>
+                <span class="s2">&quot;Trying to switch it. However &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">CACHE_MULTIPROCESSING_CONTEXT</span><span class="si">}</span><span class="s2"> may be unsafe or &quot;</span>
+                <span class="s2">&quot;unsupported. The most safe option is to launch your process &quot;</span>
+                <span class="s2">&quot;with fixed `PYTHONHASHSEED` env and remain `spawn` as start &quot;</span>
+                <span class="s2">&quot;method.</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;Possible launch is `PYTHONHASHSEED=0 python3 run.py&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">CACHE_MULTIPROCESSING_CONTEXT</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">mp</span><span class="o">.</span><span class="n">get_all_start_methods</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Cache can&#39;t be used without setting `PYTHONHASHSEED`. &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">CACHE_MULTIPROCESSING_CONTEXT</span><span class="si">}</span><span class="s2"> multiprocessing context &quot;</span>
+                <span class="s2">&quot;is not available on current OS&quot;</span>
+            <span class="p">)</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">Quaterion</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Quaterion Authors.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.4.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

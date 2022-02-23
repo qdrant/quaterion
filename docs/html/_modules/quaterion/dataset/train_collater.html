@@ -39,15 +39,15 @@
 
 
 <div class="viewcode-block" id="TrainCollater"><a class="viewcode-back" href="../../../quaterion.dataset.train_collater.html#quaterion.dataset.train_collater.TrainCollater">[docs]</a><span class="k">class</span> <span class="nc">TrainCollater</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pre_collate_fn</span><span class="p">,</span> <span class="n">encoder_collates</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">CollateFnType</span><span class="p">]):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Functional object, that aggregates all required information for performing collate on train batches.</span>
-<span class="sd">        Should be serializable for sending among worker processes.</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Functional object, that aggregates all required information for performing collate on train batches.</span>
+<span class="sd">    Should be serializable for sending among worker processes.</span>
 
-<span class="sd">        Args:</span>
-<span class="sd">            pre_collate_fn:</span>
-<span class="sd">            encoder_collates:</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">    Args:</span>
+<span class="sd">        pre_collate_fn:</span>
+<span class="sd">        encoder_collates:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pre_collate_fn</span><span class="p">,</span> <span class="n">encoder_collates</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">CollateFnType</span><span class="p">]):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pre_collate_fn</span> <span class="o">=</span> <span class="n">pre_collate_fn</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">encoder_collates</span> <span class="o">=</span> <span class="n">encoder_collates</span>
 

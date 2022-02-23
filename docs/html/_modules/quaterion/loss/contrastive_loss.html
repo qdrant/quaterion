@@ -34,7 +34,9 @@
   <h1>Source code for quaterion.loss.contrastive_loss</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span>
 
-<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">relu</span><span class="p">,</span> <span class="n">LongTensor</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">LongTensor</span>
 
 <span class="kn">from</span> <span class="nn">quaterion.loss.metrics</span> <span class="kn">import</span> <span class="n">SiameseDistanceMetric</span>
 <span class="kn">from</span> <span class="nn">quaterion.loss.pairwise_loss</span> <span class="kn">import</span> <span class="n">PairwiseLoss</span>
@@ -146,16 +148,16 @@
             <span class="c1"># shape (embeddings_count // 2, 1)</span>
             <span class="n">neg_dist_to_other</span> <span class="o">=</span> <span class="n">negative_distances</span><span class="p">[</span><span class="n">pairs</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]]</span>
             <span class="c1"># shape (embeddings_count // 2, 1)</span>
-            <span class="n">negative_distances_impact</span> <span class="o">=</span> <span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">margin</span> <span class="o">-</span> <span class="n">neg_dist_to_anchors</span><span class="p">)</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span>
+            <span class="n">negative_distances_impact</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">margin</span> <span class="o">-</span> <span class="n">neg_dist_to_anchors</span><span class="p">)</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span>
                 <span class="mi">2</span>
-            <span class="p">)</span> <span class="o">+</span> <span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">margin</span> <span class="o">-</span> <span class="n">neg_dist_to_other</span><span class="p">)</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+            <span class="p">)</span> <span class="o">+</span> <span class="n">torch</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">margin</span> <span class="o">-</span> <span class="n">neg_dist_to_other</span><span class="p">)</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
 
         <span class="c1"># shape (embeddings_count // 2, 1)</span>
         <span class="n">losses</span> <span class="o">=</span> <span class="p">(</span>
             <span class="mf">0.5</span>
             <span class="o">*</span> <span class="p">(</span>
                 <span class="n">labels</span><span class="o">.</span><span class="n">float</span><span class="p">()</span> <span class="o">*</span> <span class="n">distances</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-                <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">labels</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span> <span class="o">*</span> <span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">margin</span> <span class="o">-</span> <span class="n">distances</span><span class="p">)</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+                <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">labels</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">margin</span> <span class="o">-</span> <span class="n">distances</span><span class="p">)</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
             <span class="p">)</span>
             <span class="o">+</span> <span class="n">negative_distances_impact</span>
         <span class="p">)</span>

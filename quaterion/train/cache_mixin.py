@@ -25,6 +25,7 @@ from quaterion.train.cache.cache_model import CacheModel
 
 
 class CacheMixin:
+    """:meta private:"""
     CACHE_MULTIPROCESSING_CONTEXT = "fork"
 
     @classmethod

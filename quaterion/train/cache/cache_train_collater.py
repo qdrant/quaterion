@@ -9,6 +9,7 @@ from quaterion.train.cache.cache_encoder import CacheMode
 
 
 class CacheTrainCollater(TrainCollater):
+    """:meta private:"""
     def __init__(
         self,
         pre_collate_fn,

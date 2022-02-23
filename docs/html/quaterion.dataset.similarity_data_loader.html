@@ -245,11 +245,26 @@ Additionally, associates hash_id with each feature,</p>
 <dt class="sig sig-object py" id="quaterion.dataset.similarity_data_loader.SimilarityDataLoader">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SimilarityDataLoader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dataset</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/quaterion/dataset/similarity_data_loader.html#SimilarityDataLoader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.dataset.similarity_data_loader.SimilarityDataLoader" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">DataLoader</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Generic</span></code>[<code class="xref py py-obj docutils literal notranslate"><span class="pre">T_co</span></code>]</p>
+<p>SimilarityDataLoader is a special version of <code class="xref py py-class docutils literal notranslate"><span class="pre">DataLoader</span></code>
+which works with similarity samples.</p>
+<p>SimilarityDataLoader will automatically assign dummy collate_fn for debug purposes,
+it will be overwritten once dataloader is used for training.</p>
+<p>Required collate function should be defined individually for each encoder
+by overwriting <code class="xref py py-meth docutils literal notranslate"><span class="pre">get_collate_fn()</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataset</strong> – Dataset which outputs <a class="reference internal" href="quaterion.dataset.similarity_samples.html#quaterion.dataset.similarity_samples.SimilarityGroupSample" title="quaterion.dataset.similarity_samples.SimilarityGroupSample"><code class="xref py py-class docutils literal notranslate"><span class="pre">SimilarityGroupSample</span></code></a></p></li>
+<li><p><strong>**kwargs</strong> – Parameters passed directly into <code class="xref py py-meth docutils literal notranslate"><span class="pre">__init__()</span></code></p></li>
+</ul>
+</dd>
+</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="quaterion.dataset.similarity_data_loader.SimilarityDataLoader.collate_labels">
 <em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">collate_labels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">T_co</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tensor</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/quaterion/dataset/similarity_data_loader.html#SimilarityDataLoader.collate_labels"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.dataset.similarity_data_loader.SimilarityDataLoader.collate_labels" title="Permalink to this definition">¶</a></dt>
 <dd><p>Collate function for labels
-Converts labels into tensors, suitable for loss passing directly into loss functions and metric estimators.</p>
+Converts labels into tensors, suitable for loss passing directly into loss functions and
+metric estimators.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>batch</strong> – List of raw items from dataset</p>
@@ -331,8 +346,7 @@ Loss functions consumes labels from this function without any additional transfo
 <dl class="py property">
 <dt class="sig sig-object py" id="quaterion.dataset.similarity_data_loader.SimilarityDataLoader.original_params">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">original_params</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#quaterion.dataset.similarity_data_loader.SimilarityDataLoader.original_params" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialization params of the original dataset
-Returns:</p>
+<dd><p>Initialization params of the original dataset.</p>
 </dd></dl>
 
 <dl class="py attribute">

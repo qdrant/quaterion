@@ -38,25 +38,23 @@
 <dt class="sig sig-object py" id="quaterion.dataset.similarity_samples.SimilarityGroupSample">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SimilarityGroupSample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/quaterion/dataset/similarity_samples.html#SimilarityGroupSample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.dataset.similarity_samples.SimilarityGroupSample" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="simple">
-<dt>Represent groups of similar objects all of which should match with one-another</dt><dd><p>within the group.</p>
-</dd>
-</dl>
-<p class="rubric">Examples</p>
-<p>Faces dataset. All pictures of a single person should have single unique group
-id. In this case NN will learn to match all pictures within the group closer to
-each-other, but pictures from different groups - further.</p>
-<p><code class="docutils literal notranslate"><span class="pre">`csv</span>
-<span class="pre">file_name,group_id</span>
-<span class="pre">barak_obama_1.jpg,371</span>
-<span class="pre">barak_obama_2.jpg,371</span>
-<span class="pre">barak_obama_3.jpg,371</span>
-<span class="pre">elon_musk_1.jpg,555</span>
-<span class="pre">elon_musk_2.jpg,555</span>
-<span class="pre">elon_musk_3.jpg,555</span>
-<span class="pre">leonard_nimoy_1.jpg,209</span>
-<span class="pre">leonard_nimoy_2.jpg,209</span>
-<span class="pre">`</span></code></p>
+<p>Represent groups of similar objects all of which should match with one-another
+within the group.</p>
+<p>Examples:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Faces</span> <span class="n">dataset</span><span class="o">.</span>
+<span class="n">All</span> <span class="n">pictures</span> <span class="n">of</span> <span class="n">a</span> <span class="n">single</span> <span class="n">person</span> <span class="n">should</span> <span class="n">have</span> <span class="n">single</span> <span class="n">unique</span> <span class="n">group</span>
+<span class="nb">id</span><span class="o">.</span> <span class="n">In</span> <span class="n">this</span> <span class="n">case</span> <span class="n">NN</span> <span class="n">will</span> <span class="n">learn</span> <span class="n">to</span> <span class="n">match</span> <span class="nb">all</span> <span class="n">pictures</span> <span class="n">within</span>
+<span class="n">the</span> <span class="n">group</span> <span class="n">closer</span> <span class="n">to</span> <span class="n">each</span><span class="o">-</span><span class="n">other</span><span class="p">,</span> <span class="n">but</span> <span class="n">pictures</span> <span class="kn">from</span> <span class="nn">different</span>
+<span class="n">groups</span> <span class="o">-</span> <span class="n">further</span><span class="o">.</span>
+
+             <span class="n">file_name</span>  <span class="n">group_id</span>
+<span class="mi">0</span>      <span class="n">elon_musk_1</span><span class="o">.</span><span class="n">jpg</span>       <span class="mi">555</span>
+<span class="mi">1</span>      <span class="n">elon_musk_2</span><span class="o">.</span><span class="n">jpg</span>       <span class="mi">555</span>
+<span class="mi">2</span>      <span class="n">elon_musk_3</span><span class="o">.</span><span class="n">jpg</span>       <span class="mi">555</span>
+<span class="mi">3</span>  <span class="n">leonard_nimoy_1</span><span class="o">.</span><span class="n">jpg</span>       <span class="mi">209</span>
+<span class="mi">4</span>  <span class="n">leonard_nimoy_2</span><span class="o">.</span><span class="n">jpg</span>       <span class="mi">209</span>
+</pre></div>
+</div>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="quaterion.dataset.similarity_samples.SimilarityGroupSample.group">
 <span class="sig-name descname"><span class="pre">group</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#quaterion.dataset.similarity_samples.SimilarityGroupSample.group" title="Permalink to this definition">¶</a></dt>
@@ -73,21 +71,44 @@ each-other, but pictures from different groups - further.</p>
 <dt class="sig sig-object py" id="quaterion.dataset.similarity_samples.SimilarityPairSample">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SimilarityPairSample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj_a</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj_b</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">score</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subgroup</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/quaterion/dataset/similarity_samples.html#SimilarityPairSample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.dataset.similarity_samples.SimilarityPairSample" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p class="rubric">Example</p>
-<p><a href="#id1"><span class="problematic" id="id2">``</span></a>`
-data = [</p>
-<blockquote>
-<div><p># First query group (subgroup)
-SimilarityPairSample(obj_a=”cheesecake”, obj_b=”muffins”, score=0.9, subgroup=10),
-SimilarityPairSample(obj_a=”cheesecake”, obj_b=”macaroons”, score=0.8, subgroup=10),
-SimilarityPairSample(obj_a=”cheesecake”, obj_b=”candies”, score=0.7, subgroup=10),
-SimilarityPairSample(obj_a=”cheesecake”, obj_b=”nutella”, score=0.6, subgroup=10),</p>
-<p># Second query group
-SimilarityPairSample(obj_a=”lemon”, obj_b=”lime”, score=0.9, subgroup=11),
-SimilarityPairSample(obj_a=”lemon”, obj_b=”orange”, score=0.7, subgroup=11),
-SimilarityPairSample(obj_a=”lemon”, obj_b=”grapefruit”, score=0.6, subgroup=11),
-SimilarityPairSample(obj_a=”lemon”, obj_b=”mandarin”, score=0.6, subgroup=11),</p>
-</div></blockquote>
+<p>Examples:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="c1"># First query group (subgroup)</span>
+    <span class="n">SimilarityPairSample</span><span class="p">(</span>
+        <span class="n">obj_a</span><span class="o">=</span><span class="s2">&quot;cheesecake&quot;</span><span class="p">,</span>
+        <span class="n">obj_b</span><span class="o">=</span><span class="s2">&quot;muffins&quot;</span><span class="p">,</span>
+        <span class="n">score</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span>
+        <span class="n">subgroup</span><span class="o">=</span><span class="mi">10</span>
+    <span class="p">),</span>
+    <span class="n">SimilarityPairSample</span><span class="p">(</span>
+        <span class="n">obj_a</span><span class="o">=</span><span class="s2">&quot;cheesecake&quot;</span><span class="p">,</span>
+        <span class="n">obj_b</span><span class="o">=</span><span class="s2">&quot;macaroons&quot;</span><span class="p">,</span>
+        <span class="n">score</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>
+        <span class="n">subgroup</span><span class="o">=</span><span class="mi">10</span>
+    <span class="p">),</span>
+    <span class="n">SimilarityPairSample</span><span class="p">(</span>
+        <span class="n">obj_a</span><span class="o">=</span><span class="s2">&quot;cheesecake&quot;</span><span class="p">,</span>
+        <span class="n">obj_b</span><span class="o">=</span><span class="s2">&quot;candies&quot;</span><span class="p">,</span>
+        <span class="n">score</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span>
+        <span class="n">subgroup</span><span class="o">=</span><span class="mi">10</span>
+    <span class="p">),</span>
+
+    <span class="c1"># Second query group (subgroup)</span>
+    <span class="n">SimilarityPairSample</span><span class="p">(</span>
+        <span class="n">obj_a</span><span class="o">=</span><span class="s2">&quot;lemon&quot;</span><span class="p">,</span>
+        <span class="n">obj_b</span><span class="o">=</span><span class="s2">&quot;lime&quot;</span><span class="p">,</span>
+        <span class="n">score</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span>
+        <span class="n">subgroup</span><span class="o">=</span><span class="mi">11</span>
+    <span class="p">),</span>
+    <span class="n">SimilarityPairSample</span><span class="p">(</span>
+        <span class="n">obj_a</span><span class="o">=</span><span class="s2">&quot;lemon&quot;</span><span class="p">,</span>
+        <span class="n">obj_b</span><span class="o">=</span><span class="s2">&quot;orange&quot;</span><span class="p">,</span>
+        <span class="n">score</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span>
+        <span class="n">subgroup</span><span class="o">=</span><span class="mi">11</span>
+    <span class="p">),</span>
+<span class="p">]</span>
+</pre></div>
+</div>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="quaterion.dataset.similarity_samples.SimilarityPairSample.obj_a">
 <span class="sig-name descname"><span class="pre">obj_a</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Any</span></em><a class="headerlink" href="#quaterion.dataset.similarity_samples.SimilarityPairSample.obj_a" title="Permalink to this definition">¶</a></dt>

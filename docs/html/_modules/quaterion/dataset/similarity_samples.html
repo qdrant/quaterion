@@ -39,22 +39,45 @@
 <div class="viewcode-block" id="SimilarityPairSample"><a class="viewcode-back" href="../../../quaterion.dataset.similarity_samples.html#quaterion.dataset.similarity_samples.SimilarityPairSample">[docs]</a><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">SimilarityPairSample</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Example:</span>
-<span class="sd">        ```</span>
+
+<span class="sd">    Examples::</span>
+
 <span class="sd">        data = [</span>
 <span class="sd">            # First query group (subgroup)</span>
-<span class="sd">            SimilarityPairSample(obj_a=&quot;cheesecake&quot;, obj_b=&quot;muffins&quot;, score=0.9, subgroup=10),</span>
-<span class="sd">            SimilarityPairSample(obj_a=&quot;cheesecake&quot;, obj_b=&quot;macaroons&quot;, score=0.8, subgroup=10),</span>
-<span class="sd">            SimilarityPairSample(obj_a=&quot;cheesecake&quot;, obj_b=&quot;candies&quot;, score=0.7, subgroup=10),</span>
-<span class="sd">            SimilarityPairSample(obj_a=&quot;cheesecake&quot;, obj_b=&quot;nutella&quot;, score=0.6, subgroup=10),</span>
+<span class="sd">            SimilarityPairSample(</span>
+<span class="sd">                obj_a=&quot;cheesecake&quot;,</span>
+<span class="sd">                obj_b=&quot;muffins&quot;,</span>
+<span class="sd">                score=0.9,</span>
+<span class="sd">                subgroup=10</span>
+<span class="sd">            ),</span>
+<span class="sd">            SimilarityPairSample(</span>
+<span class="sd">                obj_a=&quot;cheesecake&quot;,</span>
+<span class="sd">                obj_b=&quot;macaroons&quot;,</span>
+<span class="sd">                score=0.8,</span>
+<span class="sd">                subgroup=10</span>
+<span class="sd">            ),</span>
+<span class="sd">            SimilarityPairSample(</span>
+<span class="sd">                obj_a=&quot;cheesecake&quot;,</span>
+<span class="sd">                obj_b=&quot;candies&quot;,</span>
+<span class="sd">                score=0.7,</span>
+<span class="sd">                subgroup=10</span>
+<span class="sd">            ),</span>
 
-<span class="sd">            # Second query group</span>
-<span class="sd">            SimilarityPairSample(obj_a=&quot;lemon&quot;, obj_b=&quot;lime&quot;, score=0.9, subgroup=11),</span>
-<span class="sd">            SimilarityPairSample(obj_a=&quot;lemon&quot;, obj_b=&quot;orange&quot;, score=0.7, subgroup=11),</span>
-<span class="sd">            SimilarityPairSample(obj_a=&quot;lemon&quot;, obj_b=&quot;grapefruit&quot;, score=0.6, subgroup=11),</span>
-<span class="sd">            SimilarityPairSample(obj_a=&quot;lemon&quot;, obj_b=&quot;mandarin&quot;, score=0.6, subgroup=11),</span>
+<span class="sd">            # Second query group (subgroup)</span>
+<span class="sd">            SimilarityPairSample(</span>
+<span class="sd">                obj_a=&quot;lemon&quot;,</span>
+<span class="sd">                obj_b=&quot;lime&quot;,</span>
+<span class="sd">                score=0.9,</span>
+<span class="sd">                subgroup=11</span>
+<span class="sd">            ),</span>
+<span class="sd">            SimilarityPairSample(</span>
+<span class="sd">                obj_a=&quot;lemon&quot;,</span>
+<span class="sd">                obj_b=&quot;orange&quot;,</span>
+<span class="sd">                score=0.7,</span>
+<span class="sd">                subgroup=11</span>
+<span class="sd">            ),</span>
 <span class="sd">        ]</span>
-<span class="sd">        ```</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">obj_a</span><span class="p">:</span> <span class="n">Any</span>
@@ -71,22 +94,21 @@
     <span class="sd">&quot;&quot;&quot;Represent groups of similar objects all of which should match with one-another</span>
 <span class="sd">        within the group.</span>
 
-<span class="sd">    Examples:</span>
-<span class="sd">        Faces dataset. All pictures of a single person should have single unique group</span>
-<span class="sd">        id. In this case NN will learn to match all pictures within the group closer to</span>
-<span class="sd">        each-other, but pictures from different groups - further.</span>
+<span class="sd">        Examples::</span>
 
-<span class="sd">        ```csv</span>
-<span class="sd">        file_name,group_id</span>
-<span class="sd">        barak_obama_1.jpg,371</span>
-<span class="sd">        barak_obama_2.jpg,371</span>
-<span class="sd">        barak_obama_3.jpg,371</span>
-<span class="sd">        elon_musk_1.jpg,555</span>
-<span class="sd">        elon_musk_2.jpg,555</span>
-<span class="sd">        elon_musk_3.jpg,555</span>
-<span class="sd">        leonard_nimoy_1.jpg,209</span>
-<span class="sd">        leonard_nimoy_2.jpg,209</span>
-<span class="sd">        ```</span>
+<span class="sd">            Faces dataset.</span>
+<span class="sd">            All pictures of a single person should have single unique group</span>
+<span class="sd">            id. In this case NN will learn to match all pictures within</span>
+<span class="sd">            the group closer to each-other, but pictures from different</span>
+<span class="sd">            groups - further.</span>
+
+<span class="sd">                         file_name  group_id</span>
+<span class="sd">            0      elon_musk_1.jpg       555</span>
+<span class="sd">            1      elon_musk_2.jpg       555</span>
+<span class="sd">            2      elon_musk_3.jpg       555</span>
+<span class="sd">            3  leonard_nimoy_1.jpg       209</span>
+<span class="sd">            4  leonard_nimoy_2.jpg       209</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">obj</span><span class="p">:</span> <span class="n">Any</span>

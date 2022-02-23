@@ -51,7 +51,6 @@
 <span class="kn">from</span> <span class="nn">quaterion.dataset.train_collater</span> <span class="kn">import</span> <span class="n">TrainCollater</span>
 <span class="kn">from</span> <span class="nn">quaterion.train.cache</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">CacheConfig</span><span class="p">,</span>
-    <span class="n">CacheType</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">quaterion.loss</span> <span class="kn">import</span> <span class="n">SimilarityLoss</span>
 <span class="kn">from</span> <span class="nn">quaterion.utils.enums</span> <span class="kn">import</span> <span class="n">TrainStage</span>
@@ -99,9 +98,8 @@
 <span class="sd">        before training as well as during the checkpoint loading.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">             Union[Encoder, Dict[str, Encoder]]: one instance of encoder which will</span>
-<span class="sd">                have quaterion_models.model.DEFAULT_ENCODER_KEY, or dict of encoder</span>
-<span class="sd">                names and corresponding encoder instances.</span>
+<span class="sd">             Union[Encoder, Dict[str, Encoder]]: instance of encoder which will be assigned to</span>
+<span class="sd">             `quaterion_models.model.DEFAULT_ENCODER_KEY`, or mapping of names and encoders.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
 
@@ -112,39 +110,40 @@
 <span class="sd">        what kind of cache they should use.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            Optional[CacheConfig]: cache configuration to be applied if provided, None</span>
-<span class="sd">                otherwise</span>
+<span class="sd">            Optional[CacheConfig]: cache configuration to be applied if provided, None otherwise</span>
+
 <span class="sd">        Examples:</span>
 
-<span class="sd">            Do not use cache (default):</span>
-<span class="sd">            ```</span>
+<span class="sd">        `Do not use cache (default)`::</span>
+
 <span class="sd">            return None</span>
-<span class="sd">            ```</span>
 
-<span class="sd">            Configure cache automatically for all non-trainable encoders:</span>
-<span class="sd">            ```</span>
+<span class="sd">        `Configure cache automatically for all non-trainable encoders`::</span>
+
 <span class="sd">            return CacheConfig(CacheType.AUTO)</span>
-<span class="sd">            ```</span>
 
-<span class="sd">            Specify cache type for each encoder individually:</span>
-<span class="sd">            ```</span>
+<span class="sd">        `Specify cache type for each encoder individually`::</span>
+
 <span class="sd">            return CacheConfig(mapping={</span>
-<span class="sd">                    &quot;text_encoder&quot;: CacheType.GPU,  # Store cache in GPU for `text_encoder`</span>
-<span class="sd">                    &quot;image_encoder&quot;: CacheType.CPU  # Store cache in RAM for `image_encoder`</span>
+<span class="sd">                    &quot;text_encoder&quot;: CacheType.GPU,</span>
+<span class="sd">                    # Store cache in GPU for `text_encoder`</span>
+<span class="sd">                    &quot;image_encoder&quot;: CacheType.CPU</span>
+<span class="sd">                    # Store cache in RAM for `image_encoder`</span>
 <span class="sd">                }</span>
 <span class="sd">            )</span>
-<span class="sd">            ```</span>
 
-<span class="sd">            Specify key for cache object disambiguation:</span>
-<span class="sd">            ```</span>
+<span class="sd">        `Specify key for cache object disambiguation`::</span>
+
 <span class="sd">            return CacheConfig(</span>
 <span class="sd">                cache_type=CacheType.AUTO,</span>
 <span class="sd">                key_extractors={&quot;text_encoder&quot;: hash}</span>
 <span class="sd">            )</span>
-<span class="sd">            ```</span>
-<span class="sd">            This function might be useful if you want to provide some more sophisticated way of storing</span>
-<span class="sd">             association between cached vectors and original object.</span>
-<span class="sd">            Item numbers from dataset will be used by default if key is not specified</span>
+
+
+<span class="sd">        This function might be useful if you want to provide some more sophisticated way of</span>
+<span class="sd">        storing association between cached vectors and original object.</span>
+<span class="sd">        Item numbers from dataset</span>
+<span class="sd">        will be used by default if key is not specified.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">pass</span></div>

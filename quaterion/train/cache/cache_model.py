@@ -16,6 +16,8 @@ class CacheModel(pl.LightningModule):
 
     Args:
         encoders: dict of cache encoders names and corresponding instances to cache
+
+    :meta private:
     """
 
     def __init__(

@@ -38,6 +38,13 @@
 <dt class="sig sig-object py" id="quaterion.dataset.similarity_dataset.SimilarityGroupDataset">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SimilarityGroupDataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dataset</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/quaterion/dataset/similarity_dataset.html#SimilarityGroupDataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.dataset.similarity_dataset.SimilarityGroupDataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code>[<a class="reference internal" href="quaterion.dataset.similarity_samples.html#quaterion.dataset.similarity_samples.SimilarityGroupSample" title="quaterion.dataset.similarity_samples.SimilarityGroupSample"><code class="xref py py-class docutils literal notranslate"><span class="pre">SimilarityGroupSample</span></code></a>]</p>
+<p>Simple wrapper class, which converts standard dataset of classification task into
+dataset, compatible with <a class="reference internal" href="quaterion.dataset.similarity_data_loader.html#quaterion.dataset.similarity_data_loader.GroupSimilarityDataLoader" title="quaterion.dataset.similarity_data_loader.GroupSimilarityDataLoader"><code class="xref py py-class docutils literal notranslate"><span class="pre">GroupSimilarityDataLoader</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>dataset</strong> – a dataset, which return data in format: <cite>(record, label)</cite></p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>

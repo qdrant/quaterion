@@ -47,21 +47,23 @@
 
 
 <div class="viewcode-block" id="SimilarityDataLoader"><a class="viewcode-back" href="../../../quaterion.dataset.similarity_data_loader.html#quaterion.dataset.similarity_data_loader.SimilarityDataLoader">[docs]</a><span class="k">class</span> <span class="nc">SimilarityDataLoader</span><span class="p">(</span><span class="n">DataLoader</span><span class="p">,</span> <span class="n">Generic</span><span class="p">[</span><span class="n">T_co</span><span class="p">]):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    SimilarityDataLoader is a special version of :class:`~torch.utils.data.DataLoader`</span>
+<span class="sd">    which works with similarity samples.</span>
+
+<span class="sd">    SimilarityDataLoader will automatically assign dummy collate_fn for debug purposes,</span>
+<span class="sd">    it will be overwritten once dataloader is used for training.</span>
+
+<span class="sd">    Required collate function should be defined individually for each encoder</span>
+<span class="sd">    by overwriting :meth:`~quaterion_models.encoders.encoder.Encoder.get_collate_fn`</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        dataset: Dataset which outputs :class:`~quaterion.dataset.similarity_samples.SimilarityGroupSample`</span>
+<span class="sd">        **kwargs: Parameters passed directly into :meth:`~torch.utils.data.DataLoader.__init__`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        SimilarityDataLoader is a special version of :class:`~torch.utils.data.DataLoader`</span>
-<span class="sd">        which works with similarity samples.</span>
 
-<span class="sd">        SimilarityDataLoader will automatically assign dummy collate_fn for debug purposes,</span>
-<span class="sd">        it will be overwritten once dataloader is used for training.</span>
-
-<span class="sd">        Required collate function should be defined individually for each encoder</span>
-<span class="sd">        by overwriting :meth:`~quaterion_models.encoders.encoder.Encoder.get_collate_fn`</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            dataset: Dataset which outputs :class:`~quaterion.dataset.similarity_samples.SimilarityGroupSample`</span>
-<span class="sd">            **kwargs: Parameters passed directly into :meth:`~torch.utils.data.DataLoader.__init__`</span>
-<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="s2">&quot;collate_fn&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
             <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;collate_fn&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">pre_collate_fn</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_original_dataset</span> <span class="o">=</span> <span class="n">dataset</span>
@@ -77,10 +79,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">original_params</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;Initialization params of the original dataset</span>
-<span class="sd">        Returns:</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;Initialization params of the original dataset.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_original_params</span>
 
 <div class="viewcode-block" id="SimilarityDataLoader.pre_collate_fn"><a class="viewcode-back" href="../../../quaterion.dataset.similarity_data_loader.html#quaterion.dataset.similarity_data_loader.SimilarityDataLoader.pre_collate_fn">[docs]</a>    <span class="nd">@classmethod</span>
@@ -110,7 +109,8 @@
 <div class="viewcode-block" id="SimilarityDataLoader.collate_labels"><a class="viewcode-back" href="../../../quaterion.dataset.similarity_data_loader.html#quaterion.dataset.similarity_data_loader.SimilarityDataLoader.collate_labels">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">collate_labels</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">T_co</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;Collate function for labels</span>
-<span class="sd">        Converts labels into tensors, suitable for loss passing directly into loss functions and metric estimators.</span>
+<span class="sd">        Converts labels into tensors, suitable for loss passing directly into loss functions and</span>
+<span class="sd">        metric estimators.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            batch: List of raw items from dataset</span>

@@ -11,7 +11,10 @@ from quaterion.train.cache.cache_encoder import CacheEncoder
 
 
 class InMemoryCacheEncoder(CacheEncoder):
-    """CacheEncoder which is able to store tensors on CPU or GPU"""
+    """CacheEncoder which is able to store tensors on CPU or GPU
+
+    :meta private:
+    """
 
     def __init__(
         self,

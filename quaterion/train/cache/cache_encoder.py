@@ -24,6 +24,8 @@ class CacheEncoder(Encoder):
 
     Args:
         encoder: Encoder object to be wrapped.
+
+    :meta private:
     """
 
     def __init__(self, encoder: Encoder):

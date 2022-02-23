@@ -14,7 +14,6 @@
 # import sys
 #
 # sys.path.insert(0, os.path.abspath("../quaterion"))
-from __future__ import annotations
 
 # -- Project information -----------------------------------------------------
 

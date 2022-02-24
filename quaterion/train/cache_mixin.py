@@ -217,6 +217,16 @@ class CacheMixin:
         )
 
     @classmethod
+    def _unwrap_cache_encoders(cls, encoders: Dict[str, Encoder]) -> Dict[str, Encoder]:
+        unwrapped_encoders = {}
+        for key, encoder in encoders.items():
+            if isinstance(encoder, CacheEncoder):
+                unwrapped_encoders[key] = encoder.wrapped_encoder
+            else:
+                unwrapped_encoders[key] = encoder
+        return unwrapped_encoders
+
+    @classmethod
     def _wrap_cache_dataloader(
         cls,
         dataloader: SimilarityDataLoader,

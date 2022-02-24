@@ -1,27 +1,24 @@
 from typing import Dict, Any, Union, Optional
 
 import pytorch_lightning as pl
-
-from torch import Tensor
 from pytorch_lightning.utilities.types import (
     TRAIN_DATALOADERS,
     EVAL_DATALOADERS,
 )
-
+from quaterion_models import MetricModel
 from quaterion_models.encoders import Encoder
 from quaterion_models.heads import EncoderHead
-from quaterion_models import MetricModel
 from quaterion_models.types import TensorInterchange
+from torch import Tensor
 
 from quaterion.dataset import SimilarityDataLoader
 from quaterion.dataset.train_collater import TrainCollater
+from quaterion.loss import SimilarityLoss
 from quaterion.train.cache import (
     CacheConfig,
-    CacheType,
 )
-from quaterion.loss import SimilarityLoss
-from quaterion.utils.enums import TrainStage
 from quaterion.train.cache_mixin import CacheMixin
+from quaterion.utils.enums import TrainStage
 
 
 class TrainableModel(pl.LightningModule, CacheMixin):
@@ -221,6 +218,7 @@ class TrainableModel(pl.LightningModule, CacheMixin):
         Args:
             path: path to save to
         """
+        self.unwrap_cache()
         self.model.save(path)
 
     def cache(
@@ -239,6 +237,12 @@ class TrainableModel(pl.LightningModule, CacheMixin):
             val_dataloader=val_dataloader,
             cache_config=self.cache_config,
         )
+
+    def unwrap_cache(self):
+        """
+        Restore original encoders
+        """
+        self.model.encoders = self._unwrap_cache_encoders(self.model.encoders)
 
     def setup_dataloader(self, dataloader: SimilarityDataLoader):
         """Update data loader's collate function with encoder-specific collate"""

@@ -25,7 +25,7 @@ jobs:
         git config --global user.name 'qdrant'
         git config --global user.email 'qdrant@users.noreply.github.com'
         git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
-        git checkout master
+        git checkout $GITHUB_HEAD_REF
         git add ./docs/
         git commit -am "docs: auto-generate docs with sphinx"
         git push

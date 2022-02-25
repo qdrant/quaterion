@@ -35,26 +35,24 @@
 <span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Optional</span>
 
 <span class="kn">import</span> <span class="nn">pytorch_lightning</span> <span class="k">as</span> <span class="nn">pl</span>
-
-<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
 <span class="kn">from</span> <span class="nn">pytorch_lightning.utilities.types</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">TRAIN_DATALOADERS</span><span class="p">,</span>
     <span class="n">EVAL_DATALOADERS</span><span class="p">,</span>
 <span class="p">)</span>
-
+<span class="kn">from</span> <span class="nn">quaterion_models</span> <span class="kn">import</span> <span class="n">MetricModel</span>
 <span class="kn">from</span> <span class="nn">quaterion_models.encoders</span> <span class="kn">import</span> <span class="n">Encoder</span>
 <span class="kn">from</span> <span class="nn">quaterion_models.heads</span> <span class="kn">import</span> <span class="n">EncoderHead</span>
-<span class="kn">from</span> <span class="nn">quaterion_models</span> <span class="kn">import</span> <span class="n">MetricModel</span>
 <span class="kn">from</span> <span class="nn">quaterion_models.types</span> <span class="kn">import</span> <span class="n">TensorInterchange</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
 
 <span class="kn">from</span> <span class="nn">quaterion.dataset</span> <span class="kn">import</span> <span class="n">SimilarityDataLoader</span>
 <span class="kn">from</span> <span class="nn">quaterion.dataset.train_collater</span> <span class="kn">import</span> <span class="n">TrainCollater</span>
+<span class="kn">from</span> <span class="nn">quaterion.loss</span> <span class="kn">import</span> <span class="n">SimilarityLoss</span>
 <span class="kn">from</span> <span class="nn">quaterion.train.cache</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">CacheConfig</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">quaterion.loss</span> <span class="kn">import</span> <span class="n">SimilarityLoss</span>
-<span class="kn">from</span> <span class="nn">quaterion.utils.enums</span> <span class="kn">import</span> <span class="n">TrainStage</span>
 <span class="kn">from</span> <span class="nn">quaterion.train.cache_mixin</span> <span class="kn">import</span> <span class="n">CacheMixin</span>
+<span class="kn">from</span> <span class="nn">quaterion.utils.enums</span> <span class="kn">import</span> <span class="n">TrainStage</span>
 
 
 <div class="viewcode-block" id="TrainableModel"><a class="viewcode-back" href="../../../quaterion.train.trainable_model.html#quaterion.train.trainable_model.TrainableModel">[docs]</a><span class="k">class</span> <span class="nc">TrainableModel</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">LightningModule</span><span class="p">,</span> <span class="n">CacheMixin</span><span class="p">):</span>
@@ -254,6 +252,7 @@
 <span class="sd">        Args:</span>
 <span class="sd">            path: path to save to</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">unwrap_cache</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">path</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TrainableModel.cache"><a class="viewcode-back" href="../../../quaterion.train.trainable_model.html#quaterion.train.trainable_model.TrainableModel.cache">[docs]</a>    <span class="k">def</span> <span class="nf">cache</span><span class="p">(</span>
@@ -272,6 +271,12 @@
             <span class="n">val_dataloader</span><span class="o">=</span><span class="n">val_dataloader</span><span class="p">,</span>
             <span class="n">cache_config</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_config</span><span class="p">,</span>
         <span class="p">)</span></div>
+
+<div class="viewcode-block" id="TrainableModel.unwrap_cache"><a class="viewcode-back" href="../../../quaterion.train.trainable_model.html#quaterion.train.trainable_model.TrainableModel.unwrap_cache">[docs]</a>    <span class="k">def</span> <span class="nf">unwrap_cache</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Restore original encoders</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">encoders</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_unwrap_cache_encoders</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">encoders</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="TrainableModel.setup_dataloader"><a class="viewcode-back" href="../../../quaterion.train.trainable_model.html#quaterion.train.trainable_model.TrainableModel.setup_dataloader">[docs]</a>    <span class="k">def</span> <span class="nf">setup_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataloader</span><span class="p">:</span> <span class="n">SimilarityDataLoader</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Update data loader&#39;s collate function with encoder-specific collate&quot;&quot;&quot;</span>

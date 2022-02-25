@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+      - with:
+          - fetch-depth: 0
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
@@ -24,10 +26,15 @@ jobs:
         git branch 
         git status
         bash -x docs/generate_docs.sh
-        git status
         git config --global user.name 'qdrant'
         git config --global user.email 'qdrant@users.noreply.github.com'
         git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
+        git status
+        git branch
         git checkout $GITHUB_HEAD_REF
+        git status
+        git branch
+        git add docs/
+
         git commit -am "docs: auto-generate docs with sphinx"
         git push

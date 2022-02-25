@@ -1,8 +1,3 @@
-# GitHub Action that uses Black to reformat the Python code in an incoming pull request.
-# If all Python code in the pull request is compliant with Black then this Action does nothing.
-# Othewrwise, Black is run and its changes are committed back to the incoming pull request.
-# https://github.com/cclauss/autoblack
-
 name: build-docs
 on: [pull_request]
 jobs:
@@ -23,18 +18,10 @@ jobs:
         poetry run pip install 'setuptools==59.5.0' # temporary fix for https://github.com/pytorch/pytorch/pull/69904
     - name: Generate docs
       run: |
-        git branch 
-        git status
         bash -x docs/generate_docs.sh
         git config --global user.name 'qdrant'
         git config --global user.email 'qdrant@users.noreply.github.com'
         git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
-        git status
-        git branch
         git checkout $GITHUB_HEAD_REF
-        git status
-        git branch
-        git add docs/
-
         git commit -am "docs: auto-generate docs with sphinx"
         git push

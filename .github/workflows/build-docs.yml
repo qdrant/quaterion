@@ -21,7 +21,10 @@ jobs:
         poetry run pip install 'setuptools==59.5.0' # temporary fix for https://github.com/pytorch/pytorch/pull/69904
     - name: Generate docs
       run: |
+        git branch 
+        git status
         bash -x docs/generate_docs.sh
+        git status
         git config --global user.name 'qdrant'
         git config --global user.email 'qdrant@users.noreply.github.com'
         git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY

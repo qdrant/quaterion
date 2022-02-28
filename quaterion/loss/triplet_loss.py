@@ -123,7 +123,8 @@ class TripletLoss(GroupLoss):
         distance_metrics = ["euclidean", "cosine_distance"]
         if distance_metric_name not in distance_metrics:
             raise ValueError(
-                f"Not supported distance metrc for this loss: {distance_metric_name}. Must be one of {', '.join(distance_metrics)}"
+                f"Not supported distance metrc for this loss: {distance_metric_name}. "
+                f"Must be one of {', '.join(distance_metrics)}"
             )
 
         mining_types = ["all", "hard"]
@@ -204,7 +205,8 @@ class TripletLoss(GroupLoss):
 
             # get the hardest negative for each anchor
             anchor_negative_mask = _get_anchor_negative_mask(groups).float()
-            # add maximum of each row to invalid pairs to make sure not to count loss values from those indices when we apply minimum function later on
+            # add maximum of each row to invalid pairs to make sure not to count loss values from
+            # those indices when we apply minimum function later on
             anchor_negative_dists = dists + dists.max(dim=1, keepdim=True)[0] * (
                 1.0 - anchor_negative_mask
             )

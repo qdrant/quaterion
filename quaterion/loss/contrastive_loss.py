@@ -1,6 +1,8 @@
 from typing import Type, Dict, Any
 
-from torch import Tensor, relu, LongTensor
+import torch
+
+from torch import Tensor, LongTensor
 
 from quaterion.loss.metrics import SiameseDistanceMetric
 from quaterion.loss.pairwise_loss import PairwiseLoss
@@ -66,7 +68,7 @@ class ContrastiveLoss(PairwiseLoss):
         labels: Tensor,
         subgroups: Tensor,
         **kwargs
-    ):
+    ) -> Tensor:
         """Compute loss value.
 
         Args:
@@ -112,16 +114,16 @@ class ContrastiveLoss(PairwiseLoss):
             # shape (embeddings_count // 2, 1)
             neg_dist_to_other = negative_distances[pairs[:, 1]]
             # shape (embeddings_count // 2, 1)
-            negative_distances_impact = relu(self.margin - neg_dist_to_anchors).pow(
-                2
-            ) + relu(self.margin - neg_dist_to_other).pow(2)
+            negative_distances_impact = torch.relu(
+                self.margin - neg_dist_to_anchors
+            ).pow(2) + torch.relu(self.margin - neg_dist_to_other).pow(2)
 
         # shape (embeddings_count // 2, 1)
         losses = (
             0.5
             * (
                 labels.float() * distances.pow(2)
-                + (1 - labels).float() * relu(self.margin - distances).pow(2)
+                + (1 - labels).float() * torch.relu(self.margin - distances).pow(2)
             )
             + negative_distances_impact
         )

@@ -1,0 +1,20 @@
+/* Make each param of signature to be on a separate line */
+/* Newlines (\a) and spaces (\20) before each parameter */
+.sig-param::before {
+    content: "\a\20\20\20\20";
+    white-space: pre;  /* preserve spaces */
+    line-height: 1.5;
+}
+
+/* Newline after the last parameter (so the closing bracket is on a new line) */
+dt em.sig-param:last-of-type::after {
+    content: "\a";
+    white-space: pre;  /* preserve spaces */
+}
+
+/* Provide more vertical space between classes, methods and functions */
+dl.py.class::after, dl.py.method::after, dl.py.function::after {
+    content: "\a";
+    white-space: pre;  /* preserve spaces */
+    line-height: 1.5;
+}

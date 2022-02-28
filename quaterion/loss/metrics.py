@@ -1,6 +1,6 @@
 import torch
 
-from torch import Tensor, pairwise_distance, cosine_similarity
+from torch import Tensor
 from torch.nn import functional as F
 
 
@@ -27,7 +27,7 @@ class SiameseDistanceMetric:
             if y is None:
                 raise ValueError("y cannot be None while matrix is False")
 
-            distances = pairwise_distance(x, y, p=2)
+            distances = torch.pairwise_distance(x, y, p=2)
         else:
 
             # Calculate dot product. Shape: (batch_size, batch_size)
@@ -69,7 +69,7 @@ class SiameseDistanceMetric:
             Tensor: shape (batch_size, 1)
         """
         if not matrix:
-            return pairwise_distance(x, y, p=1)
+            return torch.pairwise_distance(x, y, p=1)
         raise NotImplementedError()
 
     @staticmethod
@@ -89,7 +89,7 @@ class SiameseDistanceMetric:
             if y is None:
                 raise ValueError("y cannot be None while matrix is False")
 
-            return 1 - cosine_similarity(x, y)
+            return 1 - torch.cosine_similarity(x, y)
 
         x_norm = F.normalize(x, p=2, dim=1)
         if y is None:

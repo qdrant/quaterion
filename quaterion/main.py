@@ -7,7 +7,6 @@ from quaterion.dataset.similarity_data_loader import (
     GroupSimilarityDataLoader,
     SimilarityDataLoader,
 )
-from quaterion.dataset.train_collater import TrainCollater
 from quaterion.loss import GroupLoss, PairwiseLoss
 from quaterion.train.trainable_model import TrainableModel
 

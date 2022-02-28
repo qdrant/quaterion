@@ -1,0 +1,305 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>quaterion.train.trainable_model module &#8212; Quaterion  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <link rel="stylesheet" type="text/css" href="_static/quaterion.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-quaterion.train.trainable_model">
+<span id="quaterion-train-trainable-model-module"></span><h1>quaterion.train.trainable_model module<a class="headerlink" href="#module-quaterion.train.trainable_model" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="quaterion.train.trainable_model.TrainableModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">TrainableModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/quaterion/train/trainable_model.html#TrainableModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.train.trainable_model.TrainableModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">LightningModule</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">CacheMixin</span></code></p>
+<p>Base class for models to be trained.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="quaterion.train.trainable_model.TrainableModel.cache">
+<span class="sig-name descname"><span class="pre">cache</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trainer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Trainer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">train_dataloader</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="quaterion.dataset.similarity_data_loader.html#quaterion.dataset.similarity_data_loader.SimilarityDataLoader" title="quaterion.dataset.similarity_data_loader.SimilarityDataLoader"><span class="pre">SimilarityDataLoader</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">val_dataloader</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="quaterion.dataset.similarity_data_loader.html#quaterion.dataset.similarity_data_loader.SimilarityDataLoader" title="quaterion.dataset.similarity_data_loader.SimilarityDataLoader"><span class="pre">SimilarityDataLoader</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/quaterion/train/trainable_model.html#TrainableModel.cache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.train.trainable_model.TrainableModel.cache" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fill cachable encoders with embeddings</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="quaterion.train.trainable_model.TrainableModel.configure_caches">
+<span class="sig-name descname"><span class="pre">configure_caches</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="quaterion.train.cache.cache_config.html#quaterion.train.cache.cache_config.CacheConfig" title="quaterion.train.cache.cache_config.CacheConfig"><span class="pre">CacheConfig</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/quaterion/train/trainable_model.html#TrainableModel.configure_caches"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.train.trainable_model.TrainableModel.configure_caches" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method to provide cache configuration</p>
+<p>Use this method to define which encoders should cache calculated embeddings and
+what kind of cache they should use.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><em>Optional[CacheConfig]</em> – cache configuration to be applied if provided, None otherwise</p>
+</dd>
+</dl>
+<p>Examples:</p>
+<p><cite>Do not use cache (default)</cite>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">return</span> <span class="kc">None</span>
+</pre></div>
+</div>
+<p><cite>Configure cache automatically for all non-trainable encoders</cite>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">return</span> <span class="n">CacheConfig</span><span class="p">(</span><span class="n">CacheType</span><span class="o">.</span><span class="n">AUTO</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><cite>Specify cache type for each encoder individually</cite>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">return</span> <span class="n">CacheConfig</span><span class="p">(</span><span class="n">mapping</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;text_encoder&quot;</span><span class="p">:</span> <span class="n">CacheType</span><span class="o">.</span><span class="n">GPU</span><span class="p">,</span>
+        <span class="c1"># Store cache in GPU for `text_encoder`</span>
+        <span class="s2">&quot;image_encoder&quot;</span><span class="p">:</span> <span class="n">CacheType</span><span class="o">.</span><span class="n">CPU</span>
+        <span class="c1"># Store cache in RAM for `image_encoder`</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p><cite>Specify key for cache object disambiguation</cite>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">return</span> <span class="n">CacheConfig</span><span class="p">(</span>
+    <span class="n">cache_type</span><span class="o">=</span><span class="n">CacheType</span><span class="o">.</span><span class="n">AUTO</span><span class="p">,</span>
+    <span class="n">key_extractors</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;text_encoder&quot;</span><span class="p">:</span> <span class="nb">hash</span><span class="p">}</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>This function might be useful if you want to provide some more sophisticated way of
+storing association between cached vectors and original object.
+Item numbers from dataset
+will be used by default if key is not specified.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="quaterion.train.trainable_model.TrainableModel.configure_encoders">
+<span class="sig-name descname"><span class="pre">configure_encoders</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">Encoder</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Encoder</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/quaterion/train/trainable_model.html#TrainableModel.configure_encoders"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.train.trainable_model.TrainableModel.configure_encoders" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method to provide encoders configuration</p>
+<p>Use this function to define an initial state of encoders.
+This function should be used to assign initial values for encoders
+before training as well as during the checkpoint loading.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><em>Union[Encoder, Dict[str, Encoder]]</em> – instance of encoder which will be assigned to
+<cite>quaterion_models.model.DEFAULT_ENCODER_KEY</cite>, or mapping of names and encoders.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="quaterion.train.trainable_model.TrainableModel.configure_head">
+<span class="sig-name descname"><span class="pre">configure_head</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_embedding_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">EncoderHead</span></span></span><a class="reference internal" href="_modules/quaterion/train/trainable_model.html#TrainableModel.configure_head"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.train.trainable_model.TrainableModel.configure_head" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use this function to define an initial state for head layer of the model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>input_embedding_size</strong> – size of embeddings produced by encoders</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><em>EncoderHead</em> – instance of EncoderHead to be added to the model</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="quaterion.train.trainable_model.TrainableModel.configure_loss">
+<span class="sig-name descname"><span class="pre">configure_loss</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="quaterion.loss.similarity_loss.html#quaterion.loss.similarity_loss.SimilarityLoss" title="quaterion.loss.similarity_loss.SimilarityLoss"><span class="pre">SimilarityLoss</span></a></span></span><a class="reference internal" href="_modules/quaterion/train/trainable_model.html#TrainableModel.configure_loss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.train.trainable_model.TrainableModel.configure_loss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method to configure loss function to use.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="quaterion.train.trainable_model.TrainableModel.process_results">
+<span class="sig-name descname"><span class="pre">process_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">embeddings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">targets</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="quaterion.utils.enums.html#quaterion.utils.enums.TrainStage" title="quaterion.utils.enums.TrainStage"><span class="pre">TrainStage</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/quaterion/train/trainable_model.html#TrainableModel.process_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.train.trainable_model.TrainableModel.process_results" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method to provide any additional evaluations of embeddings.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>embeddings</strong> – shape: (batch_size, embedding_size) - model’s output.</p></li>
+<li><p><strong>targets</strong> – output of batch target collate.</p></li>
+<li><p><strong>batch_idx</strong> – ID of the processing batch.</p></li>
+<li><p><strong>stage</strong> – train, validation or test stage.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="quaterion.train.trainable_model.TrainableModel.save_servable">
+<span class="sig-name descname"><span class="pre">save_servable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/quaterion/train/trainable_model.html#TrainableModel.save_servable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.train.trainable_model.TrainableModel.save_servable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save model for serving, independent of Pytorch Lightning</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>path</strong> – path to save to</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="quaterion.train.trainable_model.TrainableModel.setup_dataloader">
+<span class="sig-name descname"><span class="pre">setup_dataloader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataloader</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="quaterion.dataset.similarity_data_loader.html#quaterion.dataset.similarity_data_loader.SimilarityDataLoader" title="quaterion.dataset.similarity_data_loader.SimilarityDataLoader"><span class="pre">SimilarityDataLoader</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/quaterion/train/trainable_model.html#TrainableModel.setup_dataloader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.train.trainable_model.TrainableModel.setup_dataloader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update data loader’s collate function with encoder-specific collate</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="quaterion.train.trainable_model.TrainableModel.test_step">
+<span class="sig-name descname"><span class="pre">test_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_idx</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Tensor</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/quaterion/train/trainable_model.html#TrainableModel.test_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.train.trainable_model.TrainableModel.test_step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute test loss and some additional metrics for e.g. the progress
+bar or logger.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>batch</strong> – Output of DataLoader.</p></li>
+<li><p><strong>batch_idx</strong> – Integer displaying index of this batch.</p></li>
+<li><p><strong>**kwargs</strong> – keyword arguments to be passed into <cite>process_results</cite></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="quaterion.train.trainable_model.TrainableModel.training_step">
+<span class="sig-name descname"><span class="pre">training_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Tensor</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tensor</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tensor</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/quaterion/train/trainable_model.html#TrainableModel.training_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.train.trainable_model.TrainableModel.training_step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute and return the training loss and some additional metrics for e.g.
+the progress bar or logger.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>batch</strong> – Output of DataLoader.</p></li>
+<li><p><strong>batch_idx</strong> – Integer displaying index of this batch.</p></li>
+<li><p><strong>**kwargs</strong> – keyword arguments to be passed into <cite>process_results</cite></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><em>Tensor</em> – computed loss value</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="quaterion.train.trainable_model.TrainableModel.unwrap_cache">
+<span class="sig-name descname"><span class="pre">unwrap_cache</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/quaterion/train/trainable_model.html#TrainableModel.unwrap_cache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.train.trainable_model.TrainableModel.unwrap_cache" title="Permalink to this definition">¶</a></dt>
+<dd><p>Restore original encoders</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="quaterion.train.trainable_model.TrainableModel.validation_step">
+<span class="sig-name descname"><span class="pre">validation_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_idx</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Tensor</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/quaterion/train/trainable_model.html#TrainableModel.validation_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.train.trainable_model.TrainableModel.validation_step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute validation loss and some additional metrics for e.g. the progress
+bar or logger.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>batch</strong> – Output of DataLoader.</p></li>
+<li><p><strong>batch_idx</strong> – Integer displaying index of this batch.</p></li>
+<li><p><strong>**kwargs</strong> – keyword arguments to be passed into <cite>process_results</cite></p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="quaterion.train.trainable_model.TrainableModel.loss">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">loss</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="quaterion.loss.similarity_loss.html#quaterion.loss.similarity_loss.SimilarityLoss" title="quaterion.loss.similarity_loss.SimilarityLoss"><span class="pre">SimilarityLoss</span></a></em><a class="headerlink" href="#quaterion.train.trainable_model.TrainableModel.loss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Property to get the loss function to use.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="quaterion.train.trainable_model.TrainableModel.model">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">model</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">quaterion_models.model.MetricModel</span></em><a class="headerlink" href="#quaterion.train.trainable_model.TrainableModel.model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Origin model to be trained</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><em>MetricModel</em> – model to be trained</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="quaterion.train.trainable_model.TrainableModel.training">
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#quaterion.train.trainable_model.TrainableModel.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Quaterion</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Quaterion Authors.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.4.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/quaterion.train.trainable_model.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

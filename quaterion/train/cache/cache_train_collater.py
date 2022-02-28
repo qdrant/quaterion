@@ -9,11 +9,13 @@ from quaterion.train.cache.cache_encoder import CacheMode
 
 
 class CacheTrainCollater(TrainCollater):
+    """:meta private:"""
+
     def __init__(
         self,
         pre_collate_fn,
-        encoder_collates: Dict[str, CollateFnType],
-        key_extractors: Dict[str, KeyExtractorType],
+        encoder_collates: Dict[str, "CollateFnType"],
+        key_extractors: Dict[str, "KeyExtractorType"],
         cachable_encoders: List[str],
         mode: CacheMode,
     ):

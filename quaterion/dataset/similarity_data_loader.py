@@ -13,21 +13,23 @@ from quaterion.dataset.similarity_samples import (
 
 
 class SimilarityDataLoader(DataLoader, Generic[T_co]):
+    """
+    SimilarityDataLoader is a special version of :class:`~torch.utils.data.DataLoader`
+    which works with similarity samples.
+
+    SimilarityDataLoader will automatically assign dummy collate_fn for debug purposes,
+    it will be overwritten once dataloader is used for training.
+
+    Required collate function should be defined individually for each encoder
+    by overwriting :meth:`~quaterion_models.encoders.encoder.Encoder.get_collate_fn`
+
+    Args:
+        dataset: Dataset which outputs :class:`~quaterion.dataset.similarity_samples.SimilarityGroupSample`
+        **kwargs: Parameters passed directly into :meth:`~torch.utils.data.DataLoader.__init__`
+    """
+
     def __init__(self, dataset: Dataset, **kwargs):
-        """
-        SimilarityDataLoader is a special version of :class:`~torch.utils.data.DataLoader`
-        which works with similarity samples.
 
-        SimilarityDataLoader will automatically assign dummy collate_fn for debug purposes,
-        it will be overwritten once dataloader is used for training.
-
-        Required collate function should be defined individually for each encoder
-        by overwriting :meth:`~quaterion_models.encoders.encoder.Encoder.get_collate_fn`
-
-        Args:
-            dataset: Dataset which outputs :class:`~quaterion.dataset.similarity_samples.SimilarityGroupSample`
-            **kwargs: Parameters passed directly into :meth:`~torch.utils.data.DataLoader.__init__`
-        """
         if "collate_fn" not in kwargs:
             kwargs["collate_fn"] = self.__class__.pre_collate_fn
         self._original_dataset = dataset
@@ -43,10 +45,7 @@ class SimilarityDataLoader(DataLoader, Generic[T_co]):
 
     @property
     def original_params(self) -> Dict[str, Any]:
-        """Initialization params of the original dataset
-        Returns:
-
-        """
+        """Initialization params of the original dataset."""
         return self._original_params
 
     @classmethod
@@ -76,7 +75,8 @@ class SimilarityDataLoader(DataLoader, Generic[T_co]):
     @classmethod
     def collate_labels(cls, batch: List[T_co]) -> Dict[str, torch.Tensor]:
         """Collate function for labels
-        Converts labels into tensors, suitable for loss passing directly into loss functions and metric estimators.
+        Converts labels into tensors, suitable for loss passing directly into loss functions and
+        metric estimators.
 
         Args:
             batch: List of raw items from dataset

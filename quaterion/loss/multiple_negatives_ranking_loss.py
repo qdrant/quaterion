@@ -119,4 +119,3 @@ class MultipleNegativesRankingLoss(PairwiseLoss):
             loss /= 2
 
         return loss
-

@@ -86,7 +86,7 @@ class MultipleNegativesRankingLoss(PairwiseLoss):
             pairs: Indices of corresponding objects in pairs.
             labels: Ignored for this loss. Labels will be automatically formed from `pairs`.
             subgroups: Ignored for this loss.
-                
+
             **kwargs: Additional key-word arguments for generalization of loss call
 
         Returns:

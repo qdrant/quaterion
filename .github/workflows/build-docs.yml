@@ -24,5 +24,3 @@ jobs:
         git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
         git checkout $GITHUB_HEAD_REF
         git commit -am "docs: auto-generate docs with sphinx" && git pull && git push || true
-        git pull # autoblack may have made changes
-        git push

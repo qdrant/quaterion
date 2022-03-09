@@ -20,6 +20,11 @@ class MultipleNegativesRankingLoss(PairwiseLoss):
     Then, it minimizes negative log-likelihood for softmax-normalized similarity scores.
     This optimizes  retrieval of the correct positive pair when an anchor given.
 
+    Note: `SimilarityPairSample.score` and `SimilarityPairSample.subgroup` values are ignored
+    for this loss, assuming `SimilarityPairSample.obj_a` and `SimilarityPairSample.obj_b`
+    form a positive pair, e.g., `label = 1`.
+    
+
     Args:
         scale: Scaling value for multiplying with similarity scores to make cross-entropy work.
         similarity_metric_name: Name of the metric to calculate similarities between embeddings.
@@ -92,6 +97,9 @@ class MultipleNegativesRankingLoss(PairwiseLoss):
         Returns:
             Tensor: Scalar loss value
         """
+        assert (
+            labels is None or labels.sum() == labels.size()[0]
+        ), "You seem to be using non-positive pairs. Make sure that `SimilarityPairSample.obj_a` and `SimilarityPairSample.obj_b` are positive pairs with a score of `1`"
         rep_anchor = embeddings[pairs[:, 0]]
         rep_positive = embeddings[pairs[:, 1]]
 

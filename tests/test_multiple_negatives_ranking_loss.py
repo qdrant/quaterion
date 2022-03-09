@@ -39,4 +39,3 @@ class TestMNRLoss:
         loss_res = loss.forward(self.embeddings, self.pairs, None, None)
 
         assert loss_res.shape == torch.Size([])
-

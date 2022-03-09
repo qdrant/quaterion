@@ -23,7 +23,7 @@ class MultipleNegativesRankingLoss(PairwiseLoss):
     Note: `SimilarityPairSample.score` and `SimilarityPairSample.subgroup` values are ignored
     for this loss, assuming `SimilarityPairSample.obj_a` and `SimilarityPairSample.obj_b`
     form a positive pair, e.g., `label = 1`.
-    
+
 
     Args:
         scale: Scaling value for multiplying with similarity scores to make cross-entropy work.

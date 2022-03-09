@@ -11,6 +11,7 @@ Submodules
    quaterion.loss.contrastive_loss
    quaterion.loss.group_loss
    quaterion.loss.metrics
+   quaterion.loss.multiple_negatives_ranking_loss
    quaterion.loss.pairwise_loss
    quaterion.loss.similarity_loss
    quaterion.loss.softmax_loss

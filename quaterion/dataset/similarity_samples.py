@@ -48,7 +48,7 @@ class SimilarityPairSample:
 
     obj_a: Any
     obj_b: Any
-    score: float
+    score: float = 1.0
     # Consider all examples outside this group as negative samples.
     # By default, all samples belong to group 0 - therefore other samples could
     # not be used as negative examples.

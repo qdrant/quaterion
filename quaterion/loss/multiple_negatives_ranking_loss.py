@@ -84,10 +84,10 @@ class MultipleNegativesRankingLoss(PairwiseLoss):
                 of first objects in pairs, second half are embeddings of second objects
                 in pairs.
             pairs: Indices of corresponding objects in pairs.
-            labels: Scores of positive and negative objects.
-            subgroups: subgroups to distinguish objects which can and cannot be used
-                as negative examples
-            **kwargs: additional key-word arguments for generalization of loss call
+            labels: Ignored for this loss. Labels will be automatically formed from `pairs`.
+            subgroups: Ignored for this loss.
+                
+            **kwargs: Additional key-word arguments for generalization of loss call
 
         Returns:
             Tensor: Scalar loss value

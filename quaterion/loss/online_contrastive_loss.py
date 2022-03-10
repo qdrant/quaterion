@@ -1,26 +1,28 @@
 from typing import Optional
 
 import torch
+import torch.nn.functional as F
 from quaterion.loss.group_loss import GroupLoss
 from quaterion.loss.metrics import SiameseDistanceMetric
 from quaterion.utils import (
-    get_anchor_negative_mask,
+    max_value_of_dtype,
     get_anchor_positive_mask,
-    get_triplet_mask,
+    get_anchor_negative_mask,
 )
 
 
-class TripletLoss(GroupLoss):
-    """Implements Triplet Loss as defined in https://arxiv.org/abs/1503.03832
+class OnlineContrastiveLoss(GroupLoss):
+    """Implements Contrastive Loss as defined in http://yann.lecun.com/exdb/publis/pdf/hadsell-chopra-lecun-06.pdf
 
-    It supports batch-all and batch-hard strategies for online triplet mining.
+    Unlike `quaterion.loss.ContrastiveLoss`, this one supports batch-all and batch-hard
+    strategies for online pair mining.
 
     Args:
         margin: Margin value to push negative examples
             apart. Optional, defaults to `0.5`.
         distance_metric_name: Name of the distance function. Optional, defaults to `euclidean`.
         squared (bool, optional): Squared Euclidean distance or not. Defaults to `True`.
-        mining (str, optional): Triplet mining strategy. One of
+        mining (str, optional): Pair mining strategy. One of
             `"all"`, `"hard"`. Defaults to `"hard"`.
     """
 
@@ -43,7 +45,9 @@ class TripletLoss(GroupLoss):
             raise ValueError(
                 f"Unrecognized mining strategy: {mining}. Must be one of {', '.join(mining_types)}"
             )
-        super(TripletLoss, self).__init__(distance_metric_name=distance_metric_name)
+        super(OnlineContrastiveLoss, self).__init__(
+            distance_metric_name=distance_metric_name
+        )
 
         self._margin = margin
         self._squared = squared
@@ -82,54 +86,34 @@ class TripletLoss(GroupLoss):
         )
 
         if self._mining == "all":
-            # Calculate loss for all possible triplets first, then filter by group mask
-            # Shape: (batch_size, batch_size, 1)
-            anchor_positive_dists = dists.unsqueeze(2)
-            # Shape: (batch_size, 1, batch_size)
-            anchor_negative_dists = dists.unsqueeze(1)
-            # All possible triplets: triplet_loss[anchor_id, positive_id, negative_id]
-            # Shape: (batch_size, batch_size, batch_size)
-            triplet_loss = anchor_positive_dists - anchor_negative_dists + self._margin
 
-            # set invalid triplets to 0
-            mask = get_triplet_mask(groups).float()
-            triplet_loss = mask * triplet_loss
-
-            # get rid of easy triplets
-            triplet_loss = torch.max(triplet_loss, torch.tensor(0.0))
-
-            # get the number of triplets with a positive loss
-            num_positive_triplets = torch.sum((triplet_loss > 1e-16).float())
-
-            # get scalar loss value
-            triplet_loss = torch.sum(triplet_loss) / (num_positive_triplets + 1e-16)
-
-        else:  # batch-hard triplet mining
-
-            # get the hardest positive for each anchor
+            # get a mask for valid anchor-positive pairs and calculate the number of them
             anchor_positive_mask = get_anchor_positive_mask(groups).float()
+            num_positive_pairs = anchor_positive_mask.sum()
+
             anchor_positive_dists = (
                 anchor_positive_mask * dists
             )  # invalid pairs set to 0
-            # Shape: (batch_size,)
-            hardest_positive_dists = anchor_positive_dists.max(dim=1)[0]
-
-            # get the hardest negative for each anchor
-            anchor_negative_mask = get_anchor_negative_mask(groups).float()
-            # add maximum of each row to invalid pairs to make sure not to count loss values from
-            # those indices when we apply minimum function later on
-            anchor_negative_dists = dists + dists.max(dim=1, keepdim=True)[0] * (
-                1.0 - anchor_negative_mask
-            )
-            hardest_negative_dists = anchor_negative_dists.min(dim=1)[0]
-
-            # combine hardest positives and hardest negatives
-            triplet_loss = torch.max(
-                hardest_positive_dists - hardest_negative_dists + self._margin,
-                torch.tensor(0.0),
+            positive_loss = anchor_positive_dists.pow(2).sum() / torch.max(
+                num_positive_pairs, torch.tensor(1e-16)
             )
 
-            # get scalar loss value
-            triplet_loss = triplet_loss.mean()
+            # get a mask for valid anchor-negative pairs, and set invalid ones to a maximum value
+            # to not count them later on
+            anchor_negative_mask = get_anchor_negative_mask(groups)
+            anchor_negative_dists = dists
+            anchor_negative_dists[~anchor_negative_mask] = max_value_of_dtype(
+                anchor_negative_dists.dtype
+            )
+            num_negative_pairs = anchor_negative_mask.float().sum()
 
-        return triplet_loss
+            negative_loss = F.relu(self._margin - anchor_negative_dists).pow(
+                2
+            ).sum() / torch.max(num_negative_pairs, torch.tensor(1e-16))
+
+            total_loss = 0.5 * (positive_loss + negative_loss)
+        else:  # batch-hard pair mining
+            # TODO: Implement batch-hard strategy for online pair mining
+            total_loss = 0
+
+        return total_loss

@@ -19,8 +19,9 @@ jobs:
     - name: Generate docs
       run: |
         bash -x docs/generate_docs.sh
-        git config --global user.name 'qdrant'
-        git config --global user.email 'qdrant@users.noreply.github.com'
+        git config user.name 'qdrant'
+        git config user.email 'qdrant@users.noreply.github.com'
+        git config pull.rebase false
         git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
         git checkout $GITHUB_HEAD_REF
         git add ./docs && git commit -m "docs: auto-generate docs with sphinx" && git pull && git push || true

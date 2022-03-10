@@ -14,10 +14,11 @@ from quaterion.utils import (
 class OnlineContrastiveLoss(GroupLoss):
     """Implements Contrastive Loss as defined in http://yann.lecun.com/exdb/publis/pdf/hadsell-chopra-lecun-06.pdf
 
-    Unlike `quaterion.loss.ContrastiveLoss`, this one supports batch-all and batch-hard
-    strategies for online pair mining, i.e., it makes positive and negative pairs
-    on-the-fly, so you don't need to form such pairs yourself. It first calculates all possible
-    pairs, and then filters valid positive pairs and valid negative pairs separately.
+    Unlike `quaterion.loss.ContrastiveLoss`, this one supports online pair mining, i.e., it makes
+    positive and negative pairs on-the-fly, so you don't need to form such pairs yourself.
+    Instead, it first calculates all possible pairs in a batch, and then filters
+    valid positive pairs and valid negative pairs separately. Batch-all and batch-hard strategies
+    for online pair mining are supported.
 
     Args:
         margin: Margin value to push negative examples
@@ -58,11 +59,7 @@ class OnlineContrastiveLoss(GroupLoss):
     def get_config_dict(self):
         config = super().get_config_dict()
         config.update(
-            {
-                "margin": self._margin,
-                "squared": self._squared,
-                "mining": self._mining,
-            }
+            {"margin": self._margin, "squared": self._squared, "mining": self._mining,}
         )
         return config
 
@@ -127,7 +124,7 @@ class OnlineContrastiveLoss(GroupLoss):
 
             # get the hardest negative for each anchor
             # shape (batch_size,)
-            hardest_negative_dists = anchor_positive_dists.min(dim=1)[0]
+            hardest_negative_dists = anchor_negative_dists.min(dim=1)[0]
             num_negative_pairs = torch.sum(
                 (
                     hardest_negative_dists

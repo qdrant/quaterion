@@ -49,7 +49,9 @@
     <span class="sd">&quot;&quot;&quot;Implements Contrastive Loss as defined in http://yann.lecun.com/exdb/publis/pdf/hadsell-chopra-lecun-06.pdf</span>
 
 <span class="sd">    Unlike `quaterion.loss.ContrastiveLoss`, this one supports batch-all and batch-hard</span>
-<span class="sd">    strategies for online pair mining.</span>
+<span class="sd">    strategies for online pair mining, i.e., it makes positive and negative pairs</span>
+<span class="sd">    on-the-fly, so you don&#39;t need to form such pairs yourself. It first calculates all possible</span>
+<span class="sd">    pairs, and then filters valid positive pairs and valid negative pairs separately.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        margin: Margin value to push negative examples</span>
@@ -101,7 +103,7 @@
 <div class="viewcode-block" id="OnlineContrastiveLoss.forward"><a class="viewcode-back" href="../../../quaterion.loss.online_contrastive_loss.html#quaterion.loss.online_contrastive_loss.OnlineContrastiveLoss.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">embeddings</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">groups</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">LongTensor</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Calculates Triplet Loss with specified embeddings and labels.</span>
+        <span class="sd">&quot;&quot;&quot;Calculates Contrastive Loss by making pairs on-the-fly.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            embeddings (torch.Tensor): Batch of embeddings. Shape: (batch_size, embedding_dim)</span>

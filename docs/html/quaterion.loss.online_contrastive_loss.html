@@ -40,7 +40,9 @@
 <dd><p>Bases: <a class="reference internal" href="quaterion.loss.group_loss.html#quaterion.loss.group_loss.GroupLoss" title="quaterion.loss.group_loss.GroupLoss"><code class="xref py py-class docutils literal notranslate"><span class="pre">GroupLoss</span></code></a></p>
 <p>Implements Contrastive Loss as defined in <a class="reference external" href="http://yann.lecun.com/exdb/publis/pdf/hadsell-chopra-lecun-06.pdf">http://yann.lecun.com/exdb/publis/pdf/hadsell-chopra-lecun-06.pdf</a></p>
 <p>Unlike <cite>quaterion.loss.ContrastiveLoss</cite>, this one supports batch-all and batch-hard
-strategies for online pair mining.</p>
+strategies for online pair mining, i.e., it makes positive and negative pairs
+on-the-fly, so you don’t need to form such pairs yourself. It first calculates all possible
+pairs, and then filters valid positive pairs and valid negative pairs separately.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -56,7 +58,7 @@ apart. Optional, defaults to <cite>0.5</cite>.</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="quaterion.loss.online_contrastive_loss.OnlineContrastiveLoss.forward">
 <span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">embeddings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groups</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">LongTensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/quaterion/loss/online_contrastive_loss.html#OnlineContrastiveLoss.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.loss.online_contrastive_loss.OnlineContrastiveLoss.forward" title="Permalink to this definition">¶</a></dt>
-<dd><p>Calculates Triplet Loss with specified embeddings and labels.</p>
+<dd><p>Calculates Contrastive Loss by making pairs on-the-fly.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">

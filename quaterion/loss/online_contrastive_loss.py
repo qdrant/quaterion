@@ -58,7 +58,11 @@ class OnlineContrastiveLoss(GroupLoss):
     def get_config_dict(self):
         config = super().get_config_dict()
         config.update(
-            {"margin": self._margin, "squared": self._squared, "mining": self._mining,}
+            {
+                "margin": self._margin,
+                "squared": self._squared,
+                "mining": self._mining,
+            }
         )
         return config
 

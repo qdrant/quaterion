@@ -20,7 +20,7 @@ class OnlineContrastiveLoss(GroupLoss):
     Args:
         margin: Margin value to push negative examples
             apart. Optional, defaults to `0.5`.
-        distance_metric_name: Name of the distance function. Optional, defaults to `euclidean`.
+        distance_metric_name: Name of the distance function. Optional, defaults to `"cosine_distance"`.
         squared (bool, optional): Squared Euclidean distance or not. Defaults to `True`.
         mining (str, optional): Pair mining strategy. One of
             `"all"`, `"hard"`. Defaults to `"hard"`.
@@ -29,7 +29,7 @@ class OnlineContrastiveLoss(GroupLoss):
     def __init__(
         self,
         margin: Optional[float] = 0.5,
-        distance_metric_name: str = "euclidean",
+        distance_metric_name: str = "cosine_distance",
         squared: Optional[bool] = True,
         mining: Optional[str] = "hard",
     ):
@@ -85,26 +85,27 @@ class OnlineContrastiveLoss(GroupLoss):
             else SiameseDistanceMetric.cosine_distance(x=embeddings, matrix=True)
         )
 
+        # get a mask for valid anchor-positive pairs and apply it to the distance matrix
+        # to set invalid ones to 0
+        anchor_positive_mask = get_anchor_positive_mask(groups).float()
+
+        anchor_positive_dists = anchor_positive_mask * dists  # invalid pairs set to 0
+
+        # get a mask for valid anchor-negative pairs, and apply it to distance matrix
+        # # to set invalid ones to a maximum value of dtype
+        anchor_negative_mask = get_anchor_negative_mask(groups)
+        anchor_negative_dists = dists
+        anchor_negative_dists[~anchor_negative_mask] = max_value_of_dtype(
+            anchor_negative_dists.dtype
+        )
+
         if self._mining == "all":
 
-            # get a mask for valid anchor-positive pairs and calculate the number of them
-            anchor_positive_mask = get_anchor_positive_mask(groups).float()
             num_positive_pairs = anchor_positive_mask.sum()
-
-            anchor_positive_dists = (
-                anchor_positive_mask * dists
-            )  # invalid pairs set to 0
             positive_loss = anchor_positive_dists.pow(2).sum() / torch.max(
                 num_positive_pairs, torch.tensor(1e-16)
             )
 
-            # get a mask for valid anchor-negative pairs, and set invalid ones to a maximum value
-            # to not count them later on
-            anchor_negative_mask = get_anchor_negative_mask(groups)
-            anchor_negative_dists = dists
-            anchor_negative_dists[~anchor_negative_mask] = max_value_of_dtype(
-                anchor_negative_dists.dtype
-            )
             num_negative_pairs = anchor_negative_mask.float().sum()
 
             negative_loss = F.relu(self._margin - anchor_negative_dists).pow(
@@ -113,7 +114,28 @@ class OnlineContrastiveLoss(GroupLoss):
 
             total_loss = 0.5 * (positive_loss + negative_loss)
         else:  # batch-hard pair mining
-            # TODO: Implement batch-hard strategy for online pair mining
-            total_loss = 0
+
+            # get the hardest positive for each anchor
+            # shape: (batch_size,)
+            hardest_positive_dists = anchor_positive_dists.max(dim=1)[0]
+            num_positive_pairs = torch.count_nonzero(hardest_positive_dists)
+            positive_loss = hardest_positive_dists.pow(2).sum() / torch.max(
+                num_positive_pairs, torch.tensor(0.0)
+            )
+
+            # get the hardest negative for each anchor
+            # shape (batch_size,)
+            hardest_negative_dists = anchor_positive_dists.min(dim=1)[0]
+            num_negative_pairs = torch.sum(
+                (
+                    hardest_negative_dists
+                    < max_value_of_dtype(hardest_positive_dists.dtype)
+                ).float()
+            )
+            negative_loss = F.relu(self._margin - hardest_positive_dists).pow(
+                2
+            ).sum() / torch.max(num_negative_pairs, torch.tensor(1e-16))
+
+        total_loss = 0.5 * (positive_loss + negative_loss)
 
         return total_loss

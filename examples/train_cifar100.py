@@ -1,3 +1,4 @@
+import argparse
 import os
 from typing import Dict, Union
 
@@ -11,7 +12,7 @@ from quaterion.dataset import (
     SimilarityGroupSample,
     SimilarityGroupDataset,
 )
-from quaterion.loss import TripletLoss, SimilarityLoss
+from quaterion.loss import OnlineContrastiveLoss, TripletLoss, SimilarityLoss
 from quaterion_models.heads import EmptyHead, EncoderHead
 from quaterion_models.types import CollateFnType
 from quaterion_models.encoders import Encoder
@@ -69,9 +70,10 @@ class MobilenetV3Encoder(Encoder):
 
 
 class Model(TrainableModel):
-    def __init__(self, embedding_size: int = 128, lr: float = 1e-4):
+    def __init__(self, embedding_size: int, lr: float, loss_fn: str):
         self._embedding_size = embedding_size
         self._lr = lr
+        self._loss_fn = loss_fn
         super().__init__()
 
     def configure_encoders(self) -> Union[Encoder, Dict[str, Encoder]]:
@@ -81,22 +83,40 @@ class Model(TrainableModel):
         return EmptyHead(input_embedding_size)
 
     def configure_loss(self) -> SimilarityLoss:
-        return TripletLoss()
+        return (
+            OnlineContrastiveLoss() if self._loss_fn == "contrastive" else TripletLoss()
+        )
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.model.parameters(), self._lr)
         return optimizer
 
 
-model = Model()
-train_dataloader = get_dataloader()
+if __name__ == "__main__":
+    ap = argparse.ArgumentParser()
+    ap.add_argument(
+        "--embedding-size", type=int, default=128, help="Size of the embedding vector"
+    )
 
-trainer = pl.Trainer(
-    gpus=1 if torch.cuda.is_available() else 0, num_nodes=1, max_epochs=10
-)
+    ap.add_argument("--lr", type=float, default=1e-4, help="Learning rate")
+    ap.add_argument(
+        "--loss-fn",
+        default="contrastive",
+        choices=("contrastive", "triplet"),
+        help="Loss function",
+    )
 
-Quaterion.fit(
-    trainable_model=model,
-    trainer=trainer,
-    train_dataloader=train_dataloader,
-)
+    args = ap.parse_args()
+
+    model = Model(embedding_size=args.embedding_size, lr=args.lr, loss_fn=args.loss_fn)
+    train_dataloader = get_dataloader()
+
+    trainer = pl.Trainer(
+        gpus=1 if torch.cuda.is_available() else 0, num_nodes=1, max_epochs=10
+    )
+
+    Quaterion.fit(
+        trainable_model=model,
+        trainer=trainer,
+        train_dataloader=train_dataloader,
+    )

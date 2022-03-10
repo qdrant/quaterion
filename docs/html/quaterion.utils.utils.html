@@ -35,6 +35,57 @@
   <section id="module-quaterion.utils.utils">
 <span id="quaterion-utils-utils-module"></span><h1>quaterion.utils.utils module<a class="headerlink" href="#module-quaterion.utils.utils" title="Permalink to this headline">¶</a></h1>
 <dl class="py function">
+<dt class="sig sig-object py" id="quaterion.utils.utils.get_anchor_negative_mask">
+<span class="sig-name descname"><span class="pre">get_anchor_negative_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/quaterion/utils/utils.html#get_anchor_negative_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.utils.utils.get_anchor_negative_mask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a 2D mask of valid anchor-negative pairs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>labels</strong> (<em>torch.Tensor</em>) – Labels associated with embeddings in the batch. Shape: (batch_size,)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><em>torch.Tensor</em> – Anchor-negative mask. Shape: (batch_size, batch_size)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="quaterion.utils.utils.get_anchor_positive_mask">
+<span class="sig-name descname"><span class="pre">get_anchor_positive_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/quaterion/utils/utils.html#get_anchor_positive_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.utils.utils.get_anchor_positive_mask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a 2D mask of valid anchor-positive pairs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>labels</strong> (<em>torch.Tensor</em>) – Labels associated with embeddings in the batch. Shape: (batch_size,)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><em>torch.Tensor</em> – Anchor-positive mask. Shape: (batch_size, batch_size)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="quaterion.utils.utils.get_triplet_mask">
+<span class="sig-name descname"><span class="pre">get_triplet_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/quaterion/utils/utils.html#get_triplet_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.utils.utils.get_triplet_mask" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a 3D mask of valid triplets for the batch-all strategy.</p>
+<p>Given a batch of labels with <cite>shape = (batch_size,)</cite>
+the number of possible triplets that can be formed is:
+batch_size^3, i.e. cube of batch_size,
+which can be represented as a tensor with <cite>shape = (batch_size, batch_size, batch_size)</cite>.
+However, a triplet is valid if:
+<cite>labels[i] == labels[j] and labels[i] != labels[k]</cite>
+and <cite>i</cite>, <cite>j</cite> and <cite>k</cite> are distinct indices.
+This function calculates a mask indicating which ones of all the possible triplets
+are actually valid triplets based on the given criteria above.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>labels</strong> (<em>torch.Tensor</em>) – Labels associated with embeddings in the batch. Shape: (batch_size,)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><em>torch.Tensor</em> – Triplet mask. Shape: (batch_size, batch_size,  batch_size)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="quaterion.utils.utils.info_value_of_dtype">
 <span class="sig-name descname"><span class="pre">info_value_of_dtype</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dtype</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">finfo</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">iinfo</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/quaterion/utils/utils.html#info_value_of_dtype"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.utils.utils.info_value_of_dtype" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the <cite>finfo</cite> or <cite>iinfo</cite> object of a given PyTorch data type.</p>

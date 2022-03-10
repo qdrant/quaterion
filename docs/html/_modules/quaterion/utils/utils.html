@@ -85,6 +85,100 @@
 <span class="sd">        Union[int, float]: max value of dtype</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">info_value_of_dtype</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span><span class="o">.</span><span class="n">max</span></div>
+
+
+<div class="viewcode-block" id="get_triplet_mask"><a class="viewcode-back" href="../../../quaterion.utils.utils.html#quaterion.utils.utils.get_triplet_mask">[docs]</a><span class="k">def</span> <span class="nf">get_triplet_mask</span><span class="p">(</span><span class="n">labels</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Creates a 3D mask of valid triplets for the batch-all strategy.</span>
+
+<span class="sd">    Given a batch of labels with `shape = (batch_size,)`</span>
+<span class="sd">    the number of possible triplets that can be formed is:</span>
+<span class="sd">    batch_size^3, i.e. cube of batch_size,</span>
+<span class="sd">    which can be represented as a tensor with `shape = (batch_size, batch_size, batch_size)`.</span>
+<span class="sd">    However, a triplet is valid if:</span>
+<span class="sd">    `labels[i] == labels[j] and labels[i] != labels[k]`</span>
+<span class="sd">    and `i`, `j` and `k` are distinct indices.</span>
+<span class="sd">    This function calculates a mask indicating which ones of all the possible triplets</span>
+<span class="sd">    are actually valid triplets based on the given criteria above.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        labels (torch.Tensor): Labels associated with embeddings in the batch. Shape: (batch_size,)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        torch.Tensor: Triplet mask. Shape: (batch_size, batch_size,  batch_size)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># get a mask for distinct indices</span>
+    <span class="c1"># Shape: (batch_size, batch_size)</span>
+    <span class="n">indices_equal</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">labels</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">bool</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">labels</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">indices_not_equal</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">logical_not</span><span class="p">(</span><span class="n">indices_equal</span><span class="p">)</span>
+
+    <span class="c1"># Shape: (batch_size, batch_size, 1)</span>
+    <span class="n">i_not_equal_j</span> <span class="o">=</span> <span class="n">indices_not_equal</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    <span class="c1"># Shape: (batch_size, 1, batch_size)</span>
+    <span class="n">i_not_equal_k</span> <span class="o">=</span> <span class="n">indices_not_equal</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="c1"># Shape: (1, batch_size, batch_size)</span>
+    <span class="n">j_not_equal_k</span> <span class="o">=</span> <span class="n">indices_not_equal</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="c1"># Shape: (batch_size, batch_size, batch_size)</span>
+    <span class="n">distinct_indices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">i_not_equal_j</span><span class="p">,</span> <span class="n">i_not_equal_k</span><span class="p">),</span> <span class="n">j_not_equal_k</span>
+    <span class="p">)</span>
+
+    <span class="c1"># get a mask for:</span>
+    <span class="c1"># labels[i] == labels[j] and labels[i] != labels[k]</span>
+    <span class="c1"># Shape: (batch_size, batch_size)</span>
+    <span class="n">labels_equal</span> <span class="o">=</span> <span class="n">labels</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">==</span> <span class="n">labels</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="c1"># Shape: (batch_size, batch_size, 1)</span>
+    <span class="n">i_equal_j</span> <span class="o">=</span> <span class="n">labels_equal</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+    <span class="c1"># Shape: (batch_size, 1, batch_size)</span>
+    <span class="n">i_equal_k</span> <span class="o">=</span> <span class="n">labels_equal</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="c1"># Shape: (batch_size, batch_size, batch_size)</span>
+    <span class="n">valid_indices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">i_equal_j</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">logical_not</span><span class="p">(</span><span class="n">i_equal_k</span><span class="p">))</span>
+
+    <span class="c1"># combine masks</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">distinct_indices</span><span class="p">,</span> <span class="n">valid_indices</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">mask</span></div>
+
+
+<div class="viewcode-block" id="get_anchor_positive_mask"><a class="viewcode-back" href="../../../quaterion.utils.utils.html#quaterion.utils.utils.get_anchor_positive_mask">[docs]</a><span class="k">def</span> <span class="nf">get_anchor_positive_mask</span><span class="p">(</span><span class="n">labels</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Creates a 2D mask of valid anchor-positive pairs.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        labels (torch.Tensor): Labels associated with embeddings in the batch. Shape: (batch_size,)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        torch.Tensor: Anchor-positive mask. Shape: (batch_size, batch_size)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># get a mask for distinct i and j indices</span>
+    <span class="c1"># Shape: (batch_size, batch_size)</span>
+    <span class="n">indices_equal</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">labels</span><span class="o">.</span><span class="n">size</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">bool</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">labels</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">indices_not_equal</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">logical_not</span><span class="p">(</span><span class="n">indices_equal</span><span class="p">)</span>
+
+    <span class="c1"># get a mask for labels[i] == labels[j]</span>
+    <span class="c1"># Shape: (batch_size, batch_size)</span>
+    <span class="n">labels_equal</span> <span class="o">=</span> <span class="n">labels</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">==</span> <span class="n">labels</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># combine masks</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">indices_not_equal</span><span class="p">,</span> <span class="n">labels_equal</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">mask</span></div>
+
+
+<div class="viewcode-block" id="get_anchor_negative_mask"><a class="viewcode-back" href="../../../quaterion.utils.utils.html#quaterion.utils.utils.get_anchor_negative_mask">[docs]</a><span class="k">def</span> <span class="nf">get_anchor_negative_mask</span><span class="p">(</span><span class="n">labels</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Creates a 2D mask of valid anchor-negative pairs.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        labels (torch.Tensor): Labels associated with embeddings in the batch. Shape: (batch_size,)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        torch.Tensor: Anchor-negative mask. Shape: (batch_size, batch_size)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># get a mask for labels[i] != labels[k]</span>
+    <span class="c1"># Shape: (batch_size, batch_size)</span>
+    <span class="n">labels_equal</span> <span class="o">=</span> <span class="n">labels</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">==</span> <span class="n">labels</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">logical_not</span><span class="p">(</span><span class="n">labels_equal</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">mask</span></div>
 </pre></div>
 
           </div>

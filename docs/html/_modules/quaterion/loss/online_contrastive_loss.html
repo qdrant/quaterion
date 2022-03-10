@@ -48,10 +48,11 @@
 <div class="viewcode-block" id="OnlineContrastiveLoss"><a class="viewcode-back" href="../../../quaterion.loss.online_contrastive_loss.html#quaterion.loss.online_contrastive_loss.OnlineContrastiveLoss">[docs]</a><span class="k">class</span> <span class="nc">OnlineContrastiveLoss</span><span class="p">(</span><span class="n">GroupLoss</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Implements Contrastive Loss as defined in http://yann.lecun.com/exdb/publis/pdf/hadsell-chopra-lecun-06.pdf</span>
 
-<span class="sd">    Unlike `quaterion.loss.ContrastiveLoss`, this one supports batch-all and batch-hard</span>
-<span class="sd">    strategies for online pair mining, i.e., it makes positive and negative pairs</span>
-<span class="sd">    on-the-fly, so you don&#39;t need to form such pairs yourself. It first calculates all possible</span>
-<span class="sd">    pairs, and then filters valid positive pairs and valid negative pairs separately.</span>
+<span class="sd">    Unlike `quaterion.loss.ContrastiveLoss`, this one supports online pair mining, i.e., it makes</span>
+<span class="sd">    positive and negative pairs on-the-fly, so you don&#39;t need to form such pairs yourself.</span>
+<span class="sd">    Instead, it first calculates all possible pairs in a batch, and then filters</span>
+<span class="sd">    valid positive pairs and valid negative pairs separately. Batch-all and batch-hard strategies</span>
+<span class="sd">    for online pair mining are supported.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        margin: Margin value to push negative examples</span>
@@ -92,11 +93,7 @@
 <div class="viewcode-block" id="OnlineContrastiveLoss.get_config_dict"><a class="viewcode-back" href="../../../quaterion.loss.online_contrastive_loss.html#quaterion.loss.online_contrastive_loss.OnlineContrastiveLoss.get_config_dict">[docs]</a>    <span class="k">def</span> <span class="nf">get_config_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">config</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_config_dict</span><span class="p">()</span>
         <span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
-            <span class="p">{</span>
-                <span class="s2">&quot;margin&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_margin</span><span class="p">,</span>
-                <span class="s2">&quot;squared&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_squared</span><span class="p">,</span>
-                <span class="s2">&quot;mining&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mining</span><span class="p">,</span>
-            <span class="p">}</span>
+            <span class="p">{</span><span class="s2">&quot;margin&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_margin</span><span class="p">,</span> <span class="s2">&quot;squared&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_squared</span><span class="p">,</span> <span class="s2">&quot;mining&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mining</span><span class="p">,}</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">config</span></div>
 
@@ -161,7 +158,7 @@
 
             <span class="c1"># get the hardest negative for each anchor</span>
             <span class="c1"># shape (batch_size,)</span>
-            <span class="n">hardest_negative_dists</span> <span class="o">=</span> <span class="n">anchor_positive_dists</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">hardest_negative_dists</span> <span class="o">=</span> <span class="n">anchor_negative_dists</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">num_negative_pairs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span>
                 <span class="p">(</span>
                     <span class="n">hardest_negative_dists</span>

@@ -15,7 +15,9 @@ class OnlineContrastiveLoss(GroupLoss):
     """Implements Contrastive Loss as defined in http://yann.lecun.com/exdb/publis/pdf/hadsell-chopra-lecun-06.pdf
 
     Unlike `quaterion.loss.ContrastiveLoss`, this one supports batch-all and batch-hard
-    strategies for online pair mining.
+    strategies for online pair mining, i.e., it makes positive and negative pairs
+    on-the-fly, so you don't need to form such pairs yourself. It first calculates all possible
+    pairs, and then filters valid positive pairs and valid negative pairs separately.
 
     Args:
         margin: Margin value to push negative examples
@@ -56,18 +58,14 @@ class OnlineContrastiveLoss(GroupLoss):
     def get_config_dict(self):
         config = super().get_config_dict()
         config.update(
-            {
-                "margin": self._margin,
-                "squared": self._squared,
-                "mining": self._mining,
-            }
+            {"margin": self._margin, "squared": self._squared, "mining": self._mining,}
         )
         return config
 
     def forward(
         self, embeddings: torch.Tensor, groups: torch.LongTensor
     ) -> torch.Tensor:
-        """Calculates Triplet Loss with specified embeddings and labels.
+        """Calculates Contrastive Loss by making pairs on-the-fly.
 
         Args:
             embeddings (torch.Tensor): Batch of embeddings. Shape: (batch_size, embedding_dim)

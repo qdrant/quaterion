@@ -145,7 +145,6 @@
                 <span class="mi">2</span>
             <span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">num_negative_pairs</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">1e-16</span><span class="p">))</span>
 
-            <span class="n">total_loss</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">positive_loss</span> <span class="o">+</span> <span class="n">negative_loss</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>  <span class="c1"># batch-hard pair mining</span>
 
             <span class="c1"># get the hardest positive for each anchor</span>
@@ -153,7 +152,7 @@
             <span class="n">hardest_positive_dists</span> <span class="o">=</span> <span class="n">anchor_positive_dists</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">num_positive_pairs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">hardest_positive_dists</span><span class="p">)</span>
             <span class="n">positive_loss</span> <span class="o">=</span> <span class="n">hardest_positive_dists</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span>
-                <span class="n">num_positive_pairs</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+                <span class="n">num_positive_pairs</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">1e-16</span><span class="p">)</span>
             <span class="p">)</span>
 
             <span class="c1"># get the hardest negative for each anchor</span>
@@ -162,10 +161,12 @@
             <span class="n">num_negative_pairs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span>
                 <span class="p">(</span>
                     <span class="n">hardest_negative_dists</span>
-                    <span class="o">&lt;</span> <span class="n">max_value_of_dtype</span><span class="p">(</span><span class="n">hardest_positive_dists</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+                    <span class="o">&lt;</span> <span class="n">max_value_of_dtype</span><span class="p">(</span>
+                        <span class="n">hardest_negative_dists</span><span class="o">.</span><span class="n">dtype</span>
+                    <span class="p">)</span>  <span class="c1"># It&#39;s True where we didn&#39;t set to this maximum value to mark them invalid</span>
                 <span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
             <span class="p">)</span>
-            <span class="n">negative_loss</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_margin</span> <span class="o">-</span> <span class="n">hardest_positive_dists</span><span class="p">)</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span>
+            <span class="n">negative_loss</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_margin</span> <span class="o">-</span> <span class="n">hardest_negative_dists</span><span class="p">)</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span>
                 <span class="mi">2</span>
             <span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">num_negative_pairs</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">1e-16</span><span class="p">))</span>
 

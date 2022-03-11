@@ -59,11 +59,7 @@ class OnlineContrastiveLoss(GroupLoss):
     def get_config_dict(self):
         config = super().get_config_dict()
         config.update(
-            {
-                "margin": self._margin,
-                "squared": self._squared,
-                "mining": self._mining,
-            }
+            {"margin": self._margin, "squared": self._squared, "mining": self._mining,}
         )
         return config
 
@@ -115,7 +111,6 @@ class OnlineContrastiveLoss(GroupLoss):
                 2
             ).sum() / torch.max(num_negative_pairs, torch.tensor(1e-16))
 
-            total_loss = 0.5 * (positive_loss + negative_loss)
         else:  # batch-hard pair mining
 
             # get the hardest positive for each anchor
@@ -123,7 +118,7 @@ class OnlineContrastiveLoss(GroupLoss):
             hardest_positive_dists = anchor_positive_dists.max(dim=1)[0]
             num_positive_pairs = torch.count_nonzero(hardest_positive_dists)
             positive_loss = hardest_positive_dists.pow(2).sum() / torch.max(
-                num_positive_pairs, torch.tensor(0.0)
+                num_positive_pairs, torch.tensor(1e-16)
             )
 
             # get the hardest negative for each anchor
@@ -132,10 +127,12 @@ class OnlineContrastiveLoss(GroupLoss):
             num_negative_pairs = torch.sum(
                 (
                     hardest_negative_dists
-                    < max_value_of_dtype(hardest_positive_dists.dtype)
+                    < max_value_of_dtype(
+                        hardest_negative_dists.dtype
+                    )  # It's True where we didn't set to this maximum value to mark them invalid
                 ).float()
             )
-            negative_loss = F.relu(self._margin - hardest_positive_dists).pow(
+            negative_loss = F.relu(self._margin - hardest_negative_dists).pow(
                 2
             ).sum() / torch.max(num_negative_pairs, torch.tensor(1e-16))
 

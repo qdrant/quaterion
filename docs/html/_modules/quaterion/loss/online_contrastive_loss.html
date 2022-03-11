@@ -93,7 +93,11 @@
 <div class="viewcode-block" id="OnlineContrastiveLoss.get_config_dict"><a class="viewcode-back" href="../../../quaterion.loss.online_contrastive_loss.html#quaterion.loss.online_contrastive_loss.OnlineContrastiveLoss.get_config_dict">[docs]</a>    <span class="k">def</span> <span class="nf">get_config_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">config</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_config_dict</span><span class="p">()</span>
         <span class="n">config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
-            <span class="p">{</span><span class="s2">&quot;margin&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_margin</span><span class="p">,</span> <span class="s2">&quot;squared&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_squared</span><span class="p">,</span> <span class="s2">&quot;mining&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mining</span><span class="p">,}</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;margin&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_margin</span><span class="p">,</span>
+                <span class="s2">&quot;squared&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_squared</span><span class="p">,</span>
+                <span class="s2">&quot;mining&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mining</span><span class="p">,</span>
+            <span class="p">}</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">config</span></div>
 
@@ -135,14 +139,14 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mining</span> <span class="o">==</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span>
 
             <span class="n">num_positive_pairs</span> <span class="o">=</span> <span class="n">anchor_positive_mask</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
-            <span class="n">positive_loss</span> <span class="o">=</span> <span class="n">anchor_positive_dists</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span>
+            <span class="n">positive_loss</span> <span class="o">=</span> <span class="n">anchor_positive_dists</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span>
                 <span class="n">num_positive_pairs</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">1e-16</span><span class="p">)</span>
             <span class="p">)</span>
 
             <span class="n">num_negative_pairs</span> <span class="o">=</span> <span class="n">anchor_negative_mask</span><span class="o">.</span><span class="n">float</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 
-            <span class="n">negative_loss</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_margin</span> <span class="o">-</span> <span class="n">anchor_negative_dists</span><span class="p">)</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span>
-                <span class="mi">2</span>
+            <span class="n">negative_loss</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_margin</span> <span class="o">-</span> <span class="n">anchor_negative_dists</span>
             <span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">num_negative_pairs</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">1e-16</span><span class="p">))</span>
 
         <span class="k">else</span><span class="p">:</span>  <span class="c1"># batch-hard pair mining</span>
@@ -151,7 +155,7 @@
             <span class="c1"># shape: (batch_size,)</span>
             <span class="n">hardest_positive_dists</span> <span class="o">=</span> <span class="n">anchor_positive_dists</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">num_positive_pairs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">hardest_positive_dists</span><span class="p">)</span>
-            <span class="n">positive_loss</span> <span class="o">=</span> <span class="n">hardest_positive_dists</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span>
+            <span class="n">positive_loss</span> <span class="o">=</span> <span class="n">hardest_positive_dists</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span>
                 <span class="n">num_positive_pairs</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">1e-16</span><span class="p">)</span>
             <span class="p">)</span>
 
@@ -166,8 +170,8 @@
                     <span class="p">)</span>  <span class="c1"># It&#39;s True where we didn&#39;t set to this maximum value to mark them invalid</span>
                 <span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
             <span class="p">)</span>
-            <span class="n">negative_loss</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_margin</span> <span class="o">-</span> <span class="n">hardest_negative_dists</span><span class="p">)</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span>
-                <span class="mi">2</span>
+            <span class="n">negative_loss</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_margin</span> <span class="o">-</span> <span class="n">hardest_negative_dists</span>
             <span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">num_negative_pairs</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">1e-16</span><span class="p">))</span>
 
         <span class="n">total_loss</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">positive_loss</span> <span class="o">+</span> <span class="n">negative_loss</span><span class="p">)</span>

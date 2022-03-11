@@ -70,10 +70,11 @@ class MobilenetV3Encoder(Encoder):
 
 
 class Model(TrainableModel):
-    def __init__(self, embedding_size: int, lr: float, loss_fn: str):
+    def __init__(self, embedding_size: int, lr: float, loss_fn: str, mining: str):
         self._embedding_size = embedding_size
         self._lr = lr
         self._loss_fn = loss_fn
+        self._mining = mining
         super().__init__()
 
     def configure_encoders(self) -> Union[Encoder, Dict[str, Encoder]]:
@@ -84,7 +85,9 @@ class Model(TrainableModel):
 
     def configure_loss(self) -> SimilarityLoss:
         return (
-            OnlineContrastiveLoss() if self._loss_fn == "contrastive" else TripletLoss()
+            OnlineContrastiveLoss(mining=self._mining)
+            if self._loss_fn == "contrastive"
+            else TripletLoss(miing=self._mining)
         )
 
     def configure_optimizers(self):
@@ -99,6 +102,7 @@ if __name__ == "__main__":
     )
 
     ap.add_argument("--lr", type=float, default=1e-4, help="Learning rate")
+
     ap.add_argument(
         "--loss-fn",
         default="contrastive",
@@ -106,9 +110,22 @@ if __name__ == "__main__":
         help="Loss function",
     )
 
+    ap.add_argument(
+        "--mining",
+        default="hard",
+        choices=("all", "hard"),
+        help="Type of mining for the loss funcion",
+    )
+
     args = ap.parse_args()
 
-    model = Model(embedding_size=args.embedding_size, lr=args.lr, loss_fn=args.loss_fn)
+    model = Model(
+        embedding_size=args.embedding_size,
+        lr=args.lr,
+        loss_fn=args.loss_fn,
+        mining=args.mining,
+    )
+
     train_dataloader = get_dataloader()
 
     trainer = pl.Trainer(

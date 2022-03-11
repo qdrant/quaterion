@@ -105,14 +105,14 @@ class OnlineContrastiveLoss(GroupLoss):
         if self._mining == "all":
 
             num_positive_pairs = anchor_positive_mask.sum()
-            positive_loss = anchor_positive_dists.pow(2).sum() / torch.max(
+            positive_loss = anchor_positive_dists.sum() / torch.max(
                 num_positive_pairs, torch.tensor(1e-16)
             )
 
             num_negative_pairs = anchor_negative_mask.float().sum()
 
-            negative_loss = F.relu(self._margin - anchor_negative_dists).pow(
-                2
+            negative_loss = F.relu(
+                self._margin - anchor_negative_dists
             ).sum() / torch.max(num_negative_pairs, torch.tensor(1e-16))
 
         else:  # batch-hard pair mining
@@ -121,7 +121,7 @@ class OnlineContrastiveLoss(GroupLoss):
             # shape: (batch_size,)
             hardest_positive_dists = anchor_positive_dists.max(dim=1)[0]
             num_positive_pairs = torch.count_nonzero(hardest_positive_dists)
-            positive_loss = hardest_positive_dists.pow(2).sum() / torch.max(
+            positive_loss = hardest_positive_dists.sum() / torch.max(
                 num_positive_pairs, torch.tensor(1e-16)
             )
 
@@ -136,8 +136,8 @@ class OnlineContrastiveLoss(GroupLoss):
                     )  # It's True where we didn't set to this maximum value to mark them invalid
                 ).float()
             )
-            negative_loss = F.relu(self._margin - hardest_negative_dists).pow(
-                2
+            negative_loss = F.relu(
+                self._margin - hardest_negative_dists
             ).sum() / torch.max(num_negative_pairs, torch.tensor(1e-16))
 
         total_loss = 0.5 * (positive_loss + negative_loss)

@@ -53,7 +53,7 @@ If <cite>y</cite> is <cite>None</cite>, it assigns <cite>x</cite> to <cite>y</ci
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><em>Tensor</em> – shape (batch_size, 1) if <cite>matrix</cite> is <cite>False</cite>, (batch_size, batch_size) otherwise.</p>
+<dd class="field-even"><p><em>Tensor</em> – shape (batch_size, batch_size) if <cite>matrix</cite> is <cite>True</cite>, (batch_size,) otherwise.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -73,7 +73,7 @@ understand how it works itself, and with chosen loss function especially.</p>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><em>Tensor</em> – shape (batch_size, 1)</p>
+<dd class="field-even"><p><em>Tensor</em> – shape (batch_size, batch_size) if <cite>matrix</cite> is <cite>True</cite>, (batch_size,) otherwise.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -93,7 +93,7 @@ if <cite>y</cite> it is <cite>None</cite>, it assigns <cite>x</cite> to <cite>y<
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><em>Tensor</em> – shape (batch_size, batch_size) if <cite>matrix</cite> is <cite>True</cite>, (batch_size, 1) otherwise.</p>
+<dd class="field-even"><p><em>Tensor</em> – shape (batch_size, batch_size) if <cite>matrix</cite> is <cite>True</cite>, (batch_size,) otherwise.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -112,7 +112,7 @@ if <cite>y</cite> it is <cite>None</cite>, it assigns <cite>x</cite> to <cite>y<
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><em>Tensor</em> – shape (batch_size, batch_size) if <cite>matrix</cite> is <cite>True</cite>, (batch_size, 1) otherwise.</p>
+<dd class="field-even"><p><em>Tensor</em> – shape (batch_size, batch_size) if <cite>matrix</cite> is <cite>True</cite>, (batch_size,) otherwise.</p>
 </dd>
 </dl>
 </dd></dl>

@@ -42,16 +42,8 @@
 
 <dl class="py class">
 <dt class="sig sig-object py" id="quaterion.dataset.indexing_dataset.IndexingIterableDataset">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">IndexingIterableDataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">IterableDataset[+</span> <span class="pre">T_co]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/quaterion/dataset/indexing_dataset.html#IndexingIterableDataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.dataset.indexing_dataset.IndexingIterableDataset" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Any,</span> <span class="pre">+T_co]]</span></code></p>
-<dl class="py method">
-<dt class="sig sig-object py" id="quaterion.dataset.indexing_dataset.IndexingIterableDataset.reinforce_type">
-<span class="sig-name descname"><span class="pre">reinforce_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expected_type</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#quaterion.dataset.indexing_dataset.IndexingIterableDataset.reinforce_type" title="Permalink to this definition">¶</a></dt>
-<dd><p>Reinforce the type for DataPipe instance. And the ‘expected_type’ is required
-to be a subtype of the original type hint to restrict the type requirement
-of DataPipe instance.</p>
-</dd></dl>
-
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">IndexingIterableDataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">IterableDataset</span><span class="p"><span class="pre">[</span></span><span class="pre">T_co</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/quaterion/dataset/indexing_dataset.html#IndexingIterableDataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.dataset.indexing_dataset.IndexingIterableDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">IterableDataset</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">Tuple</span></code>[<code class="xref py py-obj docutils literal notranslate"><span class="pre">Any</span></code>, <code class="xref py py-obj docutils literal notranslate"><span class="pre">T_co</span></code>]]</p>
 </dd></dl>
 
 </section>

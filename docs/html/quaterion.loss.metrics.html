@@ -100,18 +100,20 @@ if <cite>y</cite> it is <cite>None</cite>, it assigns <cite>x</cite> to <cite>y<
 
 <dl class="py method">
 <dt class="sig sig-object py" id="quaterion.loss.metrics.SiameseDistanceMetric.manhattan">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">manhattan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">matrix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/quaterion/loss/metrics.html#SiameseDistanceMetric.manhattan"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.loss.metrics.SiameseDistanceMetric.manhattan" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">manhattan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Tensor</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">squared</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/quaterion/loss/metrics.html#SiameseDistanceMetric.manhattan"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.loss.metrics.SiameseDistanceMetric.manhattan" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute manhattan distance</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>x</strong> – shape: (batch_size, …)</p></li>
-<li><p><strong>y</strong> – shape: (batch_size, …)</p></li>
-<li><p><strong>matrix</strong> – flat to calculate distance matrix (all to all)</p></li>
+<li><p><strong>y</strong> – shape: (batch_size, …), optional</p></li>
+<li><p><strong>matrix</strong> – if <cite>True</cite> calculate a distance matrix between <cite>x</cite> and <cite>y</cite> (all-to-all).
+if <cite>y</cite> it is <cite>None</cite>, it assigns <cite>x</cite> to <cite>y</cite>.</p></li>
+<li><p><strong>squared</strong> – Squared manhattan distance or not.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><em>Tensor</em> – shape (batch_size, 1)</p>
+<dd class="field-even"><p><em>Tensor</em> – shape (batch_size, batch_size) if <cite>matrix</cite> is <cite>True</cite>, (batch_size, 1) otherwise.</p>
 </dd>
 </dl>
 </dd></dl>

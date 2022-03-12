@@ -21,7 +21,7 @@ class SiameseDistanceMetric:
             squared: Squared Euclidean distance or not.
 
         Returns:
-            Tensor: shape (batch_size, batch_size) if `matrix` is `True`, (batch_size, 1) otherwise.
+            Tensor: shape (batch_size, batch_size) if `matrix` is `True`, (batch_size,) otherwise.
         """
         if not matrix:
             if y is None:
@@ -68,7 +68,7 @@ class SiameseDistanceMetric:
                 if `y` it is `None`, it assigns `x` to `y`.
 
         Returns:
-            Tensor: shape (batch_size, batch_size) if `matrix` is `True`, (batch_size, 1) otherwise.
+            Tensor: shape (batch_size, batch_size) if `matrix` is `True`, (batch_size,) otherwise.
         """
         if not matrix:
             if y is None:
@@ -102,7 +102,7 @@ class SiameseDistanceMetric:
             matrix: if `True` calculate a distance matrix between `x` and `y` (all-to-all).
                 If `y` is `None`, it assigns `x` to `y`.
         Returns:
-            Tensor: shape (batch_size, 1) if `matrix` is `False`, (batch_size, batch_size) otherwise.
+            Tensor: shape (batch_size, batch_size) if `matrix` is `True`, (batch_size,) otherwise.
         """
 
         if not matrix:
@@ -132,7 +132,7 @@ class SiameseDistanceMetric:
             y: shape: (batch_size, ...)
             matrix: flat to calculate distance matrix (all to all)
         Returns:
-            Tensor: shape (batch_size, 1)
+            Tensor: shape (batch_size, batch_size) if `matrix` is `True`, (batch_size,) otherwise.
         """
         return (
             -torch.einsum("id,jd->ij", x, y)

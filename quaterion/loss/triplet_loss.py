@@ -126,7 +126,9 @@ class TripletLoss(GroupLoss):
             # combine hardest positives and hardest negatives
             triplet_loss = torch.max(
                 # Division to maximal distance value scales target distances and prevent vector collapse
-                (hardest_positive_dists - hardest_negative_dists) / hardest_positive_dists.max() + self._margin,
+                (hardest_positive_dists - hardest_negative_dists)
+                / hardest_positive_dists.max()
+                + self._margin,
                 torch.tensor(0.0),
             )
 

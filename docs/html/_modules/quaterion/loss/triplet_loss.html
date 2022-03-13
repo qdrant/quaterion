@@ -159,7 +159,8 @@
 
             <span class="c1"># combine hardest positives and hardest negatives</span>
             <span class="n">triplet_loss</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span>
-                <span class="n">hardest_positive_dists</span> <span class="o">-</span> <span class="n">hardest_negative_dists</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_margin</span><span class="p">,</span>
+                <span class="c1"># Division to maximal distance value scales target distances and prevent vector collapse</span>
+                <span class="p">(</span><span class="n">hardest_positive_dists</span> <span class="o">-</span> <span class="n">hardest_negative_dists</span><span class="p">)</span> <span class="o">/</span> <span class="n">hardest_positive_dists</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_margin</span><span class="p">,</span>
                 <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">0.0</span><span class="p">),</span>
             <span class="p">)</span>
 

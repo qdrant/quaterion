@@ -82,11 +82,11 @@ class SiameseDistanceMetric:
                 y = x
 
             # expand dimensions to calculate element-wise diffrences with broadcasting
-            # shape: batch_size, batch_size, vector_dim)
+            # shape: (batch_size, batch_size, vector_dim)
             deltas = x.unsqueeze(1) - y.unsqueeze(0)
             abs_deltas = torch.abs(deltas)
 
-            # sum across the last dimension for eduction
+            # sum across the last dimension for reduction
             # shape: (batch_size, batch_size)
             distances = abs_deltas.sum(dim=-1)
 
@@ -113,12 +113,13 @@ class SiameseDistanceMetric:
 
         x_norm = F.normalize(x, p=2, dim=1)
         if y is None:
-            y = x
             y_norm = x_norm.transpose(0, 1)
         else:
             y_norm = F.normalize(y, p=2, dim=1).transpose(0, 1)
 
-        return 1 - torch.mm(x_norm, y_norm)
+        # actual interval of cosine similarity is (-1, 1)
+        # we need to normalize it to the interval (0, 1) before converting to a distance value
+        return 1 - (torch.mm(x_norm, y_norm) + 1) / 2
 
     @staticmethod
     def dot_product_distance(x: Tensor, y: Tensor, matrix=False) -> Tensor:

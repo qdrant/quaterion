@@ -21,8 +21,8 @@ class ContrastiveLoss(PairwiseLoss):
 
     Args:
         distance_metric_name: Name of the function, that returns a distance between two
-            embeddings. The class SiameseDistanceMetric contains pre-defined metrics
-            that can be used.
+            embeddings. :class:`~quaterion.loss.metrics.SiameseDistanceMetric` contains pre-defined
+            metrics that can be used.
         margin: Negative samples (label == 0) should have a distance of at least the
             margin value.
         size_average: Average by the size of the mini-batch.

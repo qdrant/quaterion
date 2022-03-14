@@ -55,7 +55,7 @@
 <span class="sd">            squared: Squared Euclidean distance or not.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            Tensor: shape (batch_size, batch_size) if `matrix` is `True`, (batch_size, 1) otherwise.</span>
+<span class="sd">            Tensor: shape (batch_size, batch_size) if `matrix` is `True`, (batch_size,) otherwise.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">matrix</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">y</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -92,19 +92,39 @@
         <span class="k">return</span> <span class="n">distances</span></div>
 
 <div class="viewcode-block" id="SiameseDistanceMetric.manhattan"><a class="viewcode-back" href="../../../quaterion.loss.metrics.html#quaterion.loss.metrics.SiameseDistanceMetric.manhattan">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">manhattan</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">matrix</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">manhattan</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Tensor</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">matrix</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Compute manhattan distance</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            x: shape: (batch_size, ...)</span>
-<span class="sd">            y: shape: (batch_size, ...)</span>
-<span class="sd">            matrix: flat to calculate distance matrix (all to all)</span>
+<span class="sd">            y: shape: (batch_size, ...), optional</span>
+<span class="sd">            matrix: if `True` calculate a distance matrix between `x` and `y` (all-to-all).</span>
+<span class="sd">                if `y` it is `None`, it assigns `x` to `y`.</span>
+
 <span class="sd">        Returns:</span>
-<span class="sd">            Tensor: shape (batch_size, 1)</span>
+<span class="sd">            Tensor: shape (batch_size, batch_size) if `matrix` is `True`, (batch_size,) otherwise.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">matrix</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">pairwise_distance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+            <span class="k">if</span> <span class="n">y</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;y cannot be None while matrix is False&quot;</span><span class="p">)</span>
+
+            <span class="n">distances</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">pairwise_distance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+
+            <span class="k">if</span> <span class="n">y</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="n">x</span>
+
+            <span class="c1"># expand dimensions to calculate element-wise diffrences with broadcasting</span>
+            <span class="c1"># shape: (batch_size, batch_size, vector_dim)</span>
+            <span class="n">deltas</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">y</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">abs_deltas</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">deltas</span><span class="p">)</span>
+
+            <span class="c1"># sum across the last dimension for reduction</span>
+            <span class="c1"># shape: (batch_size, batch_size)</span>
+            <span class="n">distances</span> <span class="o">=</span> <span class="n">abs_deltas</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">distances</span></div>
 
 <div class="viewcode-block" id="SiameseDistanceMetric.cosine_distance"><a class="viewcode-back" href="../../../quaterion.loss.metrics.html#quaterion.loss.metrics.SiameseDistanceMetric.cosine_distance">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">cosine_distance</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Tensor</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">matrix</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
@@ -116,7 +136,7 @@
 <span class="sd">            matrix: if `True` calculate a distance matrix between `x` and `y` (all-to-all).</span>
 <span class="sd">                If `y` is `None`, it assigns `x` to `y`.</span>
 <span class="sd">        Returns:</span>
-<span class="sd">            Tensor: shape (batch_size, 1) if `matrix` is `False`, (batch_size, batch_size) otherwise.</span>
+<span class="sd">            Tensor: shape (batch_size, batch_size) if `matrix` is `True`, (batch_size,) otherwise.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">matrix</span><span class="p">:</span>
@@ -127,12 +147,13 @@
 
         <span class="n">x_norm</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">y</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">y</span> <span class="o">=</span> <span class="n">x</span>
             <span class="n">y_norm</span> <span class="o">=</span> <span class="n">x_norm</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">y_norm</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">torch</span><span class="o">.</span><span class="n">mm</span><span class="p">(</span><span class="n">x_norm</span><span class="p">,</span> <span class="n">y_norm</span><span class="p">)</span></div>
+        <span class="c1"># actual interval of cosine similarity is (-1, 1)</span>
+        <span class="c1"># we need to normalize it to the interval (0, 1) before converting to a distance value</span>
+        <span class="k">return</span> <span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">mm</span><span class="p">(</span><span class="n">x_norm</span><span class="p">,</span> <span class="n">y_norm</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span></div>
 
 <div class="viewcode-block" id="SiameseDistanceMetric.dot_product_distance"><a class="viewcode-back" href="../../../quaterion.loss.metrics.html#quaterion.loss.metrics.SiameseDistanceMetric.dot_product_distance">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">dot_product_distance</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">matrix</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
@@ -146,7 +167,7 @@
 <span class="sd">            y: shape: (batch_size, ...)</span>
 <span class="sd">            matrix: flat to calculate distance matrix (all to all)</span>
 <span class="sd">        Returns:</span>
-<span class="sd">            Tensor: shape (batch_size, 1)</span>
+<span class="sd">            Tensor: shape (batch_size, batch_size) if `matrix` is `True`, (batch_size,) otherwise.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="o">-</span><span class="n">torch</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s2">&quot;id,jd-&gt;ij&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>

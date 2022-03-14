@@ -21,7 +21,7 @@ class SiameseDistanceMetric:
             squared: Squared Euclidean distance or not.
 
         Returns:
-            Tensor: shape (batch_size, batch_size) if `matrix` is `True`, (batch_size, 1) otherwise.
+            Tensor: shape (batch_size, batch_size) if `matrix` is `True`, (batch_size,) otherwise.
         """
         if not matrix:
             if y is None:
@@ -58,19 +58,39 @@ class SiameseDistanceMetric:
         return distances
 
     @staticmethod
-    def manhattan(x: Tensor, y: Tensor, matrix=False) -> Tensor:
+    def manhattan(x: Tensor, y: Tensor = None, matrix: bool = False) -> Tensor:
         """Compute manhattan distance
 
         Args:
             x: shape: (batch_size, ...)
-            y: shape: (batch_size, ...)
-            matrix: flat to calculate distance matrix (all to all)
+            y: shape: (batch_size, ...), optional
+            matrix: if `True` calculate a distance matrix between `x` and `y` (all-to-all).
+                if `y` it is `None`, it assigns `x` to `y`.
+
         Returns:
-            Tensor: shape (batch_size, 1)
+            Tensor: shape (batch_size, batch_size) if `matrix` is `True`, (batch_size,) otherwise.
         """
         if not matrix:
-            return torch.pairwise_distance(x, y, p=1)
-        raise NotImplementedError()
+            if y is None:
+                raise ValueError("y cannot be None while matrix is False")
+
+            distances = torch.pairwise_distance(x, y, p=1)
+
+        else:
+
+            if y is None:
+                y = x
+
+            # expand dimensions to calculate element-wise diffrences with broadcasting
+            # shape: (batch_size, batch_size, vector_dim)
+            deltas = x.unsqueeze(1) - y.unsqueeze(0)
+            abs_deltas = torch.abs(deltas)
+
+            # sum across the last dimension for reduction
+            # shape: (batch_size, batch_size)
+            distances = abs_deltas.sum(dim=-1)
+
+        return distances
 
     @staticmethod
     def cosine_distance(x: Tensor, y: Tensor = None, matrix=False) -> Tensor:
@@ -82,7 +102,7 @@ class SiameseDistanceMetric:
             matrix: if `True` calculate a distance matrix between `x` and `y` (all-to-all).
                 If `y` is `None`, it assigns `x` to `y`.
         Returns:
-            Tensor: shape (batch_size, 1) if `matrix` is `False`, (batch_size, batch_size) otherwise.
+            Tensor: shape (batch_size, batch_size) if `matrix` is `True`, (batch_size,) otherwise.
         """
 
         if not matrix:
@@ -93,12 +113,13 @@ class SiameseDistanceMetric:
 
         x_norm = F.normalize(x, p=2, dim=1)
         if y is None:
-            y = x
             y_norm = x_norm.transpose(0, 1)
         else:
             y_norm = F.normalize(y, p=2, dim=1).transpose(0, 1)
 
-        return 1 - torch.mm(x_norm, y_norm)
+        # actual interval of cosine similarity is (-1, 1)
+        # we need to normalize it to the interval (0, 1) before converting to a distance value
+        return 1 - (torch.mm(x_norm, y_norm) + 1) / 2
 
     @staticmethod
     def dot_product_distance(x: Tensor, y: Tensor, matrix=False) -> Tensor:
@@ -112,7 +133,7 @@ class SiameseDistanceMetric:
             y: shape: (batch_size, ...)
             matrix: flat to calculate distance matrix (all to all)
         Returns:
-            Tensor: shape (batch_size, 1)
+            Tensor: shape (batch_size, batch_size) if `matrix` is `True`, (batch_size,) otherwise.
         """
         return (
             -torch.einsum("id,jd->ij", x, y)

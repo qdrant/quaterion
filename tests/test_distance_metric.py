@@ -17,11 +17,11 @@ class TestDistanceMetric:
     def test_cosine_distance_matrix(self):
         res = SiameseDistanceMetric.cosine_distance(self.x, matrix=True)
         assert res.size()[0] == self.x_dim and res.size()[1] == self.x_dim
-        assert (res == self.expected_cosine_distance).float().sum() == self.x_dim ** 2
+        assert (res == self.expected_cosine_distance).float().sum() == self.x_dim**2
 
     def test_manhattan_distance_matrix(self):
         res = SiameseDistanceMetric.manhattan(self.x, matrix=True)
         assert res.size()[0] == self.x_dim and res.size()[1] == self.x_dim
         assert (
             res == self.expected_manhattan_distance
-        ).float().sum() == self.x_dim ** 2
+        ).float().sum() == self.x_dim**2

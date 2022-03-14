@@ -13,7 +13,7 @@ class MultipleNegativesRankingLoss(PairwiseLoss):
     """Implement Multiple Negatives Ranking Loss as described in https://arxiv.org/pdf/1705.00652.pdf
 
     This loss function works only with positive pairs, e.g., an `anchor` and a `positive`.
-    For each pair, it uses `positive`s of other pairs in the batch as negatives, so you don't need
+    For each pair, it uses `positive` of other pairs in the batch as negatives, so you don't need
     to worry about specifying negative examples. It is great for retrieval tasks such as
     question-answer retrieval, duplicate sentence retrieval, and cross-modal retrieval.
     It accepts pairs of anchor and positive embeddings to calculate a similarity matrix between them.
@@ -21,9 +21,12 @@ class MultipleNegativesRankingLoss(PairwiseLoss):
     This optimizes  retrieval of the correct positive pair when an anchor given.
 
     Note:
-        `SimilarityPairSample.score` and `SimilarityPairSample.subgroup` values are ignored
-        for this loss, assuming `SimilarityPairSample.obj_a` and `SimilarityPairSample.obj_b`
-        form a positive pair, e.g., `label = 1`.
+        :attr:`~quaterion.dataset.similarity_samples.SimilarityPairSample.score` and
+        :attr:`~quaterion.dataset.similarity_samples.SimilarityPairSample.subgroup` values are
+        ignored for this loss, assuming
+        :attr:`~quaterion.dataset.similarity_samples.SimilarityPairSample.obj_a` and
+        :attr:`~quaterion.dataset.similarity_samples.SimilarityPairSample.obj_b` form a positive
+        pair, e.g., `label = 1`.
 
     Args:
         scale: Scaling value for multiplying with similarity scores to make cross-entropy work.

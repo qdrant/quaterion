@@ -3,7 +3,12 @@ from quaterion.loss import SiameseDistanceMetric
 
 
 class TestDistanceMetric:
-    x = torch.tensor([[1.0, -1.5, 2.0, -3.0], [-1.0, 1.5, -2.0, 3.0],])
+    x = torch.tensor(
+        [
+            [1.0, -1.5, 2.0, -3.0],
+            [-1.0, 1.5, -2.0, 3.0],
+        ]
+    )
 
     x_dim = x.size()[0]
     expected_cosine_distance = torch.tensor([[0.0, 1.0], [1.0, 0.0]])

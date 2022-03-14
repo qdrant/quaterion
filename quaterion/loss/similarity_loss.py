@@ -9,8 +9,8 @@ class SimilarityLoss(nn.Module):
     """Base similarity losses class.
 
     Args:
-        distance_metric_name: Name of the function, that returns a distance between two
-            embeddings. The class SiameseDistanceMetric contains pre-defined metrics
+        distance_metric_name: Name of the function, that returns a distance between two embeddings.
+            :class:`~quaterion.loss.metrics.SiameseDistanceMetric` contains pre-defined metrics
             that can be used.
     """
 

@@ -11,7 +11,7 @@ class SoftmaxLoss(GroupLoss):
     """Regular cross-entropy loss.
 
     An implementation of softmax with dot product.
-    It is designed to work with the base `GroupLoss` class.
+    It is designed to work with the base :class:`~quaterion.loss.group_loss.GroupLoss`.
 
     Args:
         embedding_size: Output dimension of the encoder.

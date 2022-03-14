@@ -7,9 +7,10 @@ class GroupLoss(SimilarityLoss):
     """Base class for Group losses.
 
     Args:
-        distance_metric_name: Name of the function, that returns a distance between
-            two embeddings. The class SiameseDistanceMetric contains pre-defined metrics
+        distance_metric_name: Name of the function, that returns a distance between two embeddings.
+            :class:`~quaterion.loss.metrics.SiameseDistanceMetric` contains pre-defined metrics
             that can be used.
+
     """
 
     def __init__(self, distance_metric_name: str = "cosine_distance"):

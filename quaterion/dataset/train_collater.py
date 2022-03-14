@@ -10,8 +10,10 @@ class TrainCollater:
     Should be serializable for sending among worker processes.
 
     Args:
-        pre_collate_fn:
-        encoder_collates:
+        pre_collate_fn: function to split origin batch into ids, features and labels. Ids are means
+            to keep track of repeatable usage of the same elements. Features are  commonly encoders
+            input. Labels usually allow distinguishing positive and negative samples.
+        encoder_collates: mapping of encoder name to its collate function
     """
 
     def __init__(self, pre_collate_fn, encoder_collates: Dict[str, "CollateFnType"]):

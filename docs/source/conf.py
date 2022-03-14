@@ -70,6 +70,7 @@ exclude_patterns = [
     "*cache_encoder*",
     "*cache_model*",
     "*cache_train_collater*",
+    "*indexing_dataset*",
 ]
 # -- Options for HTML output -------------------------------------------------
 

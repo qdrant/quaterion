@@ -12,21 +12,23 @@ from quaterion.utils import (
 
 
 class OnlineContrastiveLoss(GroupLoss):
-    """Implements Contrastive Loss as defined in http://yann.lecun.com/exdb/publis/pdf/hadsell-chopra-lecun-06.pdf
+    """Implements Contrastive Loss as defined in
+    http://yann.lecun.com/exdb/publis/pdf/hadsell-chopra-lecun-06.pdf
 
-    Unlike `quaterion.loss.ContrastiveLoss`, this one supports online pair mining, i.e., it makes
-    positive and negative pairs on-the-fly, so you don't need to form such pairs yourself.
-    Instead, it first calculates all possible pairs in a batch, and then filters
+    Unlike :class:`~quaterion.loss.contrastive_loss.ContrastiveLoss`, this one supports online pair
+    mining, i.e., it makes positive and negative pairs on-the-fly, so you don't need to form such
+    pairs yourself. Instead, it first calculates all possible pairs in a batch, and then filters
     valid positive pairs and valid negative pairs separately. Batch-all and batch-hard strategies
     for online pair mining are supported.
 
     Args:
         margin: Margin value to push negative examples
             apart. Optional, defaults to `0.5`.
-        distance_metric_name: Name of the distance function. Optional, defaults to `"cosine_distance"`.
+        distance_metric_name: Name of the distance function. Optional, defaults to
+            `"cosine_distance"`.
         squared (bool, optional): Squared Euclidean distance or not. Defaults to `True`.
-        mining (str, optional): Pair mining strategy. One of
-            `"all"`, `"hard"`. Defaults to `"hard"`.
+        mining (str, optional): Pair mining strategy. One of `"all"`, `"hard"`.
+            Defaults to `"hard"`.
     """
 
     def __init__(

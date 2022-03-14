@@ -1,7 +1,12 @@
 name: build-docs
-on: [pull_request]
+on:
+  pull_request_target:
+    types:
+      - closed
+
 jobs:
   build:
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2

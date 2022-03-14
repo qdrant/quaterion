@@ -6,12 +6,12 @@ from quaterion.dataset import SimilarityGroupSample
 
 
 class SimilarityGroupDataset(Dataset[SimilarityGroupSample]):
-    """
-    Simple wrapper class, which converts standard dataset of classification task into
-    dataset, compatible with :class:`~quaterion.dataset.similarity_data_loader.GroupSimilarityDataLoader`.
+    """Simple wrapper class, which converts standard dataset of classification task into dataset,
+    compatible with :class:`~quaterion.dataset.similarity_data_loader.GroupSimilarityDataLoader`.
 
     Args:
         dataset: a dataset, which return data in format: `(record, label)`
+
     """
 
     def __init__(self, dataset: Dataset):

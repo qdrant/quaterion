@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing import Dict, Any, Union, Optional
 
 import pytorch_lightning as pl
@@ -63,7 +64,8 @@ class TrainableModel(pl.LightningModule, CacheMixin):
 
         Returns:
              Union[Encoder, Dict[str, Encoder]]: instance of encoder which will be assigned to
-             `quaterion_models.model.DEFAULT_ENCODER_KEY`, or mapping of names and encoders.
+             :const:`~quaterion_models.model.DEFAULT_ENCODER_KEY`, or mapping of names and
+             encoders.
         """
         raise NotImplementedError()
 
@@ -74,7 +76,8 @@ class TrainableModel(pl.LightningModule, CacheMixin):
         what kind of cache they should use.
 
         Returns:
-            Optional[CacheConfig]: cache configuration to be applied if provided, None otherwise
+            Optional[:class:`~quaterion.train.cache.cache_config.CacheConfig`]: cache configuration
+            to be applied if provided, None otherwise.
 
         Examples:
 
@@ -149,7 +152,7 @@ class TrainableModel(pl.LightningModule, CacheMixin):
         Args:
             batch: Output of DataLoader.
             batch_idx: Integer displaying index of this batch.
-            **kwargs: keyword arguments to be passed into `process_results`
+            **kwargs: keyword arguments to be passed into :meth:`~process_results`
 
         Returns:
             Tensor: computed loss value
@@ -167,7 +170,7 @@ class TrainableModel(pl.LightningModule, CacheMixin):
         Args:
             batch: Output of DataLoader.
             batch_idx: Integer displaying index of this batch.
-            **kwargs: keyword arguments to be passed into `process_results`
+            **kwargs: keyword arguments to be passed into :meth:`~process_results`
         """
         stage = TrainStage.VALIDATION
         self._common_step(batch=batch, batch_idx=batch_idx, stage=stage, **kwargs)
@@ -180,7 +183,7 @@ class TrainableModel(pl.LightningModule, CacheMixin):
         Args:
             batch: Output of DataLoader.
             batch_idx: Integer displaying index of this batch.
-            **kwargs: keyword arguments to be passed into `process_results`
+            **kwargs: keyword arguments to be passed into :meth:`~process_results`
         """
         stage = TrainStage.TEST
         self._common_step(batch=batch, batch_idx=batch_idx, stage=stage, **kwargs)
@@ -194,7 +197,7 @@ class TrainableModel(pl.LightningModule, CacheMixin):
             batch: Output of DataLoader.
             batch_idx: Integer displaying index of this batch.
             stage: current training stage: training, validation, etc.
-            **kwargs: keyword arguments to be passed into `process_results`
+            **kwargs: keyword arguments to be passed into :meth:`~process_results`
 
         Returns:
             Tensor: computed loss value
@@ -227,9 +230,7 @@ class TrainableModel(pl.LightningModule, CacheMixin):
         train_dataloader: SimilarityDataLoader,
         val_dataloader: Optional[SimilarityDataLoader],
     ):
-        """
-        Fill cachable encoders with embeddings
-        """
+        """Fill cachable encoders with embeddings"""
         self._cache(
             trainer=trainer,
             encoders=self.model.encoders,
@@ -239,9 +240,7 @@ class TrainableModel(pl.LightningModule, CacheMixin):
         )
 
     def unwrap_cache(self):
-        """
-        Restore original encoders
-        """
+        """Restore original encoders"""
         self.model.encoders = self._unwrap_cache_encoders(self.model.encoders)
 
     def setup_dataloader(self, dataloader: SimilarityDataLoader):

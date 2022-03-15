@@ -1,4 +1,5 @@
-from typing import List, Tuple, Union, Dict, Any
+from __future__ import annotations
+from typing import List, Tuple, Union, Dict, Any, Callable
 
 from quaterion.dataset import SimilarityPairSample, SimilarityGroupSample
 from quaterion_models.types import CollateFnType
@@ -8,7 +9,6 @@ class TrainCollater:
     """Functional object, that aggregates all required information for performing collate on train
     batches.
 
-
     Note:
         Should be serializable for sending among worker processes.
 
@@ -17,10 +17,9 @@ class TrainCollater:
             to keep track of repeatable usage of the same elements. Features are  commonly encoders
             input. Labels usually allow distinguishing positive and negative samples.
         encoder_collates: mapping of encoder name to its collate function
-
     """
 
-    def __init__(self, pre_collate_fn, encoder_collates: Dict[str, "CollateFnType"]):
+    def __init__(self, pre_collate_fn: Callable, encoder_collates: Dict[str, CollateFnType]):
         self.pre_collate_fn = pre_collate_fn
         self.encoder_collates = encoder_collates
 

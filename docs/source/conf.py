@@ -31,7 +31,18 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.autodoc",
     "sphinx.ext.viewcode",
+    "sphinx.ext.intersphinx",
 ]
+
+# mapping to quaterion_models
+# tuple: (target, inventory)
+# Each target is the base URI of a foreign Sphinx documentation set and can be a local path or an
+# HTTP URI. The inventory indicates where the inventory file can be found: it can be None (an
+# objects.inv file at the same location as the base URI) or another local file path or a full
+# HTTP URI to an inventory file.
+intersphinx_mapping = {
+    'quaterion_models': ('http://127.0.0.1:5500/docs/html', None),
+}
 
 # prevents sphinx from adding full path to type hints
 autodoc_typehints_format = "short"

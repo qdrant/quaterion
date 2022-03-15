@@ -42,7 +42,7 @@ class TrainableModel(pl.LightningModule, CacheMixin):
         """Origin model to be trained
 
         Returns:
-            MetricModel: model to be trained
+            :class:`~quaterion_models.model.MetricModel`: model to be trained
         """
         return self._model
 
@@ -63,9 +63,11 @@ class TrainableModel(pl.LightningModule, CacheMixin):
         before training as well as during the checkpoint loading.
 
         Returns:
-             Union[Encoder, Dict[str, Encoder]]: instance of encoder which will be assigned to
-             :const:`~quaterion_models.model.DEFAULT_ENCODER_KEY`, or mapping of names and
-             encoders.
+            Union[:class:`~quaterion_models.encoders.encoder.Encoder`,
+            Dict[str, :class:`~quaterion_models.encoders.encoder.Encoder`]]:
+            instance of encoder which will be assigned to
+            :const:`~quaterion_models.model.DEFAULT_ENCODER_KEY`, or mapping of names and
+            encoders.
         """
         raise NotImplementedError()
 
@@ -121,7 +123,8 @@ class TrainableModel(pl.LightningModule, CacheMixin):
         Args:
             input_embedding_size: size of embeddings produced by encoders
         Returns:
-            EncoderHead: instance of EncoderHead to be added to the model
+            :class:`~quaterion_models.heads.encoder_head.EncoderHead`: head to be added on top of
+            a model
         """
         raise NotImplementedError()
 

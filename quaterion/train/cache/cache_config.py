@@ -4,8 +4,8 @@ from enum import Enum
 from dataclasses import dataclass, field
 from typing import Dict, Optional, Callable, Any, Hashable, Union
 
-# Function to extract hash value from the input object
-# Required if there is no other way to distinguish values for caching
+#: Type of function to extract hash value from the input object.
+#: Required if there is no other way to distinguish values for caching
 KeyExtractorType = Callable[[Any], Hashable]
 
 

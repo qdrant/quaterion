@@ -45,5 +45,5 @@ class CacheConfig:
     affect others training stages."""
 
     num_workers: Optional[int] = None  # if None - inherited from source dl
-    """Num_workers to be used in CacheDataLoader during caching process. It does not 
+    """Num of workers to be used in CacheDataLoader during caching process. It does not 
     affect others training stages."""

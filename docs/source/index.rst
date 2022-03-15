@@ -10,7 +10,7 @@ Welcome to Quaterion's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-
+   quaterion
 
 Indices and tables
 ==================

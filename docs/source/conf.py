@@ -98,3 +98,9 @@ html_static_path = []
 html_css_files = [
     "quaterion.css",
 ]
+
+# Files excluded via exclude_patterns still being generating by sphinx-apidoc
+# As they are generated, some documents have links to them. It leads to a warning like:
+# `WARNING: toctree contains reference to excluded document '...'`.
+# suppress_warnings allows to remove such warnings
+suppress_warnings = ['toc.excluded']

@@ -29,8 +29,14 @@ class CacheTrainCollater(TrainCollater):
         self, ids: List[int], features: List[Any], encoder_name
     ) -> List[Hashable]:
         """
-        If custom `key_extractor` is specified for the encoder - use it instead of sequential number.
-        WARN: Do not use default `__hash__` implementation, because `torch.Tensor` does not work properly with it.
+        If custom `key_extractor` is specified for the encoder - use it instead of sequential
+        number.
+
+        Warnings: Do not use default `__hash__` implementation, because `torch.Tensor` does not
+        work properly with it.
+
+        Warnings: If you use default `__hash__` implementation, you have to handle multiprocessing
+        issues yourself. You may need to set `fork` start method or `PYTHONHASHSEED` explicitly.
         """
         if encoder_name not in self.key_extractors:
             # Use default

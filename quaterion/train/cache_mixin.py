@@ -1,5 +1,3 @@
-import multiprocessing as mp
-import os
 from typing import (
     Union,
     Dict,
@@ -26,8 +24,6 @@ from quaterion.train.cache.cache_model import CacheModel
 
 class CacheMixin:
     """:meta private:"""
-
-    CACHE_MULTIPROCESSING_CONTEXT = "fork"
 
     @classmethod
     def _apply_cache_config(
@@ -236,20 +232,6 @@ class CacheMixin:
     ) -> DataLoader:
         """Creates dataloader for caching.
 
-        Child processes need to derive randomized `PYTHONHASHSEED` value from
-        parent process to obtain the same hash values. It is only done with
-        `fork` start method.
-        `fork` start method is presented on Unix systems, and it is the default
-        for them, except macOS. Therefore, we set `fork` method explicitly.
-
-        If dataloader is not supposed to use child process, nothing being done.
-        If multiprocessing_context was set by user, it is being untouched and
-        can lead to errors.
-        If `PYTHONHASHSEED` is set explicitly then multiprocessing_context
-        won't be switched.
-        Cache can be used on Windows only in case when `PYTHONHASHSEED` is set
-        explicitly.
-
         Args:
             dataloader: dataloader to be wrapped
             cache_config: cache config to retrieve num of workers and batch
@@ -258,31 +240,17 @@ class CacheMixin:
         Returns:
             DataLoader: dataloader for caching
         """
-        cls._switch_multiprocessing_context(dataloader)
         num_workers = (
             cache_config.num_workers
             if cache_config.num_workers is not None
             else dataloader.num_workers
         )
 
-        if num_workers == 0:
-            mp_ctx = None
-        elif dataloader.multiprocessing_context:  # already switched or
-            # set by user
-            mp_ctx = dataloader.multiprocessing_context
-        elif "PYTHONHASHSEED" in os.environ:  # source dataloader has no
-            # mp context set, use default on current OS
-            mp_ctx = mp.get_start_method()
-        else:
-            mp_ctx = cls.CACHE_MULTIPROCESSING_CONTEXT
-            cls._check_mp_context(mp_ctx)
-
         # We need to reduce random sampling and repeated calculations to
         # make cache as fast as possible. Thus, we recreate dataloader
         # and set batch size explicitly.
         params = {
             **dataloader.original_params,
-            "multiprocessing_context": mp_ctx,
             "num_workers": num_workers,
             "batch_size": cache_config.batch_size,
             "shuffle": False,
@@ -295,69 +263,3 @@ class CacheMixin:
             dataset=dataloader.dataset, collate_fn=dataloader.collate_fn, **params
         )
         return cache_dl
-
-    @classmethod
-    def _switch_multiprocessing_context(cls, dataloader: SimilarityDataLoader) -> None:
-        """Switch dataloader multiprocessing context.
-
-        Do nothing if dataloader is not supposed to use child processes or
-        `PYTHONHASHSEED` has been set explicitly by user.
-
-        Args:
-            dataloader: dataloader to check and switch multiprocessing context
-
-        """
-        if "PYTHONHASHSEED" in os.environ:
-            return
-
-        if dataloader.num_workers == 0:
-            return
-
-        mp_context: Optional[
-            Union[str, mp.context.BaseContext]
-        ] = dataloader.multiprocessing_context
-        cls._check_mp_context(mp_context)
-
-        dataloader.multiprocessing_context = cls.CACHE_MULTIPROCESSING_CONTEXT
-
-    @classmethod
-    def _check_mp_context(
-        cls, mp_context: Optional[Union[str, mp.context.BaseContext]]
-    ) -> None:
-        """Check if multiprocessing context is compatible with cache.
-
-        Emits warning if current multiprocessing context start method does not
-        coincide with one required by cache.
-
-        Args:
-            mp_context: some dataloader's multiprocessing context
-
-        Raises:
-            OSError: Raise OSError if OS does not support process start method
-            required by cache. Currently, this start method is `fork` which is
-            not supported by Windows.
-        """
-        if not mp_context:
-            return
-
-        if not isinstance(mp_context, str):
-            mp_context = mp_context.get_start_method()
-
-        if mp_context != cls.CACHE_MULTIPROCESSING_CONTEXT:
-            logger.warning(
-                "Default start method on your OS is not "
-                f"{cls.CACHE_MULTIPROCESSING_CONTEXT}. "
-                "Trying to switch it. However "
-                f"{cls.CACHE_MULTIPROCESSING_CONTEXT} may be unsafe or "
-                "unsupported. The most safe option is to launch your process "
-                "with fixed `PYTHONHASHSEED` env and remain `spawn` as start "
-                "method.\n"
-                "Possible launch is `PYTHONHASHSEED=0 python3 run.py"
-            )
-
-        if cls.CACHE_MULTIPROCESSING_CONTEXT not in mp.get_all_start_methods():
-            raise OSError(
-                f"Cache can't be used without setting `PYTHONHASHSEED`. "
-                f"{cls.CACHE_MULTIPROCESSING_CONTEXT} multiprocessing context "
-                "is not available on current OS"
-            )

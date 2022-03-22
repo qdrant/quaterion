@@ -1,6 +1,7 @@
 from typing import Optional
 
 import torch
+import torch.nn.functional as F
 from quaterion.loss.group_loss import GroupLoss
 from quaterion.loss.metrics import SiameseDistanceMetric
 from quaterion.utils import (
@@ -96,7 +97,7 @@ class TripletLoss(GroupLoss):
             triplet_loss = mask * triplet_loss
 
             # get rid of easy triplets
-            triplet_loss = torch.max(triplet_loss, torch.tensor(0.0))
+            triplet_loss = F.relu(triplet_loss)
 
             # get the number of triplets with a positive loss
             num_positive_triplets = torch.sum((triplet_loss > 1e-16).float())
@@ -124,9 +125,12 @@ class TripletLoss(GroupLoss):
             hardest_negative_dists = anchor_negative_dists.min(dim=1)[0]
 
             # combine hardest positives and hardest negatives
-            triplet_loss = torch.max(
-                hardest_positive_dists - hardest_negative_dists + self._margin,
-                torch.tensor(0.0),
+            triplet_loss = F.relu(
+                # Division by the minimal distance between negative samples scales target distances
+                # # and prevents vector collapse
+                (hardest_positive_dists - hardest_negative_dists)
+                / torch.max(hardest_negative_dists.min(), torch.tensor(1e-16))
+                + self._margin
             )
 
             # get scalar loss value

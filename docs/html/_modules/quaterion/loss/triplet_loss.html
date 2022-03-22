@@ -35,6 +35,7 @@
 <span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
 <span class="kn">from</span> <span class="nn">quaterion.loss.group_loss</span> <span class="kn">import</span> <span class="n">GroupLoss</span>
 <span class="kn">from</span> <span class="nn">quaterion.loss.metrics</span> <span class="kn">import</span> <span class="n">SiameseDistanceMetric</span>
 <span class="kn">from</span> <span class="nn">quaterion.utils</span> <span class="kn">import</span> <span class="p">(</span>
@@ -130,7 +131,7 @@
             <span class="n">triplet_loss</span> <span class="o">=</span> <span class="n">mask</span> <span class="o">*</span> <span class="n">triplet_loss</span>
 
             <span class="c1"># get rid of easy triplets</span>
-            <span class="n">triplet_loss</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">triplet_loss</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">0.0</span><span class="p">))</span>
+            <span class="n">triplet_loss</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="n">triplet_loss</span><span class="p">)</span>
 
             <span class="c1"># get the number of triplets with a positive loss</span>
             <span class="n">num_positive_triplets</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="n">triplet_loss</span> <span class="o">&gt;</span> <span class="mf">1e-16</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">())</span>
@@ -158,9 +159,12 @@
             <span class="n">hardest_negative_dists</span> <span class="o">=</span> <span class="n">anchor_negative_dists</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
 
             <span class="c1"># combine hardest positives and hardest negatives</span>
-            <span class="n">triplet_loss</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span>
-                <span class="n">hardest_positive_dists</span> <span class="o">-</span> <span class="n">hardest_negative_dists</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_margin</span><span class="p">,</span>
-                <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">0.0</span><span class="p">),</span>
+            <span class="n">triplet_loss</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span>
+                <span class="c1"># Division by the minimal distance between negative samples scales target distances</span>
+                <span class="c1"># # and prevents vector collapse</span>
+                <span class="p">(</span><span class="n">hardest_positive_dists</span> <span class="o">-</span> <span class="n">hardest_negative_dists</span><span class="p">)</span>
+                <span class="o">/</span> <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">hardest_negative_dists</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">1e-16</span><span class="p">))</span>
+                <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_margin</span>
             <span class="p">)</span>
 
             <span class="c1"># get scalar loss value</span>

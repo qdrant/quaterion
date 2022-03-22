@@ -23,7 +23,6 @@ from quaterion.train.cache.cache_model import CacheModel
 
 
 class CacheMixin:
-
     @classmethod
     def _apply_cache_config(
         cls,

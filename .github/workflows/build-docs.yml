@@ -11,7 +11,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
       with:
-          fetch-depth: 0
+          ref: $GITHUB_BASE_REF
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
@@ -39,7 +39,7 @@ jobs:
         echo "git show-ref"
         git show-ref
         echo "git checkout"
-        git checkout $GITHUB_REF
+        git checkout $GITHUB_BASE_REF
         echo "git status"
         git status
         echo "git add ./docs"
@@ -49,4 +49,4 @@ jobs:
         echo "git commit"
         git commit -m "docs: auto-generate docs with sphinx"
         echo "git push"
-        git push HEAD:$GITHUB_REF
+        git push

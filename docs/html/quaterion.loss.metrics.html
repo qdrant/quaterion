@@ -16,6 +16,8 @@
     <script src="_static/doctools.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="quaterion.loss.multiple_negatives_ranking_loss module" href="quaterion.loss.multiple_negatives_ranking_loss.html" />
+    <link rel="prev" title="quaterion.loss.group_loss module" href="quaterion.loss.group_loss.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -62,8 +64,11 @@ If <cite>y</cite> is <cite>None</cite>, it assigns <cite>x</cite> to <cite>y</ci
 <dt class="sig sig-object py" id="quaterion.loss.metrics.SiameseDistanceMetric.dot_product_distance">
 <em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dot_product_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">matrix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/quaterion/loss/metrics.html#SiameseDistanceMetric.dot_product_distance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.loss.metrics.SiameseDistanceMetric.dot_product_distance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute dot product distance</p>
-<p>Dot product distance may have unexpected effects. Make sure you entirely
-understand how it works itself, and with chosen loss function especially.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Dot product distance may have unexpected effects. Make sure you entirely understand how
+it works itself, and with chosen loss function especially.</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -138,11 +143,26 @@ if <cite>y</cite> it is <cite>None</cite>, it assigns <cite>x</cite> to <cite>y<
 
 
 <h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="quaterion.html">quaterion package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="quaterion.html#subpackages">Subpackages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quaterion.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quaterion.html#module-quaterion">Module contents</a></li>
+</ul>
+</li>
+</ul>
 
 <div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="quaterion.html">quaterion package</a><ul>
+  <li><a href="quaterion.loss.html">quaterion.loss package</a><ul>
+      <li>Previous: <a href="quaterion.loss.group_loss.html" title="previous chapter">quaterion.loss.group_loss module</a></li>
+      <li>Next: <a href="quaterion.loss.multiple_negatives_ranking_loss.html" title="next chapter">quaterion.loss.multiple_negatives_ranking_loss module</a></li>
+  </ul></li>
+  </ul></li>
   </ul></li>
 </ul>
 </div>

@@ -11,7 +11,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
       with:
-          ref: $GITHUB_BASE_REF
+          fetch-depth: 0
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
@@ -23,6 +23,8 @@ jobs:
         poetry run pip install 'setuptools==59.5.0' # temporary fix for https://github.com/pytorch/pytorch/pull/69904
     - name: Generate docs
       run: |
+        echo "git checkout"
+        git checkout $GITHUB_BASE_REF
         echo "git branch"
         git branch
         echo "before bash"

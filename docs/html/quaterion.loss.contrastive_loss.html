@@ -1,0 +1,196 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>quaterion.loss.contrastive_loss module &#8212; Quaterion  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <link rel="stylesheet" type="text/css" href="_static/quaterion.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="quaterion.loss.group_loss module" href="quaterion.loss.group_loss.html" />
+    <link rel="prev" title="quaterion.loss.arcface_loss module" href="quaterion.loss.arcface_loss.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-quaterion.loss.contrastive_loss">
+<span id="quaterion-loss-contrastive-loss-module"></span><h1>quaterion.loss.contrastive_loss module<a class="headerlink" href="#module-quaterion.loss.contrastive_loss" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="quaterion.loss.contrastive_loss.ContrastiveLoss">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ContrastiveLoss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distance_metric_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'cosine_distance'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">margin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size_average</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/quaterion/loss/contrastive_loss.html#ContrastiveLoss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.loss.contrastive_loss.ContrastiveLoss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="quaterion.loss.pairwise_loss.html#quaterion.loss.pairwise_loss.PairwiseLoss" title="quaterion.loss.pairwise_loss.PairwiseLoss"><code class="xref py py-class docutils literal notranslate"><span class="pre">PairwiseLoss</span></code></a></p>
+<p>Contrastive loss.</p>
+<p>Expects as input two texts and a label of either 0 or 1. If the label == 1, then the
+distance between the two embeddings is reduced. If the label == 0, then the distance
+between the embeddings is increased.</p>
+<dl class="simple">
+<dt>Further information:</dt><dd><p><a class="reference external" href="http://yann.lecun.com/exdb/publis/pdf/hadsell-chopra-lecun-06.pdf">http://yann.lecun.com/exdb/publis/pdf/hadsell-chopra-lecun-06.pdf</a></p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>distance_metric_name</strong> – Name of the function, that returns a distance between two embeddings.
+<a class="reference internal" href="quaterion.loss.metrics.html#quaterion.loss.metrics.SiameseDistanceMetric" title="quaterion.loss.metrics.SiameseDistanceMetric"><code class="xref py py-class docutils literal notranslate"><span class="pre">SiameseDistanceMetric</span></code></a> contains pre-defined metrics
+that can be used.</p></li>
+<li><p><strong>margin</strong> – Negative samples (label == 0) should have a distance of at least the
+margin value.</p></li>
+<li><p><strong>size_average</strong> – Average by the size of the mini-batch.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="quaterion.loss.contrastive_loss.ContrastiveLoss.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">embeddings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pairs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">LongTensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subgroups</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/quaterion/loss/contrastive_loss.html#ContrastiveLoss.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.loss.contrastive_loss.ContrastiveLoss.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute loss value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>embeddings</strong> – Batch of embeddings, first half of embeddings are embeddings
+of first objects in pairs, second half are embeddings of second objects
+in pairs.</p></li>
+<li><p><strong>pairs</strong> – Indices of corresponding objects in pairs.</p></li>
+<li><p><strong>labels</strong> – Scores of positive and negative objects.</p></li>
+<li><p><strong>subgroups</strong> – subgroups to distinguish objects which can and cannot be used
+as negative examples</p></li>
+<li><p><strong>**kwargs</strong> – additional key-word arguments for generalization of loss call</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><em>Tensor</em> – averaged or summed loss value</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="quaterion.loss.contrastive_loss.ContrastiveLoss.get_config_dict">
+<span class="sig-name descname"><span class="pre">get_config_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/quaterion/loss/contrastive_loss.html#ContrastiveLoss.get_config_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.loss.contrastive_loss.ContrastiveLoss.get_config_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Config used in saving and loading purposes.</p>
+<p>Config object has to be JSON-serializable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><em>Dict[str, Any]</em> – JSON-serializable dict of params</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="quaterion.loss.contrastive_loss.ContrastiveLoss.metric_class">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">metric_class</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Type</span></span></span><a class="reference internal" href="_modules/quaterion/loss/contrastive_loss.html#ContrastiveLoss.metric_class"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.loss.contrastive_loss.ContrastiveLoss.metric_class" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class with metrics available for current loss.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><em>Type</em> – class containing metrics</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="quaterion.loss.contrastive_loss.ContrastiveLoss.training">
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#quaterion.loss.contrastive_loss.ContrastiveLoss.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Quaterion</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="quaterion.html">quaterion package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="quaterion.html#subpackages">Subpackages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quaterion.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quaterion.html#module-quaterion">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="quaterion.html">quaterion package</a><ul>
+  <li><a href="quaterion.loss.html">quaterion.loss package</a><ul>
+      <li>Previous: <a href="quaterion.loss.arcface_loss.html" title="previous chapter">quaterion.loss.arcface_loss module</a></li>
+      <li>Next: <a href="quaterion.loss.group_loss.html" title="next chapter">quaterion.loss.group_loss module</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Quaterion Authors.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.4.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/quaterion.loss.contrastive_loss.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

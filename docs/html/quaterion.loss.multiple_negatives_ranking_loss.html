@@ -1,0 +1,203 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>quaterion.loss.multiple_negatives_ranking_loss module &#8212; Quaterion  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <link rel="stylesheet" type="text/css" href="_static/quaterion.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="quaterion.loss.online_contrastive_loss module" href="quaterion.loss.online_contrastive_loss.html" />
+    <link rel="prev" title="quaterion.loss.metrics module" href="quaterion.loss.metrics.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-quaterion.loss.multiple_negatives_ranking_loss">
+<span id="quaterion-loss-multiple-negatives-ranking-loss-module"></span><h1>quaterion.loss.multiple_negatives_ranking_loss module<a class="headerlink" href="#module-quaterion.loss.multiple_negatives_ranking_loss" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="quaterion.loss.multiple_negatives_ranking_loss.MultipleNegativesRankingLoss">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleNegativesRankingLoss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">20.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">similarity_metric_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'cosine'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symmetric</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/quaterion/loss/multiple_negatives_ranking_loss.html#MultipleNegativesRankingLoss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.loss.multiple_negatives_ranking_loss.MultipleNegativesRankingLoss" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="quaterion.loss.pairwise_loss.html#quaterion.loss.pairwise_loss.PairwiseLoss" title="quaterion.loss.pairwise_loss.PairwiseLoss"><code class="xref py py-class docutils literal notranslate"><span class="pre">PairwiseLoss</span></code></a></p>
+<p>Implement Multiple Negatives Ranking Loss as described in <a class="reference external" href="https://arxiv.org/pdf/1705.00652.pdf">https://arxiv.org/pdf/1705.00652.pdf</a></p>
+<p>This loss function works only with positive pairs, e.g., an <cite>anchor</cite> and a <cite>positive</cite>.
+For each pair, it uses <cite>positive</cite> of other pairs in the batch as negatives, so you don’t need
+to worry about specifying negative examples. It is great for retrieval tasks such as
+question-answer retrieval, duplicate sentence retrieval, and cross-modal retrieval.
+It accepts pairs of anchor and positive embeddings to calculate a similarity matrix between them.
+Then, it minimizes negative log-likelihood for softmax-normalized similarity scores.
+This optimizes  retrieval of the correct positive pair when an anchor given.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><a class="reference internal" href="quaterion.dataset.similarity_samples.html#quaterion.dataset.similarity_samples.SimilarityPairSample.score" title="quaterion.dataset.similarity_samples.SimilarityPairSample.score"><code class="xref py py-attr docutils literal notranslate"><span class="pre">score</span></code></a> and
+<a class="reference internal" href="quaterion.dataset.similarity_samples.html#quaterion.dataset.similarity_samples.SimilarityPairSample.subgroup" title="quaterion.dataset.similarity_samples.SimilarityPairSample.subgroup"><code class="xref py py-attr docutils literal notranslate"><span class="pre">subgroup</span></code></a> values are
+ignored for this loss, assuming
+<a class="reference internal" href="quaterion.dataset.similarity_samples.html#quaterion.dataset.similarity_samples.SimilarityPairSample.obj_a" title="quaterion.dataset.similarity_samples.SimilarityPairSample.obj_a"><code class="xref py py-attr docutils literal notranslate"><span class="pre">obj_a</span></code></a> and
+<a class="reference internal" href="quaterion.dataset.similarity_samples.html#quaterion.dataset.similarity_samples.SimilarityPairSample.obj_b" title="quaterion.dataset.similarity_samples.SimilarityPairSample.obj_b"><code class="xref py py-attr docutils literal notranslate"><span class="pre">obj_b</span></code></a> form a positive
+pair, e.g., <cite>label = 1</cite>.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>scale</strong> – Scaling value for multiplying with similarity scores to make cross-entropy work.</p></li>
+<li><p><strong>similarity_metric_name</strong> – Name of the metric to calculate similarities between embeddings.
+Must be either <cite>“cosine”</cite> or <cite>“dot_product”</cite>. If <cite>“dot_product”</cite>, <cite>scale</cite> must be <cite>1</cite>.</p></li>
+<li><p><strong>symmetric</strong> – If True, loss is symmetric,
+i.e., it also accounts for retrieval of the correct anchor when a positive given.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="quaterion.loss.multiple_negatives_ranking_loss.MultipleNegativesRankingLoss.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">embeddings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pairs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">LongTensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subgroups</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/quaterion/loss/multiple_negatives_ranking_loss.html#MultipleNegativesRankingLoss.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.loss.multiple_negatives_ranking_loss.MultipleNegativesRankingLoss.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute loss value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>embeddings</strong> – Batch of embeddings, first half of embeddings are embeddings
+of first objects in pairs, second half are embeddings of second objects
+in pairs.</p></li>
+<li><p><strong>pairs</strong> – Indices of corresponding objects in pairs.</p></li>
+<li><p><strong>labels</strong> – Ignored for this loss. Labels will be automatically formed from <cite>pairs</cite>.</p></li>
+<li><p><strong>subgroups</strong> – Ignored for this loss.</p></li>
+<li><p><strong>**kwargs</strong> – Additional key-word arguments for generalization of loss call</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><em>Tensor</em> – Scalar loss value</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="quaterion.loss.multiple_negatives_ranking_loss.MultipleNegativesRankingLoss.get_config_dict">
+<span class="sig-name descname"><span class="pre">get_config_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/quaterion/loss/multiple_negatives_ranking_loss.html#MultipleNegativesRankingLoss.get_config_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.loss.multiple_negatives_ranking_loss.MultipleNegativesRankingLoss.get_config_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Config used in saving and loading purposes.</p>
+<p>Config object has to be JSON-serializable.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><em>Dict[str, Any]</em> – JSON-serializable dict of params</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="quaterion.loss.multiple_negatives_ranking_loss.MultipleNegativesRankingLoss.metric_class">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">metric_class</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Type</span></span></span><a class="reference internal" href="_modules/quaterion/loss/multiple_negatives_ranking_loss.html#MultipleNegativesRankingLoss.metric_class"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.loss.multiple_negatives_ranking_loss.MultipleNegativesRankingLoss.metric_class" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class with metrics available for current loss.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><em>Type</em> – class containing metrics</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="quaterion.loss.multiple_negatives_ranking_loss.MultipleNegativesRankingLoss.training">
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#quaterion.loss.multiple_negatives_ranking_loss.MultipleNegativesRankingLoss.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Quaterion</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="quaterion.html">quaterion package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="quaterion.html#subpackages">Subpackages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quaterion.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quaterion.html#module-quaterion">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="quaterion.html">quaterion package</a><ul>
+  <li><a href="quaterion.loss.html">quaterion.loss package</a><ul>
+      <li>Previous: <a href="quaterion.loss.metrics.html" title="previous chapter">quaterion.loss.metrics module</a></li>
+      <li>Next: <a href="quaterion.loss.online_contrastive_loss.html" title="next chapter">quaterion.loss.online_contrastive_loss module</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Quaterion Authors.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.4.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/quaterion.loss.multiple_negatives_ranking_loss.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,233 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>quaterion.loss.contrastive_loss &#8212; Quaterion  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/quaterion.css" />
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for quaterion.loss.contrastive_loss</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span>
+
+<span class="kn">import</span> <span class="nn">torch</span>
+
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">LongTensor</span>
+
+<span class="kn">from</span> <span class="nn">quaterion.loss.metrics</span> <span class="kn">import</span> <span class="n">SiameseDistanceMetric</span>
+<span class="kn">from</span> <span class="nn">quaterion.loss.pairwise_loss</span> <span class="kn">import</span> <span class="n">PairwiseLoss</span>
+<span class="kn">from</span> <span class="nn">quaterion.utils</span> <span class="kn">import</span> <span class="n">max_value_of_dtype</span>
+
+
+<div class="viewcode-block" id="ContrastiveLoss"><a class="viewcode-back" href="../../../quaterion.loss.contrastive_loss.html#quaterion.loss.contrastive_loss.ContrastiveLoss">[docs]</a><span class="k">class</span> <span class="nc">ContrastiveLoss</span><span class="p">(</span><span class="n">PairwiseLoss</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Contrastive loss.</span>
+
+<span class="sd">    Expects as input two texts and a label of either 0 or 1. If the label == 1, then the</span>
+<span class="sd">    distance between the two embeddings is reduced. If the label == 0, then the distance</span>
+<span class="sd">    between the embeddings is increased.</span>
+
+<span class="sd">    Further information:</span>
+<span class="sd">        http://yann.lecun.com/exdb/publis/pdf/hadsell-chopra-lecun-06.pdf</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        distance_metric_name: Name of the function, that returns a distance between two embeddings.</span>
+<span class="sd">            :class:`~quaterion.loss.metrics.SiameseDistanceMetric` contains pre-defined metrics</span>
+<span class="sd">            that can be used.</span>
+<span class="sd">        margin: Negative samples (label == 0) should have a distance of at least the</span>
+<span class="sd">            margin value.</span>
+<span class="sd">        size_average: Average by the size of the mini-batch.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ContrastiveLoss.metric_class"><a class="viewcode-back" href="../../../quaterion.loss.contrastive_loss.html#quaterion.loss.contrastive_loss.ContrastiveLoss.metric_class">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">metric_class</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Class with metrics available for current loss.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Type: class containing metrics</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">SiameseDistanceMetric</span></div>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">distance_metric_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;cosine_distance&quot;</span><span class="p">,</span>
+        <span class="n">margin</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">size_average</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">distance_metric_name</span><span class="o">=</span><span class="n">distance_metric_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">margin</span> <span class="o">=</span> <span class="n">margin</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">size_average</span> <span class="o">=</span> <span class="n">size_average</span>
+
+<div class="viewcode-block" id="ContrastiveLoss.get_config_dict"><a class="viewcode-back" href="../../../quaterion.loss.contrastive_loss.html#quaterion.loss.contrastive_loss.ContrastiveLoss.get_config_dict">[docs]</a>    <span class="k">def</span> <span class="nf">get_config_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Config used in saving and loading purposes.</span>
+
+<span class="sd">        Config object has to be JSON-serializable.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Dict[str, Any]: JSON-serializable dict of params</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="o">**</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_config_dict</span><span class="p">(),</span>
+            <span class="s2">&quot;margin&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">margin</span><span class="p">,</span>
+            <span class="s2">&quot;size_average&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">size_average</span><span class="p">,</span>
+        <span class="p">}</span></div>
+
+<div class="viewcode-block" id="ContrastiveLoss.forward"><a class="viewcode-back" href="../../../quaterion.loss.contrastive_loss.html#quaterion.loss.contrastive_loss.ContrastiveLoss.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">embeddings</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">pairs</span><span class="p">:</span> <span class="n">LongTensor</span><span class="p">,</span>
+        <span class="n">labels</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">subgroups</span><span class="p">:</span> <span class="n">Tensor</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Compute loss value.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            embeddings: Batch of embeddings, first half of embeddings are embeddings</span>
+<span class="sd">                of first objects in pairs, second half are embeddings of second objects</span>
+<span class="sd">                in pairs.</span>
+<span class="sd">            pairs: Indices of corresponding objects in pairs.</span>
+<span class="sd">            labels: Scores of positive and negative objects.</span>
+<span class="sd">            subgroups: subgroups to distinguish objects which can and cannot be used</span>
+<span class="sd">                as negative examples</span>
+<span class="sd">            **kwargs: additional key-word arguments for generalization of loss call</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Tensor: averaged or summed loss value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">rep_anchor</span> <span class="o">=</span> <span class="n">embeddings</span><span class="p">[</span><span class="n">pairs</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]]</span>
+        <span class="n">rep_other</span> <span class="o">=</span> <span class="n">embeddings</span><span class="p">[</span><span class="n">pairs</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]]</span>
+        <span class="n">distances</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">distance_metric</span><span class="p">(</span><span class="n">rep_anchor</span><span class="p">,</span> <span class="n">rep_other</span><span class="p">)</span>
+        <span class="n">negative_distances_impact</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">subgroups</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="c1"># shape (2 * batch_size, embeddings_size)</span>
+            <span class="n">embeddings_count</span> <span class="o">=</span> <span class="n">embeddings</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># `embeddings_count` consists of</span>
+            <span class="c1"># number of embeddings for `obj_a` and `obj_b`</span>
+
+            <span class="c1"># `subgroups` shape is (embeddings_count,)</span>
+            <span class="c1"># shape (embeddings_count, embeddings_count)</span>
+            <span class="n">subgroup_matrix</span><span class="p">:</span> <span class="n">Tensor</span> <span class="o">=</span> <span class="n">subgroups</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">embeddings_count</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="c1"># shape (embeddings_count, embeddings_count)</span>
+            <span class="n">comp_matrix</span><span class="p">:</span> <span class="n">Tensor</span> <span class="o">=</span> <span class="n">subgroup_matrix</span> <span class="o">!=</span> <span class="n">subgroup_matrix</span><span class="o">.</span><span class="n">T</span>
+            <span class="c1"># a matrix to take into account only distances to negative</span>
+            <span class="c1"># examples, i.e. from examples which don&#39;t belong to current</span>
+            <span class="c1"># subgroup</span>
+
+            <span class="c1"># shape (embeddings_count, embeddings_count)</span>
+            <span class="n">distance_matrix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">distance_metric</span><span class="p">(</span><span class="n">embeddings</span><span class="p">,</span> <span class="n">embeddings</span><span class="p">,</span> <span class="n">matrix</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">distance_matrix</span><span class="p">[</span><span class="o">~</span><span class="n">comp_matrix</span><span class="p">]</span> <span class="o">=</span> <span class="n">max_value_of_dtype</span><span class="p">(</span><span class="n">distance_matrix</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+            <span class="c1"># shape (embeddings_count, 1)</span>
+            <span class="n">negative_distances</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">distance_matrix</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># find negative examples</span>
+            <span class="c1"># which are the closest to positive ones</span>
+            <span class="c1"># shape (embeddings_count // 2, 1)</span>
+            <span class="n">neg_dist_to_anchors</span> <span class="o">=</span> <span class="n">negative_distances</span><span class="p">[</span><span class="n">pairs</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]]</span>
+            <span class="c1"># shape (embeddings_count // 2, 1)</span>
+            <span class="n">neg_dist_to_other</span> <span class="o">=</span> <span class="n">negative_distances</span><span class="p">[</span><span class="n">pairs</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]]</span>
+            <span class="c1"># shape (embeddings_count // 2, 1)</span>
+            <span class="n">negative_distances_impact</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">margin</span> <span class="o">-</span> <span class="n">neg_dist_to_anchors</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">torch</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">margin</span> <span class="o">-</span> <span class="n">neg_dist_to_other</span><span class="p">)</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="c1"># shape (embeddings_count // 2, 1)</span>
+        <span class="n">losses</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="mf">0.5</span>
+            <span class="o">*</span> <span class="p">(</span>
+                <span class="n">labels</span><span class="o">.</span><span class="n">float</span><span class="p">()</span> <span class="o">*</span> <span class="n">distances</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+                <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">labels</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">margin</span> <span class="o">-</span> <span class="n">distances</span><span class="p">)</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="o">+</span> <span class="n">negative_distances_impact</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">losses</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">size_average</span> <span class="k">else</span> <span class="n">losses</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span></div></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">Quaterion</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../quaterion.html">quaterion package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Quaterion Authors.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.4.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

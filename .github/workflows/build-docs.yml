@@ -32,4 +32,7 @@ jobs:
         git status
         git checkout $GITHUB_REF
         git status
-        git add ./docs && git commit -m "docs: auto-generate docs with sphinx" && git pull && git push || true
+        git add ./docs
+        git status
+        git commit -m "docs: auto-generate docs with sphinx"
+        git push

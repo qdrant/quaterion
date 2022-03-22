@@ -31,7 +31,18 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.autodoc",
     "sphinx.ext.viewcode",
+    "sphinx.ext.intersphinx",
 ]
+
+# mapping to quaterion_models
+# tuple: (target, inventory)
+# Each target is the base URI of a foreign Sphinx documentation set and can be a local path or an
+# HTTP URI. The inventory indicates where the inventory file can be found: it can be None (an
+# objects.inv file at the same location as the base URI) or another local file path or a full
+# HTTP URI to an inventory file.
+intersphinx_mapping = {
+    "quaterion_models": ("http://127.0.0.1:5500/docs/html", None),
+}
 
 # prevents sphinx from adding full path to type hints
 autodoc_typehints_format = "short"
@@ -70,6 +81,7 @@ exclude_patterns = [
     "*cache_encoder*",
     "*cache_model*",
     "*cache_train_collater*",
+    "*indexing_dataset*",
 ]
 # -- Options for HTML output -------------------------------------------------
 
@@ -81,8 +93,14 @@ html_theme = "alabaster"
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ["_static"]
+html_static_path = []
 
 html_css_files = [
     "quaterion.css",
 ]
+
+# Files excluded via exclude_patterns still being generating by sphinx-apidoc
+# As they are generated, some documents have links to them. It leads to a warning like:
+# `WARNING: toctree contains reference to excluded document '...'`.
+# suppress_warnings allows to remove such warnings
+suppress_warnings = ["toc.excluded"]

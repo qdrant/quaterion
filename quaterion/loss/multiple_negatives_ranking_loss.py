@@ -13,17 +13,20 @@ class MultipleNegativesRankingLoss(PairwiseLoss):
     """Implement Multiple Negatives Ranking Loss as described in https://arxiv.org/pdf/1705.00652.pdf
 
     This loss function works only with positive pairs, e.g., an `anchor` and a `positive`.
-    For each pair, it uses `positive`s of other pairs in the batch as negatives, so you don't need
+    For each pair, it uses `positive` of other pairs in the batch as negatives, so you don't need
     to worry about specifying negative examples. It is great for retrieval tasks such as
     question-answer retrieval, duplicate sentence retrieval, and cross-modal retrieval.
     It accepts pairs of anchor and positive embeddings to calculate a similarity matrix between them.
     Then, it minimizes negative log-likelihood for softmax-normalized similarity scores.
     This optimizes  retrieval of the correct positive pair when an anchor given.
 
-    Note: `SimilarityPairSample.score` and `SimilarityPairSample.subgroup` values are ignored
-    for this loss, assuming `SimilarityPairSample.obj_a` and `SimilarityPairSample.obj_b`
-    form a positive pair, e.g., `label = 1`.
-
+    Note:
+        :attr:`~quaterion.dataset.similarity_samples.SimilarityPairSample.score` and
+        :attr:`~quaterion.dataset.similarity_samples.SimilarityPairSample.subgroup` values are
+        ignored for this loss, assuming
+        :attr:`~quaterion.dataset.similarity_samples.SimilarityPairSample.obj_a` and
+        :attr:`~quaterion.dataset.similarity_samples.SimilarityPairSample.obj_b` form a positive
+        pair, e.g., `label = 1`.
 
     Args:
         scale: Scaling value for multiplying with similarity scores to make cross-entropy work.
@@ -97,9 +100,12 @@ class MultipleNegativesRankingLoss(PairwiseLoss):
         Returns:
             Tensor: Scalar loss value
         """
-        assert (
-            labels is None or labels.sum() == labels.size()[0]
-        ), "You seem to be using non-positive pairs. Make sure that `SimilarityPairSample.obj_a` and `SimilarityPairSample.obj_b` are positive pairs with a score of `1`"
+        _warn = (
+            "You seem to be using non-positive pairs. "
+            "Make sure that `SimilarityPairSample.obj_a` and `SimilarityPairSample.obj_b` "
+            "are positive pairs with a score of `1`"
+        )
+        assert labels is None or labels.sum() == labels.size()[0], _warn
         rep_anchor = embeddings[pairs[:, 0]]
         rep_positive = embeddings[pairs[:, 1]]
 

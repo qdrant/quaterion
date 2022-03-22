@@ -13,8 +13,7 @@ from quaterion.dataset.similarity_samples import (
 
 
 class SimilarityDataLoader(DataLoader, Generic[T_co]):
-    """
-    SimilarityDataLoader is a special version of :class:`~torch.utils.data.DataLoader`
+    """SimilarityDataLoader is a special version of :class:`~torch.utils.data.DataLoader`
     which works with similarity samples.
 
     SimilarityDataLoader will automatically assign dummy collate_fn for debug purposes,
@@ -24,7 +23,7 @@ class SimilarityDataLoader(DataLoader, Generic[T_co]):
     by overwriting :meth:`~quaterion_models.encoders.encoder.Encoder.get_collate_fn`
 
     Args:
-        dataset: Dataset which outputs :class:`~quaterion.dataset.similarity_samples.SimilarityGroupSample`
+        dataset: Dataset which outputs similarity samples
         **kwargs: Parameters passed directly into :meth:`~torch.utils.data.DataLoader.__init__`
     """
 
@@ -50,14 +49,14 @@ class SimilarityDataLoader(DataLoader, Generic[T_co]):
 
     @classmethod
     def pre_collate_fn(cls, batch: List[T_co]):
-        """
-        Function applied to batch before actual collate.
-        Splits bach into features - arguments of prediction and labels - targets.
-        Encoder-specific `collate_fn`_s will then be applied to feature list only.
+        """Function applied to batch before actual collate.
+
+        Splits batch into features - arguments of prediction and labels - targets.
+        Encoder-specific `collate_fn` will then be applied to feature list only.
         Loss functions consumes labels from this function without any additional transformations.
 
         Args:
-            batch: List of similarity
+            batch: List of similarity samples
 
         Returns:
             - ids of the features
@@ -75,11 +74,12 @@ class SimilarityDataLoader(DataLoader, Generic[T_co]):
     @classmethod
     def collate_labels(cls, batch: List[T_co]) -> Dict[str, torch.Tensor]:
         """Collate function for labels
-        Converts labels into tensors, suitable for loss passing directly into loss functions and
+
+        Convert labels into tensors, suitable for loss passing directly into loss functions and
         metric estimators.
 
         Args:
-            batch: List of raw items from dataset
+            batch: List of similarity samples
 
         Returns:
             Collated labels
@@ -91,16 +91,17 @@ class SimilarityDataLoader(DataLoader, Generic[T_co]):
         cls, batch: List[T_co], hash_ids: List[int]
     ) -> Tuple[List[Any], List[int]]:
         """Retrieve and enumerate objects from similarity samples.
+
         Each individual object should be used as input for the encoder.
-        Additionally, associates hash_id with each feature,
-         if there are more than one feature in the sample - generates new unique ids based on input one.
+        Additionally, associates hash_id with each feature, if there are more than one feature in
+        the sample - generates new unique ids based on input one.
 
         Args:
-            batch: List of raw items from dataset
+            batch: List of similarity samples
             hash_ids: pseudo-random ids of the similarity samples
 
         Returns:
-            - List of input features for encored collate
+            - List of input features for encoder collate
             - List of ids, associated with each feature
         """
         raise NotImplementedError()
@@ -114,17 +115,19 @@ class PairsSimilarityDataLoader(SimilarityDataLoader[SimilarityPairSample]):
     def collate_labels(
         cls, batch: List[SimilarityPairSample]
     ) -> Dict[str, torch.Tensor]:
-        """Collate function for labels of SimilarityPairSamples
-        Converts labels into tensors, suitable for loss passing directly into loss functions and metric estimators.
+        """Collate function for labels of :class:`~quaterion.dataset.similarity_samples.SimilarityPairSample`
+
+        Convert labels into tensors, suitable for loss passing directly into loss functions and
+        metric estimators.
 
         Args:
-            batch: List of SimilarityPairSample objects
+            batch: List of :class:`~quaterion.dataset.similarity_samples.SimilarityPairSample`
 
         Returns:
             Collated labels:
-                - labels - tensor of scores for each input pair
-                - pairs - pairs of id offsets of features, associater with respect labels
-                - subgroups - subgroup id for each featire
+            - labels - tensor of scores for each input pair
+            - pairs - pairs of id offsets of features, associated with respect labels
+            - subgroups - subgroup id for each featire
 
         Examples:
 
@@ -182,14 +185,16 @@ class GroupSimilarityDataLoader(SimilarityDataLoader[SimilarityGroupSample]):
         cls, batch: List[SimilarityGroupSample]
     ) -> Dict[str, torch.Tensor]:
         """Collate function for labels
-        Converts labels into tensors, suitable for loss passing directly into loss functions and metric estimators.
+
+        Convert labels into tensors, suitable for loss passing directly into loss functions and
+        metric estimators.
 
         Args:
-            batch: Input batch with features and labels
+            batch: List of :class:`~quaterion.dataset.similarity_samples.SimilarityGroupSample`
 
         Returns:
             Collated labels:
-                - groups - id of the group for each feature object
+            - groups -- id of the group for each feature object
 
         Examples:
 

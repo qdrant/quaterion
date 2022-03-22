@@ -4,8 +4,8 @@ from enum import Enum
 from dataclasses import dataclass, field
 from typing import Dict, Optional, Callable, Any, Hashable, Union
 
-# Function to extract hash value from the input object
-# Required if there is no other way to distinguish values for caching
+#: Type of function to extract hash value from the input object.
+#: Required if there is no other way to distinguish values for caching
 KeyExtractorType = Callable[[Any], Hashable]
 
 
@@ -24,13 +24,15 @@ class CacheType(str, Enum):
 
 @dataclass
 class CacheConfig:
-    """Class to be used in `configure_cache` of `TrainableModel`."""
+    """Class to be used in
+    :meth:`~quaterion.train.trainable_model.TrainableModel.configure_caches`
+    """
 
     cache_type: Optional[CacheType] = CacheType.AUTO
     """Cache type used for cacheable encoders not set in mapping"""
 
     mapping: Dict[str, CacheType] = field(default_factory=dict)
-    """Mapping of `encoder_name` to `CacheType`"""
+    """Mapping of `encoder_name` to :class:`~CacheType`"""
 
     key_extractors: Union[KeyExtractorType, Dict[str, KeyExtractorType]] = field(
         default_factory=dict
@@ -43,5 +45,5 @@ class CacheConfig:
     affect others training stages."""
 
     num_workers: Optional[int] = None  # if None - inherited from source dl
-    """Num_workers to be used in CacheDataLoader during caching process. It does not 
+    """Num of workers to be used in CacheDataLoader during caching process. It does not 
     affect others training stages."""

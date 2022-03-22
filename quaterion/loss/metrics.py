@@ -125,8 +125,9 @@ class SiameseDistanceMetric:
     def dot_product_distance(x: Tensor, y: Tensor, matrix=False) -> Tensor:
         """Compute dot product distance
 
-        Dot product distance may have unexpected effects. Make sure you entirely
-        understand how it works itself, and with chosen loss function especially.
+        Warnings:
+            Dot product distance may have unexpected effects. Make sure you entirely understand how
+            it works itself, and with chosen loss function especially.
 
         Args:
             x: shape: (batch_size, ...)

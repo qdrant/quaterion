@@ -23,16 +23,28 @@ jobs:
         poetry run pip install 'setuptools==59.5.0' # temporary fix for https://github.com/pytorch/pytorch/pull/69904
     - name: Generate docs
       run: |
+        echo "git branch"
         git branch
+        echo "before bash"
         bash -x docs/generate_docs.sh
+        echo "right after bash"
         git config user.name 'qdrant'
         git config user.email 'qdrant@users.noreply.github.com'
         git config pull.rebase false
         git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
+        echo "git status"
         git status
+        echo "git fetch"
+        git fetch
+        echo "git checkout"
         git checkout $GITHUB_REF
+        echo "git status"
         git status
+        echo "git add ./docs"
         git add ./docs
+        echo "git status"
         git status
+        echo "git commit"
         git commit -m "docs: auto-generate docs with sphinx"
-        git push
+        echo "git push"
+        git push $GITHUB_REF

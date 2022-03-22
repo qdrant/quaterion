@@ -100,12 +100,12 @@ class MultipleNegativesRankingLoss(PairwiseLoss):
         Returns:
             Tensor: Scalar loss value
         """
-        _warn = "You seem to be using non-positive pairs. " \
-                "Make sure that `SimilarityPairSample.obj_a` and `SimilarityPairSample.obj_b` " \
-                "are positive pairs with a score of `1`"
-        assert (
-            labels is None or labels.sum() == labels.size()[0]
-        ), _warn
+        _warn = (
+            "You seem to be using non-positive pairs. "
+            "Make sure that `SimilarityPairSample.obj_a` and `SimilarityPairSample.obj_b` "
+            "are positive pairs with a score of `1`"
+        )
+        assert labels is None or labels.sum() == labels.size()[0], _warn
         rep_anchor = embeddings[pairs[:, 0]]
         rep_positive = embeddings[pairs[:, 1]]
 

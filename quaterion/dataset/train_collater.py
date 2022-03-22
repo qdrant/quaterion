@@ -19,7 +19,9 @@ class TrainCollater:
         encoder_collates: mapping of encoder name to its collate function
     """
 
-    def __init__(self, pre_collate_fn: Callable, encoder_collates: Dict[str, CollateFnType]):
+    def __init__(
+        self, pre_collate_fn: Callable, encoder_collates: Dict[str, CollateFnType]
+    ):
         self.pre_collate_fn = pre_collate_fn
         self.encoder_collates = encoder_collates
 

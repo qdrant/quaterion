@@ -41,7 +41,7 @@ extensions = [
 # objects.inv file at the same location as the base URI) or another local file path or a full
 # HTTP URI to an inventory file.
 intersphinx_mapping = {
-    'quaterion_models': ('http://127.0.0.1:5500/docs/html', None),
+    "quaterion_models": ("http://127.0.0.1:5500/docs/html", None),
 }
 
 # prevents sphinx from adding full path to type hints
@@ -103,4 +103,4 @@ html_css_files = [
 # As they are generated, some documents have links to them. It leads to a warning like:
 # `WARNING: toctree contains reference to excluded document '...'`.
 # suppress_warnings allows to remove such warnings
-suppress_warnings = ['toc.excluded']
+suppress_warnings = ["toc.excluded"]

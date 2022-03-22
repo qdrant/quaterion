@@ -36,6 +36,8 @@ jobs:
         git status
         echo "git fetch"
         git fetch
+        echo "git show-ref"
+        git show-ref
         echo "git checkout"
         git checkout $GITHUB_REF
         echo "git status"
@@ -47,4 +49,4 @@ jobs:
         echo "git commit"
         git commit -m "docs: auto-generate docs with sphinx"
         echo "git push"
-        git push $GITHUB_REF
+        git push HEAD:$GITHUB_REF

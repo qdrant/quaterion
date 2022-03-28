@@ -1,6 +1,7 @@
-from typing import List
+from typing import Union, Dict
 
 import torch
+from torch import Tensor
 
 
 class BaseMetric:
@@ -8,7 +9,7 @@ class BaseMetric:
         self.encoder = encoder
         self.distance_metric = distance_metric
 
-        self.embeddings = torch.Tensor()
+        self.embeddings = Tensor()
         self.labels = None
 
     def compute(self):
@@ -17,8 +18,9 @@ class BaseMetric:
     def calculate_distances(self):
         return self.distance_metric(self.embeddings, self.embeddings, matrix=True)
 
-    def update(self, batch: List, device="cpu") -> None:
-        _, features, labels = batch
+    def update(
+        self, features: Tensor, labels: Union[Tensor, Dict], device="cpu"
+    ) -> None:
         training = self.encoder.training
         self.encoder.eval()
         with torch.inference_mode():

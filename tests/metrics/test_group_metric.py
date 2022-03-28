@@ -10,5 +10,6 @@ def test_retrieval_r_precision(retrieval_r_precision_params):
     metric = RetrievalRPrecision(encoder, distance_fn)
 
     for batch in data:
-        metric.update(batch)
+        _, features, labels = batch
+        metric.update(features, labels)
     assert metric.compute() == exp_metric

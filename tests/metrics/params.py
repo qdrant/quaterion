@@ -39,8 +39,16 @@ def _retrieval_r_precision_params():
     batches = list()
     batches.append(
         (
-            [1, 2,],
-            torch.Tensor([[0.0, 0.3, 0.9, 0.6], [0.3, 0.0, 0.4, 0.15],]),
+            [
+                1,
+                2,
+            ],
+            torch.Tensor(
+                [
+                    [0.0, 0.3, 0.9, 0.6],
+                    [0.3, 0.0, 0.4, 0.15],
+                ]
+            ),
             {"groups": torch.LongTensor([1, 2])},
         )
     )
@@ -86,7 +94,13 @@ def _retrieval_precision_params():
     # endregion
     # region 2nd test
     params.append(
-        (DummyEncoder(), dummy_metric_fn, 2, [dummy_batch], torch.Tensor([0.5, 0.5, 0.5, 0.5]))
+        (
+            DummyEncoder(),
+            dummy_metric_fn,
+            2,
+            [dummy_batch],
+            torch.Tensor([0.5, 0.5, 0.5, 0.5]),
+        )
     )
     # endregion
     # endregion

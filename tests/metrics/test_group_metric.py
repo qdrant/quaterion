@@ -12,4 +12,3 @@ def test_retrieval_r_precision(retrieval_r_precision_params):
     for batch in data:
         metric.update(batch)
     assert metric.compute() == exp_metric
-

@@ -40,6 +40,6 @@ class BaseMetric:
         else:
             if isinstance(labels, dict):
                 for key, value in labels.items():
-                    self.labels[key] = torch.cat(value, labels[key])
+                    self.labels[key] = torch.cat([value, labels[key]])
             else:
                 self.labels = torch.cat([self.labels, labels])

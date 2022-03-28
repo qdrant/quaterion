@@ -12,7 +12,12 @@ from quaterion.dataset import (
     SimilarityGroupSample,
     SimilarityGroupDataset,
 )
-from quaterion.loss import OnlineContrastiveLoss, TripletLoss, SimilarityLoss
+from quaterion.loss import (
+    ArcFaceLoss,
+    OnlineContrastiveLoss,
+    TripletLoss,
+    SimilarityLoss,
+)
 from quaterion_models.heads import EmptyHead, EncoderHead
 from quaterion_models.types import CollateFnType
 from quaterion_models.encoders import Encoder
@@ -84,10 +89,24 @@ class Model(TrainableModel):
         return EmptyHead(input_embedding_size)
 
     def configure_loss(self) -> SimilarityLoss:
+        if "arcface" in self._loss_fn:
+            if self._loss_fn.startswith("ptml"):
+                from quaterion.loss import PytorchMetricLearningWrapper
+                from pytorch_metric_learning import losses, miners
+
+                loss = losses.ArcFaceLoss(
+                    num_classes=100, embedding_size=self._embedding_size
+                )
+                miner = miners.MultiSimilarityMiner()
+                return PytorchMetricLearningWrapper(loss, miner)
+
+        else:
+            return ArcFaceLoss(embedding_size=self._embedding_size, num_groups=100)
+
         return (
             OnlineContrastiveLoss(mining=self._mining)
             if self._loss_fn == "contrastive"
-            else TripletLoss(miing=self._mining)
+            else TripletLoss(mining=self._mining)
         )
 
     def configure_optimizers(self):
@@ -106,15 +125,15 @@ if __name__ == "__main__":
     ap.add_argument(
         "--loss-fn",
         default="contrastive",
-        choices=("contrastive", "triplet"),
-        help="Loss function",
+        choices=("contrastive", "triplet", "arcface", "ptml-arcface"),
+        help="Loss function. Choose ptml-arcface to test pytorch-metric-learning integration",
     )
 
     ap.add_argument(
         "--mining",
         default="hard",
         choices=("all", "hard"),
-        help="Type of mining for the loss funcion",
+        help="Type of mining for the Contrastive or Triplet Loss funcions",
     )
 
     args = ap.parse_args()

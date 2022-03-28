@@ -18,27 +18,29 @@ class PytorchMetricLearningWrapper(GroupLoss):
     to the constructor of this wrapper.
 
     Note:
-        1. This is an experimental feature that may be subject to change, deprecation or removal.
-        2. See below for a quick usage example of this wrapper, but refer to the documentation of
-            `pytorch-metric-learning` to learn more about individual
-            [losses](https://kevinmusgrave.github.io/pytorch-metric-learning/losses) and
-            [miners](https://kevinmusgrave.github.io/pytorch-metric-learning/miners).
+        This is an experimental feature that may be subject to change, deprecation or removal.
+
+    Note:
+        See below for a quick usage example of this wrapper, but refer to the documentation of
+        `pytorch-metric-learning` to learn more about individual
+        `losses <https://kevinmusgrave.github.io/pytorch-metric-learning/losses>`__ and
+        `miners <https://kevinmusgrave.github.io/pytorch-metric-learning/miners>`__.
 
     Args:
         loss: An instance of a loss object subclassing
-            [`pytorch_metric_learning_wrapper.losses.BaseMetricLossFunction`](https://kevinmusgrave.github.io/pytorch-metric-learning/losses/#basemetriclossfunction).
+            `pytorch_metric_learning.losses.BaseMetricLossFunction <https://kevinmusgrave.github.io/pytorch-metric-learning/losses/#basemetriclossfunction>`__.
         miner: An instance of a miner object subclassing
-            [`pytorch_metric_learning.miners.BaseMetric`](https://kevinmusgrave.github.io/pytorch-metric-learning/miners/#baseminer).
+            `pytorch_metric_learning.miners.BaseMetric <https://kevinmusgrave.github.io/pytorch-metric-learning/miners/#baseminer>`__.
 
-    Examples:
-        ```python
+    Example::
+
         class MyTrainableModel(quaterion.TrainableModel):
             ...
             def configure_loss(self):
                 loss = pytorch_metric_learning.losses.TripletMarginLoss()
                 miner = pytorch_metric_learning.miner.MultiSimilarityMiner()
                 return quaterion.loss.PytorchMetricLearningWrapper(loss, miner)
-        ```
+
     """
 
     def __init__(self, loss: BaseMetricLossFunction, miner: Optional[BaseMiner] = None):
@@ -51,4 +53,4 @@ class PytorchMetricLearningWrapper(GroupLoss):
         if self._miner is not None:
             mined_indices = self._miner(embeddings, groups)
 
-        return self._loss(embeddings, groups, mined_embeddings)
+        return self._loss(embeddings, groups, mined_indices)

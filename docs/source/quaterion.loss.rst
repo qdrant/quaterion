@@ -1,6 +1,14 @@
 quaterion.loss package
 ======================
 
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   quaterion.loss.extras
+
 Submodules
 ----------
 

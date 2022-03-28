@@ -91,7 +91,7 @@ class Model(TrainableModel):
     def configure_loss(self) -> SimilarityLoss:
         if "arcface" in self._loss_fn:
             if self._loss_fn.startswith("ptml"):
-                from quaterion.loss import PytorchMetricLearningWrapper
+                from quaterion.loss.extras import PytorchMetricLearningWrapper
                 from pytorch_metric_learning import losses, miners
 
                 loss = losses.ArcFaceLoss(

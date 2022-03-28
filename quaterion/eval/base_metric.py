@@ -8,7 +8,7 @@ class BaseMetric:
         self.encoder = encoder
         self.distance_metric = distance_metric
 
-        self.embeddings = None
+        self.embeddings = torch.Tensor()
         self.labels = None
 
     def compute(self):
@@ -17,21 +17,27 @@ class BaseMetric:
     def calculate_distances(self):
         return self.distance_metric(self.embeddings, self.embeddings, matrix=True)
 
-    def update(self, batch: List) -> None:
+    def update(self, batch: List, device="cpu") -> None:
         _, features, labels = batch
-        embeddings = self.encoder(features).detach().to("cpu")
-        self.embeddings = (
-            embeddings
-            if self.embeddings is None
-            else torch.cat([self.embeddings, embeddings])
-        )
-        if self.labels is not None:
-            if isinstance(labels, dict):
-                for key in labels:
-                    self.labels[key] = torch.cat(
-                        [self.labels[key].to("cpu"), labels[key]]
-                    )
-            else:
-                self.labels = torch.cat([self.labels.to("cpu"), labels.to("cpu")])
+        training = self.encoder.training
+        self.encoder.eval()
+        with torch.inference_mode():
+            embeddings = self.encoder(features).to(device)
+        if training:
+            self.encoder.train()
+
+        self.embeddings = torch.cat([self.embeddings, embeddings])
+
+        if isinstance(labels, dict):
+            labels = {key: value.to(device) for key, value in labels.items()}
         else:
+            labels = labels.to(device)
+
+        if self.labels is None:
             self.labels = labels
+        else:
+            if isinstance(labels, dict):
+                for key, value in labels.items():
+                    self.labels[key] = torch.cat(value, labels[key])
+            else:
+                self.labels = torch.cat([self.labels, labels])

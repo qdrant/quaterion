@@ -12,14 +12,12 @@ from quaterion.dataset import (
     SimilarityGroupSample,
     SimilarityGroupDataset,
 )
-from quaterion.loss import (
-    OnlineContrastiveLoss,
-    TripletLoss,
-    SimilarityLoss,
-)
+from quaterion.loss import SimilarityLoss
+from quaterion.loss.extras import PytorchMetricLearningWrapper
 from quaterion_models.heads import EmptyHead, EncoderHead
 from quaterion_models.types import CollateFnType
 from quaterion_models.encoders import Encoder
+from pytorch_metric_learning import losses, miners
 
 
 try:
@@ -74,11 +72,9 @@ class MobilenetV3Encoder(Encoder):
 
 
 class Model(TrainableModel):
-    def __init__(self, embedding_size: int, lr: float, loss_fn: str, mining: str):
+    def __init__(self, embedding_size: int, lr: float):
         self._embedding_size = embedding_size
         self._lr = lr
-        self._loss_fn = loss_fn
-        self._mining = mining
         super().__init__()
 
     def configure_encoders(self) -> Union[Encoder, Dict[str, Encoder]]:
@@ -88,11 +84,9 @@ class Model(TrainableModel):
         return EmptyHead(input_embedding_size)
 
     def configure_loss(self) -> SimilarityLoss:
-        return (
-            OnlineContrastiveLoss(mining=self._mining)
-            if self._loss_fn == "contrastive"
-            else TripletLoss(mining=self._mining)
-        )
+        loss = losses.ArcFaceLoss(embedding_size=self._embedding_size, num_classes=100)
+        miner = miners.MultiSimilarityMiner()
+        return PytorchMetricLearningWrapper(loss, miner)
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.model.parameters(), self._lr)
@@ -107,27 +101,11 @@ if __name__ == "__main__":
 
     ap.add_argument("--lr", type=float, default=1e-4, help="Learning rate")
 
-    ap.add_argument(
-        "--loss-fn",
-        default="contrastive",
-        choices=("contrastive", "triplet"),
-        help="Loss function",
-    )
-
-    ap.add_argument(
-        "--mining",
-        default="hard",
-        choices=("all", "hard"),
-        help="Type of mining for the Contrastive or Triplet Loss funcions",
-    )
-
     args = ap.parse_args()
 
     model = Model(
         embedding_size=args.embedding_size,
         lr=args.lr,
-        loss_fn=args.loss_fn,
-        mining=args.mining,
     )
 
     train_dataloader = get_dataloader()

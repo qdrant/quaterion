@@ -18,6 +18,7 @@ class BaseMetric:
             :class:`~quaterion.loss.metrics.SiameseDistanceMetric` methods.
 
     """
+
     def __init__(self, encoder: Encoder, distance_metric: Callable):
         self.encoder = encoder
         self.distance_metric = distance_metric

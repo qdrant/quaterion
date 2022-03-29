@@ -24,6 +24,7 @@ class RetrievalRPrecision(BaseMetric):
         retrieval R-precision is calculated as 15/20 = 0.75.
 
     """
+
     def __init__(self, encoder, distance_metric):
         super().__init__(encoder, distance_metric)
 

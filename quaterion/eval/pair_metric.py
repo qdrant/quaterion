@@ -5,6 +5,7 @@ from quaterion.eval.base_metric import BaseMetric
 
 class PairMetric(BaseMetric):
     """Base class for metrics computation for pair based data"""
+
     def compute(self):
         raise NotImplementedError()
 
@@ -38,6 +39,7 @@ class RetrievalReciprocalRank(PairMetric):
         1/2 = 0.5.
 
     """
+
     def __init__(self, encoder, distance_metric):
         super().__init__(encoder, distance_metric)
 

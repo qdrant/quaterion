@@ -8,7 +8,7 @@ class Cosine(BaseDistance):
     """Compute cosine similarities (and its interpretation as distances).
 
     Note:
-        The output range of this metric is `0, -> 1`.
+        The output range of this metric is `0 -> 1`.
     """
 
     @staticmethod
@@ -17,7 +17,7 @@ class Cosine(BaseDistance):
 
     @staticmethod
     def distance(x: Tensor, y: Tensor) -> Tensor:
-        return 1 - self.distance(x, y)
+        return 1 - Cosine.distance(x, y)
 
     @staticmethod
     def similarity_matrix(x: Tensor, y: Tensor = None) -> Tensor:
@@ -31,4 +31,4 @@ class Cosine(BaseDistance):
 
     @staticmethod
     def distance_matrix(x: Tensor, y: Tensor = None) -> Tensor:
-        return 1 - self.similarity_matrix(x, y)
+        return 1 - Cosine.similarity_matrix(x, y)

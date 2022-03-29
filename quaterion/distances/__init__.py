@@ -2,6 +2,7 @@ from enum import Enum
 
 from quaterion.distances.base_distance import BaseDistance
 from quaterion.distances.cosine import Cosine
+from quaterion.distances.euclidean import Euclidean
 
 
 class Distance(str, Enum):
@@ -18,6 +19,6 @@ class Distance(str, Enum):
 
         You can pass a value from :class:`~Distance` enum or its string representation as an argument.
         """
-        dists = {"cosine": Cosine}
+        dists = {"cosine": Cosine, "euclidean": Euclidean}
 
         return dists[name]

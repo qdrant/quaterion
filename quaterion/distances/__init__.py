@@ -1,9 +1,23 @@
 from enum import Enum
 
-class Distance(Enum, str):
+from quaterion.distances.base_distance import BaseDistance
+from quaterion.distances.cosine import Cosine
+
+
+class Distance(str, Enum):
     """An enumerator to pass distance metric names across the package."""
 
     EUCLIDEAN = "euclidean"
     COSINE = "cosine"
     DOT_PRODUCT = "dot_product"
     MANHATTAN = "manhattan"
+
+    @staticmethod
+    def get_by_name(name: str) -> BaseDistance:
+        """A simple utility method to get the distance class by name.
+
+        You can pass a value from :class:`~Distance` enum or its string representation as an argument.
+        """
+        dists = {"cosine": Cosine}
+
+        return dists[name]

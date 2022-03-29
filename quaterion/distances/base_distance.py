@@ -5,7 +5,8 @@ from torch import Tensor
 class BaseDistance:
     """Provides a base class that any distance metric should implement."""
 
-    def distance(self, x: Tensor, y: Tensor) -> Tensor:
+    @staticmethod
+    def distance(x: Tensor, y: Tensor) -> Tensor:
         """Calculate distances, i.e., the lower the value, the more similar the samples.
 
         Args:
@@ -17,7 +18,8 @@ class BaseDistance:
         """
         raise NotImplementedError
 
-    def similarity(self, x: Tensor, y: Tensor) -> Tensor:
+    @staticmethod
+    def similarity(x: Tensor, y: Tensor) -> Tensor:
         """Calculate similarities, i.e., the higher the value, the more similar the samples.
 
         Args:
@@ -29,7 +31,8 @@ class BaseDistance:
         """
         raise NotImplementedError
 
-    def distance_matrix(self, x: Tensor, y: Optional[Tensor] = None) -> Tensor:
+    @staticmethod
+    def distance_matrix(x: Tensor, y: Optional[Tensor] = None) -> Tensor:
         """Calculate a distance matrix, i.e., distances between all possible pairs in `x` and `y`.
 
         Args:
@@ -41,7 +44,8 @@ class BaseDistance:
         """
         raise NotImplementedError
 
-    def similarity_matrix(self, x: Tensor, y: Optional[Tensor] = None) -> Tensor:
+    @staticmethod
+    def similarity_matrix(x: Tensor, y: Optional[Tensor] = None) -> Tensor:
         """Calculate a similarity matrix, i.e., similarities between all possible pairs in `x` and `y`.
 
         Args:

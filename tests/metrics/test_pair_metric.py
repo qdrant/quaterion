@@ -5,18 +5,18 @@ from quaterion.eval.pair_metric import RetrievalPrecision, RetrievalReciprocalRa
 
 
 def test_retrieval_precision(retrieval_precision_params):
-    encoder, distance_fn, k, data, exp_metric = retrieval_precision_params
-    metric = RetrievalPrecision(encoder, distance_fn, k)
+    distance_fn, k, data, exp_metric = retrieval_precision_params
+    metric = RetrievalPrecision(distance_fn, k)
     for batch in data:
-        _, features, labels = batch
-        metric.update(features, labels)
+        embeddings, pairs, labels, subgroups = batch
+        metric.update(embeddings, pairs, labels, subgroups)
     assert torch.allclose(metric.compute(), exp_metric)
 
 
 def test_retrieval_reciprocal_rank(retrieval_reciprocal_rank_params):
-    encoder, distance_fn, data, exp_metric = retrieval_reciprocal_rank_params
-    metric = RetrievalReciprocalRank(encoder, distance_fn)
+    distance_fn, data, exp_metric = retrieval_reciprocal_rank_params
+    metric = RetrievalReciprocalRank(distance_fn)
     for batch in data:
-        _, features, labels = batch
-        metric.update(features, labels)
+        embeddings, pairs, labels, subgroups = batch
+        metric.update(embeddings, pairs, labels, subgroups)
     assert torch.allclose(metric.compute(), exp_metric)

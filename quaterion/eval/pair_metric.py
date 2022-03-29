@@ -1,24 +1,59 @@
 import torch
+from torch import Tensor, LongTensor
 
 from quaterion.eval.base_metric import BaseMetric
 
 
 class PairMetric(BaseMetric):
-    """Base class for metrics computation for pair based data"""
+    """Base class for metrics computation for pair based data
 
-    def compute(self):
+    Args:
+        distance_metric: function for distance matrix computation. Possible choice might be one of
+            :class:`~quaterion.loss.metrics.SiameseDistanceMetric` methods.
+
+    Provides default implementations for embeddings and labels accumulation, distance and
+    interaction matrices calculation.
+    """
+
+    def __init__(self, distance_metric):
+        super().__init__(distance_metric)
+        self.pairs = LongTensor()
+        self.labels = Tensor()
+        self.subgroups = Tensor()
+
+    def compute(self) -> Tensor:
         raise NotImplementedError()
 
     def precompute(self):
         """Perform distance matrix calculation and create an interaction matrix based on labels."""
-        pairs = self.labels["pairs"]
-        labels = self.labels["labels"]
         distance_matrix = self.calculate_distances()
         target = torch.zeros_like(distance_matrix)
         # todo: subgroups should also be taken into account
-        target[pairs[:, 0], pairs[:, 1]] = labels
-        target[pairs[:, 1], pairs[:, 0]] = labels
+        target[self.pairs[:, 0], self.pairs[:, 1]] = self.labels
+        target[self.pairs[:, 1], self.pairs[:, 0]] = self.labels
         return distance_matrix, target
+
+    def update(
+        self,
+        embeddings: Tensor,
+        pairs: LongTensor,
+        labels: Tensor,
+        subgroups: Tensor,
+        device="cpu",
+    ) -> None:
+        """Process and accumulate embeddings and corresponding labels
+
+        Args:
+            embeddings: embeddings to accumulate
+            pairs: indices to match objects from the same pair
+            labels: labels to determine whether objects in pair is similar or not
+            subgroups: subgroups to find related objects among different pairs
+            device: device to store calculated embeddings and labels on.
+        """
+        self.embeddings = torch.cat([self.embeddings, embeddings.detach().to(device)])
+        self.pairs = torch.cat([self.pairs, pairs.to(device)])
+        self.labels = torch.cat([self.labels, labels])
+        self.subgroups = torch.cat([self.subgroups, subgroups.to(device)])
 
 
 class RetrievalReciprocalRank(PairMetric):
@@ -27,8 +62,6 @@ class RetrievalReciprocalRank(PairMetric):
     Calculates the reciprocal of the rank at which the first relevant document was retrieved.
 
     Args:
-        encoder: :class:`~quaterion_models.encoders.encoder.Encoder` instance to calculate
-            embeddings.
         distance_metric: function for distance matrix computation. Possible choice might be one of
             :class:`~quaterion.loss.metrics.SiameseDistanceMetric` methods.
 
@@ -40,8 +73,8 @@ class RetrievalReciprocalRank(PairMetric):
 
     """
 
-    def __init__(self, encoder, distance_metric):
-        super().__init__(encoder, distance_metric)
+    def __init__(self, distance_metric):
+        super().__init__(distance_metric)
 
     def compute(self):
         """Calculates retrieval reciprocal rank"""
@@ -61,8 +94,6 @@ class RetrievalPrecision(PairMetric):
     """Calculates retrieval precision@k for pair based datasets
 
     Args:
-        encoder: :class:`~quaterion_models.encoders.encoder.Encoder` instance to calculate
-            embeddings.
         distance_metric: function for distance matrix computation. Possible choice might be one of
             :class:`~quaterion.loss.metrics.SiameseDistanceMetric` methods.
         k: number of documents among which to search a relevant one
@@ -77,8 +108,8 @@ class RetrievalPrecision(PairMetric):
         have score < 1.
     """
 
-    def __init__(self, encoder, distance_metric, k=1):
-        super().__init__(encoder, distance_metric)
+    def __init__(self, distance_metric, k=1):
+        super().__init__(distance_metric)
         self.k = k
         if self.k < 1:
             raise ValueError("k must be greater than 0")

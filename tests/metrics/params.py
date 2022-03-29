@@ -1,10 +1,6 @@
 import pytest
+
 import torch
-
-
-class DummyEncoder(torch.nn.Module):
-    def __call__(self, batch):
-        return batch
 
 
 def dummy_metric_fn(x, y, matrix=True):
@@ -21,7 +17,6 @@ def _retrieval_r_precision_params():
 
     # region 1st test
     dummy_batch = (
-        [1, 2, 3, 4],
         torch.Tensor(
             [
                 [0.0, 0.3, 0.9, 0.6],
@@ -30,36 +25,26 @@ def _retrieval_r_precision_params():
                 [0.6, 0.15, 0.8, 0.0],
             ]
         ),
-        {"groups": torch.LongTensor([1, 2, 1, 2])},
+        torch.LongTensor([1, 2, 1, 2]),
     )
-    params.append((DummyEncoder(), dummy_metric_fn, [dummy_batch], torch.Tensor([0.5])))
+    params.append((dummy_metric_fn, [dummy_batch], torch.Tensor([0.5])))
     # endregion 1st test
 
     # region 2nd test
     batches = list()
     batches.append(
         (
-            [
-                1,
-                2,
-            ],
-            torch.Tensor(
-                [
-                    [0.0, 0.3, 0.9, 0.6],
-                    [0.3, 0.0, 0.4, 0.15],
-                ]
-            ),
-            {"groups": torch.LongTensor([1, 2])},
+            torch.Tensor([[0.0, 0.3, 0.9, 0.6], [0.3, 0.0, 0.4, 0.15],]),
+            torch.LongTensor([1, 2]),
         )
     )
     batches.append(
         (
-            [3, 4],
             torch.Tensor([[0.9, 0.4, 0.0, 0.8], [0.6, 0.15, 0.8, 0.0]]),
-            {"groups": torch.LongTensor([1, 2])},
+            torch.LongTensor([1, 2]),
         )
     )
-    params.append((DummyEncoder(), dummy_metric_fn, batches, torch.Tensor([0.5])))
+    params.append((dummy_metric_fn, batches, torch.Tensor([0.5])))
     # endregion 2nd test
     # endregion dummy test
     return params
@@ -73,34 +58,26 @@ def retrieval_r_precision_params(request):
 def _retrieval_precision_params():
     params = []
     # region dummy tests
+
+    # distances aren't actually calculated, embeddings already contains assumed distances
+    # avoids distance calculation and test only metric logic
+
     # region 1st test
-    indices = [1, 2]
+    embeddings = torch.Tensor(
+        [[1, 0.3, 0.2, 0.5], [0, 1, 0.8, 0.6], [0.5, 0.7, 1, 0.8], [1, 0.2, 0.5, 1]]
+    )
+    num_of_pairs = embeddings.shape[0] // 2
     dummy_batch = (
-        indices,
-        torch.Tensor(
-            [[1, 0.3, 0.2, 0.5], [0, 1, 0.8, 0.6], [0.5, 0.7, 1, 0.8], [1, 0.2, 0.5, 1]]
-        ),
-        {
-            "pairs": torch.LongTensor(
-                [[i, i + len(indices)] for i in range(len(indices))]
-            ),
-            "labels": torch.Tensor([1.0, 1.0]),
-            "subgroups": torch.Tensor([1, 2] * 2),
-        },
+        embeddings,
+        torch.LongTensor([[i, i + num_of_pairs] for i in range(num_of_pairs)]),
+        torch.Tensor([1.0, 1.0]),
+        torch.Tensor([1, 2] * 2),
     )
-    params.append(
-        (DummyEncoder(), dummy_metric_fn, 1, [dummy_batch], torch.Tensor([1, 0, 1, 1]))
-    )
+    params.append((dummy_metric_fn, 1, [dummy_batch], torch.Tensor([1, 0, 1, 1])))
     # endregion
     # region 2nd test
     params.append(
-        (
-            DummyEncoder(),
-            dummy_metric_fn,
-            2,
-            [dummy_batch],
-            torch.Tensor([0.5, 0.5, 0.5, 0.5]),
-        )
+        (dummy_metric_fn, 2, [dummy_batch], torch.Tensor([0.5, 0.5, 0.5, 0.5]),)
     )
     # endregion
     # endregion
@@ -115,24 +92,24 @@ def retrieval_precision_params(request):
 def _retrieval_reciprocal_rank_params():
     params = []
     # region dummy tests
+
+    # distances aren't actually calculated, embeddings already contains assumed distances
+    # avoids distance calculation and test only metric logic
+
     # region 1st test
-    indices = [1, 2]
+    embeddings = torch.Tensor(
+        [[1, 0.3, 0.2, 0.5], [0, 1, 0.8, 0.6], [0.5, 0.7, 1, 0.8], [1, 0.2, 0.5, 1]]
+    )
+    num_of_pairs = embeddings.shape[0] // 2
     dummy_batch = (
-        indices,
-        torch.Tensor(
-            [[1, 0.3, 0.2, 0.5], [0, 1, 0.8, 0.6], [0.5, 0.7, 1, 0.8], [1, 0.2, 0.5, 1]]
+        embeddings,
+        torch.LongTensor(
+            [[i, i + num_of_pairs] for i in range(num_of_pairs)]
         ),
-        {
-            "pairs": torch.LongTensor(
-                [[i, i + len(indices)] for i in range(len(indices))]
-            ),
-            "labels": torch.Tensor([1.0, 1.0]),
-            "subgroups": torch.Tensor([1, 2] * 2),
-        },
+        torch.Tensor([1.0, 1.0]),
+        torch.Tensor([1, 2] * 2),
     )
-    params.append(
-        (DummyEncoder(), dummy_metric_fn, [dummy_batch], torch.Tensor([1, 0.5, 1, 1]))
-    )
+    params.append((dummy_metric_fn, [dummy_batch], torch.Tensor([1, 0.5, 1, 1])))
     # endregion
     # endregion
     return params

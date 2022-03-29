@@ -1,9 +1,41 @@
 import torch
+from torch import Tensor
 
 from quaterion.eval.base_metric import BaseMetric
 
 
-class RetrievalRPrecision(BaseMetric):
+class GroupMetric(BaseMetric):
+    """Base class for group metrics
+
+    Provide default implementation for embeddings and groups accumulation.
+
+    Args:
+        distance_metric: function for distance matrix computation. Possible choice might be one of
+            :class:`~quaterion.loss.metrics.SiameseDistanceMetric` methods.
+    """
+
+    def __init__(self, distance_metric):
+        super().__init__(distance_metric)
+        self.groups = torch.LongTensor()
+
+    def update(
+        self, embeddings: Tensor, groups: torch.LongTensor, device="cpu"
+    ) -> None:
+        """Process and accumulate batch
+
+        Args:
+            embeddings: embeddings to accumulate
+            groups: groups to distinguish similar and dissimilar objects.
+            device: device to store calculated embeddings and groups on.
+        """
+        self.embeddings = torch.cat([self.embeddings, embeddings.detach().to(device)])
+        self.groups = torch.cat([self.groups, groups.to(device)])
+
+    def compute(self) -> Tensor:
+        raise NotImplementedError()
+
+
+class RetrievalRPrecision(GroupMetric):
     """Class for computation retrieval R-precision for group based data
 
     R-Precision is defined as the precision after R documents have been retrieved by the system,
@@ -12,8 +44,6 @@ class RetrievalRPrecision(BaseMetric):
     query topic.
 
     Args:
-        encoder: :class:`~quaterion_models.encoders.encoder.Encoder` instance to calculate
-            embeddings.
         distance_metric: function for distance matrix computation. Possible choice might be one of
             :class:`~quaterion.loss.metrics.SiameseDistanceMetric` methods.
 
@@ -25,24 +55,23 @@ class RetrievalRPrecision(BaseMetric):
 
     """
 
-    def __init__(self, encoder, distance_metric):
-        super().__init__(encoder, distance_metric)
+    def __init__(self, distance_metric):
+        super().__init__(distance_metric)
 
-    def compute(self):
+    def compute(self) -> Tensor:
         """Calculates retrieval R-precision
 
         Returns:
-            torch.Tensor: zero-size tensor
+            Tensor: zero-size tensor
         """
-        groups = self.labels["groups"]
         distance_matrix = self.calculate_distances()
         # assign max dist to obj on diag to ignore distance from obj to itself
         distance_matrix[torch.eye(distance_matrix.shape[0], dtype=torch.bool)] = (
             torch.max(distance_matrix) + 1
         )
-        group_matrix = groups.repeat(groups.shape[0], 1)
+        group_matrix = self.groups.repeat(self.groups.shape[0], 1)
         # objects with the same groups are true, others are false
-        group_mask = torch.BoolTensor(group_matrix == groups.unsqueeze(1))
+        group_mask = torch.BoolTensor(group_matrix == self.groups.unsqueeze(1))
         # exclude obj
         group_mask[torch.eye(group_mask.shape[0], dtype=torch.bool)] = False
         # number of members for group which is on i-th position in groups

@@ -34,7 +34,12 @@ def _retrieval_r_precision_params():
     batches = list()
     batches.append(
         (
-            torch.Tensor([[0.0, 0.3, 0.9, 0.6], [0.3, 0.0, 0.4, 0.15],]),
+            torch.Tensor(
+                [
+                    [0.0, 0.3, 0.9, 0.6],
+                    [0.3, 0.0, 0.4, 0.15],
+                ]
+            ),
             torch.LongTensor([1, 2]),
         )
     )
@@ -77,7 +82,12 @@ def _retrieval_precision_params():
     # endregion
     # region 2nd test
     params.append(
-        (dummy_metric_fn, 2, [dummy_batch], torch.Tensor([0.5, 0.5, 0.5, 0.5]),)
+        (
+            dummy_metric_fn,
+            2,
+            [dummy_batch],
+            torch.Tensor([0.5, 0.5, 0.5, 0.5]),
+        )
     )
     # endregion
     # endregion
@@ -103,9 +113,7 @@ def _retrieval_reciprocal_rank_params():
     num_of_pairs = embeddings.shape[0] // 2
     dummy_batch = (
         embeddings,
-        torch.LongTensor(
-            [[i, i + num_of_pairs] for i in range(num_of_pairs)]
-        ),
+        torch.LongTensor([[i, i + num_of_pairs] for i in range(num_of_pairs)]),
         torch.Tensor([1.0, 1.0]),
         torch.Tensor([1, 2] * 2),
     )

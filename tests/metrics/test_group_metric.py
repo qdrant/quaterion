@@ -31,12 +31,17 @@ def test_retrieval_r_precision():
 
     # region multiple batches
     first_batch = (
-        torch.Tensor([[0.0, 0.3, 0.9, 0.6], [0.3, 0.0, 0.4, 0.15], ]),  # embeddings
-        torch.LongTensor([1, 2])  # groups
+        torch.Tensor(
+            [
+                [0.0, 0.3, 0.9, 0.6],
+                [0.3, 0.0, 0.4, 0.15],
+            ]
+        ),  # embeddings
+        torch.LongTensor([1, 2]),  # groups
     )
     second_batch = (
         torch.Tensor([[0.9, 0.4, 0.0, 0.8], [0.6, 0.15, 0.8, 0.0]]),  # embeddings
-        torch.LongTensor([1, 2])  # groups
+        torch.LongTensor([1, 2]),  # groups
     )
 
     exp_metric = torch.Tensor([0.5])

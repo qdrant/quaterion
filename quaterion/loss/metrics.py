@@ -5,7 +5,13 @@ from torch.nn import functional as F
 
 
 class SiameseDistanceMetric:
-    """Common distance metrics for losses."""
+    """Common distance metrics for losses.
+
+    Warnings:
+        This class is deprecated in favor of  several subclasses of :class:`~quaterion.distances.base_distance.BaseDistance`,
+        and it will be completely removed once refactoring is complete.
+
+    """
 
     @staticmethod
     def euclidean(

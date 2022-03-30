@@ -4,7 +4,7 @@ import torch
 
 from torch import Tensor, LongTensor
 
-from quaterion.loss.metrics import SiameseDistanceMetric
+from quaterion.distances import Distance
 from quaterion.loss.pairwise_loss import PairwiseLoss
 from quaterion.utils import max_value_of_dtype
 
@@ -20,27 +20,16 @@ class ContrastiveLoss(PairwiseLoss):
         http://yann.lecun.com/exdb/publis/pdf/hadsell-chopra-lecun-06.pdf
 
     Args:
-        distance_metric_name: Name of the function, that returns a distance between two embeddings.
-            :class:`~quaterion.loss.metrics.SiameseDistanceMetric` contains pre-defined metrics
-            that can be used.
+        distance_metric_name: Name of the function, e.g., :class:`~quaterion.distances.Distance`. Optional, defaults to :attr:`~quaterion.distances.Distance.COSINE`.
         margin: Negative samples (label == 0) should have a distance of at least the
             margin value.
         size_average: Average by the size of the mini-batch.
     """
 
-    @classmethod
-    def metric_class(cls) -> Type:
-        """Class with metrics available for current loss.
-
-        Returns:
-            Type: class containing metrics
-        """
-        return SiameseDistanceMetric
-
     def __init__(
         self,
-        distance_metric_name: str = "cosine_distance",
-        margin: float = 1.0,
+        distance_metric_name: Distance = Distance.COSINE,
+        margin: float = 0.5,
         size_average: bool = True,
     ):
         super().__init__(distance_metric_name=distance_metric_name)
@@ -86,7 +75,7 @@ class ContrastiveLoss(PairwiseLoss):
         """
         rep_anchor = embeddings[pairs[:, 0]]
         rep_other = embeddings[pairs[:, 1]]
-        distances = self.distance_metric(rep_anchor, rep_other)
+        distances = self.distance_metric.distance(rep_anchor, rep_other)
         negative_distances_impact = 0.0
 
         if len(subgroups.unique()) > 1:
@@ -104,7 +93,7 @@ class ContrastiveLoss(PairwiseLoss):
             # subgroup
 
             # shape (embeddings_count, embeddings_count)
-            distance_matrix = self.distance_metric(embeddings, embeddings, matrix=True)
+            distance_matrix = self.distance_metric.distance_matrix(embeddings)
             distance_matrix[~comp_matrix] = max_value_of_dtype(distance_matrix.dtype)
             # shape (embeddings_count, 1)
             negative_distances, _ = distance_matrix.min(dim=1)  # find negative examples

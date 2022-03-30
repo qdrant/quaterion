@@ -2,8 +2,8 @@ from typing import Optional
 
 import torch
 import torch.nn.functional as F
+from quaterion.distances import Distance
 from quaterion.loss.group_loss import GroupLoss
-from quaterion.loss.metrics import SiameseDistanceMetric
 from quaterion.utils import (
     max_value_of_dtype,
     get_anchor_positive_mask,
@@ -24,9 +24,8 @@ class OnlineContrastiveLoss(GroupLoss):
     Args:
         margin: Margin value to push negative examples
             apart. Optional, defaults to `0.5`.
-        distance_metric_name: Name of the distance function. Optional, defaults to
-            `"cosine_distance"`.
-        squared (bool, optional): Squared Euclidean distance or not. Defaults to `True`.
+        distance_metric_name: Name of the distance function, e.g., :class:`~quaterion.distances.Distance`. Optional, defaults to
+            :attr:`~quaterion.distances.Distance.COSINE`.
         mining (str, optional): Pair mining strategy. One of `"all"`, `"hard"`.
             Defaults to `"hard"`.
     """
@@ -34,17 +33,9 @@ class OnlineContrastiveLoss(GroupLoss):
     def __init__(
         self,
         margin: Optional[float] = 0.5,
-        distance_metric_name: str = "cosine_distance",
-        squared: Optional[bool] = True,
+        distance_metric_name: Distance = Distance.COSINE,
         mining: Optional[str] = "hard",
     ):
-        distance_metrics = ["euclidean", "cosine_distance"]
-        if distance_metric_name not in distance_metrics:
-            raise ValueError(
-                f"Not supported distance metrc for this loss: {distance_metric_name}. "
-                f"Must be one of {', '.join(distance_metrics)}"
-            )
-
         mining_types = ["all", "hard"]
         if mining not in mining_types:
             raise ValueError(
@@ -55,7 +46,6 @@ class OnlineContrastiveLoss(GroupLoss):
         )
 
         self._margin = margin
-        self._squared = squared
         self._mining = mining
 
     def get_config_dict(self):
@@ -63,10 +53,10 @@ class OnlineContrastiveLoss(GroupLoss):
         config.update(
             {
                 "margin": self._margin,
-                "squared": self._squared,
                 "mining": self._mining,
             }
         )
+
         return config
 
     def forward(
@@ -82,13 +72,7 @@ class OnlineContrastiveLoss(GroupLoss):
             torch.Tensor: Scalar loss value.
         """
         # Shape: (batch_size, batch_size)
-        dists = (
-            SiameseDistanceMetric.euclidean(
-                x=embeddings, matrix=True, squared=self._squared
-            )
-            if self.distance_metric_name == "euclidean"
-            else SiameseDistanceMetric.cosine_distance(x=embeddings, matrix=True)
-        )
+        dists = self.distance_metric.distance_matrix(embeddings)
 
         # get a mask for valid anchor-positive pairs and apply it to the distance matrix
         # to set invalid ones to 0

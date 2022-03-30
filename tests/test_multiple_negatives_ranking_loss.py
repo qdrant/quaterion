@@ -26,7 +26,7 @@ class TestMNRLoss:
 
     def test_dot_product(self):
         loss = MultipleNegativesRankingLoss(
-            scale=1, similarity_metric_name="dot_product"
+            scale=1, distance_metric_name="dot_product"
         )
 
         loss_res = loss.forward(self.embeddings, self.pairs, None, None)

@@ -31,4 +31,4 @@ class TestDistances:
 
             assert (
                 res == self.expected[distance_name][method_name]
-            ).float().sum() == self.x_dim ** 2
+            ).float().sum() == self.x_dim**2

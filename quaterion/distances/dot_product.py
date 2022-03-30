@@ -19,7 +19,7 @@ class DotProduct(BaseDistance):
     @staticmethod
     def distance(x: Tensor, y: Tensor) -> Tensor:
         # TODO: think of a wiser way of interpreting dot product as distances, which is also compatible with other distance metrics.
-        return -DotProduct.distance(x, y)
+        return -DotProduct.similarity(x, y)
 
     @staticmethod
     def similarity_matrix(x: Tensor, y: Tensor = None) -> Tensor:

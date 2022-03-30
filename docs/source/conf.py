@@ -95,10 +95,7 @@ html_theme = "sphinx_rtd_theme"
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = []
 
-html_css_files = [
-    "quaterion.css",
-    "css/custom.css"
-]
+html_css_files = ["quaterion.css", "css/custom.css"]
 
 # Files excluded via exclude_patterns still being generating by sphinx-apidoc
 # As they are generated, some documents have links to them. It leads to a warning like:
@@ -108,13 +105,13 @@ suppress_warnings = ["toc.excluded"]
 
 html_theme_options = {
     # google analytics can be added here
-    'logo_only': False,
-    'display_version': True,
-    'prev_next_buttons_location': 'bottom',
-    'style_external_links': False,
-    'vcs_pageview_mode': '',
+    "logo_only": False,
+    "display_version": True,
+    "prev_next_buttons_location": "bottom",
+    "style_external_links": False,
+    "vcs_pageview_mode": "",
     # Toc options
-    'collapse_navigation': True,
-    'sticky_navigation': True,
-    'titles_only': False
+    "collapse_navigation": True,
+    "sticky_navigation": True,
+    "titles_only": False,
 }

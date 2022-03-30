@@ -1,0 +1,198 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>quaterion.distances.manhattan module &#8212; Quaterion  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <link rel="stylesheet" type="text/css" href="_static/quaterion.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="quaterion.eval package" href="quaterion.eval.html" />
+    <link rel="prev" title="quaterion.distances.euclidean module" href="quaterion.distances.euclidean.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-quaterion.distances.manhattan">
+<span id="quaterion-distances-manhattan-module"></span><h1>quaterion.distances.manhattan module<a class="headerlink" href="#module-quaterion.distances.manhattan" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="quaterion.distances.manhattan.Manhattan">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Manhattan</span></span><a class="reference internal" href="_modules/quaterion/distances/manhattan.html#Manhattan"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.distances.manhattan.Manhattan" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="quaterion.distances.base_distance.html#quaterion.distances.base_distance.BaseDistance" title="quaterion.distances.base_distance.BaseDistance"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseDistance</span></code></a></p>
+<p>Compute Manhattan distances (and its interpretation as similarities).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Interpretation of Manhattan distances as similarities is based on the trick in the book “Collective Intelligence” by Toby Segaran, and it’s in the range of <cite>0 -&gt; 1</cite>.</p>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="quaterion.distances.manhattan.Manhattan.distance">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/quaterion/distances/manhattan.html#Manhattan.distance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.distances.manhattan.Manhattan.distance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate distances, i.e., the lower the value, the more similar the samples.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – shape: (batch_size, embedding_dim)</p></li>
+<li><p><strong>y</strong> – shape: (batch_size, embedding_dim)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><em>Distances - shape</em> – (batch_size,)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="quaterion.distances.manhattan.Manhattan.distance_matrix">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">distance_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Tensor</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/quaterion/distances/manhattan.html#Manhattan.distance_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.distances.manhattan.Manhattan.distance_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate a distance matrix, i.e., distances between all possible pairs in <cite>x</cite> and <cite>y</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – shape: (batch_size, embedding_dim)</p></li>
+<li><p><strong>y</strong> – shape: (batch_size, embedding_dim). If <cite>y is None</cite>, it assigns <cite>x</cite> to <cite>y</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><em>Distance matrix - shape</em> – (batch_size, batch_size)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="quaterion.distances.manhattan.Manhattan.similarity">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">similarity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/quaterion/distances/manhattan.html#Manhattan.similarity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.distances.manhattan.Manhattan.similarity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate similarities, i.e., the higher the value, the more similar the samples.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – shape: (batch_size, embedding_dim)</p></li>
+<li><p><strong>y</strong> – shape: (batch_size, embedding_dim)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><em>Similarities - shape</em> – (batch_size,)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="quaterion.distances.manhattan.Manhattan.similarity_matrix">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">similarity_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Tensor</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/quaterion/distances/manhattan.html#Manhattan.similarity_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.distances.manhattan.Manhattan.similarity_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate a similarity matrix, i.e., similarities between all possible pairs in <cite>x</cite> and <cite>y</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – shape: (batch_size, embedding_dim)</p></li>
+<li><p><strong>y</strong> – shape: (batch_size, embedding_dim). If <cite>y is None</cite>, it assigns <cite>x</cite> to <cite>y</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><em>Similarity matrix - shape</em> – (batch_size, batch_size)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Quaterion</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="quaterion.html">quaterion package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="quaterion.html#subpackages">Subpackages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quaterion.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quaterion.html#module-quaterion">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="quaterion.html">quaterion package</a><ul>
+  <li><a href="quaterion.distances.html">quaterion.distances package</a><ul>
+      <li>Previous: <a href="quaterion.distances.euclidean.html" title="previous chapter">quaterion.distances.euclidean module</a></li>
+      <li>Next: <a href="quaterion.eval.html" title="next chapter">quaterion.eval package</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Quaterion Authors.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.5.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/quaterion.distances.manhattan.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

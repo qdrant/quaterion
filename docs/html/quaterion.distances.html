@@ -1,0 +1,166 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>quaterion.distances package &#8212; Quaterion  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <link rel="stylesheet" type="text/css" href="_static/quaterion.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="quaterion.distances.base_distance module" href="quaterion.distances.base_distance.html" />
+    <link rel="prev" title="quaterion.dataset.train_collater module" href="quaterion.dataset.train_collater.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="quaterion-distances-package">
+<h1>quaterion.distances package<a class="headerlink" href="#quaterion-distances-package" title="Permalink to this headline">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="quaterion.distances.base_distance.html">quaterion.distances.base_distance module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quaterion.distances.cosine.html">quaterion.distances.cosine module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quaterion.distances.dot_product.html">quaterion.distances.dot_product module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quaterion.distances.euclidean.html">quaterion.distances.euclidean module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quaterion.distances.manhattan.html">quaterion.distances.manhattan module</a></li>
+</ul>
+</div>
+</section>
+<section id="module-quaterion.distances">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-quaterion.distances" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="quaterion.distances.Distance">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/quaterion/distances.html#Distance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.distances.Distance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></p>
+<p>An enumerator to pass distance metric names across the package.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="quaterion.distances.Distance.get_by_name">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_by_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="quaterion.distances.base_distance.html#quaterion.distances.base_distance.BaseDistance" title="quaterion.distances.base_distance.BaseDistance"><span class="pre">BaseDistance</span></a></span></span><a class="reference internal" href="_modules/quaterion/distances.html#Distance.get_by_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.distances.Distance.get_by_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>A simple utility method to get the distance class by name.</p>
+<p>You can pass a value from <a class="reference internal" href="#quaterion.distances.Distance" title="quaterion.distances.Distance"><code class="xref py py-class docutils literal notranslate"><span class="pre">Distance</span></code></a> enum or its string representation as an argument.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="quaterion.distances.Distance.COSINE">
+<span class="sig-name descname"><span class="pre">COSINE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'cosine'</span></em><a class="headerlink" href="#quaterion.distances.Distance.COSINE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="quaterion.distances.Distance.DOT_PRODUCT">
+<span class="sig-name descname"><span class="pre">DOT_PRODUCT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'dot_product'</span></em><a class="headerlink" href="#quaterion.distances.Distance.DOT_PRODUCT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="quaterion.distances.Distance.EUCLIDEAN">
+<span class="sig-name descname"><span class="pre">EUCLIDEAN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'euclidean'</span></em><a class="headerlink" href="#quaterion.distances.Distance.EUCLIDEAN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="quaterion.distances.Distance.MANHATTAN">
+<span class="sig-name descname"><span class="pre">MANHATTAN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'manhattan'</span></em><a class="headerlink" href="#quaterion.distances.Distance.MANHATTAN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Quaterion</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="quaterion.html">quaterion package</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="quaterion.html#subpackages">Subpackages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quaterion.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quaterion.html#module-quaterion">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="quaterion.html">quaterion package</a><ul>
+      <li>Previous: <a href="quaterion.dataset.train_collater.html" title="previous chapter">quaterion.dataset.train_collater module</a></li>
+      <li>Next: <a href="quaterion.distances.base_distance.html" title="next chapter">quaterion.distances.base_distance module</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Quaterion Authors.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.5.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/quaterion.distances.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

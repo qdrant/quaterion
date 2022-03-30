@@ -1,0 +1,138 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>quaterion.distances &#8212; Quaterion  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/quaterion.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for quaterion.distances</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
+
+<span class="kn">from</span> <span class="nn">quaterion.distances.base_distance</span> <span class="kn">import</span> <span class="n">BaseDistance</span>
+<span class="kn">from</span> <span class="nn">quaterion.distances.cosine</span> <span class="kn">import</span> <span class="n">Cosine</span>
+<span class="kn">from</span> <span class="nn">quaterion.distances.euclidean</span> <span class="kn">import</span> <span class="n">Euclidean</span>
+<span class="kn">from</span> <span class="nn">quaterion.distances.manhattan</span> <span class="kn">import</span> <span class="n">Manhattan</span>
+<span class="kn">from</span> <span class="nn">quaterion.distances.dot_product</span> <span class="kn">import</span> <span class="n">DotProduct</span>
+
+
+<div class="viewcode-block" id="Distance"><a class="viewcode-back" href="../../quaterion.distances.html#quaterion.distances.Distance">[docs]</a><span class="k">class</span> <span class="nc">Distance</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;An enumerator to pass distance metric names across the package.&quot;&quot;&quot;</span>
+
+    <span class="n">EUCLIDEAN</span> <span class="o">=</span> <span class="s2">&quot;euclidean&quot;</span>
+    <span class="n">COSINE</span> <span class="o">=</span> <span class="s2">&quot;cosine&quot;</span>
+    <span class="n">DOT_PRODUCT</span> <span class="o">=</span> <span class="s2">&quot;dot_product&quot;</span>
+    <span class="n">MANHATTAN</span> <span class="o">=</span> <span class="s2">&quot;manhattan&quot;</span>
+
+<div class="viewcode-block" id="Distance.get_by_name"><a class="viewcode-back" href="../../quaterion.distances.html#quaterion.distances.Distance.get_by_name">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">get_by_name</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BaseDistance</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;A simple utility method to get the distance class by name.</span>
+
+<span class="sd">        You can pass a value from :class:`~Distance` enum or its string representation as an argument.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">dists</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;cosine&quot;</span><span class="p">:</span> <span class="n">Cosine</span><span class="p">,</span>
+            <span class="s2">&quot;euclidean&quot;</span><span class="p">:</span> <span class="n">Euclidean</span><span class="p">,</span>
+            <span class="s2">&quot;manhattan&quot;</span><span class="p">:</span> <span class="n">Manhattan</span><span class="p">,</span>
+            <span class="s2">&quot;dot_product&quot;</span><span class="p">:</span> <span class="n">DotProduct</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">dists</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Unrecognized distance name: </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">. Must be one of </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">dists</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">Quaterion</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../quaterion.html">quaterion package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Quaterion Authors.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.5.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

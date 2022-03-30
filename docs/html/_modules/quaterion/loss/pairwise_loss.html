@@ -34,6 +34,7 @@
   <h1>Source code for quaterion.loss.pairwise_loss</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
 
+<span class="kn">from</span> <span class="nn">quaterion.distances</span> <span class="kn">import</span> <span class="n">Distance</span>
 <span class="kn">from</span> <span class="nn">quaterion.loss.similarity_loss</span> <span class="kn">import</span> <span class="n">SimilarityLoss</span>
 
 
@@ -41,12 +42,10 @@
     <span class="sd">&quot;&quot;&quot;Base class for pairwise losses.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        distance_metric_name: Name of the function, that returns a distance between two embeddings.</span>
-<span class="sd">            :class:`~quaterion.loss.metrics.SiameseDistanceMetric` contains pre-defined metrics</span>
-<span class="sd">            that can be used.</span>
+<span class="sd">        distance_metric_name: Name of the distance function, e.g., :class:`~quaterion.distances.Distance`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">distance_metric_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;cosine_distance&quot;</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">distance_metric_name</span><span class="p">:</span> <span class="n">Distance</span> <span class="o">=</span> <span class="n">Distance</span><span class="o">.</span><span class="n">COSINE</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">PairwiseLoss</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">distance_metric_name</span><span class="o">=</span><span class="n">distance_metric_name</span><span class="p">)</span>
 
 <div class="viewcode-block" id="PairwiseLoss.forward"><a class="viewcode-back" href="../../../quaterion.loss.pairwise_loss.html#quaterion.loss.pairwise_loss.PairwiseLoss.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>

@@ -32,59 +32,24 @@
           <div class="body" role="main">
             
   <h1>Source code for quaterion.loss.similarity_loss</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Type</span>
 
-<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span><span class="p">,</span> <span class="n">Tensor</span>
-
+<span class="kn">from</span> <span class="nn">quaterion.distances</span> <span class="kn">import</span> <span class="n">Distance</span>
 <span class="kn">from</span> <span class="nn">quaterion.loss.metrics</span> <span class="kn">import</span> <span class="n">SiameseDistanceMetric</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span><span class="p">,</span> <span class="n">nn</span>
 
 
 <div class="viewcode-block" id="SimilarityLoss"><a class="viewcode-back" href="../../../quaterion.loss.similarity_loss.html#quaterion.loss.similarity_loss.SimilarityLoss">[docs]</a><span class="k">class</span> <span class="nc">SimilarityLoss</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Base similarity losses class.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        distance_metric_name: Name of the function, that returns a distance between two embeddings.</span>
-<span class="sd">            :class:`~quaterion.loss.metrics.SiameseDistanceMetric` contains pre-defined metrics</span>
-<span class="sd">            that can be used.</span>
+<span class="sd">        distance_metric_name: Name of the distance function, e.g., :class:`~quaterion.distances.Distance`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">distance_metric_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;cosine_distance&quot;</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">distance_metric_name</span><span class="p">:</span> <span class="n">Distance</span> <span class="o">=</span> <span class="n">Distance</span><span class="o">.</span><span class="n">COSINE</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">SimilarityLoss</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">distance_metric</span> <span class="o">=</span> <span class="n">Distance</span><span class="o">.</span><span class="n">get_by_name</span><span class="p">(</span><span class="n">distance_metric_name</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">distance_metric_name</span> <span class="o">=</span> <span class="n">distance_metric_name</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">distance_metric</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_distance_function</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">distance_metric_name</span><span class="p">)</span>
-
-<div class="viewcode-block" id="SimilarityLoss.metric_class"><a class="viewcode-back" href="../../../quaterion.loss.similarity_loss.html#quaterion.loss.similarity_loss.SimilarityLoss.metric_class">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">metric_class</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Type</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Class with metrics available for current loss.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            Type: class containing metrics</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">SiameseDistanceMetric</span></div>
-
-<div class="viewcode-block" id="SimilarityLoss.get_distance_function"><a class="viewcode-back" href="../../../quaterion.loss.similarity_loss.html#quaterion.loss.similarity_loss.SimilarityLoss.get_distance_function">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">get_distance_function</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">,</span> <span class="n">function_name</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">Tensor</span><span class="p">],</span> <span class="n">Tensor</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;Retrieve distance function from metric class.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            function_name: name of attribute in cls.metric_class instance</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            Callable[[Tensor, Tensor], Tensor]: function for distance calculation</span>
-
-<span class="sd">        Raises:</span>
-<span class="sd">            RuntimeError: unknown `distance_metric_name` is passed</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">foo</span> <span class="ow">in</span> <span class="nb">vars</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">metric_class</span><span class="p">())</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="n">function_name</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">foo</span><span class="o">.</span><span class="vm">__func__</span>
-
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Unknown `distance_metric_name` </span><span class="si">{</span><span class="n">function_name</span><span class="si">}</span><span class="s2">,&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot; available metrics: </span><span class="si">{</span><span class="nb">vars</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">metric_class</span><span class="p">())</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="p">)</span></div>
 
 <div class="viewcode-block" id="SimilarityLoss.get_config_dict"><a class="viewcode-back" href="../../../quaterion.loss.similarity_loss.html#quaterion.loss.similarity_loss.SimilarityLoss.get_config_dict">[docs]</a>    <span class="k">def</span> <span class="nf">get_config_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;Config used in saving and loading purposes.</span>

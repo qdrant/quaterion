@@ -30,8 +30,8 @@ class MultipleNegativesRankingLoss(PairwiseLoss):
 
     Args:
         scale: Scaling value for multiplying with similarity scores to make cross-entropy work.
-        distance_metric_name: Name of the metric to calculate similarities between embeddings.
-            Optional, defaults to `"cosine"`. If `"dot_product"`, `scale` must be `1`.
+        distance_metric_name: Name of the metric to calculate similarities between embeddings, e.g., :class:`quaterion.distances.Distance`.
+            Optional, defaults to :attr:`~quaterion.distances.Distance.COSINE`. If :attr:`~quaterion.distances.Distance.DOT_PRODUCT`, `scale` must be `1`.
         symmetric: If True, loss is symmetric,
             i.e., it also accounts for retrieval of the correct anchor when a positive given.
     """

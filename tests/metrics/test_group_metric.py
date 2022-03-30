@@ -24,7 +24,12 @@ def test_retrieval_r_precision():
 
     # region multiple batches
     first_batch = (
-        torch.Tensor([[1, 1], [8, 8],]),  # embeddings
+        torch.Tensor(
+            [
+                [1, 1],
+                [8, 8],
+            ]
+        ),  # embeddings
         torch.LongTensor([1, 2]),  # groups
     )
     second_batch = (

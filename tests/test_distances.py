@@ -52,8 +52,4 @@ class TestDistances:
             else:  # similarity matrix
                 res = dist_obj.similarity_matrix(self.x)
 
-            assert (
-                torch.isclose(
-                    res, self.expected[distance_name][method_name], atol=3e-08
-                )  # workaround to avoid small numerical errors
-            ).float().sum() == self.x_dim**2
+            assert torch.allclose(res, self.expected[distance_name][method_name], atol=3e-08)  # workaround to avoid small numerical errors

@@ -1,0 +1,101 @@
+.wy-nav-side {
+	background: #182b3a;
+}
+.wy-side-nav-search {
+	background-color: #bc1439;
+}
+
+.wy-menu-vertical a:hover {
+	background: #1e3d55;
+}
+
+.wy-nav-content a {
+	color: #bc1439;
+}
+.wy-nav-content a:hover {
+	color: #bc1439;
+	text-decoration: underline;
+}
+
+.wy-nav-content a:visited {
+	color: #a55b6d;
+}
+
+.admonition {
+	border: 1px solid transparent;
+	position: relative;
+	padding: .75rem 1.25rem .75rem 3rem;
+	margin-bottom: 1rem;
+	border-radius: 0.25rem;
+}
+.admonition.note {
+	color: #182b3a;
+	background-color: #d1ecf1;
+	border-color: #bee5eb;
+}
+.admonition.note .admonition-title {
+	background: #182b3a;
+	color: #d1ecf1;
+}
+
+html.writer-html4 .rst-content dl:not(.docutils) > dt:first-child, html.writer-html5 .rst-content dl[class]:not(.option-list):not(.field-list):not(.footnote):not(.glossary):not(.simple) > dt:first-child {
+	background: #d1ecf1;
+	color: #182b3a;
+	border-top-color: #182b3a;
+}
+
+/* we can use ID to identify block
+	but let's be aware that ID is generated from the section caption name,
+	so if content changes, ID will change too
+ */
+#next-steps .toctree-wrapper ul {
+	display: flex;
+	justify-content: space-between;
+}
+#next-steps .toctree-wrapper ul > li {
+	display: flex;
+	margin: 0;
+	max-width: 49%;
+	height: 160px;
+	flex-grow: 2;
+}
+
+#next-steps .toctree-wrapper ul > li a {
+	display: block;
+	height: 160px;
+	flex-grow: 2;
+	position: relative;
+	padding: 40px 25px;
+	border: 1px solid #cfcfcf;
+	border-radius: 5px;
+
+	color: #404040;
+	text-decoration: none;
+	font-size: 1.25rem;
+	line-height: 1.5rem;
+}
+
+#next-steps .toctree-wrapper ul > li:first-of-type {
+	margin-right: 1rem;
+}
+
+#next-steps .toctree-wrapper ul > li a:after {
+	content: "";
+	display: block;
+	width: 0;
+	height: 2px;
+	position: absolute;
+	top: calc(100% - 2px);
+	left: 0;
+	background-color: #bc1439;
+	-webkit-transition: width 0.25s ease-in-out;
+	transition: width 0.25s ease-in-out;
+}
+
+#next-steps .toctree-wrapper ul > li:hover a {
+	color: #bc1439;
+}
+
+#next-steps .toctree-wrapper ul > li:hover a:after {
+	width: 100%;
+}

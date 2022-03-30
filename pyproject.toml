@@ -30,6 +30,7 @@ sphinx = "^4.4.0"
 
 [tool.poetry.extras]
 pytorch-metric-learning = ["pytorch-metric-learning"]
+docs = ["Sphinx", "sphinx_rtd_theme"]
 
 
 [build-system]

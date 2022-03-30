@@ -88,7 +88,7 @@ exclude_patterns = [
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = "alabaster"
+html_theme = "sphinx_rtd_theme"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -97,6 +97,7 @@ html_static_path = []
 
 html_css_files = [
     "quaterion.css",
+    "css/custom.css"
 ]
 
 # Files excluded via exclude_patterns still being generating by sphinx-apidoc
@@ -104,3 +105,16 @@ html_css_files = [
 # `WARNING: toctree contains reference to excluded document '...'`.
 # suppress_warnings allows to remove such warnings
 suppress_warnings = ["toc.excluded"]
+
+html_theme_options = {
+    # google analytics can be added here
+    'logo_only': False,
+    'display_version': True,
+    'prev_next_buttons_location': 'bottom',
+    'style_external_links': False,
+    'vcs_pageview_mode': '',
+    # Toc options
+    'collapse_navigation': True,
+    'sticky_navigation': True,
+    'titles_only': False
+}

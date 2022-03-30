@@ -17,7 +17,7 @@ class Cosine(BaseDistance):
 
     @staticmethod
     def distance(x: Tensor, y: Tensor) -> Tensor:
-        return 1 - Cosine.distance(x, y)
+        return 1 - Cosine.similarity(x, y)
 
     @staticmethod
     def similarity_matrix(x: Tensor, y: Tensor = None) -> Tensor:

@@ -56,4 +56,4 @@ class TestDistances:
                 torch.isclose(
                     res, self.expected[distance_name][method_name], atol=3e-08
                 )  # workaround to avoid small numerical errors
-            ).float().sum() == self.x_dim ** 2
+            ).float().sum() == self.x_dim**2

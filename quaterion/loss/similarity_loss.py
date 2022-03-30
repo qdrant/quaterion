@@ -1,8 +1,8 @@
-from typing import Type, Callable, Dict, Any
+from typing import Any, Callable, Dict, Type
 
-from torch import nn, Tensor
-
+from quaterion.distances import Distance
 from quaterion.loss.metrics import SiameseDistanceMetric
+from torch import Tensor, nn
 
 
 class SimilarityLoss(nn.Module):
@@ -14,43 +14,10 @@ class SimilarityLoss(nn.Module):
             that can be used.
     """
 
-    def __init__(self, distance_metric_name: str = "cosine_distance"):
+    def __init__(self, distance_metric_name: Distance = Distance.COSINE):
         super(SimilarityLoss, self).__init__()
+        self.distance_metric = Distance.get_by_name(distance_metric_name)
         self.distance_metric_name = distance_metric_name
-        self.distance_metric = self.get_distance_function(self.distance_metric_name)
-
-    @classmethod
-    def metric_class(cls) -> Type:
-        """Class with metrics available for current loss.
-
-        Returns:
-            Type: class containing metrics
-        """
-        return SiameseDistanceMetric
-
-    @classmethod
-    def get_distance_function(
-        cls, function_name: str
-    ) -> Callable[[Tensor, Tensor], Tensor]:
-        """Retrieve distance function from metric class.
-
-        Args:
-            function_name: name of attribute in cls.metric_class instance
-
-        Returns:
-            Callable[[Tensor, Tensor], Tensor]: function for distance calculation
-
-        Raises:
-            RuntimeError: unknown `distance_metric_name` is passed
-        """
-        for name, foo in vars(cls.metric_class()).items():
-            if name == function_name:
-                return foo.__func__
-
-        raise RuntimeError(
-            f"Unknown `distance_metric_name` {function_name},"
-            f" available metrics: {vars(cls.metric_class()).keys()}"
-        )
 
     def get_config_dict(self) -> Dict[str, Any]:
         """Config used in saving and loading purposes.

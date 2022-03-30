@@ -28,4 +28,9 @@ class Distance(str, Enum):
             "dot_product": DotProduct,
         }
 
-        return dists[name]
+        try:
+            return dists[name]
+        except KeyError:
+            raise ValueError(
+                f"Unrecognized distance name: {name}. Must be one of {list(dists.keys())}"
+            )

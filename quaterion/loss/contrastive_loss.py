@@ -20,7 +20,7 @@ class ContrastiveLoss(PairwiseLoss):
         http://yann.lecun.com/exdb/publis/pdf/hadsell-chopra-lecun-06.pdf
 
     Args:
-        distance_metric_name: Name of the function, e.g., :class:`quaterion.distances.Distance`. Optional, defaults to :attr:`~quaterion.distances.Distance.COSINE`.
+        distance_metric_name: Name of the function, e.g., :class:`~quaterion.distances.Distance`. Optional, defaults to :attr:`~quaterion.distances.Distance.COSINE`.
         margin: Negative samples (label == 0) should have a distance of at least the
             margin value.
         size_average: Average by the size of the mini-batch.

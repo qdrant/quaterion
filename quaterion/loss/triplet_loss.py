@@ -48,7 +48,7 @@ class TripletLoss(GroupLoss):
                 "mining": self._mining,
             }
         )
-        
+
         return config
 
     def forward(

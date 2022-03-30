@@ -25,9 +25,7 @@ class TestMNRLoss:
         assert loss_res.shape == torch.Size([])
 
     def test_dot_product(self):
-        loss = MultipleNegativesRankingLoss(
-            scale=1, distance_metric_name="dot_product"
-        )
+        loss = MultipleNegativesRankingLoss(scale=1, distance_metric_name="dot_product")
 
         loss_res = loss.forward(self.embeddings, self.pairs, None, None)
 

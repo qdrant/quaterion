@@ -230,5 +230,3 @@ def test_retrieval_reciprocal_rank():
 
     # endregion
     # endregion single batch
-
-

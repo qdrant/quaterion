@@ -96,7 +96,6 @@ def test_retrieval_r_precision():
     # region random sampling
     num_objects = 100
     groups = torch.LongTensor([1] * num_objects + [2] * num_objects)
-
     same_dist_embeddings, diff_dist_embeddings = sample_embeddings(
         mean=1, std=1, mean_coef=2, num_objects=num_objects, embedding_dim=10,
     )

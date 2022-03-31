@@ -223,5 +223,3 @@ def test_retrieval_reciprocal_rank():
     assert same_dist_metric.compute().mean() <= diff_dist_metric.compute().mean()
     # endregion random sampling
     # endregion single batch
-
-

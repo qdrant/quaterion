@@ -4,8 +4,17 @@ from quaterion.eval.group_metric import RetrievalRPrecision
 from quaterion.loss import SiameseDistanceMetric
 
 
-def sample_embeddings(mean, std, mean_coef, num_groups, embedding_dim):
-    size = num_groups, embedding_dim
+def sample_embeddings(mean, std, mean_coef, num_objects, embedding_dim):
+    """Generates embeddings from different distributions for tests
+
+    Since metrics might be hard to implement and to test, it might be useful to test them with
+    random sampling.
+
+    Here 2 sets of embeddings being generated.
+    All embeddings in the first set sampled from one distribution.
+    Embeddings in the second set sampled from different distributions.
+    """
+    size = num_objects, embedding_dim
     x = torch.normal(mean=mean, std=std, size=size)
     y = torch.normal(mean=mean, std=std, size=size)
     z = torch.normal(mean=mean * mean_coef, std=std, size=size)
@@ -84,20 +93,17 @@ def test_retrieval_r_precision():
     assert metric.compute() == exp_metric
     # endregion worst case
 
-    # region random
-    num_experiments = 100
-    num_groups = 4
-    groups = torch.LongTensor([1] * num_groups + [2] * num_groups)
+    # region random sampling
+    num_objects = 100
+    groups = torch.LongTensor([1] * num_objects + [2] * num_objects)
 
-    for _ in range(num_experiments):
+    same_dist_embeddings, diff_dist_embeddings = sample_embeddings(
+        mean=1, std=1, mean_coef=2, num_objects=num_objects, embedding_dim=10,
+    )
+    same_dist_metric = RetrievalRPrecision(SiameseDistanceMetric.manhattan)
+    same_dist_metric.update(same_dist_embeddings, groups)
 
-        same_dist_embeddings, diff_dist_embeddings = sample_embeddings(
-            mean=1, std=1, mean_coef=10, num_groups=num_groups, embedding_dim=10,
-        )
-        same_dist_metric = RetrievalRPrecision(SiameseDistanceMetric.manhattan)
-        same_dist_metric.update(same_dist_embeddings, groups)
-
-        diff_dist_metric = RetrievalRPrecision(SiameseDistanceMetric.manhattan)
-        diff_dist_metric.update(diff_dist_embeddings, groups)
-        assert same_dist_metric.compute() <= diff_dist_metric.compute()
-    # endregion random
+    diff_dist_metric = RetrievalRPrecision(SiameseDistanceMetric.manhattan)
+    diff_dist_metric.update(diff_dist_embeddings, groups)
+    assert same_dist_metric.compute() <= diff_dist_metric.compute()
+    # endregion random sampling

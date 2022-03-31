@@ -118,26 +118,23 @@ def test_retrieval_precision():
     # endregion k = 1, worst case
 
     # region random sampling
-    num_experiments = 100
-    num_of_pairs = 4
+    num_of_pairs = 100
     pairs = torch.LongTensor([[i, i + num_of_pairs] for i in range(num_of_pairs)])
     labels = torch.Tensor([1.0] * num_of_pairs)
     subgroups = torch.Tensor(
         [0] * num_of_pairs * 2
     )  # subgroup is required for each object
 
-    for _ in range(num_experiments):
-        same_dist_embeddings, diff_dist_embeddings = sample_embeddings(
-            mean=1, std=1, mean_coef=10, num_of_pairs=num_of_pairs, embedding_dim=10
-        )
-        same_dist_metric = RetrievalPrecision(SiameseDistanceMetric.manhattan, k=1)
-        same_dist_metric.update(same_dist_embeddings, pairs, labels, subgroups)
+    same_dist_embeddings, diff_dist_embeddings = sample_embeddings(
+        mean=1, std=1, mean_coef=1.1, num_of_pairs=num_of_pairs, embedding_dim=10
+    )
+    same_dist_metric = RetrievalPrecision(SiameseDistanceMetric.manhattan, k=1)
+    same_dist_metric.update(same_dist_embeddings, pairs, labels, subgroups)
 
-        diff_dist_metric = RetrievalPrecision(SiameseDistanceMetric.manhattan, k=1)
-        diff_dist_metric.update(diff_dist_embeddings, pairs, labels, subgroups)
-
-        assert same_dist_metric.compute().mean() <= diff_dist_metric.compute().mean()
-    # endregion
+    diff_dist_metric = RetrievalPrecision(SiameseDistanceMetric.manhattan, k=1)
+    diff_dist_metric.update(diff_dist_embeddings, pairs, labels, subgroups)
+    assert same_dist_metric.compute().mean() <= diff_dist_metric.compute().mean()
+    # endregion random sampling
     # endregion single batch
 
 
@@ -208,27 +205,23 @@ def test_retrieval_reciprocal_rank():
     # endregion worst case
 
     # region random sampling
-    num_experiments = 100
-    num_of_pairs = 4
+    num_of_pairs = 100
     pairs = torch.LongTensor([[i, i + num_of_pairs] for i in range(num_of_pairs)])
     labels = torch.Tensor([1.0] * num_of_pairs)
     subgroups = torch.Tensor(
         [0] * num_of_pairs * 2
     )  # subgroup is required for each object
 
-    for _ in range(num_experiments):
-        same_dist_embeddings, diff_dist_embeddings = sample_embeddings(
-            mean=1, std=1, mean_coef=10, num_of_pairs=num_of_pairs, embedding_dim=10
-        )
-        same_dist_metric = RetrievalReciprocalRank(SiameseDistanceMetric.manhattan)
-        same_dist_metric.update(same_dist_embeddings, pairs, labels, subgroups)
+    same_dist_embeddings, diff_dist_embeddings = sample_embeddings(
+        mean=1, std=1, mean_coef=1.1, num_of_pairs=num_of_pairs, embedding_dim=10
+    )
+    same_dist_metric = RetrievalReciprocalRank(SiameseDistanceMetric.manhattan)
+    same_dist_metric.update(same_dist_embeddings, pairs, labels, subgroups)
 
-        diff_dist_metric = RetrievalReciprocalRank(SiameseDistanceMetric.manhattan)
-        diff_dist_metric.update(diff_dist_embeddings, pairs, labels, subgroups)
-
-        assert same_dist_metric.compute().mean() <= diff_dist_metric.compute().mean()
-
-    # endregion
+    diff_dist_metric = RetrievalReciprocalRank(SiameseDistanceMetric.manhattan)
+    diff_dist_metric.update(diff_dist_embeddings, pairs, labels, subgroups)
+    assert same_dist_metric.compute().mean() <= diff_dist_metric.compute().mean()
+    # endregion random sampling
     # endregion single batch
 
 

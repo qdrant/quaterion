@@ -44,7 +44,12 @@ def test_retrieval_r_precision():
 
     # region multiple batches
     first_batch = (
-        torch.Tensor([[1, 1], [8, 8],]),  # embeddings
+        torch.Tensor(
+            [
+                [1, 1],
+                [8, 8],
+            ]
+        ),  # embeddings
         torch.LongTensor([1, 2]),  # groups
     )
     second_batch = (
@@ -97,7 +102,11 @@ def test_retrieval_r_precision():
     num_objects = 100
     groups = torch.LongTensor([1] * num_objects + [2] * num_objects)
     same_dist_embeddings, diff_dist_embeddings = sample_embeddings(
-        mean=1, std=1, mean_coef=2, num_objects=num_objects, embedding_dim=10,
+        mean=1,
+        std=1,
+        mean_coef=2,
+        num_objects=num_objects,
+        embedding_dim=10,
     )
     same_dist_metric = RetrievalRPrecision(SiameseDistanceMetric.manhattan)
     same_dist_metric.update(same_dist_embeddings, groups)

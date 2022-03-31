@@ -4,6 +4,17 @@ from quaterion.eval.group_metric import RetrievalRPrecision
 from quaterion.loss import SiameseDistanceMetric
 
 
+def sample_embeddings(mean, std, mean_coef, num_groups, embedding_dim):
+    size = num_groups, embedding_dim
+    x = torch.normal(mean=mean, std=std, size=size)
+    y = torch.normal(mean=mean, std=std, size=size)
+    z = torch.normal(mean=mean * mean_coef, std=std, size=size)
+
+    same_dist_embeddings = torch.cat([x, y])
+    diff_dist_embeddings = torch.cat([x, z])
+    return same_dist_embeddings, diff_dist_embeddings
+
+
 def test_retrieval_r_precision():
     # region single batch
     embeddings = torch.Tensor([[1, 1], [8, 8], [4, 4], [6, 7]])
@@ -24,12 +35,7 @@ def test_retrieval_r_precision():
 
     # region multiple batches
     first_batch = (
-        torch.Tensor(
-            [
-                [1, 1],
-                [8, 8],
-            ]
-        ),  # embeddings
+        torch.Tensor([[1, 1], [8, 8],]),  # embeddings
         torch.LongTensor([1, 2]),  # groups
     )
     second_batch = (
@@ -45,3 +51,53 @@ def test_retrieval_r_precision():
         metric.update(embeddings, groups)
     assert metric.compute() == exp_metric
     # endregion multiple batches
+
+    # region ideal case
+    embeddings = torch.Tensor([[1, 1], [8, 8], [2, 2], [6, 6]])
+    # distance matrix
+    # [
+    #     [0., 14., 2., 10.],
+    #     [14., 0., 12., 4.],
+    #     [2., 12., 0., 8.],
+    #     [10., 4., 8., 0.]
+    # ]
+    groups = torch.LongTensor([1, 2, 1, 2])
+    exp_metric = torch.Tensor([1.0])
+    metric = RetrievalRPrecision(SiameseDistanceMetric.manhattan)
+    metric.update(embeddings, groups)
+    assert metric.compute() == exp_metric
+    # endregion ideal case
+
+    # region worst case
+    embeddings = torch.Tensor([[1, 1], [2, 2], [8, 8], [6, 6]])
+    # distance matrix
+    # [
+    #      [0., 2., 14., 10.],
+    #      [2., 0., 12., 8.],
+    #      [14., 12., 0., 4.],
+    #      [10., 8., 4., 0.]
+    # ]
+    groups = torch.LongTensor([1, 2, 1, 2])
+    exp_metric = torch.Tensor([0.0])
+    metric = RetrievalRPrecision(SiameseDistanceMetric.manhattan)
+    metric.update(embeddings, groups)
+    assert metric.compute() == exp_metric
+    # endregion worst case
+
+    # region random
+    num_experiments = 100
+    num_groups = 4
+    groups = torch.LongTensor([1] * num_groups + [2] * num_groups)
+
+    for _ in range(num_experiments):
+
+        same_dist_embeddings, diff_dist_embeddings = sample_embeddings(
+            mean=1, std=1, mean_coef=10, num_groups=num_groups, embedding_dim=10,
+        )
+        same_dist_metric = RetrievalRPrecision(SiameseDistanceMetric.manhattan)
+        same_dist_metric.update(same_dist_embeddings, groups)
+
+        diff_dist_metric = RetrievalRPrecision(SiameseDistanceMetric.manhattan)
+        diff_dist_metric.update(diff_dist_embeddings, groups)
+        assert same_dist_metric.compute() <= diff_dist_metric.compute()
+    # endregion random

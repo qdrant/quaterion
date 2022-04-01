@@ -35,4 +35,3 @@ class RetrievalReciprocalRank(PairMetric):
         position = torch.nonzero(target)
         metric = 1.0 / (position[:, 1] + 1.0)
         return metric
-

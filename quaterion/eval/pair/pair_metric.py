@@ -54,4 +54,3 @@ class PairMetric(BaseMetric):
         self.pairs = torch.cat([self.pairs, pairs.to(device)])
         self.labels = torch.cat([self.labels, labels])
         self.subgroups = torch.cat([self.subgroups, subgroups.to(device)])
-

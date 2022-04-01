@@ -179,7 +179,7 @@ python-versions = ">=3.7"
 
 [[package]]
 name = "fsspec"
-version = "2022.2.0"
+version = "2022.3.0"
 description = "File-system specification"
 category = "main"
 optional = false
@@ -210,6 +210,7 @@ s3 = ["s3fs"]
 sftp = ["paramiko"]
 smb = ["smbprotocol"]
 ssh = ["paramiko"]
+tqdm = ["tqdm"]
 
 [[package]]
 name = "google-auth"
@@ -379,7 +380,7 @@ name = "joblib"
 version = "1.1.0"
 description = "Lightweight pipelining with Python functions"
 category = "main"
-optional = true
+optional = false
 python-versions = ">=3.6"
 
 [[package]]
@@ -514,7 +515,7 @@ name = "pillow"
 version = "9.0.1"
 description = "Python Imaging Library (Fork)"
 category = "main"
-optional = true
+optional = false
 python-versions = ">=3.7"
 
 [[package]]
@@ -670,7 +671,7 @@ name = "pytorch-metric-learning"
 version = "1.3.0"
 description = "The easiest way to use deep metric learning in your application. Modular, flexible, and extensible. Written in PyTorch."
 category = "main"
-optional = true
+optional = false
 python-versions = ">=3.0"
 
 [package.dependencies]
@@ -764,7 +765,7 @@ name = "scikit-learn"
 version = "1.0.2"
 description = "A set of python modules for machine learning and data mining"
 category = "main"
-optional = true
+optional = false
 python-versions = ">=3.7"
 
 [package.dependencies]
@@ -784,7 +785,7 @@ name = "scipy"
 version = "1.7.3"
 description = "SciPy: Scientific Library for Python"
 category = "main"
-optional = true
+optional = false
 python-versions = ">=3.7,<3.11"
 
 [package.dependencies]
@@ -951,7 +952,7 @@ name = "threadpoolctl"
 version = "3.1.0"
 description = "threadpoolctl"
 category = "main"
-optional = true
+optional = false
 python-versions = ">=3.6"
 
 [[package]]
@@ -1002,7 +1003,7 @@ name = "torchvision"
 version = "0.12.0"
 description = "image and video datasets and models for torch deep learning"
 category = "main"
-optional = true
+optional = false
 python-versions = ">=3.7"
 
 [package.dependencies]
@@ -1124,7 +1125,7 @@ pytorch-metric-learning = ["pytorch-metric-learning"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7,<3.10"
-content-hash = "69fc842d3fedc17d3788cfb8b82fc029bc778bb0b557ff4946e13d42d8ab58cf"
+content-hash = "8b942f24815cfdaee4c705257a335b4812012e14f23d4098d07de8fe8f1e0440"
 
 [metadata.files]
 absl-py = [
@@ -1327,8 +1328,8 @@ frozenlist = [
     {file = "frozenlist-1.3.0.tar.gz", hash = "sha256:ce6f2ba0edb7b0c1d8976565298ad2deba6f8064d2bebb6ffce2ca896eb35b0b"},
 ]
 fsspec = [
-    {file = "fsspec-2022.2.0-py3-none-any.whl", hash = "sha256:eb9c9d9aee49d23028deefffe53e87c55d3515512c63f57e893710301001449a"},
-    {file = "fsspec-2022.2.0.tar.gz", hash = "sha256:20322c659538501f52f6caa73b08b2ff570b7e8ea30a86559721d090e473ad5c"},
+    {file = "fsspec-2022.3.0-py3-none-any.whl", hash = "sha256:a53491b003210fce6911dd8f2d37e20c41a27ce52a655eef11b885d1578ed4cf"},
+    {file = "fsspec-2022.3.0.tar.gz", hash = "sha256:fd582cc4aa0db5968bad9317cae513450eddd08b2193c4428d9349265a995523"},
 ]
 google-auth = [
     {file = "google-auth-2.6.2.tar.gz", hash = "sha256:60d449f8142c742db760f4c0be39121bc8d9be855555d784c252deaca1ced3f5"},

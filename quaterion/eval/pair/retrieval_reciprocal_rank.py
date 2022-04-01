@@ -13,7 +13,7 @@ class RetrievalReciprocalRank(PairMetric):
         distance_metric_name: name of a distance metric to calculate distance or similarity
             matrices. Available names could be found in :class:`~quaterion.distances.Distance`.
 
-    Examples:
+    Example:
 
         Response on a query returned 10 documents, 3 of them are relevant. Assume positions of
         relevant documents are [2, 5, 9]. Then retrieval reciprocal rank being calculated as

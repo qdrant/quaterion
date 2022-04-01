@@ -12,7 +12,7 @@ class RetrievalPrecision(PairMetric):
             matrices. Available names could be found in :class:`~quaterion.distances.Distance`.
         k: number of documents among which to search a relevant one
 
-    Examples:
+    Example:
 
         Assume `k` is 4. Then only 4 documents being retrieved as a query response. Only 2 of them
         are relevant and score will be 2/4 = 0.5.

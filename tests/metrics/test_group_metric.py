@@ -1,6 +1,6 @@
 import torch
 
-from quaterion.eval.group_metric import RetrievalRPrecision
+from quaterion.eval.group import RetrievalRPrecision
 from quaterion.loss import SiameseDistanceMetric
 
 

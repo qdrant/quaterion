@@ -2,7 +2,7 @@ import pytest
 import torch
 
 from quaterion.loss.metrics import SiameseDistanceMetric
-from quaterion.eval.pair_metric import RetrievalPrecision, RetrievalReciprocalRank
+from quaterion.eval.pair import RetrievalPrecision, RetrievalReciprocalRank
 
 
 def sample_embeddings(mean, std, mean_coef, num_of_pairs, embedding_dim):

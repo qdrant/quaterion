@@ -5,12 +5,11 @@ from quaterion.eval.group import GroupMetric
 
 
 class RetrievalRPrecision(GroupMetric):
-    """Class for computation retrieval R-precision for group based data
+    """Class to compute the retrieval R-precision score for group based data
 
-    R-Precision is defined as the precision after R documents have been retrieved by the system,
-    where R is also the total number of judged relevant documents for the given topic.
-    Precision is defined as the portion of retrieved documents that are truly relevant to the given
-    query topic.
+    Retrieval R-Precision is the ratio of `r/R`, where R is the number of the relevant documents
+    for a given query in the collection, and `r` is the number of the truly relevant documents
+    found in the `R` highest scored results for that query.
 
     Args:
         distance_metric: function for distance matrix computation. Possible choice might be one of
@@ -18,9 +17,9 @@ class RetrievalRPrecision(GroupMetric):
 
     Examples:
 
-        If there are 20 relevant documents in a corpus of 100 documents then 20 documents being
-        retrieved. Only 15 of these 20 documents occurred to be relevant. Then
-        retrieval R-precision is calculated as 15/20 = 0.75.
+        Suppose that a collection contains 20 relevant documents for our query, and the model can
+        retrieve 15 of them in the 20 highest scored results, then Retrieval R-Precision is
+        calculated as r/R = 15/20 = 0.75.
 
     """
 

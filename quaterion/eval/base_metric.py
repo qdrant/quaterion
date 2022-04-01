@@ -4,9 +4,9 @@ from torch import Tensor
 
 
 class BaseMetric:
-    """Base metric class
+    """Base class for evaluation metrics
 
-    Provides default implementation of matrix distance calculation.
+    Provides a default implementation for distance matrix calculation.
 
     Args:
         distance_metric: function for distance matrix computation. Possible choice might be one of

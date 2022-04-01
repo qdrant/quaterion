@@ -38,17 +38,17 @@
 <span id="quaterion-eval-pair-retrieval-reciprocal-rank-module"></span><h1>quaterion.eval.pair.retrieval_reciprocal_rank module<a class="headerlink" href="#module-quaterion.eval.pair.retrieval_reciprocal_rank" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="quaterion.eval.pair.retrieval_reciprocal_rank.RetrievalReciprocalRank">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RetrievalReciprocalRank</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distance_metric</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/quaterion/eval/pair/retrieval_reciprocal_rank.html#RetrievalReciprocalRank"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.eval.pair.retrieval_reciprocal_rank.RetrievalReciprocalRank" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RetrievalReciprocalRank</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distance_metric_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="quaterion.distances.html#quaterion.distances.Distance" title="quaterion.distances.Distance"><span class="pre">Distance</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Distance.COSINE</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/quaterion/eval/pair/retrieval_reciprocal_rank.html#RetrievalReciprocalRank"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.eval.pair.retrieval_reciprocal_rank.RetrievalReciprocalRank" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="quaterion.eval.pair.pair_metric.html#quaterion.eval.pair.pair_metric.PairMetric" title="quaterion.eval.pair.pair_metric.PairMetric"><code class="xref py py-class docutils literal notranslate"><span class="pre">PairMetric</span></code></a></p>
 <p>Calculates retrieval reciprocal rank for pair based datasets</p>
 <p>Calculates the reciprocal of the rank at which the first relevant document was retrieved.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>distance_metric</strong> – function for distance matrix computation. Possible choice might be one of
-<a class="reference internal" href="quaterion.loss.metrics.html#quaterion.loss.metrics.SiameseDistanceMetric" title="quaterion.loss.metrics.SiameseDistanceMetric"><code class="xref py py-class docutils literal notranslate"><span class="pre">SiameseDistanceMetric</span></code></a> methods.</p>
+<dd class="field-odd"><p><strong>distance_metric_name</strong> – name of a distance metric to calculate distance or similarity
+matrices. Available names could be found in <a class="reference internal" href="quaterion.distances.html#quaterion.distances.Distance" title="quaterion.distances.Distance"><code class="xref py py-class docutils literal notranslate"><span class="pre">Distance</span></code></a>.</p>
 </dd>
 </dl>
-<p class="rubric">Examples</p>
+<p class="rubric">Example</p>
 <p>Response on a query returned 10 documents, 3 of them are relevant. Assume positions of
 relevant documents are [2, 5, 9]. Then retrieval reciprocal rank being calculated as
 1/2 = 0.5.</p>

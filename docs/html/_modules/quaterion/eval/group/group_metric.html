@@ -35,6 +35,7 @@
 <span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
 
+<span class="kn">from</span> <span class="nn">quaterion.distances</span> <span class="kn">import</span> <span class="n">Distance</span>
 <span class="kn">from</span> <span class="nn">quaterion.eval.base_metric</span> <span class="kn">import</span> <span class="n">BaseMetric</span>
 
 
@@ -44,12 +45,12 @@
 <span class="sd">    Provide default implementation for embeddings and groups accumulation.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        distance_metric: function for distance matrix computation. Possible choice might be one of</span>
-<span class="sd">            :class:`~quaterion.loss.metrics.SiameseDistanceMetric` methods.</span>
+<span class="sd">        distance_metric_name: name of a distance metric to calculate distance or similarity</span>
+<span class="sd">            matrices. Available names could be found in :class:`~quaterion.distances.Distance`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">distance_metric</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">distance_metric</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">distance_metric_name</span><span class="p">:</span> <span class="n">Distance</span> <span class="o">=</span> <span class="n">Distance</span><span class="o">.</span><span class="n">COSINE</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">distance_metric_name</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">groups</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">LongTensor</span><span class="p">()</span>
 
 <div class="viewcode-block" id="GroupMetric.update"><a class="viewcode-back" href="../../../../quaterion.eval.group.group_metric.html#quaterion.eval.group.group_metric.GroupMetric.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span>

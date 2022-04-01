@@ -38,19 +38,19 @@
 <span id="quaterion-eval-pair-retrieval-precision-module"></span><h1>quaterion.eval.pair.retrieval_precision module<a class="headerlink" href="#module-quaterion.eval.pair.retrieval_precision" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="quaterion.eval.pair.retrieval_precision.RetrievalPrecision">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RetrievalPrecision</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distance_metric</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/quaterion/eval/pair/retrieval_precision.html#RetrievalPrecision"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.eval.pair.retrieval_precision.RetrievalPrecision" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RetrievalPrecision</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distance_metric_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="quaterion.distances.html#quaterion.distances.Distance" title="quaterion.distances.Distance"><span class="pre">Distance</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Distance.COSINE</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/quaterion/eval/pair/retrieval_precision.html#RetrievalPrecision"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.eval.pair.retrieval_precision.RetrievalPrecision" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="quaterion.eval.pair.pair_metric.html#quaterion.eval.pair.pair_metric.PairMetric" title="quaterion.eval.pair.pair_metric.PairMetric"><code class="xref py py-class docutils literal notranslate"><span class="pre">PairMetric</span></code></a></p>
 <p>Calculates retrieval precision&#64;k for pair based datasets</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>distance_metric</strong> – function for distance matrix computation. Possible choice might be one of
-<a class="reference internal" href="quaterion.loss.metrics.html#quaterion.loss.metrics.SiameseDistanceMetric" title="quaterion.loss.metrics.SiameseDistanceMetric"><code class="xref py py-class docutils literal notranslate"><span class="pre">SiameseDistanceMetric</span></code></a> methods.</p></li>
+<li><p><strong>distance_metric_name</strong> – name of a distance metric to calculate distance or similarity
+matrices. Available names could be found in <a class="reference internal" href="quaterion.distances.html#quaterion.distances.Distance" title="quaterion.distances.Distance"><code class="xref py py-class docutils literal notranslate"><span class="pre">Distance</span></code></a>.</p></li>
 <li><p><strong>k</strong> – number of documents among which to search a relevant one</p></li>
 </ul>
 </dd>
 </dl>
-<p class="rubric">Examples</p>
+<p class="rubric">Example</p>
 <p>Assume <cite>k</cite> is 4. Then only 4 documents being retrieved as a query response. Only 2 of them
 are relevant and score will be 2/4 = 0.5.</p>
 <div class="admonition note">

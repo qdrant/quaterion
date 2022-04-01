@@ -18,7 +18,6 @@ Submodules
    quaterion.loss.arcface_loss
    quaterion.loss.contrastive_loss
    quaterion.loss.group_loss
-   quaterion.loss.metrics
    quaterion.loss.multiple_negatives_ranking_loss
    quaterion.loss.online_contrastive_loss
    quaterion.loss.pairwise_loss

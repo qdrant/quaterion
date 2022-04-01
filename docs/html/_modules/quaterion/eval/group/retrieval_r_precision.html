@@ -35,21 +35,22 @@
 <span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
 
+<span class="kn">from</span> <span class="nn">quaterion.distances</span> <span class="kn">import</span> <span class="n">Distance</span>
 <span class="kn">from</span> <span class="nn">quaterion.eval.group</span> <span class="kn">import</span> <span class="n">GroupMetric</span>
 
 
 <div class="viewcode-block" id="RetrievalRPrecision"><a class="viewcode-back" href="../../../../quaterion.eval.group.retrieval_r_precision.html#quaterion.eval.group.retrieval_r_precision.RetrievalRPrecision">[docs]</a><span class="k">class</span> <span class="nc">RetrievalRPrecision</span><span class="p">(</span><span class="n">GroupMetric</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Class to compute the retrieval R-precision score for group based data</span>
 
-<span class="sd">    Retrieval R-Precision is the ratio of `r/R`, where R is the number of the relevant documents</span>
+<span class="sd">    Retrieval R-Precision is the ratio of `r/R`, where `R` is the number of the relevant documents</span>
 <span class="sd">    for a given query in the collection, and `r` is the number of the truly relevant documents</span>
 <span class="sd">    found in the `R` highest scored results for that query.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        distance_metric: function for distance matrix computation. Possible choice might be one of</span>
-<span class="sd">            :class:`~quaterion.loss.metrics.SiameseDistanceMetric` methods.</span>
+<span class="sd">        distance_metric_name: name of a distance metric to calculate distance or similarity</span>
+<span class="sd">            matrices. Available names could be found in :class:`~quaterion.distances.Distance`.</span>
 
-<span class="sd">    Examples:</span>
+<span class="sd">    Example:</span>
 
 <span class="sd">        Suppose that a collection contains 20 relevant documents for our query, and the model can</span>
 <span class="sd">        retrieve 15 of them in the 20 highest scored results, then Retrieval R-Precision is</span>
@@ -57,8 +58,8 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">distance_metric</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">distance_metric</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">distance_metric_name</span><span class="p">:</span> <span class="n">Distance</span> <span class="o">=</span> <span class="n">Distance</span><span class="o">.</span><span class="n">COSINE</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">distance_metric_name</span><span class="p">)</span>
 
 <div class="viewcode-block" id="RetrievalRPrecision.compute"><a class="viewcode-back" href="../../../../quaterion.eval.group.retrieval_r_precision.html#quaterion.eval.group.retrieval_r_precision.RetrievalRPrecision.compute">[docs]</a>    <span class="k">def</span> <span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Calculates retrieval R-precision</span>

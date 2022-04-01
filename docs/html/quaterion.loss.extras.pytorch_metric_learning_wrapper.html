@@ -34,8 +34,68 @@
 
           <div class="body" role="main">
             
-  <section id="quaterion-loss-extras-pytorch-metric-learning-wrapper-module">
-<h1>quaterion.loss.extras.pytorch_metric_learning_wrapper module<a class="headerlink" href="#quaterion-loss-extras-pytorch-metric-learning-wrapper-module" title="Permalink to this headline">¶</a></h1>
+  <section id="module-quaterion.loss.extras.pytorch_metric_learning_wrapper">
+<span id="quaterion-loss-extras-pytorch-metric-learning-wrapper-module"></span><h1>quaterion.loss.extras.pytorch_metric_learning_wrapper module<a class="headerlink" href="#module-quaterion.loss.extras.pytorch_metric_learning_wrapper" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="quaterion.loss.extras.pytorch_metric_learning_wrapper.PytorchMetricLearningWrapper">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">PytorchMetricLearningWrapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">loss</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">BaseMetricLossFunction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">miner</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">BaseMiner</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/quaterion/loss/extras/pytorch_metric_learning_wrapper.html#PytorchMetricLearningWrapper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.loss.extras.pytorch_metric_learning_wrapper.PytorchMetricLearningWrapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="quaterion.loss.group_loss.html#quaterion.loss.group_loss.GroupLoss" title="quaterion.loss.group_loss.GroupLoss"><code class="xref py py-class docutils literal notranslate"><span class="pre">GroupLoss</span></code></a></p>
+<p>Provides a simple wrapper to be able to use losses and miners from pytorch-metric-learning.</p>
+<p>You need to create loss (and optionally miner) instances yourself, and pass those instances
+to the constructor of this wrapper.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This is an experimental feature that may be subject to change, deprecation or removal.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>See below for a quick usage example of this wrapper, but refer to the documentation of
+<cite>pytorch-metric-learning</cite> to learn more about individual
+<a class="reference external" href="https://kevinmusgrave.github.io/pytorch-metric-learning/losses">losses</a> and
+<a class="reference external" href="https://kevinmusgrave.github.io/pytorch-metric-learning/miners">miners</a>.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>loss</strong> – An instance of a loss object subclassing
+<a class="reference external" href="https://kevinmusgrave.github.io/pytorch-metric-learning/losses/#basemetriclossfunction">pytorch_metric_learning.losses.BaseMetricLossFunction</a>.</p></li>
+<li><p><strong>miner</strong> – An instance of a miner object subclassing
+<a class="reference external" href="https://kevinmusgrave.github.io/pytorch-metric-learning/miners/#baseminer">pytorch_metric_learning.miners.BaseMetric</a>.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MyTrainableModel</span><span class="p">(</span><span class="n">quaterion</span><span class="o">.</span><span class="n">TrainableModel</span><span class="p">):</span>
+    <span class="o">...</span>
+    <span class="k">def</span> <span class="nf">configure_loss</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">pytorch_metric_learning</span><span class="o">.</span><span class="n">losses</span><span class="o">.</span><span class="n">TripletMarginLoss</span><span class="p">()</span>
+        <span class="n">miner</span> <span class="o">=</span> <span class="n">pytorch_metric_learning</span><span class="o">.</span><span class="n">miner</span><span class="o">.</span><span class="n">MultiSimilarityMiner</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">quaterion</span><span class="o">.</span><span class="n">loss</span><span class="o">.</span><span class="n">PytorchMetricLearningWrapper</span><span class="p">(</span><span class="n">loss</span><span class="p">,</span> <span class="n">miner</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="quaterion.loss.extras.pytorch_metric_learning_wrapper.PytorchMetricLearningWrapper.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">embeddings</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groups</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/quaterion/loss/extras/pytorch_metric_learning_wrapper.html#PytorchMetricLearningWrapper.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.loss.extras.pytorch_metric_learning_wrapper.PytorchMetricLearningWrapper.forward" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>embeddings</strong> – shape: (batch_size, vector_length)</p></li>
+<li><p><strong>groups</strong> – shape: (batch_size,) - Groups, associated with embeddings</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><em>Tensor</em> – zero-size tensor, loss value</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="quaterion.loss.extras.pytorch_metric_learning_wrapper.PytorchMetricLearningWrapper.training">
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#quaterion.loss.extras.pytorch_metric_learning_wrapper.PytorchMetricLearningWrapper.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </section>
 
 

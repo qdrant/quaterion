@@ -110,6 +110,8 @@
       </ul></li>
       <li><a href="quaterion.eval.base_metric.html#quaterion.eval.base_metric.BaseMetric.calculate_distances">calculate_distances() (BaseMetric method)</a>
 </li>
+      <li><a href="quaterion.eval.base_metric.html#quaterion.eval.base_metric.BaseMetric.calculate_similarities">calculate_similarities() (BaseMetric method)</a>
+</li>
       <li><a href="quaterion.dataset.similarity_data_loader.html#quaterion.dataset.similarity_data_loader.GroupSimilarityDataLoader.collate_labels">collate_labels() (GroupSimilarityDataLoader class method)</a>
 
       <ul>
@@ -148,8 +150,6 @@
 </li>
       <li><a href="quaterion.distances.html#quaterion.distances.Distance.COSINE">COSINE (Distance attribute)</a>
 </li>
-      <li><a href="quaterion.loss.metrics.html#quaterion.loss.metrics.SiameseDistanceMetric.cosine_distance">cosine_distance() (SiameseDistanceMetric static method)</a>
-</li>
       <li><a href="quaterion.train.cache.cache_config.html#quaterion.train.cache.cache_config.CacheType.CPU">CPU (CacheType attribute)</a>, <a href="quaterion.train.cache.html#quaterion.train.cache.CacheType.CPU">[1]</a>
 </li>
   </ul></td>
@@ -180,6 +180,8 @@
         <li><a href="quaterion.distances.manhattan.html#quaterion.distances.manhattan.Manhattan.distance">(Manhattan static method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="quaterion.distances.base_distance.html#quaterion.distances.base_distance.BaseDistance.distance_matrix">distance_matrix() (BaseDistance static method)</a>
 
       <ul>
@@ -192,11 +194,7 @@
         <li><a href="quaterion.distances.manhattan.html#quaterion.distances.manhattan.Manhattan.distance_matrix">(Manhattan static method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="quaterion.distances.html#quaterion.distances.Distance.DOT_PRODUCT">DOT_PRODUCT (Distance attribute)</a>
-</li>
-      <li><a href="quaterion.loss.metrics.html#quaterion.loss.metrics.SiameseDistanceMetric.dot_product_distance">dot_product_distance() (SiameseDistanceMetric static method)</a>
 </li>
       <li><a href="quaterion.distances.dot_product.html#quaterion.distances.dot_product.DotProduct">DotProduct (class in quaterion.distances.dot_product)</a>
 </li>
@@ -219,8 +217,6 @@
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="quaterion.distances.html#quaterion.distances.Distance.EUCLIDEAN">EUCLIDEAN (Distance attribute)</a>
-</li>
-      <li><a href="quaterion.loss.metrics.html#quaterion.loss.metrics.SiameseDistanceMetric.euclidean">euclidean() (SiameseDistanceMetric static method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -250,6 +246,8 @@
         <li><a href="quaterion.loss.online_contrastive_loss.html#quaterion.loss.online_contrastive_loss.OnlineContrastiveLoss.forward">(OnlineContrastiveLoss method)</a>
 </li>
         <li><a href="quaterion.loss.pairwise_loss.html#quaterion.loss.pairwise_loss.PairwiseLoss.forward">(PairwiseLoss method)</a>
+</li>
+        <li><a href="quaterion.loss.extras.pytorch_metric_learning_wrapper.html#quaterion.loss.extras.pytorch_metric_learning_wrapper.PytorchMetricLearningWrapper.forward">(PytorchMetricLearningWrapper method)</a>
 </li>
         <li><a href="quaterion.loss.softmax_loss.html#quaterion.loss.softmax_loss.SoftmaxLoss.forward">(SoftmaxLoss method)</a>
 </li>
@@ -336,8 +334,6 @@
 </li>
       <li><a href="quaterion.distances.html#quaterion.distances.Distance.MANHATTAN">MANHATTAN (Distance attribute)</a>
 </li>
-      <li><a href="quaterion.loss.metrics.html#quaterion.loss.metrics.SiameseDistanceMetric.manhattan">manhattan() (SiameseDistanceMetric static method)</a>
-</li>
       <li><a href="quaterion.train.cache.cache_config.html#quaterion.train.cache.cache_config.CacheConfig.mapping">mapping (CacheConfig attribute)</a>, <a href="quaterion.train.cache.html#quaterion.train.cache.CacheConfig.mapping">[1]</a>
 </li>
       <li><a href="quaterion.utils.utils.html#quaterion.utils.utils.max_value_of_dtype">max_value_of_dtype() (in module quaterion.utils.utils)</a>
@@ -398,9 +394,11 @@
 </li>
         <li><a href="quaterion.loss.contrastive_loss.html#module-quaterion.loss.contrastive_loss">quaterion.loss.contrastive_loss</a>
 </li>
-        <li><a href="quaterion.loss.group_loss.html#module-quaterion.loss.group_loss">quaterion.loss.group_loss</a>
+        <li><a href="quaterion.loss.extras.html#module-quaterion.loss.extras">quaterion.loss.extras</a>
 </li>
-        <li><a href="quaterion.loss.metrics.html#module-quaterion.loss.metrics">quaterion.loss.metrics</a>
+        <li><a href="quaterion.loss.extras.pytorch_metric_learning_wrapper.html#module-quaterion.loss.extras.pytorch_metric_learning_wrapper">quaterion.loss.extras.pytorch_metric_learning_wrapper</a>
+</li>
+        <li><a href="quaterion.loss.group_loss.html#module-quaterion.loss.group_loss">quaterion.loss.group_loss</a>
 </li>
         <li><a href="quaterion.loss.multiple_negatives_ranking_loss.html#module-quaterion.loss.multiple_negatives_ranking_loss">quaterion.loss.multiple_negatives_ranking_loss</a>
 </li>
@@ -489,10 +487,10 @@
         <li><a href="quaterion.dataset.similarity_data_loader.html#quaterion.dataset.similarity_data_loader.SimilarityDataLoader.pin_memory">(SimilarityDataLoader attribute)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="quaterion.dataset.similarity_data_loader.html#quaterion.dataset.similarity_data_loader.SimilarityDataLoader.pre_collate_fn">pre_collate_fn() (SimilarityDataLoader class method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="quaterion.dataset.train_collater.html#quaterion.dataset.train_collater.TrainCollater.pre_encoder_collate">pre_encoder_collate() (TrainCollater method)</a>
 </li>
       <li><a href="quaterion.eval.pair.pair_metric.html#quaterion.eval.pair.pair_metric.PairMetric.precompute">precompute() (PairMetric method)</a>
@@ -506,6 +504,8 @@
 </li>
       </ul></li>
       <li><a href="quaterion.train.trainable_model.html#quaterion.train.trainable_model.TrainableModel.process_results">process_results() (TrainableModel method)</a>
+</li>
+      <li><a href="quaterion.loss.extras.pytorch_metric_learning_wrapper.html#quaterion.loss.extras.pytorch_metric_learning_wrapper.PytorchMetricLearningWrapper">PytorchMetricLearningWrapper (class in quaterion.loss.extras.pytorch_metric_learning_wrapper)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -686,17 +686,24 @@
 </li>
       </ul></li>
       <li>
+    quaterion.loss.extras
+
+      <ul>
+        <li><a href="quaterion.loss.extras.html#module-quaterion.loss.extras">module</a>
+</li>
+      </ul></li>
+      <li>
+    quaterion.loss.extras.pytorch_metric_learning_wrapper
+
+      <ul>
+        <li><a href="quaterion.loss.extras.pytorch_metric_learning_wrapper.html#module-quaterion.loss.extras.pytorch_metric_learning_wrapper">module</a>
+</li>
+      </ul></li>
+      <li>
     quaterion.loss.group_loss
 
       <ul>
         <li><a href="quaterion.loss.group_loss.html#module-quaterion.loss.group_loss">module</a>
-</li>
-      </ul></li>
-      <li>
-    quaterion.loss.metrics
-
-      <ul>
-        <li><a href="quaterion.loss.metrics.html#module-quaterion.loss.metrics">module</a>
 </li>
       </ul></li>
       <li>
@@ -831,8 +838,6 @@
 </li>
       <li><a href="quaterion.train.trainable_model.html#quaterion.train.trainable_model.TrainableModel.setup_dataloader">setup_dataloader() (TrainableModel method)</a>
 </li>
-      <li><a href="quaterion.loss.metrics.html#quaterion.loss.metrics.SiameseDistanceMetric">SiameseDistanceMetric (class in quaterion.loss.metrics)</a>
-</li>
       <li><a href="quaterion.distances.base_distance.html#quaterion.distances.base_distance.BaseDistance.similarity">similarity() (BaseDistance static method)</a>
 
       <ul>
@@ -909,6 +914,8 @@
         <li><a href="quaterion.loss.online_contrastive_loss.html#quaterion.loss.online_contrastive_loss.OnlineContrastiveLoss.training">(OnlineContrastiveLoss attribute)</a>
 </li>
         <li><a href="quaterion.loss.pairwise_loss.html#quaterion.loss.pairwise_loss.PairwiseLoss.training">(PairwiseLoss attribute)</a>
+</li>
+        <li><a href="quaterion.loss.extras.pytorch_metric_learning_wrapper.html#quaterion.loss.extras.pytorch_metric_learning_wrapper.PytorchMetricLearningWrapper.training">(PytorchMetricLearningWrapper attribute)</a>
 </li>
         <li><a href="quaterion.loss.similarity_loss.html#quaterion.loss.similarity_loss.SimilarityLoss.training">(SimilarityLoss attribute)</a>
 </li>

@@ -34,8 +34,9 @@
   <h1>Source code for quaterion.distances.cosine</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
-<span class="kn">from</span> <span class="nn">quaterion.distances.base_distance</span> <span class="kn">import</span> <span class="n">BaseDistance</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
+
+<span class="kn">from</span> <span class="nn">quaterion.distances.base_distance</span> <span class="kn">import</span> <span class="n">BaseDistance</span>
 
 
 <div class="viewcode-block" id="Cosine"><a class="viewcode-back" href="../../../quaterion.distances.cosine.html#quaterion.distances.cosine.Cosine">[docs]</a><span class="k">class</span> <span class="nc">Cosine</span><span class="p">(</span><span class="n">BaseDistance</span><span class="p">):</span>

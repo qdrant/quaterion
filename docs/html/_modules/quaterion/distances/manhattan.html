@@ -33,16 +33,19 @@
             
   <h1>Source code for quaterion.distances.manhattan</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
+
 <span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">quaterion.distances.base_distance</span> <span class="kn">import</span> <span class="n">BaseDistance</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
+
+<span class="kn">from</span> <span class="nn">quaterion.distances.base_distance</span> <span class="kn">import</span> <span class="n">BaseDistance</span>
 
 
 <div class="viewcode-block" id="Manhattan"><a class="viewcode-back" href="../../../quaterion.distances.manhattan.html#quaterion.distances.manhattan.Manhattan">[docs]</a><span class="k">class</span> <span class="nc">Manhattan</span><span class="p">(</span><span class="n">BaseDistance</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Compute Manhattan distances (and its interpretation as similarities).</span>
 
 <span class="sd">    Note:</span>
-<span class="sd">        Interpretation of Manhattan distances as similarities is based on the trick in the book &quot;Collective Intelligence&quot; by Toby Segaran, and it&#39;s in the range of `0 -&gt; 1`.</span>
+<span class="sd">        Interpretation of Manhattan distances as similarities is based on the trick in the book</span>
+<span class="sd">        &quot;Collective Intelligence&quot; by Toby Segaran, and it&#39;s in the range of `0 -&gt; 1`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="Manhattan.distance"><a class="viewcode-back" href="../../../quaterion.distances.manhattan.html#quaterion.distances.manhattan.Manhattan.distance">[docs]</a>    <span class="nd">@staticmethod</span>
@@ -58,7 +61,7 @@
         <span class="k">if</span> <span class="n">y</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">y</span> <span class="o">=</span> <span class="n">x</span>
 
-        <span class="c1"># expand dimensions to calculate element-wise diffrences with broadcasting</span>
+        <span class="c1"># expand dimensions to calculate element-wise differences with broadcasting</span>
         <span class="c1"># shape: (batch_size, batch_size, embedding_dim)</span>
         <span class="n">deltas</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">y</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">abs_deltas</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">deltas</span><span class="p">)</span>

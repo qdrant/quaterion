@@ -38,19 +38,19 @@
 <span id="quaterion-eval-group-retrieval-r-precision-module"></span><h1>quaterion.eval.group.retrieval_r_precision module<a class="headerlink" href="#module-quaterion.eval.group.retrieval_r_precision" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="quaterion.eval.group.retrieval_r_precision.RetrievalRPrecision">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RetrievalRPrecision</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distance_metric</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/quaterion/eval/group/retrieval_r_precision.html#RetrievalRPrecision"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.eval.group.retrieval_r_precision.RetrievalRPrecision" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RetrievalRPrecision</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distance_metric_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="quaterion.distances.html#quaterion.distances.Distance" title="quaterion.distances.Distance"><span class="pre">Distance</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Distance.COSINE</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/quaterion/eval/group/retrieval_r_precision.html#RetrievalRPrecision"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.eval.group.retrieval_r_precision.RetrievalRPrecision" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="quaterion.eval.group.group_metric.html#quaterion.eval.group.group_metric.GroupMetric" title="quaterion.eval.group.group_metric.GroupMetric"><code class="xref py py-class docutils literal notranslate"><span class="pre">GroupMetric</span></code></a></p>
 <p>Class to compute the retrieval R-precision score for group based data</p>
-<p>Retrieval R-Precision is the ratio of <cite>r/R</cite>, where R is the number of the relevant documents
+<p>Retrieval R-Precision is the ratio of <cite>r/R</cite>, where <cite>R</cite> is the number of the relevant documents
 for a given query in the collection, and <cite>r</cite> is the number of the truly relevant documents
 found in the <cite>R</cite> highest scored results for that query.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>distance_metric</strong> – function for distance matrix computation. Possible choice might be one of
-<a class="reference internal" href="quaterion.loss.metrics.html#quaterion.loss.metrics.SiameseDistanceMetric" title="quaterion.loss.metrics.SiameseDistanceMetric"><code class="xref py py-class docutils literal notranslate"><span class="pre">SiameseDistanceMetric</span></code></a> methods.</p>
+<dd class="field-odd"><p><strong>distance_metric_name</strong> – name of a distance metric to calculate distance or similarity
+matrices. Available names could be found in <a class="reference internal" href="quaterion.distances.html#quaterion.distances.Distance" title="quaterion.distances.Distance"><code class="xref py py-class docutils literal notranslate"><span class="pre">Distance</span></code></a>.</p>
 </dd>
 </dl>
-<p class="rubric">Examples</p>
+<p class="rubric">Example</p>
 <p>Suppose that a collection contains 20 relevant documents for our query, and the model can
 retrieve 15 of them in the 20 highest scored results, then Retrieval R-Precision is
 calculated as r/R = 15/20 = 0.75.</p>

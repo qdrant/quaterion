@@ -17,7 +17,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="quaterion.loss.online_contrastive_loss module" href="quaterion.loss.online_contrastive_loss.html" />
-    <link rel="prev" title="quaterion.loss.metrics module" href="quaterion.loss.metrics.html" />
+    <link rel="prev" title="quaterion.loss.group_loss module" href="quaterion.loss.group_loss.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -40,12 +40,14 @@
 <dt class="sig sig-object py" id="quaterion.loss.multiple_negatives_ranking_loss.MultipleNegativesRankingLoss">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleNegativesRankingLoss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">20.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance_metric_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="quaterion.distances.html#quaterion.distances.Distance" title="quaterion.distances.Distance"><span class="pre">Distance</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Distance.COSINE</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symmetric</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/quaterion/loss/multiple_negatives_ranking_loss.html#MultipleNegativesRankingLoss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.loss.multiple_negatives_ranking_loss.MultipleNegativesRankingLoss" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="quaterion.loss.pairwise_loss.html#quaterion.loss.pairwise_loss.PairwiseLoss" title="quaterion.loss.pairwise_loss.PairwiseLoss"><code class="xref py py-class docutils literal notranslate"><span class="pre">PairwiseLoss</span></code></a></p>
-<p>Implement Multiple Negatives Ranking Loss as described in <a class="reference external" href="https://arxiv.org/pdf/1705.00652.pdf">https://arxiv.org/pdf/1705.00652.pdf</a></p>
+<p>Implement Multiple Negatives Ranking Loss as described in
+<a class="reference external" href="https://arxiv.org/pdf/1705.00652.pdf">https://arxiv.org/pdf/1705.00652.pdf</a></p>
 <p>This loss function works only with positive pairs, e.g., an <cite>anchor</cite> and a <cite>positive</cite>.
 For each pair, it uses <cite>positive</cite> of other pairs in the batch as negatives, so you don’t need
 to worry about specifying negative examples. It is great for retrieval tasks such as
 question-answer retrieval, duplicate sentence retrieval, and cross-modal retrieval.
-It accepts pairs of anchor and positive embeddings to calculate a similarity matrix between them.
+It accepts pairs of anchor and positive embeddings to calculate a similarity matrix between
+them.
 Then, it minimizes negative log-likelihood for softmax-normalized similarity scores.
 This optimizes  retrieval of the correct positive pair when an anchor given.</p>
 <div class="admonition note">
@@ -61,8 +63,10 @@ pair, e.g., <cite>label = 1</cite>.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>scale</strong> – Scaling value for multiplying with similarity scores to make cross-entropy work.</p></li>
-<li><p><strong>distance_metric_name</strong> – Name of the metric to calculate similarities between embeddings, e.g., <a class="reference internal" href="quaterion.distances.html#quaterion.distances.Distance" title="quaterion.distances.Distance"><code class="xref py py-class docutils literal notranslate"><span class="pre">Distance</span></code></a>.
-Optional, defaults to <a class="reference internal" href="quaterion.distances.html#quaterion.distances.Distance.COSINE" title="quaterion.distances.Distance.COSINE"><code class="xref py py-attr docutils literal notranslate"><span class="pre">COSINE</span></code></a>. If <a class="reference internal" href="quaterion.distances.html#quaterion.distances.Distance.DOT_PRODUCT" title="quaterion.distances.Distance.DOT_PRODUCT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DOT_PRODUCT</span></code></a>, <cite>scale</cite> must be <cite>1</cite>.</p></li>
+<li><p><strong>distance_metric_name</strong> – Name of the metric to calculate similarities between embeddings,
+e.g., <a class="reference internal" href="quaterion.distances.html#quaterion.distances.Distance" title="quaterion.distances.Distance"><code class="xref py py-class docutils literal notranslate"><span class="pre">Distance</span></code></a>.
+Optional, defaults to <a class="reference internal" href="quaterion.distances.html#quaterion.distances.Distance.COSINE" title="quaterion.distances.Distance.COSINE"><code class="xref py py-attr docutils literal notranslate"><span class="pre">COSINE</span></code></a>.
+If <a class="reference internal" href="quaterion.distances.html#quaterion.distances.Distance.DOT_PRODUCT" title="quaterion.distances.Distance.DOT_PRODUCT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">DOT_PRODUCT</span></code></a>, <cite>scale</cite> must be <cite>1</cite>.</p></li>
 <li><p><strong>symmetric</strong> – If True, loss is symmetric,
 i.e., it also accounts for retrieval of the correct anchor when a positive given.</p></li>
 </ul>
@@ -144,7 +148,7 @@ in pairs.</p></li>
   <li><a href="index.html">Documentation overview</a><ul>
   <li><a href="quaterion.html">quaterion package</a><ul>
   <li><a href="quaterion.loss.html">quaterion.loss package</a><ul>
-      <li>Previous: <a href="quaterion.loss.metrics.html" title="previous chapter">quaterion.loss.metrics module</a></li>
+      <li>Previous: <a href="quaterion.loss.group_loss.html" title="previous chapter">quaterion.loss.group_loss module</a></li>
       <li>Next: <a href="quaterion.loss.online_contrastive_loss.html" title="next chapter">quaterion.loss.online_contrastive_loss module</a></li>
   </ul></li>
   </ul></li>

@@ -1,7 +1,8 @@
 import torch
 import torch.nn.functional as F
-from quaterion.distances.base_distance import BaseDistance
 from torch import Tensor
+
+from quaterion.distances.base_distance import BaseDistance
 
 
 class Cosine(BaseDistance):

@@ -1,14 +1,17 @@
 from typing import Optional
+
 import torch
-from quaterion.distances.base_distance import BaseDistance
 from torch import Tensor
+
+from quaterion.distances.base_distance import BaseDistance
 
 
 class Manhattan(BaseDistance):
     """Compute Manhattan distances (and its interpretation as similarities).
 
     Note:
-        Interpretation of Manhattan distances as similarities is based on the trick in the book "Collective Intelligence" by Toby Segaran, and it's in the range of `0 -> 1`.
+        Interpretation of Manhattan distances as similarities is based on the trick in the book
+        "Collective Intelligence" by Toby Segaran, and it's in the range of `0 -> 1`.
     """
 
     @staticmethod
@@ -24,7 +27,7 @@ class Manhattan(BaseDistance):
         if y is None:
             y = x
 
-        # expand dimensions to calculate element-wise diffrences with broadcasting
+        # expand dimensions to calculate element-wise differences with broadcasting
         # shape: (batch_size, batch_size, embedding_dim)
         deltas = x.unsqueeze(1) - y.unsqueeze(0)
         abs_deltas = torch.abs(deltas)

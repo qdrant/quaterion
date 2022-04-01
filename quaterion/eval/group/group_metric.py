@@ -1,6 +1,7 @@
 import torch
 from torch import Tensor
 
+from quaterion.distances import Distance
 from quaterion.eval.base_metric import BaseMetric
 
 
@@ -10,12 +11,12 @@ class GroupMetric(BaseMetric):
     Provide default implementation for embeddings and groups accumulation.
 
     Args:
-        distance_metric: function for distance matrix computation. Possible choice might be one of
-            :class:`~quaterion.loss.metrics.SiameseDistanceMetric` methods.
+        distance_metric_name: name of a distance metric to calculate distance or similarity
+            matrices. Available names could be found in :class:`~quaterion.distances.Distance`.
     """
 
-    def __init__(self, distance_metric):
-        super().__init__(distance_metric)
+    def __init__(self, distance_metric_name: Distance = Distance.COSINE):
+        super().__init__(distance_metric_name)
         self.groups = torch.LongTensor()
 
     def update(

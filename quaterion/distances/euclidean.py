@@ -1,18 +1,22 @@
 from typing import Optional
+
 import torch
-from quaterion.distances.base_distance import BaseDistance
 from torch import Tensor
 import torch.nn.functional as F
+
+from quaterion.distances.base_distance import BaseDistance
 
 
 class Euclidean(BaseDistance):
     """Compute Euclidean distances (and its interpretation as similarities).
 
     Note:
-        Interpretation of Euclidean distances as similarities is based on the trick in the book "Collective Intelligence" by Toby Segaran, and it's in the range of `0 -> 1`.
+        Interpretation of Euclidean distances as similarities is based on the trick in the book
+        "Collective Intelligence" by Toby Segaran, and it's in the range of `0 -> 1`.
 
     Note:
-        The distance matrix computation is based on `a trick explained by Samuel Albanie <https://www.robots.ox.ac.uk/~albanie/notes/Euclidean_distance_trick.pdf>`__.
+        The distance matrix computation is based on `a trick explained by Samuel Albanie
+        <https://www.robots.ox.ac.uk/~albanie/notes/Euclidean_distance_trick.pdf>`__.
     """
 
     @staticmethod

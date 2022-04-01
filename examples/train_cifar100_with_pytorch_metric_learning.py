@@ -5,19 +5,17 @@ from typing import Dict, Union
 import pytorch_lightning as pl
 import torch
 import torch.nn as nn
-from torch.utils.data import Dataset
+from pytorch_metric_learning import losses, miners
+
 from quaterion import Quaterion, TrainableModel
 from quaterion.dataset import (
     GroupSimilarityDataLoader,
-    SimilarityGroupSample,
     SimilarityGroupDataset,
 )
 from quaterion.loss import SimilarityLoss
 from quaterion.loss.extras import PytorchMetricLearningWrapper
 from quaterion_models.heads import EmptyHead, EncoderHead
-from quaterion_models.types import CollateFnType
 from quaterion_models.encoders import Encoder
-from pytorch_metric_learning import losses, miners
 
 
 try:
@@ -32,7 +30,8 @@ except ImportError:
 
 
 def get_dataloader():
-    # Mean and std values taken from https://github.com/LJY-HY/cifar_pytorch-lightning/blob/master/datasets/CIFAR.py#L43
+    # Mean and std values taken from
+    # https://github.com/LJY-HY/cifar_pytorch-lightning/blob/master/datasets/CIFAR.py#L43
     mean = [0.4914, 0.4822, 0.4465]
     std = [0.2023, 0.1994, 0.2010]
     path = os.path.join(os.path.expanduser("~"), "torchvision", "datasets")

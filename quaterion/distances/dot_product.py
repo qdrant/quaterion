@@ -1,15 +1,16 @@
 import torch
-from quaterion.distances.base_distance import BaseDistance
 from torch import Tensor
+
+from quaterion.distances.base_distance import BaseDistance
 
 
 class DotProduct(BaseDistance):
     """Compute dot product similarities (and its interpretation as distances).
 
     Warnings:
-        Interpretation of dot product as distances may have unexpected effects. Make sure that you entirely understand how
-        it exactly works, and when combined and with the chosen loss function in particular,
-        because those values are negative.
+        Interpretation of dot product as distances may have unexpected effects. Make sure that you
+        entirely understand how it exactly works, and when combined and with the chosen loss
+        function in particular, because those values are negative.
     """
 
     @staticmethod

@@ -10,13 +10,15 @@ from quaterion.loss.pairwise_loss import PairwiseLoss
 
 
 class MultipleNegativesRankingLoss(PairwiseLoss):
-    """Implement Multiple Negatives Ranking Loss as described in https://arxiv.org/pdf/1705.00652.pdf
+    """Implement Multiple Negatives Ranking Loss as described in
+    https://arxiv.org/pdf/1705.00652.pdf
 
     This loss function works only with positive pairs, e.g., an `anchor` and a `positive`.
     For each pair, it uses `positive` of other pairs in the batch as negatives, so you don't need
     to worry about specifying negative examples. It is great for retrieval tasks such as
     question-answer retrieval, duplicate sentence retrieval, and cross-modal retrieval.
-    It accepts pairs of anchor and positive embeddings to calculate a similarity matrix between them.
+    It accepts pairs of anchor and positive embeddings to calculate a similarity matrix between
+    them.
     Then, it minimizes negative log-likelihood for softmax-normalized similarity scores.
     This optimizes  retrieval of the correct positive pair when an anchor given.
 
@@ -30,8 +32,10 @@ class MultipleNegativesRankingLoss(PairwiseLoss):
 
     Args:
         scale: Scaling value for multiplying with similarity scores to make cross-entropy work.
-        distance_metric_name: Name of the metric to calculate similarities between embeddings, e.g., :class:`~quaterion.distances.Distance`.
-            Optional, defaults to :attr:`~quaterion.distances.Distance.COSINE`. If :attr:`~quaterion.distances.Distance.DOT_PRODUCT`, `scale` must be `1`.
+        distance_metric_name: Name of the metric to calculate similarities between embeddings,
+            e.g., :class:`~quaterion.distances.Distance`.
+            Optional, defaults to :attr:`~quaterion.distances.Distance.COSINE`.
+            If :attr:`~quaterion.distances.Distance.DOT_PRODUCT`, `scale` must be `1`.
         symmetric: If True, loss is symmetric,
             i.e., it also accounts for retrieval of the correct anchor when a positive given.
     """

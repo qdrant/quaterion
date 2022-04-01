@@ -1,21 +1,22 @@
 import torch
 from torch import Tensor
 
+from quaterion.distances import Distance
 from quaterion.eval.group import GroupMetric
 
 
 class RetrievalRPrecision(GroupMetric):
     """Class to compute the retrieval R-precision score for group based data
 
-    Retrieval R-Precision is the ratio of `r/R`, where R is the number of the relevant documents
+    Retrieval R-Precision is the ratio of `r/R`, where `R` is the number of the relevant documents
     for a given query in the collection, and `r` is the number of the truly relevant documents
     found in the `R` highest scored results for that query.
 
     Args:
-        distance_metric: function for distance matrix computation. Possible choice might be one of
-            :class:`~quaterion.loss.metrics.SiameseDistanceMetric` methods.
+        distance_metric_name: name of a distance metric to calculate distance or similarity
+            matrices. Available names could be found in :class:`~quaterion.distances.Distance`.
 
-    Examples:
+    Example:
 
         Suppose that a collection contains 20 relevant documents for our query, and the model can
         retrieve 15 of them in the 20 highest scored results, then Retrieval R-Precision is
@@ -23,8 +24,8 @@ class RetrievalRPrecision(GroupMetric):
 
     """
 
-    def __init__(self, distance_metric):
-        super().__init__(distance_metric)
+    def __init__(self, distance_metric_name: Distance = Distance.COSINE):
+        super().__init__(distance_metric_name)
 
     def compute(self) -> Tensor:
         """Calculates retrieval R-precision

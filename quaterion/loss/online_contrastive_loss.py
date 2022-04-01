@@ -24,7 +24,8 @@ class OnlineContrastiveLoss(GroupLoss):
     Args:
         margin: Margin value to push negative examples
             apart. Optional, defaults to `0.5`.
-        distance_metric_name: Name of the distance function, e.g., :class:`~quaterion.distances.Distance`. Optional, defaults to
+        distance_metric_name: Name of the distance function, e.g.,
+            :class:`~quaterion.distances.Distance`. Optional, defaults to
             :attr:`~quaterion.distances.Distance.COSINE`.
         mining (str, optional): Pair mining strategy. One of `"all"`, `"hard"`.
             Defaults to `"hard"`.
@@ -66,7 +67,8 @@ class OnlineContrastiveLoss(GroupLoss):
 
         Args:
             embeddings (torch.Tensor): Batch of embeddings. Shape: (batch_size, embedding_dim)
-            groups (torch.LongTensor): Batch of labels associated with `embeddings`. Shape: (batch_size,)
+            groups (torch.LongTensor): Batch of labels associated with `embeddings`.
+                Shape: (batch_size,)
 
         Returns:
             torch.Tensor: Scalar loss value.

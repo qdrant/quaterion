@@ -1,6 +1,6 @@
-from typing import Callable
-
 from torch import Tensor
+
+from quaterion.distances import Distance
 
 
 class BaseMetric:
@@ -9,14 +9,14 @@ class BaseMetric:
     Provides a default implementation for distance matrix calculation.
 
     Args:
-        distance_metric: function for distance matrix computation. Possible choice might be one of
-            :class:`~quaterion.loss.metrics.SiameseDistanceMetric` methods.
+        distance_metric_name: name of a distance metric to calculate distance or similarity
+            matrices. Available names could be found in :class:`~quaterion.distances.Distance`.
 
     """
 
-    def __init__(self, distance_metric: Callable):
+    def __init__(self, distance_metric_name: Distance = Distance.COSINE):
         super().__init__()
-        self.distance_metric = distance_metric
+        self.distance_metric = Distance.get_by_name(distance_metric_name)
         self.embeddings = Tensor()
 
     def compute(self) -> Tensor:
@@ -33,4 +33,12 @@ class BaseMetric:
         Returns:
             Tensor: distance matrix
         """
-        return self.distance_metric(self.embeddings, self.embeddings, matrix=True)
+        return self.distance_metric.distance_matrix(self.embeddings)
+
+    def calculate_similarities(self) -> Tensor:
+        """Calculates similarity matrix
+
+        Returns:
+            Tensor: similarity matrix
+        """
+        return self.distance_metric.similarity_matrix(self.embeddings)

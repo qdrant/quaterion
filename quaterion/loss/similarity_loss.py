@@ -1,15 +1,15 @@
-from typing import Any, Callable, Dict, Type
+from typing import Any, Dict
 
 from quaterion.distances import Distance
-from quaterion.loss.metrics import SiameseDistanceMetric
-from torch import Tensor, nn
+from torch import nn
 
 
 class SimilarityLoss(nn.Module):
     """Base similarity losses class.
 
     Args:
-        distance_metric_name: Name of the distance function, e.g., :class:`~quaterion.distances.Distance`.
+        distance_metric_name: Name of the distance function, e.g.,
+            :class:`~quaterion.distances.Distance`.
     """
 
     def __init__(self, distance_metric_name: Distance = Distance.COSINE):

@@ -1,14 +1,15 @@
 import torch
 
 from quaterion.eval.pair import PairMetric
+from quaterion.distances import Distance
 
 
 class RetrievalPrecision(PairMetric):
     """Calculates retrieval precision@k for pair based datasets
 
     Args:
-        distance_metric: function for distance matrix computation. Possible choice might be one of
-            :class:`~quaterion.loss.metrics.SiameseDistanceMetric` methods.
+        distance_metric_name: name of a distance metric to calculate distance or similarity
+            matrices. Available names could be found in :class:`~quaterion.distances.Distance`.
         k: number of documents among which to search a relevant one
 
     Examples:
@@ -21,8 +22,8 @@ class RetrievalPrecision(PairMetric):
         have score < 1.
     """
 
-    def __init__(self, distance_metric, k=1):
-        super().__init__(distance_metric)
+    def __init__(self, distance_metric_name: Distance = Distance.COSINE, k=1):
+        super().__init__(distance_metric_name)
         self.k = k
         if self.k < 1:
             raise ValueError("k must be greater than 0")

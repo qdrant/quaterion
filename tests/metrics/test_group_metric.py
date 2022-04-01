@@ -1,7 +1,7 @@
 import torch
 
+from quaterion.distances import Distance
 from quaterion.eval.group import RetrievalRPrecision
-from quaterion.loss import SiameseDistanceMetric
 
 
 def sample_embeddings(mean, std, mean_coef, num_objects, embedding_dim):
@@ -37,7 +37,7 @@ def test_retrieval_r_precision():
     # one mismatch - (2, 3), correct pair is (2, 0).
     groups = torch.LongTensor([1, 2, 1, 2])
     exp_metric = torch.Tensor([0.75])
-    metric = RetrievalRPrecision(SiameseDistanceMetric.manhattan)
+    metric = RetrievalRPrecision(Distance.MANHATTAN)
     metric.update(embeddings, groups)
     assert metric.compute() == exp_metric
     # endregion single batch
@@ -58,7 +58,7 @@ def test_retrieval_r_precision():
     )
 
     exp_metric = torch.Tensor([0.75])
-    metric = RetrievalRPrecision(SiameseDistanceMetric.manhattan)
+    metric = RetrievalRPrecision(Distance.MANHATTAN)
 
     for batch in (first_batch, second_batch):
         embeddings, groups = batch
@@ -77,7 +77,7 @@ def test_retrieval_r_precision():
     # ]
     groups = torch.LongTensor([1, 2, 1, 2])
     exp_metric = torch.Tensor([1.0])
-    metric = RetrievalRPrecision(SiameseDistanceMetric.manhattan)
+    metric = RetrievalRPrecision(Distance.MANHATTAN)
     metric.update(embeddings, groups)
     assert metric.compute() == exp_metric
     # endregion ideal case
@@ -93,7 +93,7 @@ def test_retrieval_r_precision():
     # ]
     groups = torch.LongTensor([1, 2, 1, 2])
     exp_metric = torch.Tensor([0.0])
-    metric = RetrievalRPrecision(SiameseDistanceMetric.manhattan)
+    metric = RetrievalRPrecision(Distance.MANHATTAN)
     metric.update(embeddings, groups)
     assert metric.compute() == exp_metric
     # endregion worst case
@@ -108,10 +108,10 @@ def test_retrieval_r_precision():
         num_objects=num_objects,
         embedding_dim=10,
     )
-    same_dist_metric = RetrievalRPrecision(SiameseDistanceMetric.manhattan)
+    same_dist_metric = RetrievalRPrecision(Distance.MANHATTAN)
     same_dist_metric.update(same_dist_embeddings, groups)
 
-    diff_dist_metric = RetrievalRPrecision(SiameseDistanceMetric.manhattan)
+    diff_dist_metric = RetrievalRPrecision(Distance.MANHATTAN)
     diff_dist_metric.update(diff_dist_embeddings, groups)
     assert same_dist_metric.compute() <= diff_dist_metric.compute()
     # endregion random sampling

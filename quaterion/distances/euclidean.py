@@ -1,8 +1,10 @@
 from typing import Optional
+
 import torch
-from quaterion.distances.base_distance import BaseDistance
 from torch import Tensor
 import torch.nn.functional as F
+
+from quaterion.distances.base_distance import BaseDistance
 
 
 class Euclidean(BaseDistance):

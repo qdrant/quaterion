@@ -50,6 +50,7 @@
  | <a href="#O"><strong>O</strong></a>
  | <a href="#P"><strong>P</strong></a>
  | <a href="#Q"><strong>Q</strong></a>
+ | <a href="#R"><strong>R</strong></a>
  | <a href="#S"><strong>S</strong></a>
  | <a href="#T"><strong>T</strong></a>
  | <a href="#U"><strong>U</strong></a>
@@ -107,12 +108,28 @@
         <li><a href="quaterion.train.cache.cache_config.html#quaterion.train.cache.cache_config.CacheType">(class in quaterion.train.cache.cache_config)</a>
 </li>
       </ul></li>
+      <li><a href="quaterion.eval.base_metric.html#quaterion.eval.base_metric.BaseMetric.calculate_distances">calculate_distances() (BaseMetric method)</a>
+</li>
       <li><a href="quaterion.dataset.similarity_data_loader.html#quaterion.dataset.similarity_data_loader.GroupSimilarityDataLoader.collate_labels">collate_labels() (GroupSimilarityDataLoader class method)</a>
 
       <ul>
         <li><a href="quaterion.dataset.similarity_data_loader.html#quaterion.dataset.similarity_data_loader.PairsSimilarityDataLoader.collate_labels">(PairsSimilarityDataLoader class method)</a>
 </li>
         <li><a href="quaterion.dataset.similarity_data_loader.html#quaterion.dataset.similarity_data_loader.SimilarityDataLoader.collate_labels">(SimilarityDataLoader class method)</a>
+</li>
+      </ul></li>
+      <li><a href="quaterion.eval.base_metric.html#quaterion.eval.base_metric.BaseMetric.compute">compute() (BaseMetric method)</a>
+
+      <ul>
+        <li><a href="quaterion.eval.group.group_metric.html#quaterion.eval.group.group_metric.GroupMetric.compute">(GroupMetric method)</a>
+</li>
+        <li><a href="quaterion.eval.pair.pair_metric.html#quaterion.eval.pair.pair_metric.PairMetric.compute">(PairMetric method)</a>
+</li>
+        <li><a href="quaterion.eval.pair.retrieval_precision.html#quaterion.eval.pair.retrieval_precision.RetrievalPrecision.compute">(RetrievalPrecision method)</a>
+</li>
+        <li><a href="quaterion.eval.pair.retrieval_reciprocal_rank.html#quaterion.eval.pair.retrieval_reciprocal_rank.RetrievalReciprocalRank.compute">(RetrievalReciprocalRank method)</a>
+</li>
+        <li><a href="quaterion.eval.group.retrieval_r_precision.html#quaterion.eval.group.retrieval_r_precision.RetrievalRPrecision.compute">(RetrievalRPrecision method)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -199,13 +216,11 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="quaterion.distances.euclidean.html#quaterion.distances.euclidean.Euclidean">Euclidean (class in quaterion.distances.euclidean)</a>
 </li>
-      <li><a href="quaterion.distances.html#quaterion.distances.Distance.EUCLIDEAN">EUCLIDEAN (Distance attribute)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="quaterion.loss.metrics.html#quaterion.loss.metrics.SiameseDistanceMetric.euclidean">euclidean() (SiameseDistanceMetric static method)</a>
+      <li><a href="quaterion.distances.html#quaterion.distances.Distance.EUCLIDEAN">EUCLIDEAN (Distance attribute)</a>
 </li>
-      <li><a href="quaterion.eval.base_metric.html#quaterion.eval.base_metric.BaseMetric.eval">eval() (BaseMetric method)</a>
+      <li><a href="quaterion.loss.metrics.html#quaterion.loss.metrics.SiameseDistanceMetric.euclidean">euclidean() (SiameseDistanceMetric static method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -274,6 +289,8 @@
       <li><a href="quaterion.dataset.similarity_samples.html#quaterion.dataset.similarity_samples.SimilarityGroupSample.group">group (SimilarityGroupSample attribute)</a>
 </li>
       <li><a href="quaterion.loss.group_loss.html#quaterion.loss.group_loss.GroupLoss">GroupLoss (class in quaterion.loss.group_loss)</a>
+</li>
+      <li><a href="quaterion.eval.group.group_metric.html#quaterion.eval.group.group_metric.GroupMetric">GroupMetric (class in quaterion.eval.group.group_metric)</a>
 </li>
       <li><a href="quaterion.dataset.similarity_data_loader.html#quaterion.dataset.similarity_data_loader.GroupSimilarityDataLoader">GroupSimilarityDataLoader (class in quaterion.dataset.similarity_data_loader)</a>
 </li>
@@ -361,6 +378,20 @@
 </li>
         <li><a href="quaterion.eval.base_metric.html#module-quaterion.eval.base_metric">quaterion.eval.base_metric</a>
 </li>
+        <li><a href="quaterion.eval.group.html#module-quaterion.eval.group">quaterion.eval.group</a>
+</li>
+        <li><a href="quaterion.eval.group.group_metric.html#module-quaterion.eval.group.group_metric">quaterion.eval.group.group_metric</a>
+</li>
+        <li><a href="quaterion.eval.group.retrieval_r_precision.html#module-quaterion.eval.group.retrieval_r_precision">quaterion.eval.group.retrieval_r_precision</a>
+</li>
+        <li><a href="quaterion.eval.pair.html#module-quaterion.eval.pair">quaterion.eval.pair</a>
+</li>
+        <li><a href="quaterion.eval.pair.pair_metric.html#module-quaterion.eval.pair.pair_metric">quaterion.eval.pair.pair_metric</a>
+</li>
+        <li><a href="quaterion.eval.pair.retrieval_precision.html#module-quaterion.eval.pair.retrieval_precision">quaterion.eval.pair.retrieval_precision</a>
+</li>
+        <li><a href="quaterion.eval.pair.retrieval_reciprocal_rank.html#module-quaterion.eval.pair.retrieval_reciprocal_rank">quaterion.eval.pair.retrieval_reciprocal_rank</a>
+</li>
         <li><a href="quaterion.loss.html#module-quaterion.loss">quaterion.loss</a>
 </li>
         <li><a href="quaterion.loss.arcface_loss.html#module-quaterion.loss.arcface_loss">quaterion.loss.arcface_loss</a>
@@ -444,6 +475,8 @@
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="quaterion.eval.pair.pair_metric.html#quaterion.eval.pair.pair_metric.PairMetric">PairMetric (class in quaterion.eval.pair.pair_metric)</a>
+</li>
       <li><a href="quaterion.dataset.similarity_data_loader.html#quaterion.dataset.similarity_data_loader.PairsSimilarityDataLoader">PairsSimilarityDataLoader (class in quaterion.dataset.similarity_data_loader)</a>
 </li>
       <li><a href="quaterion.loss.pairwise_loss.html#quaterion.loss.pairwise_loss.PairwiseLoss">PairwiseLoss (class in quaterion.loss.pairwise_loss)</a>
@@ -461,6 +494,8 @@
       <li><a href="quaterion.dataset.similarity_data_loader.html#quaterion.dataset.similarity_data_loader.SimilarityDataLoader.pre_collate_fn">pre_collate_fn() (SimilarityDataLoader class method)</a>
 </li>
       <li><a href="quaterion.dataset.train_collater.html#quaterion.dataset.train_collater.TrainCollater.pre_encoder_collate">pre_encoder_collate() (TrainCollater method)</a>
+</li>
+      <li><a href="quaterion.eval.pair.pair_metric.html#quaterion.eval.pair.pair_metric.PairMetric.precompute">precompute() (PairMetric method)</a>
 </li>
       <li><a href="quaterion.dataset.similarity_data_loader.html#quaterion.dataset.similarity_data_loader.GroupSimilarityDataLoader.prefetch_factor">prefetch_factor (GroupSimilarityDataLoader attribute)</a>
 
@@ -579,6 +614,57 @@
 </li>
       </ul></li>
       <li>
+    quaterion.eval.group
+
+      <ul>
+        <li><a href="quaterion.eval.group.html#module-quaterion.eval.group">module</a>
+</li>
+      </ul></li>
+      <li>
+    quaterion.eval.group.group_metric
+
+      <ul>
+        <li><a href="quaterion.eval.group.group_metric.html#module-quaterion.eval.group.group_metric">module</a>
+</li>
+      </ul></li>
+      <li>
+    quaterion.eval.group.retrieval_r_precision
+
+      <ul>
+        <li><a href="quaterion.eval.group.retrieval_r_precision.html#module-quaterion.eval.group.retrieval_r_precision">module</a>
+</li>
+      </ul></li>
+      <li>
+    quaterion.eval.pair
+
+      <ul>
+        <li><a href="quaterion.eval.pair.html#module-quaterion.eval.pair">module</a>
+</li>
+      </ul></li>
+      <li>
+    quaterion.eval.pair.pair_metric
+
+      <ul>
+        <li><a href="quaterion.eval.pair.pair_metric.html#module-quaterion.eval.pair.pair_metric">module</a>
+</li>
+      </ul></li>
+      <li>
+    quaterion.eval.pair.retrieval_precision
+
+      <ul>
+        <li><a href="quaterion.eval.pair.retrieval_precision.html#module-quaterion.eval.pair.retrieval_precision">module</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    quaterion.eval.pair.retrieval_reciprocal_rank
+
+      <ul>
+        <li><a href="quaterion.eval.pair.retrieval_reciprocal_rank.html#module-quaterion.eval.pair.retrieval_reciprocal_rank">module</a>
+</li>
+      </ul></li>
+      <li>
     quaterion.loss
 
       <ul>
@@ -592,8 +678,6 @@
         <li><a href="quaterion.loss.arcface_loss.html#module-quaterion.loss.arcface_loss">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     quaterion.loss.contrastive_loss
 
@@ -713,6 +797,20 @@
         <li><a href="quaterion.utils.utils.html#module-quaterion.utils.utils">module</a>
 </li>
       </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="R">R</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="quaterion.eval.pair.retrieval_precision.html#quaterion.eval.pair.retrieval_precision.RetrievalPrecision">RetrievalPrecision (class in quaterion.eval.pair.retrieval_precision)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="quaterion.eval.pair.retrieval_reciprocal_rank.html#quaterion.eval.pair.retrieval_reciprocal_rank.RetrievalReciprocalRank">RetrievalReciprocalRank (class in quaterion.eval.pair.retrieval_reciprocal_rank)</a>
+</li>
+      <li><a href="quaterion.eval.group.retrieval_r_precision.html#quaterion.eval.group.retrieval_r_precision.RetrievalRPrecision">RetrievalRPrecision (class in quaterion.eval.group.retrieval_r_precision)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -837,6 +935,14 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="quaterion.train.trainable_model.html#quaterion.train.trainable_model.TrainableModel.unwrap_cache">unwrap_cache() (TrainableModel method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="quaterion.eval.group.group_metric.html#quaterion.eval.group.group_metric.GroupMetric.update">update() (GroupMetric method)</a>
+
+      <ul>
+        <li><a href="quaterion.eval.pair.pair_metric.html#quaterion.eval.pair.pair_metric.PairMetric.update">(PairMetric method)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 

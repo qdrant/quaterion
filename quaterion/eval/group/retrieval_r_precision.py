@@ -47,9 +47,7 @@ class RetrievalRPrecision(GroupMetric):
         return retrieval_r_precision(distance_matrix, group_mask.float())
 
 
-def retrieval_r_precision(
-    distance_matrix: torch.Tensor, labels: torch.Tensor
-):
+def retrieval_r_precision(distance_matrix: torch.Tensor, labels: torch.Tensor):
     """Calculates retrieval r precision given distance matrix and labels
 
     Args:

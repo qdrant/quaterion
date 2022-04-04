@@ -26,13 +26,25 @@ class RetrievalReciprocalRank(PairMetric):
 
     def compute(self):
         """Calculates retrieval reciprocal rank"""
-        distance_matrix, target = self.precompute()
+        distance_matrix, labels = self.precompute()
         distance_matrix[torch.eye(distance_matrix.shape[0], dtype=torch.bool)] = (
             torch.max(distance_matrix) + 1
         )
+        return retrieval_reciprocal_rank(distance_matrix, labels)
 
-        indices = torch.argsort(distance_matrix, dim=1)
-        target = target.gather(1, indices)
-        position = torch.nonzero(target)
-        metric = 1.0 / (position[:, 1] + 1.0)
-        return metric
+
+def retrieval_reciprocal_rank(distance_matrix, labels):
+    """Calculates retrieval precision@k given distance matrix, labels and k
+
+    Args:
+        distance_matrix: distance matrix having max possible distance value on a diagonal
+        labels: labels matrix having False or 0. on a diagonal
+
+    Returns:
+        torch.Tensor: retrieval precision@k for each row in tensor
+    """
+    indices = torch.argsort(distance_matrix, dim=1)
+    target = labels.gather(1, indices)
+    position = torch.nonzero(target)
+    metric = 1.0 / (position[:, 1] + 1.0)
+    return metric

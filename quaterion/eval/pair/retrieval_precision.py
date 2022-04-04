@@ -30,14 +30,28 @@ class RetrievalPrecision(PairMetric):
 
     def compute(self):
         """Calculates retrieval precision@k"""
-        distance_matrix, target = self.precompute()
+        distance_matrix, labels = self.precompute()
         # assign max dist to obj on diag to ignore distance from obj to itself
         distance_matrix[torch.eye(distance_matrix.shape[0], dtype=torch.bool)] = (
             torch.max(distance_matrix) + 1
         )
-        metric = (
-            target.gather(1, distance_matrix.topk(self.k, dim=1, largest=False)[1])
-            .sum(dim=1)
-            .float()
-        ) / self.k
-        return metric
+        return retrieval_precision(distance_matrix, labels, self.k)
+
+
+def retrieval_precision(distance_matrix, labels, k):
+    """Calculates retrieval precision@k given distance matrix, labels and k
+
+    Args:
+        distance_matrix: distance matrix having max possible distance value on a diagonal
+        labels: labels matrix having False or 0. on a diagonal
+        k: number of documents to retrieve
+
+    Returns:
+        torch.Tensor: retrieval precision@k for each row in tensor
+    """
+    metric = (
+        labels.gather(1, distance_matrix.topk(k, dim=1, largest=False)[1])
+        .sum(dim=1)
+        .float()
+    ) / k
+    return metric

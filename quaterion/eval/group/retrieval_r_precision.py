@@ -40,20 +40,32 @@ class RetrievalRPrecision(GroupMetric):
         )
         group_matrix = self.groups.repeat(self.groups.shape[0], 1)
         # objects with the same groups are true, others are false
+
         group_mask = torch.BoolTensor(group_matrix == self.groups.unsqueeze(1))
         # exclude obj
         group_mask[torch.eye(group_mask.shape[0], dtype=torch.bool)] = False
-        # number of members for group which is on i-th position in groups
-        relevant_numbers = group_mask.sum(dim=-1)
-        nearest_to_furthest_ind = torch.argsort(
-            distance_matrix, dim=-1, descending=False
-        )
-        sorted_by_distance = torch.gather(
-            group_mask, dim=-1, index=nearest_to_furthest_ind
-        )
-        top_k_mask = (
-            torch.arange(0, group_mask.shape[0], step=1).repeat(group_mask.shape[0], 1)
-            < relevant_numbers
-        )
-        metric = sorted_by_distance[top_k_mask].float()
-        return metric.mean()
+        return retrieval_r_precision(distance_matrix, group_mask.float())
+
+
+def retrieval_r_precision(
+    distance_matrix: torch.Tensor, labels: torch.Tensor
+):
+    """Calculates retrieval r precision given distance matrix and labels
+
+    Args:
+        distance_matrix: distance matrix having max possible distance value on a diagonal
+        labels: labels matrix having False or 0. on a diagonal
+
+    Returns:
+        torch.Tensor: mean retrieval r precision
+    """
+    # number of members for group which is on i-th position in groups
+    relevant_numbers = labels.sum(dim=-1)
+    nearest_to_furthest_ind = torch.argsort(distance_matrix, dim=-1, descending=False)
+    sorted_by_distance = torch.gather(labels, dim=-1, index=nearest_to_furthest_ind)
+    top_k_mask = (
+        torch.arange(0, labels.shape[0], step=1).repeat(labels.shape[0], 1)
+        < relevant_numbers
+    )
+    metric = sorted_by_distance[top_k_mask].float()
+    return metric.mean()

@@ -64,17 +64,31 @@
 
 <div class="viewcode-block" id="RetrievalPrecision.compute"><a class="viewcode-back" href="../../../../quaterion.eval.pair.retrieval_precision.html#quaterion.eval.pair.retrieval_precision.RetrievalPrecision.compute">[docs]</a>    <span class="k">def</span> <span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Calculates retrieval precision@k&quot;&quot;&quot;</span>
-        <span class="n">distance_matrix</span><span class="p">,</span> <span class="n">target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">precompute</span><span class="p">()</span>
+        <span class="n">distance_matrix</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">precompute</span><span class="p">()</span>
         <span class="c1"># assign max dist to obj on diag to ignore distance from obj to itself</span>
         <span class="n">distance_matrix</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">distance_matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">bool</span><span class="p">)]</span> <span class="o">=</span> <span class="p">(</span>
             <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">distance_matrix</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
         <span class="p">)</span>
-        <span class="n">metric</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">target</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">distance_matrix</span><span class="o">.</span><span class="n">topk</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">largest</span><span class="o">=</span><span class="kc">False</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
-            <span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-            <span class="o">.</span><span class="n">float</span><span class="p">()</span>
-        <span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span>
-        <span class="k">return</span> <span class="n">metric</span></div></div>
+        <span class="k">return</span> <span class="n">retrieval_precision</span><span class="p">(</span><span class="n">distance_matrix</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">k</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="retrieval_precision"><a class="viewcode-back" href="../../../../quaterion.eval.pair.retrieval_precision.html#quaterion.eval.pair.retrieval_precision.retrieval_precision">[docs]</a><span class="k">def</span> <span class="nf">retrieval_precision</span><span class="p">(</span><span class="n">distance_matrix</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculates retrieval precision@k given distance matrix, labels and k</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        distance_matrix: distance matrix having max possible distance value on a diagonal</span>
+<span class="sd">        labels: labels matrix having False or 0. on a diagonal</span>
+<span class="sd">        k: number of documents to retrieve</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        torch.Tensor: retrieval precision@k for each row in tensor</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">metric</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">labels</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">distance_matrix</span><span class="o">.</span><span class="n">topk</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">largest</span><span class="o">=</span><span class="kc">False</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="o">.</span><span class="n">float</span><span class="p">()</span>
+    <span class="p">)</span> <span class="o">/</span> <span class="n">k</span>
+    <span class="k">return</span> <span class="n">metric</span></div>
 </pre></div>
 
           </div>

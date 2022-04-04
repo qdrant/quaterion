@@ -60,16 +60,28 @@
 
 <div class="viewcode-block" id="RetrievalReciprocalRank.compute"><a class="viewcode-back" href="../../../../quaterion.eval.pair.retrieval_reciprocal_rank.html#quaterion.eval.pair.retrieval_reciprocal_rank.RetrievalReciprocalRank.compute">[docs]</a>    <span class="k">def</span> <span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Calculates retrieval reciprocal rank&quot;&quot;&quot;</span>
-        <span class="n">distance_matrix</span><span class="p">,</span> <span class="n">target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">precompute</span><span class="p">()</span>
+        <span class="n">distance_matrix</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">precompute</span><span class="p">()</span>
         <span class="n">distance_matrix</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">distance_matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">bool</span><span class="p">)]</span> <span class="o">=</span> <span class="p">(</span>
             <span class="n">torch</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">distance_matrix</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
         <span class="p">)</span>
+        <span class="k">return</span> <span class="n">retrieval_reciprocal_rank</span><span class="p">(</span><span class="n">distance_matrix</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span></div></div>
 
-        <span class="n">indices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">distance_matrix</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">target</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">indices</span><span class="p">)</span>
-        <span class="n">position</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
-        <span class="n">metric</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">position</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mf">1.0</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">metric</span></div></div>
+
+<div class="viewcode-block" id="retrieval_reciprocal_rank"><a class="viewcode-back" href="../../../../quaterion.eval.pair.retrieval_reciprocal_rank.html#quaterion.eval.pair.retrieval_reciprocal_rank.retrieval_reciprocal_rank">[docs]</a><span class="k">def</span> <span class="nf">retrieval_reciprocal_rank</span><span class="p">(</span><span class="n">distance_matrix</span><span class="p">,</span> <span class="n">labels</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculates retrieval precision@k given distance matrix, labels and k</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        distance_matrix: distance matrix having max possible distance value on a diagonal</span>
+<span class="sd">        labels: labels matrix having False or 0. on a diagonal</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        torch.Tensor: retrieval precision@k for each row in tensor</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">indices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">distance_matrix</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">target</span> <span class="o">=</span> <span class="n">labels</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">indices</span><span class="p">)</span>
+    <span class="n">position</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+    <span class="n">metric</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">position</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mf">1.0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">metric</span></div>
 </pre></div>
 
           </div>

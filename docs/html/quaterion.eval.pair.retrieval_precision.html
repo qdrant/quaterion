@@ -66,6 +66,24 @@ have score &lt; 1.</p>
 
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="quaterion.eval.pair.retrieval_precision.retrieval_precision">
+<span class="sig-name descname"><span class="pre">retrieval_precision</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distance_matrix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/quaterion/eval/pair/retrieval_precision.html#retrieval_precision"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.eval.pair.retrieval_precision.retrieval_precision" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates retrieval precision&#64;k given distance matrix, labels and k</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>distance_matrix</strong> – distance matrix having max possible distance value on a diagonal</p></li>
+<li><p><strong>labels</strong> – labels matrix having False or 0. on a diagonal</p></li>
+<li><p><strong>k</strong> – number of documents to retrieve</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><em>torch.Tensor</em> – retrieval precision&#64;k for each row in tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 
 

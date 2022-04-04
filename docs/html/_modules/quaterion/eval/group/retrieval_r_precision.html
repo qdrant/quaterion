@@ -74,23 +74,33 @@
         <span class="p">)</span>
         <span class="n">group_matrix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
         <span class="c1"># objects with the same groups are true, others are false</span>
+
         <span class="n">group_mask</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">BoolTensor</span><span class="p">(</span><span class="n">group_matrix</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
         <span class="c1"># exclude obj</span>
         <span class="n">group_mask</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">group_mask</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">bool</span><span class="p">)]</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="c1"># number of members for group which is on i-th position in groups</span>
-        <span class="n">relevant_numbers</span> <span class="o">=</span> <span class="n">group_mask</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">nearest_to_furthest_ind</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span>
-            <span class="n">distance_matrix</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">descending</span><span class="o">=</span><span class="kc">False</span>
-        <span class="p">)</span>
-        <span class="n">sorted_by_distance</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span>
-            <span class="n">group_mask</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">nearest_to_furthest_ind</span>
-        <span class="p">)</span>
-        <span class="n">top_k_mask</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">group_mask</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">step</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">group_mask</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
-            <span class="o">&lt;</span> <span class="n">relevant_numbers</span>
-        <span class="p">)</span>
-        <span class="n">metric</span> <span class="o">=</span> <span class="n">sorted_by_distance</span><span class="p">[</span><span class="n">top_k_mask</span><span class="p">]</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">metric</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span></div></div>
+        <span class="k">return</span> <span class="n">retrieval_r_precision</span><span class="p">(</span><span class="n">distance_matrix</span><span class="p">,</span> <span class="n">group_mask</span><span class="o">.</span><span class="n">float</span><span class="p">())</span></div></div>
+
+
+<div class="viewcode-block" id="retrieval_r_precision"><a class="viewcode-back" href="../../../../quaterion.eval.group.retrieval_r_precision.html#quaterion.eval.group.retrieval_r_precision.retrieval_r_precision">[docs]</a><span class="k">def</span> <span class="nf">retrieval_r_precision</span><span class="p">(</span><span class="n">distance_matrix</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">labels</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calculates retrieval r precision given distance matrix and labels</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        distance_matrix: distance matrix having max possible distance value on a diagonal</span>
+<span class="sd">        labels: labels matrix having False or 0. on a diagonal</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        torch.Tensor: mean retrieval r precision</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># number of members for group which is on i-th position in groups</span>
+    <span class="n">relevant_numbers</span> <span class="o">=</span> <span class="n">labels</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">nearest_to_furthest_ind</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">distance_matrix</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">descending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">sorted_by_distance</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">nearest_to_furthest_ind</span><span class="p">)</span>
+    <span class="n">top_k_mask</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">labels</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">step</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">labels</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="o">&lt;</span> <span class="n">relevant_numbers</span>
+    <span class="p">)</span>
+    <span class="n">metric</span> <span class="o">=</span> <span class="n">sorted_by_distance</span><span class="p">[</span><span class="n">top_k_mask</span><span class="p">]</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">metric</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span></div>
 </pre></div>
 
           </div>

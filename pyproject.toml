@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "quaterion"
-version = "0.1.13"
+version = "0.1.14"
 description = "Metric Learning fine-tuning framework"
 authors = ["generall <andrey@vasnetsov.com>"]
 packages = [

@@ -34,3 +34,8 @@ class GroupMetric(BaseMetric):
 
     def compute(self) -> Tensor:
         raise NotImplementedError()
+
+    def reset(self):
+        """Reset accumulated embeddings and groups"""
+        super().reset()
+        self.groups = torch.LongTensor()

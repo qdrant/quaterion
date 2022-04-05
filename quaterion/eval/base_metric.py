@@ -42,3 +42,7 @@ class BaseMetric:
             Tensor: similarity matrix
         """
         return self.distance_metric.similarity_matrix(self.embeddings)
+
+    def reset(self):
+        """Reset accumulated metric state"""
+        self.embeddings = Tensor()

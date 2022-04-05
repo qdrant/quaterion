@@ -26,7 +26,7 @@ class IndexingDataset(Dataset[Tuple[Any, T_co]]):
             raise NotImplementedError()
 
     def __getitem__(self, index) -> Tuple[Any, T_co]:
-        item = self._dataset.__getitem__(index=index)
+        item = self._dataset.__getitem__(index)
         record_hash = _hashit(index, self.seed)
         return record_hash, item
 

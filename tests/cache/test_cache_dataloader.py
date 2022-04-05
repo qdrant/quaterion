@@ -15,8 +15,6 @@ from quaterion.dataset import SimilarityPairSample, PairsSimilarityDataLoader
 from quaterion.loss import SimilarityLoss, ContrastiveLoss
 from quaterion.train.cache import (
     CacheConfig,
-    CacheType,
-    CacheEncoder,
     InMemoryCacheEncoder,
 )
 from quaterion_models.model import DEFAULT_ENCODER_KEY
@@ -39,9 +37,11 @@ class FakeEncoder(Encoder):
             "mandarin  ".strip(): torch.tensor([0.0, 1.0, 0.0, 0.0, 0.0, 0.0]),
         }
 
+    @property
     def trainable(self) -> bool:
         return False
 
+    @property
     def embedding_size(self) -> int:
         return 6
 

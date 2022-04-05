@@ -60,9 +60,11 @@ class StartupEncoder(Encoder):
 
         self._pretrained_name = pretrained_name
 
+    @property
     def trainable(self) -> bool:
         return False
 
+    @property
     def embedding_size(self) -> int:
         return self.encoder.get_sentence_embedding_dimension()
 

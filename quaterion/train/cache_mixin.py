@@ -97,7 +97,7 @@ class CacheMixin:
             ValueError: if encoder layers are not frozen. Cache can be applied
                 only to fully frozen encoders' outputs.
         """
-        if encoder.trainable():
+        if encoder.trainable:
             if encoder_name in cache_config.mapping:
                 raise ValueError(
                     f"Can't configure cache for encoder {encoder_name}. "

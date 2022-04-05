@@ -67,7 +67,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">groups</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="p">,</span> <span class="n">groups</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)])</span></div>
 
 <div class="viewcode-block" id="GroupMetric.compute"><a class="viewcode-back" href="../../../../quaterion.eval.group.group_metric.html#quaterion.eval.group.group_metric.GroupMetric.compute">[docs]</a>    <span class="k">def</span> <span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div></div>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="GroupMetric.reset"><a class="viewcode-back" href="../../../../quaterion.eval.group.group_metric.html#quaterion.eval.group.group_metric.GroupMetric.reset">[docs]</a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Reset accumulated embeddings and groups&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">groups</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">LongTensor</span><span class="p">()</span></div></div>
 </pre></div>
 
           </div>

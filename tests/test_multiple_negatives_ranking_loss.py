@@ -21,20 +21,28 @@ class TestMNRLoss:
     def test_default_args(self):
         loss = MultipleNegativesRankingLoss()
 
-        loss_res = loss.forward(self.embeddings, self.pairs, torch.Tensor(), torch.Tensor())
+        loss_res = loss.forward(
+            self.embeddings, self.pairs, torch.Tensor(), torch.Tensor()
+        )
 
         assert loss_res.shape == torch.Size([])
 
     def test_dot_product(self):
-        loss = MultipleNegativesRankingLoss(scale=1, distance_metric_name=Distance.DOT_PRODUCT)
+        loss = MultipleNegativesRankingLoss(
+            scale=1, distance_metric_name=Distance.DOT_PRODUCT
+        )
 
-        loss_res = loss.forward(self.embeddings, self.pairs, torch.Tensor(), torch.Tensor())
+        loss_res = loss.forward(
+            self.embeddings, self.pairs, torch.Tensor(), torch.Tensor()
+        )
 
         assert loss_res.shape == torch.Size([])
 
     def test_symmetric(self):
         loss = MultipleNegativesRankingLoss(symmetric=True)
 
-        loss_res = loss.forward(self.embeddings, self.pairs, torch.Tensor(), torch.Tensor())
+        loss_res = loss.forward(
+            self.embeddings, self.pairs, torch.Tensor(), torch.Tensor()
+        )
 
         assert loss_res.shape == torch.Size([])

@@ -51,7 +51,9 @@ class PairMetric(BaseMetric):
             subgroups: subgroups to find related objects among different pairs
             device: device to store calculated embeddings and labels on.
         """
-        self.embeddings = torch.cat([self.embeddings.to(device), embeddings.detach().to(device)])
+        self.embeddings = torch.cat(
+            [self.embeddings.to(device), embeddings.detach().to(device)]
+        )
         self.pairs = torch.cat([self.pairs.to(device), pairs.to(device)])
         self.labels = torch.cat([self.labels.to(device), labels.to(device)])
         self.subgroups = torch.cat([self.subgroups.to(device), subgroups.to(device)])

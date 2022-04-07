@@ -29,7 +29,9 @@ class GroupMetric(BaseMetric):
             groups: groups to distinguish similar and dissimilar objects.
             device: device to store calculated embeddings and groups on.
         """
-        self.embeddings = torch.cat([self.embeddings.to(device), embeddings.detach().to(device)])
+        self.embeddings = torch.cat(
+            [self.embeddings.to(device), embeddings.detach().to(device)]
+        )
         self.groups = torch.cat([self.groups.to(device), groups.to(device)])
 
     def compute(self) -> Tensor:

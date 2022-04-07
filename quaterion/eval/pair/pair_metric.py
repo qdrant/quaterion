@@ -53,7 +53,7 @@ class PairMetric(BaseMetric):
         """
         self.embeddings = torch.cat([self.embeddings, embeddings.detach().to(device)])
         self.pairs = torch.cat([self.pairs, pairs.to(device)])
-        self.labels = torch.cat([self.labels, labels])
+        self.labels = torch.cat([self.labels, labels.to(device)])
         self.subgroups = torch.cat([self.subgroups, subgroups.to(device)])
 
     def reset(self):

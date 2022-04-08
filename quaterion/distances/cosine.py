@@ -26,7 +26,7 @@ class Cosine(BaseDistance):
         if y is None:
             y_norm = x_norm.transpose(0, 1)
         else:
-            y_norm = F.normalize(x, p=2, dim=1).transpose(0, 1)
+            y_norm = F.normalize(y, p=2, dim=1).transpose(0, 1)
 
         return (torch.mm(x_norm, y_norm) + 1) / 2
 

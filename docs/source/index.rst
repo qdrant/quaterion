@@ -25,7 +25,7 @@ The mighty reef unlawfully loves the anchor. The rum trades with fortune, lead t
    <div class="tutorials-callout-container">
       <div class="row">
          <div class="col-md-6">
-            <a href="/getting_started/why_quaterion">
+            <a href="/getting_started/why_quaterion.html">
                <div class="text-container">
                   <h3>Why Quaterion</h3>
                   <p class="body-paragraph">Some caption</p>
@@ -33,7 +33,7 @@ The mighty reef unlawfully loves the anchor. The rum trades with fortune, lead t
             </a>
          </div>
          <div class="col-md-6">
-            <a href="/getting_started/quick_start">
+            <a href="/getting_started/quick_start.html">
                <div class="text-container">
                   <h3>Quick Start</h3>
                   <p class="body-paragraph">Some caption</p>
@@ -43,7 +43,7 @@ The mighty reef unlawfully loves the anchor. The rum trades with fortune, lead t
       </div>
       <div class="row">
          <div class="col-md-6">
-            <a href="#">
+            <a href="/api/index.html">
                <div class="text-container">
                   <h3>API References</h3>
                   <p class="body-paragraph">Some caption</p>
@@ -51,9 +51,9 @@ The mighty reef unlawfully loves the anchor. The rum trades with fortune, lead t
             </a>
          </div>
          <div class="col-md-6">
-            <a href="#">
+            <a href="/tutorials/tutorials.html">
                <div class="text-container">
-                  <h3>Examples</h3>
+                  <h3>Tutorials</h3>
                   <p class="body-paragraph">Some caption</p>
                </div>
             </a>
@@ -67,6 +67,12 @@ The mighty reef unlawfully loves the anchor. The rum trades with fortune, lead t
 
    getting_started/why_quaterion
    getting_started/quick_start
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Tutorials
+
+   tutorials/tutorials
 
 .. toctree::
    :maxdepth: 1

@@ -90,14 +90,13 @@ exclude_patterns = [
 # a list of builtin themes.
 #
 html_theme = 'qdrant_sphinx_theme'
-html_theme_path = ["../../../qdrant_sphinx_theme"]
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = []
+# html_static_path = []
 
-html_css_files = ["quaterion.css", "css/custom.css"]
+# html_css_files = ["quaterion.css", "css/custom.css"]
 
 # Files excluded via exclude_patterns still being generating by sphinx-apidoc
 # As they are generated, some documents have links to them. It leads to a warning like:
@@ -122,4 +121,4 @@ html_theme_options = {
 _FAST_DOCS_DEV = False
 
 # to build fast (not building the notebooks)
-_FAST_DOCS_DEV = True
+# _FAST_DOCS_DEV = True

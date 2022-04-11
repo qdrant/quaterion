@@ -18,6 +18,8 @@ Install
 Next Steps
 ==========
 
+The mighty reef unlawfully loves the anchor. The rum trades with fortune, lead the bikini atoll until it whines.
+
 .. raw:: html
 
    <div class="tutorials-callout-container">
@@ -58,48 +60,6 @@ Next Steps
          </div>
       </div>
    </div>
-
-The mighty reef unlawfully loves the anchor. The rum trades with fortune, lead the bikini atoll until it whines.
-
-
-
-.. raw:: html
-
-    <div class="tutorials-callout-container">
-        <div class="row">
-
-.. Add callout items below this line
-
-.. customcalloutitem::
-   :description: Use this 2-step guide to learn key concepts.
-   :header: New to Lightning?
-   :button_link:  getting_started/why_quaterion.html
-
-
-.. customcalloutitem::
-   :description: Easily organize your existing PyTorch code into PyTorch Lightning.
-   :header: PyTorch to PyTorch Lightning
-   :button_link: getting_started/quick_start.html
-
-
-.. customcalloutitem::
-   :description: See how Lightning is used in research areas like NLP, Computer Vision, RL and meta learning.
-   :header: Examples
-   :button_link: tutorials.html
-
-
-.. customcalloutitem::
-   :description: Detailed descriptions of each API package.
-   :header: API Reference
-   :button_link: api/index.html
-
-.. raw:: html
-
-        </div>
-    </div>
-
-.. End of callout item section
-
 
 .. toctree::
    :maxdepth: 1

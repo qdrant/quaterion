@@ -277,14 +277,13 @@
 <span id="quaterion-loss-pairwise-loss-module"></span><h1>quaterion.loss.pairwise_loss module<a class="headerlink" href="#module-quaterion.loss.pairwise_loss" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="quaterion.loss.pairwise_loss.PairwiseLoss">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">PairwiseLoss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distance_metric_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'cosine_distance'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/quaterion/loss/pairwise_loss.html#PairwiseLoss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.loss.pairwise_loss.PairwiseLoss" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">PairwiseLoss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distance_metric_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="quaterion.distances.html#quaterion.distances.Distance" title="quaterion.distances.Distance"><span class="pre">Distance</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Distance.COSINE</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/quaterion/loss/pairwise_loss.html#PairwiseLoss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.loss.pairwise_loss.PairwiseLoss" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="quaterion.loss.similarity_loss.html#quaterion.loss.similarity_loss.SimilarityLoss" title="quaterion.loss.similarity_loss.SimilarityLoss"><code class="xref py py-class docutils literal notranslate"><span class="pre">SimilarityLoss</span></code></a></p>
 <p>Base class for pairwise losses.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>distance_metric_name</strong> – Name of the function, that returns a distance between two embeddings.
-<a class="reference internal" href="quaterion.loss.metrics.html#quaterion.loss.metrics.SiameseDistanceMetric" title="quaterion.loss.metrics.SiameseDistanceMetric"><code class="xref py py-class docutils literal notranslate"><span class="pre">SiameseDistanceMetric</span></code></a> contains pre-defined metrics
-that can be used.</p>
+<dd class="field-odd"><p><strong>distance_metric_name</strong> – Name of the distance function, e.g.,
+<a class="reference internal" href="quaterion.distances.html#quaterion.distances.Distance" title="quaterion.distances.Distance"><code class="xref py py-class docutils literal notranslate"><span class="pre">Distance</span></code></a>.</p>
 </dd>
 </dl>
 <dl class="py method">

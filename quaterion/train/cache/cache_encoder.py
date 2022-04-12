@@ -31,7 +31,7 @@ class CacheEncoder(Encoder):
     """
 
     def __init__(self, encoder: Encoder):
-        if encoder.trainable():
+        if encoder.trainable:
             raise ValueError("Trainable encoder can't be cached")
         super().__init__()
         self._encoder = encoder
@@ -40,6 +40,7 @@ class CacheEncoder(Encoder):
     def wrapped_encoder(self):
         return self._encoder
 
+    @property
     def trainable(self) -> bool:
         """Defines if encoder is trainable. This flag affects caching and checkpoint
         saving of the encoder.
@@ -49,13 +50,14 @@ class CacheEncoder(Encoder):
         """
         return False
 
+    @property
     def embedding_size(self) -> int:
         """Size of output embedding.
 
         Returns:
             int: Size of resulting embedding.
         """
-        return self._encoder.embedding_size()
+        return self._encoder.embedding_size
 
     def cache_collate(
         self, batch: Union[Tuple[List[Hashable], List[Any]], List[Hashable]]

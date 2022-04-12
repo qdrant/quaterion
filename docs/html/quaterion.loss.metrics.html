@@ -43,8 +43,6 @@
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="quaterion.loss.multiple_negatives_ranking_loss module" href="quaterion.loss.multiple_negatives_ranking_loss.html" />
-    <link rel="prev" title="quaterion.loss.group_loss module" href="quaterion.loss.group_loss.html" />
   <!-- Google Analytics -->
   
   <!-- End Google Analytics -->
@@ -194,9 +192,9 @@
 <li class="toctree-l1"><a class="reference internal" href="tutorials/tutorials.html">List of tutorials</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Quaterion API</span></p>
-<ul class="current">
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="api/index.html">Quaterion API</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="quaterion.html">quaterion package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quaterion.html">quaterion package</a></li>
 </ul>
 
             
@@ -237,10 +235,6 @@
       </li>
 
         
-          <li><a href="quaterion.html">quaterion package</a> &gt;</li>
-        
-          <li><a href="quaterion.loss.html">quaterion.loss package</a> &gt;</li>
-        
       <li>quaterion.loss.metrics module</li>
     
     
@@ -273,96 +267,8 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
              <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
               
-  <section id="module-quaterion.loss.metrics">
-<span id="quaterion-loss-metrics-module"></span><h1>quaterion.loss.metrics module<a class="headerlink" href="#module-quaterion.loss.metrics" title="Permalink to this headline">¶</a></h1>
-<dl class="py class">
-<dt class="sig sig-object py" id="quaterion.loss.metrics.SiameseDistanceMetric">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SiameseDistanceMetric</span></span><a class="reference internal" href="_modules/quaterion/loss/metrics.html#SiameseDistanceMetric"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.loss.metrics.SiameseDistanceMetric" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Common distance metrics for losses.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="quaterion.loss.metrics.SiameseDistanceMetric.cosine_distance">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cosine_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Tensor</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">matrix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/quaterion/loss/metrics.html#SiameseDistanceMetric.cosine_distance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.loss.metrics.SiameseDistanceMetric.cosine_distance" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute cosine distance</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> – shape: (batch_size, …)</p></li>
-<li><p><strong>y</strong> – shape: (batch_size, …), optional</p></li>
-<li><p><strong>matrix</strong> – if <cite>True</cite> calculate a distance matrix between <cite>x</cite> and <cite>y</cite> (all-to-all).
-If <cite>y</cite> is <cite>None</cite>, it assigns <cite>x</cite> to <cite>y</cite>.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><em>Tensor</em> – shape (batch_size, batch_size) if <cite>matrix</cite> is <cite>True</cite>, (batch_size,) otherwise.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="quaterion.loss.metrics.SiameseDistanceMetric.dot_product_distance">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dot_product_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">matrix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/quaterion/loss/metrics.html#SiameseDistanceMetric.dot_product_distance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.loss.metrics.SiameseDistanceMetric.dot_product_distance" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute dot product distance</p>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>Dot product distance may have unexpected effects. Make sure you entirely understand how
-it works itself, and with chosen loss function especially.</p>
-</div>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> – shape: (batch_size, …)</p></li>
-<li><p><strong>y</strong> – shape: (batch_size, …)</p></li>
-<li><p><strong>matrix</strong> – flat to calculate distance matrix (all to all)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><em>Tensor</em> – shape (batch_size, batch_size) if <cite>matrix</cite> is <cite>True</cite>, (batch_size,) otherwise.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="quaterion.loss.metrics.SiameseDistanceMetric.euclidean">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">euclidean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Tensor</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">squared</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/quaterion/loss/metrics.html#SiameseDistanceMetric.euclidean"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.loss.metrics.SiameseDistanceMetric.euclidean" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute euclidean distance</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> – shape: (batch_size, …)</p></li>
-<li><p><strong>y</strong> – shape: (batch_size, …), optional</p></li>
-<li><p><strong>matrix</strong> – if <cite>True</cite> calculate a distance matrix between <cite>x</cite> and <cite>y</cite> (all-to-all).
-if <cite>y</cite> it is <cite>None</cite>, it assigns <cite>x</cite> to <cite>y</cite>.</p></li>
-<li><p><strong>squared</strong> – Squared Euclidean distance or not.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><em>Tensor</em> – shape (batch_size, batch_size) if <cite>matrix</cite> is <cite>True</cite>, (batch_size,) otherwise.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="quaterion.loss.metrics.SiameseDistanceMetric.manhattan">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">manhattan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Tensor</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">matrix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="_modules/quaterion/loss/metrics.html#SiameseDistanceMetric.manhattan"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.loss.metrics.SiameseDistanceMetric.manhattan" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute manhattan distance</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>x</strong> – shape: (batch_size, …)</p></li>
-<li><p><strong>y</strong> – shape: (batch_size, …), optional</p></li>
-<li><p><strong>matrix</strong> – if <cite>True</cite> calculate a distance matrix between <cite>x</cite> and <cite>y</cite> (all-to-all).
-if <cite>y</cite> it is <cite>None</cite>, it assigns <cite>x</cite> to <cite>y</cite>.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><em>Tensor</em> – shape (batch_size, batch_size) if <cite>matrix</cite> is <cite>True</cite>, (batch_size,) otherwise.</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
+  <section id="quaterion-loss-metrics-module">
+<h1>quaterion.loss.metrics module<a class="headerlink" href="#quaterion-loss-metrics-module" title="Permalink to this headline">¶</a></h1>
 </section>
 
 
@@ -370,15 +276,6 @@ if <cite>y</cite> it is <cite>None</cite>, it assigns <cite>x</cite> to <cite>y<
              
             </div>
             <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="quaterion.loss.multiple_negatives_ranking_loss.html" class="btn btn-neutral float-right" title="quaterion.loss.multiple_negatives_ranking_loss module" accesskey="n" rel="next">Next <img src="_static/images/chevron-right-orange.svg" class="next-page"></a>
-      
-      
-        <a href="quaterion.loss.group_loss.html" class="btn btn-neutral" title="quaterion.loss.group_loss module" accesskey="p" rel="prev"><img src="_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
-      
-    </div>
   
 
   

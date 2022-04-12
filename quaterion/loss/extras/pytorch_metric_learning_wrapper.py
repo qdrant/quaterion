@@ -1,3 +1,7 @@
+from typing import Optional
+
+from quaterion.loss.group_loss import GroupLoss
+
 try:
     from pytorch_metric_learning.losses import BaseMetricLossFunction
     from pytorch_metric_learning.miners import BaseMiner
@@ -6,9 +10,6 @@ except ImportError:
 
     print("You need to install pytorch_mmetric_learning for this wrapper.")
     sys.exit(1)
-
-from typing import Optional
-from quaterion.loss.group_loss import GroupLoss
 
 
 class PytorchMetricLearningWrapper(GroupLoss):

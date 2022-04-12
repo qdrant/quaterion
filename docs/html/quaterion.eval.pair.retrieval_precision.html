@@ -1,0 +1,617 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-PQBQ3CV');
+  </script>
+  <!-- End Google Tag Manager -->
+
+  <meta charset="utf-8">
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="google-site-verification" content="okUst94cAlWSsUsGZTB4xSS4UKTtRV8Nu5XZ9pdd3Aw" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>quaterion.eval.pair.retrieval_precision module &mdash; Quaterion  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+   <link rel="stylesheet" href="_static/css/font_awesome_all.min.css" type="text/css" />
+  <!-- <link rel="stylesheet" href="_static/pygments.css" type="text/css" /> -->
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="quaterion.eval.pair.retrieval_reciprocal_rank module" href="quaterion.eval.pair.retrieval_reciprocal_rank.html" />
+    <link rel="prev" title="quaterion.eval.pair.pair_metric module" href="quaterion.eval.pair.pair_metric.html" />
+  <!-- Google Analytics -->
+  
+  <!-- End Google Analytics -->
+  
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+  <!-- Preload the theme fonts -->
+
+<link rel="preload" href="_static/fonts/FreightSans/freight-sans-book.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/FreightSans/freight-sans-medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/IBMPlexMono/IBMPlexMono-Medium.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/FreightSans/freight-sans-bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/FreightSans/freight-sans-medium-italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="_static/fonts/IBMPlexMono/IBMPlexMono-SemiBold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+
+<!-- Preload the katex fonts -->
+
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Math-Italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Main-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size1-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size4-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size2-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Size3-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/fonts/KaTeX_Caligraphic-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+  <script defer src="https://use.fontawesome.com/releases/v6.1.1/js/all.js" integrity="sha384-xBXmu0dk1bEoiwd71wOonQLyH+VpgR1XcDH3rtxrLww5ajNTuMvBdL5SOiFZnNdp" crossorigin="anonymous"></script>
+</head>
+
+<div class="container-fluid header-holder tutorials-header" id="header-holder">
+  <div class="container">
+    <div class="header-container">
+      <a class="header-logo" href="/" aria-label="PyTorch">
+      <!--  <img class="call-to-action-img" src="_static/images/logo-qdrant-icon.png"/> -->
+      </a>
+
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="/getting_started/why_quaterion.html">Get Started</a>
+          </li>
+
+          <li>
+            <a href="https://qdrant.tech/blog/" target="_blank">Blog</a>
+          </li>
+
+          <li class="mr-4">
+            <div id="resourcesDropdownButton" data-toggle="resources-dropdown" class="resources-dropdown">
+              <a class="resource-option with-down-arrow">
+                Community
+              </a>
+              <div class="resources-dropdown-menu">
+                <a class="nav-dropdown-item" href="https://www.linkedin.com/company/qdrant/">
+                  <span class="dropdown-title">
+                    <i class="fa-brands fa-linkedin"></i>
+                    Linkedin
+                  </span>
+                </a>
+                <a class="nav-dropdown-item" href="https://twitter.com/qdrant_engine" target="_blank">
+                  <span class="dropdown-title">
+                    <i class="fa-brands fa-twitter"></i>
+                    Twitter
+                  </span>
+                </a>
+                <a class="nav-dropdown-item" href="https://discord.gg/tdtYvXjC4h">
+                  <span class="dropdown-title">
+                    <i class="fa-brands fa-discord"></i>
+                    Discord
+                  </span>
+                </a>
+              </div>
+            </div>
+          </li>
+
+          <li>
+            <a href="https://qdrant.tech/" target="_blank">Qdrant</a>
+          </li>
+
+          <li>
+            <a href="https://github.com/qdrant/quaterion" target="_blank">
+              <i class="fa-brands fa-github"></i>
+              GitHub
+            </a>
+          </li>
+
+        </ul>
+      </div>
+
+      <a class="main-menu-open-button" href="#" data-behavior="open-mobile-menu"></a>
+    </div>
+  </div>
+</div>
+
+<body class="pytorch-body">
+
+   
+
+    
+
+    <div class="table-of-contents-link-wrapper">
+      <span>Table of Contents</span>
+      <a href="#" class="toggle-table-of-contents" data-behavior="toggle-table-of-contents"></a>
+    </div>
+
+    <nav data-toggle="wy-nav-shift" class="pytorch-left-menu" id="pytorch-left-menu">
+      <div class="pytorch-side-scroll">
+        <div class="pytorch-menu pytorch-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          <div class="pytorch-left-menu-search">
+            
+
+            
+              
+              
+            
+
+            
+
+
+  
+
+
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search Docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+            
+          </div>
+
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="getting_started/why_quaterion.html">Why Quaterion?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started/quick_start.html">Quick Start</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/tutorials.html">List of tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Quaterion API</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="api/index.html">Quaterion API</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="quaterion.html">quaterion package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <div class="pytorch-container">
+      <div class="pytorch-page-level-bar" id="pytorch-page-level-bar">
+        <div class="pytorch-breadcrumbs-wrapper">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="pytorch-breadcrumbs">
+    
+      <li>
+        <a href="index.html">
+          
+            Docs
+          
+        </a> &gt;
+      </li>
+
+        
+          <li><a href="quaterion.html">quaterion package</a> &gt;</li>
+        
+          <li><a href="quaterion.eval.html">quaterion.eval package</a> &gt;</li>
+        
+          <li><a href="quaterion.eval.pair.html">quaterion.eval.pair package</a> &gt;</li>
+        
+      <li>quaterion.eval.pair.retrieval_precision module</li>
+    
+    
+      <li class="pytorch-breadcrumbs-aside">
+        
+            
+            <a href="_sources/quaterion.eval.pair.retrieval_precision.rst.txt" rel="nofollow"><img src="_static/images/view-page-source-icon.svg"></a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+</div>
+        </div>
+
+        <div class="pytorch-shortcuts-wrapper" id="pytorch-shortcuts-wrapper">
+          Shortcuts
+        </div>
+      </div>
+
+      <section data-toggle="wy-nav-shift" id="pytorch-content-wrap" class="pytorch-content-wrap">
+        <div class="pytorch-content-left">
+
+        
+          
+          <div class="rst-content">
+          
+            <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
+             <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
+              
+  <section id="module-quaterion.eval.pair.retrieval_precision">
+<span id="quaterion-eval-pair-retrieval-precision-module"></span><h1>quaterion.eval.pair.retrieval_precision module<a class="headerlink" href="#module-quaterion.eval.pair.retrieval_precision" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="quaterion.eval.pair.retrieval_precision.RetrievalPrecision">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RetrievalPrecision</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distance_metric_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="quaterion.distances.html#quaterion.distances.Distance" title="quaterion.distances.Distance"><span class="pre">Distance</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Distance.COSINE</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/quaterion/eval/pair/retrieval_precision.html#RetrievalPrecision"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.eval.pair.retrieval_precision.RetrievalPrecision" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="quaterion.eval.pair.pair_metric.html#quaterion.eval.pair.pair_metric.PairMetric" title="quaterion.eval.pair.pair_metric.PairMetric"><code class="xref py py-class docutils literal notranslate"><span class="pre">PairMetric</span></code></a></p>
+<p>Calculates retrieval precision&#64;k for pair based datasets</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>distance_metric_name</strong> – name of a distance metric to calculate distance or similarity
+matrices. Available names could be found in <a class="reference internal" href="quaterion.distances.html#quaterion.distances.Distance" title="quaterion.distances.Distance"><code class="xref py py-class docutils literal notranslate"><span class="pre">Distance</span></code></a>.</p></li>
+<li><p><strong>k</strong> – number of documents among which to search a relevant one</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<p>Assume <cite>k</cite> is 4. Then only 4 documents being retrieved as a query response. Only 2 of them
+are relevant and score will be 2/4 = 0.5.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If <cite>k</cite> is greater than overall amount of relevant documents, then precision&#64;k will always
+have score &lt; 1.</p>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="quaterion.eval.pair.retrieval_precision.RetrievalPrecision.compute">
+<span class="sig-name descname"><span class="pre">compute</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/quaterion/eval/pair/retrieval_precision.html#RetrievalPrecision.compute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.eval.pair.retrieval_precision.RetrievalPrecision.compute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates retrieval precision&#64;k</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="quaterion.eval.pair.retrieval_precision.retrieval_precision">
+<span class="sig-name descname"><span class="pre">retrieval_precision</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distance_matrix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/quaterion/eval/pair/retrieval_precision.html#retrieval_precision"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.eval.pair.retrieval_precision.retrieval_precision" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates retrieval precision&#64;k given distance matrix, labels and k</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>distance_matrix</strong> – distance matrix having max possible distance value on a diagonal</p></li>
+<li><p><strong>labels</strong> – labels matrix having False or 0. on a diagonal</p></li>
+<li><p><strong>k</strong> – number of documents to retrieve</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><em>torch.Tensor</em> – retrieval precision&#64;k for each row in tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+             </article>
+             
+            </div>
+            <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="quaterion.eval.pair.retrieval_reciprocal_rank.html" class="btn btn-neutral float-right" title="quaterion.eval.pair.retrieval_reciprocal_rank module" accesskey="n" rel="next">Next <img src="_static/images/chevron-right-orange.svg" class="next-page"></a>
+      
+      
+        <a href="quaterion.eval.pair.pair_metric.html" class="btn btn-neutral" title="quaterion.eval.pair.pair_metric module" accesskey="p" rel="prev"><img src="_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+      
+    </div>
+  
+
+  
+
+    <hr>
+
+  
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2022, Quaterion Authors.
+
+    </p>
+  </div>
+    
+      <div>
+        Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+      </div>
+     
+
+</footer>
+
+          </div>
+        </div>
+
+        <div class="pytorch-content-right" id="pytorch-content-right">
+          <div class="pytorch-right-menu" id="pytorch-right-menu">
+            <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
+              <ul>
+<li><a class="reference internal" href="#">quaterion.eval.pair.retrieval_precision module</a></li>
+</ul>
+
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+  
+
+
+  
+
+     
+       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+         <script src="_static/jquery.js"></script>
+         <script src="_static/underscore.js"></script>
+         <script src="_static/doctools.js"></script>
+     
+
+  
+
+  <script type="text/javascript" src="_static/js/vendor/popper.min.js"></script>
+  <script type="text/javascript" src="_static/js/vendor/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+  <!-- Begin Footer -->
+
+  <div class="container-fluid docs-tutorials-resources" id="docs-tutorials-resources">
+    <div class="container">
+      <div class="row">
+        <!--
+        <div class="col-md-4 text-center">
+          <h2>Docs</h2>
+          <p>Access comprehensive developer documentation for PyTorch</p>
+          <a class="with-right-arrow" href="">View Docs</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Tutorials</h2>
+          <p>Get in-depth tutorials for beginners and advanced developers</p>
+          <a class="with-right-arrow" href="">View Tutorials</a>
+        </div>
+
+        <div class="col-md-4 text-center">
+          <h2>Resources</h2>
+          <p>Find development resources and get your questions answered</p>
+          <a class="with-right-arrow" href="">View Resources</a>
+        </div>
+        -->
+      </div>
+    </div>
+  </div>
+
+  <!--
+  <footer class="site-footer">
+    <div class="container footer-container">
+      <div class="footer-logo-wrapper">
+        <a href="/" class="footer-logo"></a>
+      </div>
+
+      <div class="footer-links-wrapper">
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="/">PyTorch</a></li>
+            <li><a href="/getting_started/why_quaterion.html">Get Started</a></li>
+            <li><a href="">Features</a></li>
+            <li><a href="">Ecosystem</a></li>
+            <li><a href="https://qdrant.tech/blog/">Blog</a></li>
+            <li><a href="https://github.com/qdrant/quaterion">Contributing</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col">
+          <ul>
+            <li class="list-title"><a href="">Resources</a></li>
+            <li><a href="">Tutorials</a></li>
+            <li><a href="">Docs</a></li>
+            <li><a href="" target="_blank">Discuss</a></li>
+            <li><a href="https://github.com/qdrant/quaterion/issues" target="_blank">Github Issues</a></li>
+            <li><a href="" target="_blank">Brand Guidelines</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links-col follow-us-col">
+          <ul>
+            <li class="list-title">Stay Connected</li>
+            <li>
+              <div id="mc_embed_signup">
+                <form
+                  action="https://twitter.us14.list-manage.com/subscribe/post?u=75419c71fe0a935e53dfa4a3f&id=91d0dccd39"
+                  method="post"
+                  id="mc-embedded-subscribe-form"
+                  name="mc-embedded-subscribe-form"
+                  class="email-subscribe-form validate"
+                  target="_blank"
+                  novalidate>
+                  <div id="mc_embed_signup_scroll" class="email-subscribe-form-fields-wrapper">
+                    <div class="mc-field-group">
+                      <label for="mce-EMAIL" style="display:none;">Email Address</label>
+                      <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="Email Address">
+                    </div>
+
+                    <div id="mce-responses" class="clear">
+                      <div class="response" id="mce-error-response" style="display:none"></div>
+                      <div class="response" id="mce-success-response" style="display:none"></div>
+                    </div>
+
+                    <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_75419c71fe0a935e53dfa4a3f_91d0dccd39" tabindex="-1" value=""></div>
+
+                    <div class="clear">
+                      <input type="submit" value="" name="subscribe" id="mc-embedded-subscribe" class="button email-subscribe-button">
+                    </div>
+                  </div>
+                </form>
+              </div>
+
+            </li>
+          </ul>
+
+          <div class="footer-social-icons">
+            <a href="" target="_blank" class="facebook"></a>
+            <a href="https://twitter.com/qdrant_engine" target="_blank" class="twitter"></a>
+            <a href="" target="_blank" class="youtube"></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+  -->
+
+  <div class="cookie-banner-wrapper">
+  <div class="container">
+    <p class="gdpr-notice">To analyze traffic and optimize your experience, we serve cookies on this site. By clicking or navigating, you agree to allow our usage of cookies. Read our <a href="/privacy-policy">Privacy Policy</a>.</p>
+    <img class="close-button" src="_static/images/qdrant-x.svg">
+  </div>
+</div>
+
+  <!-- End Footer -->
+
+  <!-- Begin Mobile Menu -->
+
+  <div class="mobile-main-menu">
+    <div class="container-fluid">
+      <div class="container">
+        <div class="mobile-main-menu-header-container">
+          <a class="header-logo" href="/" aria-label="PyTorch Lightning"></a>
+          <a class="main-menu-close-button" href="#" data-behavior="close-mobile-menu"></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="mobile-main-menu-links-container">
+      <div class="main-menu">
+        <ul>
+          <li>
+            <a href="/getting_started/why_quaterion.html">Get Started</a>
+          </li>
+
+          <li>
+            <a href="https://qdrant.tech/blog/">Blog</a>
+          </li>
+
+          <li class="resources-mobile-menu-title">
+            Community
+          </li>
+
+          <li>
+            <ul class="resources-mobile-menu-items">
+              <li>
+                <a class="nav-dropdown-item" href="https://www.linkedin.com/company/qdrant/">
+                  <span class="dropdown-title">
+                    <i class="fa-brands fa-linkedin"></i>
+                    Linkedin
+                  </span>
+                </a>
+              </li>
+              <li>
+                <a class="nav-dropdown-item" href="https://twitter.com/qdrant_engine" target="_blank">
+                  <span class="dropdown-title">
+                    <i class="fa-brands fa-twitter"></i>
+                    Twitter
+                  </span>
+                </a>
+              </li>
+              <li>
+                <a class="nav-dropdown-item" href="https://discord.gg/tdtYvXjC4h">
+                  <span class="dropdown-title">
+                    <i class="fa-brands fa-discord"></i>
+                    Discord
+                  </span>
+                </a>
+              </li>
+            </ul>
+          </li>
+
+          <li>
+            <a href="https://github.com/qdrant/quaterion">Github</a>
+          </li>
+
+          <li>
+            <a href="https://qdrant.tech/">Qdrant</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- End Mobile Menu -->
+
+  <script type="text/javascript" src="_static/js/vendor/anchor.min.js"></script>
+
+  <script type="text/javascript">
+    $(document).ready(function() {
+      mobileMenu.bind();
+      mobileTOC.bind();
+      pytorchAnchors.bind();
+      sideMenus.bind();
+      scrollToAnchor.bind();
+      highlightNavigation.bind();
+      mainMenuDropdown.bind();
+      filterTags.bind();
+
+      // Add class to links that have code blocks, since we cannot create links in code blocks
+      $("article.pytorch-article a span.pre").each(function(e) {
+        $(this).closest("a").addClass("has-code");
+      });
+    })                                                                                         
+  </script>
+
+  <!-- Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PQBQ3CV"
+  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+  <!-- End Google Tag Manager (noscript) -->
+ </body>
+</html>

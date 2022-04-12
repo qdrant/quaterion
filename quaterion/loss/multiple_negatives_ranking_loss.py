@@ -5,18 +5,20 @@ import torch
 from torch import Tensor, LongTensor
 import torch.nn.functional as F
 
-from quaterion.loss.metrics import SiameseDistanceMetric
+from quaterion.distances import Distance
 from quaterion.loss.pairwise_loss import PairwiseLoss
 
 
 class MultipleNegativesRankingLoss(PairwiseLoss):
-    """Implement Multiple Negatives Ranking Loss as described in https://arxiv.org/pdf/1705.00652.pdf
+    """Implement Multiple Negatives Ranking Loss as described in
+    https://arxiv.org/pdf/1705.00652.pdf
 
     This loss function works only with positive pairs, e.g., an `anchor` and a `positive`.
     For each pair, it uses `positive` of other pairs in the batch as negatives, so you don't need
     to worry about specifying negative examples. It is great for retrieval tasks such as
     question-answer retrieval, duplicate sentence retrieval, and cross-modal retrieval.
-    It accepts pairs of anchor and positive embeddings to calculate a similarity matrix between them.
+    It accepts pairs of anchor and positive embeddings to calculate a similarity matrix between
+    them.
     Then, it minimizes negative log-likelihood for softmax-normalized similarity scores.
     This optimizes  retrieval of the correct positive pair when an anchor given.
 
@@ -30,37 +32,22 @@ class MultipleNegativesRankingLoss(PairwiseLoss):
 
     Args:
         scale: Scaling value for multiplying with similarity scores to make cross-entropy work.
-        similarity_metric_name: Name of the metric to calculate similarities between embeddings.
-            Must be either `"cosine"` or `"dot_product"`. If `"dot_product"`, `scale` must be `1`.
+        distance_metric_name: Name of the metric to calculate similarities between embeddings,
+            e.g., :class:`~quaterion.distances.Distance`.
+            Optional, defaults to :attr:`~quaterion.distances.Distance.COSINE`.
+            If :attr:`~quaterion.distances.Distance.DOT_PRODUCT`, `scale` must be `1`.
         symmetric: If True, loss is symmetric,
             i.e., it also accounts for retrieval of the correct anchor when a positive given.
     """
 
-    @classmethod
-    def metric_class(cls) -> Type:
-        """Class with metrics available for current loss.
-
-        Returns:
-            Type: class containing metrics
-        """
-        return SiameseDistanceMetric
-
     def __init__(
         self,
         scale: float = 20.0,
-        similarity_metric_name: str = "cosine",
+        distance_metric_name: Distance = Distance.COSINE,
         symmetric: bool = False,
     ):
-        similarity_metrics = ["cosine", "dot_product"]
-        if similarity_metric_name not in similarity_metrics:
-            raise ValueError(
-                f"Not supported similarity metric for this loss: {similarity_metric_name}. "
-                f"Must be one of {', '.join(similarity_metrics)}"
-            )
-
-        super().__init__(distance_metric_name=similarity_metric_name + "_distance")
+        super().__init__(distance_metric_name=distance_metric_name)
         self._scale = scale
-        self._similarity_metric_name = similarity_metric_name
         self._symmetric = symmetric
 
     def get_config_dict(self) -> Dict[str, Any]:
@@ -71,11 +58,15 @@ class MultipleNegativesRankingLoss(PairwiseLoss):
         Returns:
             Dict[str, Any]: JSON-serializable dict of params
         """
-        return {
-            "scale": self._scale,
-            "similarity_metric_name": self._similarity_metric_name,
-            "symmetric": self._symmetric,
-        }
+        config = self.get_config_dict()
+        config.update(
+            {
+                "scale": self._scale,
+                "symmetric": self._symmetric,
+            }
+        )
+
+        return config
 
     def forward(
         self,
@@ -109,15 +100,9 @@ class MultipleNegativesRankingLoss(PairwiseLoss):
         rep_anchor = embeddings[pairs[:, 0]]
         rep_positive = embeddings[pairs[:, 1]]
 
+        # get similarity matrix to be used as logits
         # shape: (batch_size, batch_size)
-        distance_matrix = self.distance_metric(rep_anchor, rep_positive, matrix=True)
-
-        # convert distance values to similarity scores and then scale to use as logits
-        logits = (
-            1 - distance_matrix
-            if self._similarity_metric_name == "cosine"
-            else -distance_matrix
-        )
+        logits = self.distance_metric.similarity_matrix(rep_anchor, rep_positive)
         logits *= self._scale
 
         # create integer label IDs

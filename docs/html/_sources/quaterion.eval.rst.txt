@@ -1,6 +1,15 @@
 quaterion.eval package
 ======================
 
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   quaterion.eval.group
+   quaterion.eval.pair
+
 Submodules
 ----------
 

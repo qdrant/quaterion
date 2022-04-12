@@ -277,14 +277,13 @@
 <span id="quaterion-loss-similarity-loss-module"></span><h1>quaterion.loss.similarity_loss module<a class="headerlink" href="#module-quaterion.loss.similarity_loss" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="quaterion.loss.similarity_loss.SimilarityLoss">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SimilarityLoss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distance_metric_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'cosine_distance'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/quaterion/loss/similarity_loss.html#SimilarityLoss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.loss.similarity_loss.SimilarityLoss" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SimilarityLoss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distance_metric_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="quaterion.distances.html#quaterion.distances.Distance" title="quaterion.distances.Distance"><span class="pre">Distance</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">Distance.COSINE</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/quaterion/loss/similarity_loss.html#SimilarityLoss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.loss.similarity_loss.SimilarityLoss" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
 <p>Base similarity losses class.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>distance_metric_name</strong> – Name of the function, that returns a distance between two embeddings.
-<a class="reference internal" href="quaterion.loss.metrics.html#quaterion.loss.metrics.SiameseDistanceMetric" title="quaterion.loss.metrics.SiameseDistanceMetric"><code class="xref py py-class docutils literal notranslate"><span class="pre">SiameseDistanceMetric</span></code></a> contains pre-defined metrics
-that can be used.</p>
+<dd class="field-odd"><p><strong>distance_metric_name</strong> – Name of the distance function, e.g.,
+<a class="reference internal" href="quaterion.distances.html#quaterion.distances.Distance" title="quaterion.distances.Distance"><code class="xref py py-class docutils literal notranslate"><span class="pre">Distance</span></code></a>.</p>
 </dd>
 </dl>
 <dl class="py method">
@@ -295,34 +294,6 @@ that can be used.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p><em>Dict[str, Any]</em> – JSON-serializable dict of params</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="quaterion.loss.similarity_loss.SimilarityLoss.get_distance_function">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_distance_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">function_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tensor</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tensor</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/quaterion/loss/similarity_loss.html#SimilarityLoss.get_distance_function"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.loss.similarity_loss.SimilarityLoss.get_distance_function" title="Permalink to this definition">¶</a></dt>
-<dd><p>Retrieve distance function from metric class.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>function_name</strong> – name of attribute in cls.metric_class instance</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><em>Callable[[Tensor, Tensor], Tensor]</em> – function for distance calculation</p>
-</dd>
-<dt class="field-odd">Raises</dt>
-<dd class="field-odd"><p><strong>RuntimeError</strong> – unknown <cite>distance_metric_name</cite> is passed</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="quaterion.loss.similarity_loss.SimilarityLoss.metric_class">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">metric_class</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Type</span></span></span><a class="reference internal" href="_modules/quaterion/loss/similarity_loss.html#SimilarityLoss.metric_class"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#quaterion.loss.similarity_loss.SimilarityLoss.metric_class" title="Permalink to this definition">¶</a></dt>
-<dd><p>Class with metrics available for current loss.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p><em>Type</em> – class containing metrics</p>
 </dd>
 </dl>
 </dd></dl>

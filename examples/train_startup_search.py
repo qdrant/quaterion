@@ -6,7 +6,8 @@ from typing import Dict, Union, List, Any
 
 import pytorch_lightning as pl
 import torch
-import torch.nn as nn
+from torch.utils.data import Dataset
+
 from quaterion import Quaterion, TrainableModel
 from quaterion.dataset.similarity_data_loader import (
     GroupSimilarityDataLoader,
@@ -16,7 +17,6 @@ from quaterion.loss import SoftmaxLoss, SimilarityLoss
 from quaterion_models.types import CollateFnType
 from quaterion_models.encoders import Encoder
 from quaterion_models.heads import GatedHead, EncoderHead
-from torch.utils.data import DataLoader, Dataset
 
 try:
     from sentence_transformers import SentenceTransformer
@@ -60,9 +60,11 @@ class StartupEncoder(Encoder):
 
         self._pretrained_name = pretrained_name
 
+    @property
     def trainable(self) -> bool:
         return False
 
+    @property
     def embedding_size(self) -> int:
         return self.encoder.get_sentence_embedding_dimension()
 
@@ -109,7 +111,7 @@ class Model(TrainableModel):
         return GatedHead(input_embedding_size)
 
     def configure_loss(self) -> SimilarityLoss:
-        return SoftmaxLoss(self.model.head.output_size(), self._num_groups)
+        return SoftmaxLoss(self.model.head.output_size, self._num_groups)
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(

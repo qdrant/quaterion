@@ -8,6 +8,7 @@ Subpackages
    :maxdepth: 4
 
    quaterion.dataset
+   quaterion.distances
    quaterion.eval
    quaterion.loss
    quaterion.train

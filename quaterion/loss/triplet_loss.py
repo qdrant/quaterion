@@ -2,8 +2,8 @@ from typing import Optional
 
 import torch
 import torch.nn.functional as F
+from quaterion.distances import Distance
 from quaterion.loss.group_loss import GroupLoss
-from quaterion.loss.metrics import SiameseDistanceMetric
 from quaterion.utils import (
     get_anchor_negative_mask,
     get_anchor_positive_mask,
@@ -19,26 +19,19 @@ class TripletLoss(GroupLoss):
     Args:
         margin: Margin value to push negative examples
             apart. Optional, defaults to `0.5`.
-        distance_metric_name: Name of the distance function. Optional, defaults to `euclidean`.
-        squared (bool, optional): Squared Euclidean distance or not. Defaults to `True`.
+        distance_metric_name: Name of the distance function, e.g.,
+            :class:`~quaterion.distances.Distance`. Optional, defaults to
+            :attr:`~quaterion.distances.Distance.COSINE`.
         mining (str, optional): Triplet mining strategy. One of
             `"all"`, `"hard"`. Defaults to `"hard"`.
     """
 
     def __init__(
         self,
-        margin: Optional[float] = 0.5,
-        distance_metric_name: str = "euclidean",
-        squared: Optional[bool] = True,
+        margin: Optional[float] = 1.0,
+        distance_metric_name: Distance = Distance.COSINE,
         mining: Optional[str] = "hard",
     ):
-        distance_metrics = ["euclidean", "cosine_distance"]
-        if distance_metric_name not in distance_metrics:
-            raise ValueError(
-                f"Not supported distance metrc for this loss: {distance_metric_name}. "
-                f"Must be one of {', '.join(distance_metrics)}"
-            )
-
         mining_types = ["all", "hard"]
         if mining not in mining_types:
             raise ValueError(
@@ -47,7 +40,6 @@ class TripletLoss(GroupLoss):
         super(TripletLoss, self).__init__(distance_metric_name=distance_metric_name)
 
         self._margin = margin
-        self._squared = squared
         self._mining = mining
 
     def get_config_dict(self):
@@ -55,10 +47,10 @@ class TripletLoss(GroupLoss):
         config.update(
             {
                 "margin": self._margin,
-                "squared": self._squared,
                 "mining": self._mining,
             }
         )
+
         return config
 
     def forward(
@@ -74,13 +66,7 @@ class TripletLoss(GroupLoss):
             torch.Tensor: Scalar loss value.
         """
         # Shape: (batch_size, batch_size)
-        dists = (
-            SiameseDistanceMetric.euclidean(
-                x=embeddings, matrix=True, squared=self._squared
-            )
-            if self.distance_metric_name == "euclidean"
-            else SiameseDistanceMetric.cosine_distance(x=embeddings, matrix=True)
-        )
+        dists = self.distance_metric.distance_matrix(embeddings)
 
         if self._mining == "all":
             # Calculate loss for all possible triplets first, then filter by group mask

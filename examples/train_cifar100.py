@@ -5,11 +5,9 @@ from typing import Dict, Union
 import pytorch_lightning as pl
 import torch
 import torch.nn as nn
-from torch.utils.data import Dataset
 from quaterion import Quaterion, TrainableModel
 from quaterion.dataset import (
     GroupSimilarityDataLoader,
-    SimilarityGroupSample,
     SimilarityGroupDataset,
 )
 from quaterion.loss import (
@@ -18,7 +16,6 @@ from quaterion.loss import (
     SimilarityLoss,
 )
 from quaterion_models.heads import EmptyHead, EncoderHead
-from quaterion_models.types import CollateFnType
 from quaterion_models.encoders import Encoder
 
 
@@ -63,9 +60,11 @@ class MobilenetV3Encoder(Encoder):
 
         self._embedding_size = embedding_size
 
+    @property
     def trainable(self) -> bool:
         return True
 
+    @property
     def embedding_size(self) -> int:
         return self._embedding_size
 

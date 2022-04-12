@@ -28,9 +28,11 @@ class MobilenetV3Encoder(Encoder):
 
         self._embedding_size = embedding_size
 
+    @property
     def trainable(self) -> bool:
         return True
 
+    @property
     def embedding_size(self) -> int:
         return self._embedding_size
 

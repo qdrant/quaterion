@@ -267,10 +267,52 @@
   <h1>Source code for quaterion.eval.base_metric</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
 
+<span class="kn">from</span> <span class="nn">quaterion.distances</span> <span class="kn">import</span> <span class="n">Distance</span>
+
 
 <div class="viewcode-block" id="BaseMetric"><a class="viewcode-back" href="../../../quaterion.eval.base_metric.html#quaterion.eval.base_metric.BaseMetric">[docs]</a><span class="k">class</span> <span class="nc">BaseMetric</span><span class="p">:</span>
-<div class="viewcode-block" id="BaseMetric.eval"><a class="viewcode-back" href="../../../quaterion.eval.base_metric.html#quaterion.eval.base_metric.BaseMetric.eval">[docs]</a>    <span class="k">def</span> <span class="nf">eval</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
-        <span class="k">pass</span></div></div>
+    <span class="sd">&quot;&quot;&quot;Base class for evaluation metrics</span>
+
+<span class="sd">    Provides a default implementation for distance matrix calculation.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        distance_metric_name: name of a distance metric to calculate distance or similarity</span>
+<span class="sd">            matrices. Available names could be found in :class:`~quaterion.distances.Distance`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">distance_metric_name</span><span class="p">:</span> <span class="n">Distance</span> <span class="o">=</span> <span class="n">Distance</span><span class="o">.</span><span class="n">COSINE</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">distance_metric</span> <span class="o">=</span> <span class="n">Distance</span><span class="o">.</span><span class="n">get_by_name</span><span class="p">(</span><span class="n">distance_metric_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">embeddings</span> <span class="o">=</span> <span class="n">Tensor</span><span class="p">()</span>
+
+<div class="viewcode-block" id="BaseMetric.compute"><a class="viewcode-back" href="../../../quaterion.eval.base_metric.html#quaterion.eval.base_metric.BaseMetric.compute">[docs]</a>    <span class="k">def</span> <span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Calculates metric</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Tensor: metric result</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="BaseMetric.calculate_distances"><a class="viewcode-back" href="../../../quaterion.eval.base_metric.html#quaterion.eval.base_metric.BaseMetric.calculate_distances">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_distances</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Calculates distance matrix</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Tensor: distance matrix</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">distance_metric</span><span class="o">.</span><span class="n">distance_matrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">embeddings</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BaseMetric.calculate_similarities"><a class="viewcode-back" href="../../../quaterion.eval.base_metric.html#quaterion.eval.base_metric.BaseMetric.calculate_similarities">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_similarities</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tensor</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Calculates similarity matrix</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Tensor: similarity matrix</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">distance_metric</span><span class="o">.</span><span class="n">similarity_matrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">embeddings</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="BaseMetric.reset"><a class="viewcode-back" href="../../../quaterion.eval.base_metric.html#quaterion.eval.base_metric.BaseMetric.reset">[docs]</a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Reset accumulated metric state&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">embeddings</span> <span class="o">=</span> <span class="n">Tensor</span><span class="p">()</span></div></div>
 </pre></div>
 
              </article>

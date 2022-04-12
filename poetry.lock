@@ -1149,7 +1149,7 @@ pytorch-metric-learning = ["pytorch-metric-learning"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7,<3.10"
-content-hash = "30b99d0693576c0a0e9cdcde41ab906d291a241588849a692ef34b4af286e62a"
+content-hash = "9b57bf3ba2d75075b80004f0668c44fab297be86054b016ae2ee413bfe149599"
 
 [metadata.files]
 absl-py = [

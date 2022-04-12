@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "quaterion"
-version = "0.1.11"
+version = "0.1.18"
 description = "Metric Learning fine-tuning framework"
 authors = ["generall <andrey@vasnetsov.com>"]
 packages = [
@@ -16,7 +16,7 @@ keywords = ["framework", "metric-learning", "similarity", "deep-learning", "pyto
 python = ">=3.7,<3.10"
 torch = ">=1.8.2"
 pytorch-lightning = "^1.5.8"
-quaterion-models = ">=0.1.5"
+quaterion-models = ">=0.1.6"
 loguru = "^0.5.3"
 mmh3 = "^3.0.0"
 pytorch-metric-learning = {version = "^1.2.1", optional = true}

@@ -115,7 +115,7 @@ html_theme_options = {
     "collapse_navigation": True,
     "sticky_navigation": True,
     "titles_only": False,
-    "qdrant_project": "quaterion"
+    "qdrant_project": "quaterion",
 }
 
 # default is false

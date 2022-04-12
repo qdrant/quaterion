@@ -721,7 +721,7 @@ sphinx = "*"
 type = "git"
 url = "https://github.com/qdrant/qdrant_sphinx_theme.git"
 reference = "master"
-resolved_reference = "ada52ea4ad60e1329a1e489b5bdc57d7c4d3efc9"
+resolved_reference = "f09571802da1a210c89742d794d6fd6a1bf373ab"
 
 [[package]]
 name = "quaterion-models"

@@ -32,6 +32,7 @@ black = "^22.3.0"
 
 [tool.poetry.extras]
 pytorch-metric-learning = ["pytorch-metric-learning"]
+full = ["pytorch-metric-learning"]
 
 
 [build-system]

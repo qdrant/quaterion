@@ -41,7 +41,7 @@ extensions = [
 # objects.inv file at the same location as the base URI) or another local file path or a full
 # HTTP URI to an inventory file.
 intersphinx_mapping = {
-    "quaterion_models": ("http://127.0.0.1:5500/docs/html", None),
+    "quaterion_models": ("https://quaterion-models.qdrant.tech/", None),
 }
 
 # prevents sphinx from adding full path to type hints
@@ -88,19 +88,31 @@ exclude_patterns = [
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = "alabaster"
+html_theme = 'qdrant_sphinx_theme'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = []
-
-html_css_files = [
-    "quaterion.css",
-]
+# html_static_path = []
 
 # Files excluded via exclude_patterns still being generating by sphinx-apidoc
 # As they are generated, some documents have links to them. It leads to a warning like:
 # `WARNING: toctree contains reference to excluded document '...'`.
 # suppress_warnings allows to remove such warnings
 suppress_warnings = ["toc.excluded"]
+
+html_theme_options = {
+    # google analytics can be added here
+    "logo_only": False,
+    "display_version": True,
+    "prev_next_buttons_location": "bottom",
+    "style_external_links": False,
+    # Toc options
+    "collapse_navigation": True,
+    "sticky_navigation": True,
+    "titles_only": False,
+    "qdrant_project": "quaterion"
+}
+
+# default is false
+_FAST_DOCS_DEV = False

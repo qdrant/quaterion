@@ -27,6 +27,7 @@ pytest = "^6.2.5"
 ipdb = "^0.13.9"
 sphinx = "^4.4.0"
 qdrant-sphinx-theme = { git = "https://github.com/qdrant/qdrant_sphinx_theme.git", branch = "master" }
+black = "^22.3.0"
 
 
 [tool.poetry.extras]

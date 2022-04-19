@@ -88,7 +88,7 @@ exclude_patterns = [
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'qdrant_sphinx_theme'
+html_theme = "qdrant_sphinx_theme"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -111,7 +111,7 @@ html_theme_options = {
     "collapse_navigation": True,
     "sticky_navigation": True,
     "titles_only": False,
-    "qdrant_project": "quaterion"
+    "qdrant_project": "quaterion",
 }
 
 # default is false

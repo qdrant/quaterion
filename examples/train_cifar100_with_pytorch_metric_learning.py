@@ -30,10 +30,10 @@ except ImportError:
 
 
 def get_dataloader():
-    # Mean and std values taken from
-    # https://github.com/LJY-HY/cifar_pytorch-lightning/blob/master/datasets/CIFAR.py#L43
-    mean = [0.4914, 0.4822, 0.4465]
-    std = [0.2023, 0.1994, 0.2010]
+    # Use Mean and std values for the ImageNet dataset as the base model was pretrained on it.
+    # taken from https://www.geeksforgeeks.org/how-to-normalize-images-in-pytorch/
+    mean = [0.485, 0.456, 0.406]
+    std = [0.229, 0.224, 0.225]
     path = os.path.join(os.path.expanduser("~"), "torchvision", "datasets")
 
     transform = transforms.Compose(

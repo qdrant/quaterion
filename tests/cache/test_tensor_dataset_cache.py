@@ -66,13 +66,9 @@ class Model(TrainableModel):
         return optimizer
 
     def configure_caches(self) -> Optional[CacheConfig]:
-        return CacheConfig(
-            cache_type=CacheType.AUTO,
-            save_dir=self._cache_path
-        )
+        return CacheConfig(cache_type=CacheType.AUTO, save_dir=self._cache_path)
 
 
-# @pytest.mark.skip(reason="Not yet finished")
 def test_tensor_dataset_cache():
     from torchvision import transforms
     from torchvision.datasets import FakeData
@@ -104,12 +100,7 @@ def test_tensor_dataset_cache():
     )
 
     trainer = pl.Trainer(
-        callbacks=[
-            ModelCheckpoint(
-                dirpath=tmp_ckpt_dir,
-                filename="test"
-            )
-        ],
+        callbacks=[ModelCheckpoint(dirpath=tmp_ckpt_dir, filename="test")],
         logger=False,
         max_epochs=1,
     )
@@ -130,12 +121,7 @@ def test_tensor_dataset_cache():
     )
 
     trainer = pl.Trainer(
-        callbacks=[
-            ModelCheckpoint(
-                dirpath=tmp_ckpt_dir,
-                filename="test"
-            )
-        ],
+        callbacks=[ModelCheckpoint(dirpath=tmp_ckpt_dir, filename="test")],
         logger=False,
         max_epochs=3,
     )

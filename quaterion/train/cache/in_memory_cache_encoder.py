@@ -1,4 +1,6 @@
-from typing import Hashable, List
+import pickle
+
+from typing import Hashable, List, OrderedDict
 
 import torch
 
@@ -56,6 +58,9 @@ class InMemoryCacheEncoder(CacheEncoder):
         """
         return self.cache_collate
 
+    def is_filled(self) -> bool:
+        return len(self.cache) != 0
+
     def fill_cache(self, keys: List[Hashable], data: "TensorInterchange") -> None:
         embeddings = self._encoder(data)
         if self.cache_type == CacheType.CPU:
@@ -68,3 +73,9 @@ class InMemoryCacheEncoder(CacheEncoder):
     def reset_cache(self) -> None:
         """Resets cache."""
         self.cache.clear()
+
+    def save_cache(self, path):
+        pickle.dump(self.cache, open(path, "wb"))
+
+    def load_cache(self, path):
+        self.cache = pickle.load(open(path, "rb"))

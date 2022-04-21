@@ -126,7 +126,7 @@ def test_cache_dataloader():
     trainer = pl.Trainer(logger=False, gpus=None)
 
     cache_trainable_model = FakeCachableTrainableModel()
-    cache_trainable_model.cache(
+    cache_trainable_model.setup_cache(
         trainer=trainer, train_dataloader=dataloader, val_dataloader=None
     )
 

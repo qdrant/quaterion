@@ -17,6 +17,7 @@ from quaterion.dataset.train_collater import TrainCollater
 from quaterion.loss import SimilarityLoss
 from quaterion.train.cache import (
     CacheConfig,
+    CacheType,
 )
 from quaterion.train.cache_mixin import CacheMixin
 from quaterion.utils.enums import TrainStage
@@ -29,8 +30,9 @@ class TrainableModel(pl.LightningModule, CacheMixin):
         super().__init__(*args, **kwargs)
 
         encoders = self.configure_encoders()
-        self.cache_config = self.configure_caches()
-        encoders = self._apply_cache_config(encoders, self.cache_config)
+        self.cache_config: CacheConfig = self.configure_caches() or CacheConfig(
+            cache_type=CacheType.NONE
+        )
 
         head = self.configure_head(MetricModel.get_encoders_output_size(encoders))
 
@@ -149,7 +151,10 @@ class TrainableModel(pl.LightningModule, CacheMixin):
     def training_step(
         self, batch: TensorInterchange, batch_idx: int, **kwargs
     ) -> Tensor:
-        """Compute and return the training loss and some additional metrics for e.g.
+        """
+        :meta private:
+
+        Compute and return the training loss and some additional metrics for e.g.
         the progress bar or logger.
 
         Args:
@@ -167,7 +172,10 @@ class TrainableModel(pl.LightningModule, CacheMixin):
         return loss
 
     def validation_step(self, batch, batch_idx, **kwargs) -> Optional[Tensor]:
-        """Compute validation loss and some additional metrics for e.g. the progress
+        """
+        :meta private:
+
+        Compute validation loss and some additional metrics for e.g. the progress
         bar or logger.
 
         Args:
@@ -180,7 +188,10 @@ class TrainableModel(pl.LightningModule, CacheMixin):
         return None
 
     def test_step(self, batch, batch_idx, **kwargs) -> Optional[Tensor]:
-        """Compute test loss and some additional metrics for e.g. the progress
+        """
+        :meta private:
+
+        Compute test loss and some additional metrics for e.g. the progress
         bar or logger.
 
         Args:
@@ -227,14 +238,34 @@ class TrainableModel(pl.LightningModule, CacheMixin):
         self.unwrap_cache()
         self.model.save(path)
 
-    def cache(
+    def setup_cache(
         self,
         trainer: pl.Trainer,
         train_dataloader: SimilarityDataLoader,
         val_dataloader: Optional[SimilarityDataLoader],
     ):
-        """Fill cachable encoders with embeddings"""
-        self._cache(
+        """
+        :meta private:
+        Prepares encoder's cache for faster training:
+
+        - Replaces frozen encoders with cache Wrapper according
+          to the cache configuration defined in :meth:`configure_caches`.
+        - Fill cachable encoders with embeddings
+
+        Args:
+            trainer: Pytorch Lightning trainer object
+            train_dataloader: train dataloader
+            val_dataloader: validation dataloader
+
+        Returns:
+            `False`, if cache is already created or not required.
+            `True`, if cache is newly created
+        """
+        self.model.encoders = self._apply_cache_config(
+            self.model.encoders, self.cache_config
+        )
+
+        return self._cache(
             trainer=trainer,
             encoders=self.model.encoders,
             train_dataloader=train_dataloader,
@@ -243,11 +274,19 @@ class TrainableModel(pl.LightningModule, CacheMixin):
         )
 
     def unwrap_cache(self):
-        """Restore original encoders"""
+        """
+        :meta private:
+        Restore original encoders
+        """
         self.model.encoders = self._unwrap_cache_encoders(self.model.encoders)
 
     def setup_dataloader(self, dataloader: SimilarityDataLoader):
-        """Update data loader's collate function with encoder-specific collate"""
+        """
+        Setup data loader for encoder-specific settings, Setup encoder-specific collate function
+
+        Each encoder have its own unique way to transform a list of records into NN-compatible format.
+        These transformations are usually done during data pre-processing step.
+        """
         encoder_collate_fns = dict(
             (key, encoder.get_collate_fn())
             for key, encoder in self.model.encoders.items()

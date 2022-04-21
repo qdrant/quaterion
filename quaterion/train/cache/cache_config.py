@@ -12,6 +12,9 @@ KeyExtractorType = Callable[[Any], Hashable]
 class CacheType(str, Enum):
     """Available tensor devices to be used for caching."""
 
+    NONE = "none"
+    """Disable cache"""
+
     AUTO = "auto"
     """Use CUDA if it is available, else use CPU."""
 
@@ -47,3 +50,6 @@ class CacheConfig:
     num_workers: Optional[int] = None  # if None - inherited from source dl
     """Num of workers to be used in CacheDataLoader during caching process. It does not 
     affect others training stages."""
+
+    save_dir: Optional[str] = None
+    """If provided, cache fill be saved to the given directory and re-used between launches"""

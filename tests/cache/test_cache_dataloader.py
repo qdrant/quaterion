@@ -133,7 +133,7 @@ def test_cache_dataloader():
     encoder = cache_trainable_model.model.encoders[DEFAULT_ENCODER_KEY]
 
     assert isinstance(encoder, InMemoryCacheEncoder)
-    assert len(encoder.cache) == len(dataset.data) * 2
+    assert len(encoder._cache) == len(dataset.data) * 2
 
     cached_ids, labels = next(iter(dataloader))
     print("cached_batch: ", cached_ids)

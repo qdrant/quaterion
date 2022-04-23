@@ -132,6 +132,10 @@ class CacheEncoder(Encoder):
         """
         raise NotImplementedError()
 
+    def finish_fill(self):
+        """Notify cache that fill is complete"""
+        raise NotImplementedError()
+
     def reset_cache(self):
         """Reset all stored data."""
         raise NotImplementedError()

@@ -151,10 +151,7 @@ class TrainableModel(pl.LightningModule, CacheMixin):
     def training_step(
         self, batch: TensorInterchange, batch_idx: int, **kwargs
     ) -> Tensor:
-        """
-        :meta private:
-
-        Compute and return the training loss and some additional metrics for e.g.
+        """:meta private: Compute and return the training loss and some additional metrics for e.g.
         the progress bar or logger.
 
         Args:
@@ -172,10 +169,7 @@ class TrainableModel(pl.LightningModule, CacheMixin):
         return loss
 
     def validation_step(self, batch, batch_idx, **kwargs) -> Optional[Tensor]:
-        """
-        :meta private:
-
-        Compute validation loss and some additional metrics for e.g. the progress
+        """:meta private: Compute validation loss and some additional metrics for e.g. the progress
         bar or logger.
 
         Args:
@@ -188,10 +182,7 @@ class TrainableModel(pl.LightningModule, CacheMixin):
         return None
 
     def test_step(self, batch, batch_idx, **kwargs) -> Optional[Tensor]:
-        """
-        :meta private:
-
-        Compute test loss and some additional metrics for e.g. the progress
+        """:meta private: Compute test loss and some additional metrics for e.g. the progress
         bar or logger.
 
         Args:
@@ -244,9 +235,7 @@ class TrainableModel(pl.LightningModule, CacheMixin):
         train_dataloader: SimilarityDataLoader,
         val_dataloader: Optional[SimilarityDataLoader],
     ):
-        """
-        :meta private:
-        Prepares encoder's cache for faster training:
+        """:meta private: Prepares encoder's cache for faster training:
 
         - Replaces frozen encoders with cache Wrapper according
           to the cache configuration defined in :meth:`configure_caches`.
@@ -274,15 +263,11 @@ class TrainableModel(pl.LightningModule, CacheMixin):
         )
 
     def unwrap_cache(self):
-        """
-        :meta private:
-        Restore original encoders
-        """
+        """:meta private: Restore original encoders"""
         self.model.encoders = self._unwrap_cache_encoders(self.model.encoders)
 
     def setup_dataloader(self, dataloader: SimilarityDataLoader):
-        """
-        Setup data loader for encoder-specific settings, Setup encoder-specific collate function
+        """Setup data loader for encoder-specific settings, Setup encoder-specific collate function
 
         Each encoder have its own unique way to transform a list of records into NN-compatible format.
         These transformations are usually done during data pre-processing step.

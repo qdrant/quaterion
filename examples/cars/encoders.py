@@ -22,11 +22,11 @@ class CarsEncoder(Encoder):
             self._encoder = torch.load(restore_path)
         else:
             # replace the classifier layer with a newly initialized linear projection
-            self._encoder = torchvision.models.mobilenet_v3_small(pretrained=True)
+            self._encoder = torchvision.models.resnet18(pretrained=True)
             # replace classifier layer with an identity function
-            self._encoder.classifier = nn.Identity()
+            self._encoder.fc = nn.Identity()
 
-        self._embedding_size = 576  # last dimension from the base model
+        self._embedding_size = 512  # last dimension from the base model
 
     @property
     def trainable(self) -> bool:

@@ -1,3 +1,4 @@
+from torch import nn
 from typing import Dict, Union
 
 import torch
@@ -6,7 +7,17 @@ from quaterion.loss import SimilarityLoss, TripletLoss
 from quaterion_models.encoders import Encoder
 from quaterion_models.heads import EncoderHead, WideningHead
 
-from cars.encoders import CarsEncoder
+try:
+    import torchvision
+except ImportError:
+    import sys
+
+    print("You need to install torchvision for this example:")
+    print("pip install torchvision")
+
+    sys.exit(1)
+
+from .encoders import CarsEncoder
 
 
 class Model(TrainableModel):
@@ -17,7 +28,9 @@ class Model(TrainableModel):
         super().__init__()
 
     def configure_encoders(self) -> Union[Encoder, Dict[str, Encoder]]:
-        return CarsEncoder(self._embedding_size)
+        pre_trained_encoder = torchvision.models.resnet18(pretrained=True)
+        pre_trained_encoder.classifier = nn.Identity()
+        return CarsEncoder(pre_trained_encoder)
 
     def configure_head(self, input_embedding_size) -> EncoderHead:
         return WideningHead(input_embedding_size)

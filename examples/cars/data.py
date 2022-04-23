@@ -4,7 +4,6 @@ from typing import Callable
 import numpy as np
 from quaterion.dataset import (
     GroupSimilarityDataLoader,
-    SimilarityGroupDataset,
     SimilarityGroupSample,
 )
 from torch.utils.data import Dataset, Subset
@@ -25,8 +24,8 @@ def get_dataloaders(
     mean = [0.485, 0.456, 0.406]
     std = [0.229, 0.224, 0.225]
 
-    # dataset will be downloaded to this directory under user home
-    path = os.path.join(os.path.expanduser("~"), "torchvision", "datasets")
+    # dataset will be downloaded to this directory under local directory
+    path = os.path.join(".", "torchvision", "datasets")
 
     # we need to merge train and test splits into a full dataset first,
     # and then we will split it to two subsets again with each one composed of distinct labels.
@@ -91,7 +90,7 @@ def get_dataloaders(
     return train_dataloader, test_dataloader
 
 
-class CarsDataset(SimilarityGroupDataset):
+class CarsDataset(Dataset):
     def __init__(self, dataset: Dataset, transform: Callable):
         self._dataset = dataset
         self._transform = transform

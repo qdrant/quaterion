@@ -23,7 +23,7 @@ class Model(TrainableModel):
         return WideningHead(input_embedding_size)
 
     def configure_loss(self) -> SimilarityLoss:
-        return TripletLoss(mining=self._mining)
+        return TripletLoss(mining=self._mining, margin=0.5)
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.model.parameters(), self._lr)

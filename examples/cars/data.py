@@ -41,10 +41,10 @@ def get_dataloaders(
     # get a list of labels for all samples in the dataset
     labels_list = np.array([label for _, label in full_dataset])
 
-    # get a mask for indices where label is included train_categories
+    # get a mask for indices where label is included in train_categories
     labels_mask = np.isin(labels_list, train_categories)
 
-    # get a list of indices of to be used as train samples
+    # get a list of indices to be used as train samples
     train_indices = np.argwhere(labels_mask).squeeze()
 
     # others will be used as test samples
@@ -69,7 +69,7 @@ def get_dataloaders(
         ]
     )
 
-    # now that we have distinct indices for train and test sets, we can use `Subset` to new datasets
+    # now that we have distinct indices for train and test sets, we can use `Subset` to create new datasets
     # from `full_dataset`, which contain only the samples at given indices.
     # finally, we apply transformations created above.
     train_dataset = CarsDataset(

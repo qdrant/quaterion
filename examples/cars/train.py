@@ -56,7 +56,7 @@ def train(
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("--batch-size", type=int, default=128, help="Batch size")
+    ap.add_argument("--batch-size", type=int, default=384, help="Batch size")
 
     ap.add_argument(
         "--embedding-size", type=int, default=512, help="Size of the embedding vector"

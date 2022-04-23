@@ -1,4 +1,5 @@
 import os.path
+import tempfile
 
 import pytorch_lightning as pl
 import shutil
@@ -73,14 +74,8 @@ def test_tensor_dataset_cache():
     from torchvision import transforms
     from torchvision.datasets import FakeData
 
-    tmp_ckpt_dir = os.path.join(os.path.dirname(__file__), "data", "ckpt")
-    tmp_cache_dir = os.path.join(os.path.dirname(__file__), "data", "cache")
-
-    shutil.rmtree(tmp_ckpt_dir, ignore_errors=True)
-    os.makedirs(tmp_ckpt_dir, exist_ok=True)
-
-    shutil.rmtree(tmp_cache_dir, ignore_errors=True)
-    os.makedirs(tmp_cache_dir, exist_ok=True)
+    tmp_ckpt_dir = tempfile.TemporaryDirectory()
+    tmp_cache_dir = tempfile.TemporaryDirectory()
 
     transform = transforms.Compose(
         [
@@ -96,11 +91,11 @@ def test_tensor_dataset_cache():
     model = Model(
         embedding_size=128,
         lr=0.001,
-        cache_path=tmp_cache_dir,
+        cache_path=tmp_cache_dir.name,
     )
 
     trainer = pl.Trainer(
-        callbacks=[ModelCheckpoint(dirpath=tmp_ckpt_dir, filename="test")],
+        callbacks=[ModelCheckpoint(dirpath=tmp_ckpt_dir.name, filename="test")],
         logger=False,
         max_epochs=1,
     )
@@ -109,7 +104,7 @@ def test_tensor_dataset_cache():
 
     # Same, but with checkpoint
     print("--------- with checkpoint ----------")
-    ckpt_path = os.path.join(tmp_ckpt_dir, "test.ckpt")
+    ckpt_path = os.path.join(tmp_ckpt_dir.name, "test.ckpt")
 
     dataset = SimilarityGroupDataset(FakeData(size=100, transform=transform))
     dataloader = GroupSimilarityDataLoader(dataset, batch_size=4)
@@ -117,11 +112,11 @@ def test_tensor_dataset_cache():
     model = Model(
         embedding_size=128,
         lr=0.001,
-        cache_path=tmp_cache_dir,
+        cache_path=tmp_cache_dir.name,
     )
 
     trainer = pl.Trainer(
-        callbacks=[ModelCheckpoint(dirpath=tmp_ckpt_dir, filename="test")],
+        callbacks=[ModelCheckpoint(dirpath=tmp_ckpt_dir.name, filename="test")],
         logger=False,
         max_epochs=3,
     )

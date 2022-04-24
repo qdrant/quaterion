@@ -58,6 +58,10 @@ class CacheModel(pl.LightningModule):
 
         return torch.Tensor([1])
 
+    def on_predict_end(self) -> None:
+        for encoder in self.encoders.values():
+            encoder.finish_fill()
+
     # region anchors
     def train_dataloader(self) -> TRAIN_DATALOADERS:
         pass

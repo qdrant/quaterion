@@ -1,4 +1,4 @@
-from typing import Any, List, Generic, Tuple, Dict
+from typing import Any, List, Generic, Tuple, Dict, Union
 
 import torch
 from torch.utils.data import DataLoader
@@ -33,10 +33,23 @@ class SimilarityDataLoader(DataLoader, Generic[T_co]):
             kwargs["collate_fn"] = self.__class__.pre_collate_fn
         self._original_dataset = dataset
         self._original_params = kwargs
-        super().__init__(self._wrap_dataset(dataset), **kwargs)
+        self._indexing_dataset_layer = self._wrap_indexing_dataset(dataset)
+        super().__init__(self._indexing_dataset_layer, **kwargs)
+
+    def set_salt(self, salt):
+        """
+        Assigns a new salt to the IndexingDataset.
+        Might be useful to distinguish cache sequential keys for train and validation datasets.
+
+        Args:
+            salt: salt for index generation
+        """
+        self._indexing_dataset_layer.set_salt(salt)
 
     @classmethod
-    def _wrap_dataset(cls, dataset: Dataset) -> Dataset:
+    def _wrap_indexing_dataset(
+        cls, dataset: Dataset
+    ) -> Union[IndexingIterableDataset, IndexingDataset]:
         if isinstance(dataset, IterableDataset):
             return IndexingIterableDataset(dataset)
         else:

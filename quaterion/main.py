@@ -8,6 +8,7 @@ from quaterion.dataset.similarity_data_loader import (
     SimilarityDataLoader,
 )
 from quaterion.loss import GroupLoss, PairwiseLoss
+from quaterion.train.cleanup_callback import CleanupCallback
 from quaterion.train.trainable_model import TrainableModel
 
 
@@ -21,6 +22,7 @@ class Quaterion:
         trainer: pl.Trainer,
         train_dataloader: SimilarityDataLoader,
         val_dataloader: Optional[SimilarityDataLoader] = None,
+        ckpt_path: Optional[str] = None,
     ):
         """Handle training routine
 
@@ -34,6 +36,9 @@ class Quaterion:
                 stage
             val_dataloader: Optional DataLoader instance to retrieve samples during
                 validation stage
+            ckpt_path: Path/URL of the checkpoint from which training is resumed. If there is
+                no checkpoint file at the path, an exception is raised. If resuming from mid-epoch checkpoint,
+                training will start from the beginning of the next epoch.
         """
 
         if isinstance(train_dataloader, PairsSimilarityDataLoader):
@@ -49,12 +54,14 @@ class Quaterion:
                     "Try other loss/data loader"
                 )
 
+        trainer.callbacks.append(CleanupCallback())
+        # Prepare data loaders for training
+
         trainable_model.setup_dataloader(train_dataloader)
+        if val_dataloader:
+            trainable_model.setup_dataloader(val_dataloader)
 
-        if val_dataloader is not None:
-            val_dataloader.collate_fn = train_dataloader.collate_fn
-
-        trainable_model.cache(
+        trainable_model.setup_cache(
             trainer=trainer,
             train_dataloader=train_dataloader,
             val_dataloader=val_dataloader,
@@ -64,6 +71,5 @@ class Quaterion:
             model=trainable_model,
             train_dataloaders=train_dataloader,
             val_dataloaders=val_dataloader,
+            ckpt_path=ckpt_path,
         )
-
-        trainable_model.unwrap_cache()

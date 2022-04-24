@@ -1,4 +1,6 @@
-from typing import Hashable, List
+import pickle
+
+from typing import Hashable, List, OrderedDict
 
 import torch
 
@@ -22,9 +24,14 @@ class InMemoryCacheEncoder(CacheEncoder):
         cache_type=CacheType.AUTO,
     ):
         super().__init__(encoder)
-        self.cache = {}
+        self._cache = None
+        self._offset_map = {}
         self._cache_type = cache_type
         self._original_device = None
+        self._tmp = []
+
+    def _encoder_device(self):
+        return next(self._encoder.parameters(), torch.Tensor(0)).device
 
     @property
     def cache_type(self):
@@ -39,9 +46,10 @@ class InMemoryCacheEncoder(CacheEncoder):
         Returns:
             Tensor: embeddings of shape [batch_size x embedding_size]
         """
-        embeddings: torch.Tensor = torch.stack([self.cache[value] for value in batch])
+        offsets = [self._offset_map[key] for key in batch]
+        embeddings: torch.Tensor = self._cache[offsets]
 
-        device = next(self.parameters(), torch.Tensor(0)).device
+        device = self._encoder_device()
         if device != embeddings.device:
             embeddings = embeddings.to(device)
 
@@ -56,6 +64,9 @@ class InMemoryCacheEncoder(CacheEncoder):
         """
         return self.cache_collate
 
+    def is_filled(self) -> bool:
+        return self._cache is not None
+
     def fill_cache(self, keys: List[Hashable], data: "TensorInterchange") -> None:
         embeddings = self._encoder(data)
         if self.cache_type == CacheType.CPU:
@@ -63,8 +74,25 @@ class InMemoryCacheEncoder(CacheEncoder):
         if self.cache_type == CacheType.GPU:
             # ToDo: Move to which GPU?
             pass
-        self.cache.update(dict(zip(keys, embeddings)))
+        for key in keys:
+            self._offset_map[key] = len(self._offset_map)
+        self._tmp.append(embeddings)
+
+    def finish_fill(self):
+        self._cache = torch.cat(self._tmp)
+        self._tmp = []
 
     def reset_cache(self) -> None:
         """Resets cache."""
-        self.cache.clear()
+        self._cache = None
+        self._offset_map = {}
+        self._tmp = []
+
+    def save_cache(self, path):
+        pickle.dump([self._cache.to("cpu"), self._offset_map], open(path, "wb"))
+
+    def load_cache(self, path):
+        self._cache, self._offset_map = pickle.load(open(path, "rb"))
+        if self.cache_type != CacheType.CPU:
+            device = self._encoder_device()
+            self._cache = self._cache.to(device)

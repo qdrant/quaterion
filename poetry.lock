@@ -566,7 +566,7 @@ name = "pillow"
 version = "9.1.0"
 description = "Python Imaging Library (Fork)"
 category = "main"
-optional = true
+optional = false
 python-versions = ">=3.7"
 
 [package.extras]
@@ -1096,7 +1096,7 @@ name = "torchvision"
 version = "0.12.0"
 description = "image and video datasets and models for torch deep learning"
 category = "main"
-optional = true
+optional = false
 python-versions = ">=3.7"
 
 [package.dependencies]
@@ -1222,12 +1222,13 @@ docs = ["sphinx", "jaraco.packaging (>=9)", "rst.linker (>=1.9)"]
 testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-cov", "pytest-enabler (>=1.0.1)", "jaraco.itertools", "func-timeout", "pytest-black (>=0.3.7)", "pytest-mypy (>=0.9.1)"]
 
 [extras]
+full = ["pytorch-metric-learning"]
 pytorch-metric-learning = ["pytorch-metric-learning"]
 
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7,<3.10"
-content-hash = "e8b1e3095205f0b3aeb5d4f7acb955d9887ebb24096dc411f6d5c6468932d412"
+content-hash = "6db805d6007e6926c441b517c32ffc7898cc22c3ad5a0458270b877968e707a4"
 
 [metadata.files]
 absl-py = [

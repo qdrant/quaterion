@@ -117,6 +117,10 @@ class CacheEncoder(Encoder):
         """
         raise ValueError("Cached encoder does not support loading")
 
+    def is_filled(self) -> bool:
+        """Check if cache already filled"""
+        raise NotImplementedError()
+
     def fill_cache(self, keys: List[Hashable], data: "TensorInterchange") -> None:
         """Apply wrapped encoder to data and store processed data on
         corresponding device.
@@ -128,6 +132,18 @@ class CacheEncoder(Encoder):
         """
         raise NotImplementedError()
 
+    def finish_fill(self):
+        """Notify cache that fill is complete"""
+        raise NotImplementedError()
+
     def reset_cache(self):
         """Reset all stored data."""
+        raise NotImplementedError()
+
+    def save_cache(self, path):
+        """Persists cache state on disk"""
+        raise NotImplementedError()
+
+    def load_cache(self, path):
+        """Loads cache state from disk"""
         raise NotImplementedError()

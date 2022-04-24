@@ -1,3 +1,5 @@
+import os
+
 from typing import (
     Union,
     Dict,
@@ -27,7 +29,7 @@ class CacheMixin:
     def _apply_cache_config(
         cls,
         encoders: Union[Encoder, Dict[str, Encoder]],
-        cache_config: Optional[CacheConfig],
+        cache_config: CacheConfig,
     ) -> Union[Encoder, Dict[str, Encoder]]:
         """Applies received cache configuration for cached encoders, remain
         non-cached encoders as is
@@ -50,7 +52,7 @@ class CacheMixin:
             ValueError: if CacheConfig instance does not have some of required
                 options set. E.g. not `mapping` nor `cache_type` being set
         """
-        if not cache_config:
+        if cache_config.cache_type == CacheType.NONE:
             return encoders
 
         if not cache_config.cache_type and not cache_config.mapping:
@@ -97,6 +99,9 @@ class CacheMixin:
             ValueError: if encoder layers are not frozen. Cache can be applied
                 only to fully frozen encoders' outputs.
         """
+        if isinstance(encoder, CacheEncoder):
+            return encoder
+
         if encoder.trainable:
             if encoder_name in cache_config.mapping:
                 raise ValueError(
@@ -126,7 +131,7 @@ class CacheMixin:
         train_dataloader: SimilarityDataLoader,
         val_dataloader: Optional[SimilarityDataLoader],
         cache_config: CacheConfig,
-    ) -> None:
+    ) -> bool:
         """Filling cache for model's cache encoders.
 
         Args:
@@ -137,6 +142,10 @@ class CacheMixin:
             cache_config: cache config instance to configure cache batch size
                 and num of workers to use for caching
 
+        Returns:
+            True, if cache was filled with data
+            False, if cache is not used
+
         """
         cache_encoders = {
             name: encoder
@@ -145,7 +154,7 @@ class CacheMixin:
         }
 
         if not cache_encoders:
-            return
+            return False
 
         if cache_config.key_extractors and not isinstance(
             cache_config.key_extractors, dict
@@ -164,36 +173,59 @@ class CacheMixin:
             },
             key_extractors=key_extractors,
             cachable_encoders=list(cache_encoders.keys()),
-            mode=CacheMode.FILL,
+            mode=CacheMode.TRAIN,
         )
 
         train_dataloader.collate_fn = cache_collater
+        train_dataloader.set_salt("train")
 
-        cache_train_dataloader = cls._wrap_cache_dataloader(
-            dataloader=train_dataloader, cache_config=cache_config
-        )
-
-        cache_val_dataloader = None
         if val_dataloader is not None:
             val_dataloader.collate_fn = cache_collater
-            cache_val_dataloader = cls._wrap_cache_dataloader(
-                dataloader=val_dataloader, cache_config=cache_config
+            val_dataloader.set_salt("val")
+
+        for encoder in cache_encoders.values():
+            if encoder.is_filled():
+                logger.debug("Cache is already filled")
+                return False
+
+        is_persisted = True
+
+        if cache_config.save_dir:
+            for key, encoder in cache_encoders.items():
+                if not os.path.exists(os.path.join(cache_config.save_dir, key)):
+                    is_persisted = False
+        else:
+            is_persisted = False
+
+        if not is_persisted:
+            cache_collater.mode = CacheMode.FILL
+            cls._fill_cache(
+                trainer=trainer,
+                cache_encoders=cache_encoders,
+                train_dataloader=train_dataloader,
+                val_dataloader=val_dataloader,
+                cache_config=cache_config,
             )
+            cache_collater.mode = CacheMode.TRAIN
+            logger.info("Caching has been successfully finished")
+            if cache_config.save_dir:
+                cls.save_cache(cache_config.save_dir, cache_encoders)
+                logger.info(f"Cache saved to {cache_config.save_dir}")
 
-        cls._fill_cache(
-            trainer, cache_encoders, cache_train_dataloader, cache_val_dataloader
-        )
+        else:
+            cls.load_cache(cache_config.save_dir, cache_encoders)
+            logger.info(f"Cache loaded from: {cache_config.save_dir}")
 
-        cache_collater.mode = CacheMode.TRAIN
-        logger.info("Caching has been successfully finished")
+        return True
 
     @classmethod
     def _fill_cache(
         cls,
         trainer: pl.Trainer,
         cache_encoders: Dict[str, CacheEncoder],
-        train_dataloader: DataLoader,
-        val_dataloader: DataLoader,
+        train_dataloader: SimilarityDataLoader,
+        val_dataloader: SimilarityDataLoader,
+        cache_config: CacheConfig,
     ) -> None:
         """Fills cache and restores trainer state for further training process.
 
@@ -204,12 +236,23 @@ class CacheMixin:
             val_dataloader: model's val dataloader
 
         """
+        cache_train_dataloader = cls._wrap_cache_dataloader(
+            dataloader=train_dataloader, cache_config=cache_config
+        )
+
+        cache_val_dataloader = None
+        if val_dataloader is not None:
+            cache_val_dataloader = cls._wrap_cache_dataloader(
+                dataloader=val_dataloader, cache_config=cache_config
+            )
+
         # The actual caching
         trainer.predict(
             CacheModel(
                 cache_encoders,
             ),
-            [train_dataloader, val_dataloader],
+            [cache_train_dataloader, cache_val_dataloader],
+            return_predictions=False,
         )
 
     @classmethod
@@ -261,3 +304,21 @@ class CacheMixin:
             dataset=dataloader.dataset, collate_fn=dataloader.collate_fn, **params
         )
         return cache_dl
+
+    @classmethod
+    def save_cache(cls, dir_path: str, encoders: Dict[str, Encoder]):
+        for key, encoder in encoders.items():
+            if isinstance(encoder, CacheEncoder):
+                encoder.save_cache(os.path.join(dir_path, key))
+
+    @classmethod
+    def load_cache(cls, dir_path: str, encoders: Dict[str, Encoder]):
+        for key, encoder in encoders.items():
+            if isinstance(encoder, CacheEncoder):
+                encoder_cache_path = os.path.join(dir_path, key)
+                if not os.path.exists(encoder_cache_path):
+                    raise RuntimeError(
+                        "Encoder cache was configured, but not found. "
+                        f"Expected to find cache at {encoder_cache_path}, but file does not exists!"
+                    )
+                encoder.load_cache(encoder_cache_path)

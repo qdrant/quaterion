@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Union
 
 
 @dataclass
@@ -79,3 +79,6 @@ class SimilarityGroupSample:
 
     obj: Any
     group: int
+
+
+SimilaritySample = Union[SimilarityGroupSample, SimilarityPairSample]

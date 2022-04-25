@@ -22,6 +22,7 @@ from quaterion.train.cache import (
 )
 from quaterion.train.cache.cache_encoder import CacheMode
 from quaterion.train.cache.cache_model import CacheModel
+from quaterion.dataset.label_cache_dataset import LabelCacheMode
 
 
 class CacheMixin:
@@ -136,7 +137,7 @@ class CacheMixin:
 
         Args:
             trainer: Lightning Trainer holds required parameters for model launch (gpu, e.t.c.)
-            encoders: mapping of model's encoders and their names
+            encoders: mapping of all model's encoders and their names
             train_dataloader: model's train dataloader
             val_dataloader: model's val dataloader
             cache_config: cache config instance to configure cache batch size
@@ -155,6 +156,14 @@ class CacheMixin:
 
         if not cache_encoders:
             return False
+
+        # Check if all encoders are cachable, and we don't use custom key extractor.
+        # If so, we can also cache whole dataset and avoid reading from it
+        is_full_cache_possible = (
+            len(cache_encoders) == len(encoders) and not cache_config.key_extractors
+        )
+        if is_full_cache_possible:
+            logger.info("Using full cache")
 
         if cache_config.key_extractors and not isinstance(
             cache_config.key_extractors, dict
@@ -188,16 +197,27 @@ class CacheMixin:
                 logger.debug("Cache is already filled")
                 return False
 
+        encoders_save_path = (
+            os.path.join(cache_config.save_dir, "encoders")
+            if cache_config.save_dir
+            else None
+        )
+
         is_persisted = True
 
         if cache_config.save_dir:
             for key, encoder in cache_encoders.items():
-                if not os.path.exists(os.path.join(cache_config.save_dir, key)):
+                if not os.path.exists(os.path.join(encoders_save_path, key)):
                     is_persisted = False
         else:
             is_persisted = False
 
         if not is_persisted:
+            if is_full_cache_possible:
+                train_dataloader.set_label_cache_mode(LabelCacheMode.learn)
+                if val_dataloader:
+                    val_dataloader.set_label_cache_mode(LabelCacheMode.learn)
+
             cache_collater.mode = CacheMode.FILL
             cls._fill_cache(
                 trainer=trainer,
@@ -209,12 +229,33 @@ class CacheMixin:
             cache_collater.mode = CacheMode.TRAIN
             logger.info("Caching has been successfully finished")
             if cache_config.save_dir:
-                cls.save_cache(cache_config.save_dir, cache_encoders)
+                cls.save_cache(encoders_save_path, cache_encoders)
+                train_dataloader.save_label_cache(
+                    os.path.join(cache_config.save_dir, "train_labels")
+                )
+                if val_dataloader:
+                    val_dataloader.save_label_cache(
+                        os.path.join(cache_config.save_dir, "val_labels")
+                    )
                 logger.info(f"Cache saved to {cache_config.save_dir}")
 
         else:
-            cls.load_cache(cache_config.save_dir, cache_encoders)
+            cls.load_cache(encoders_save_path, cache_encoders)
+            train_dataloader.load_label_cache(
+                os.path.join(cache_config.save_dir, "train_labels")
+            )
+            if val_dataloader:
+                val_dataloader.load_label_cache(
+                    os.path.join(cache_config.save_dir, "val_labels")
+                )
             logger.info(f"Cache loaded from: {cache_config.save_dir}")
+
+        if is_full_cache_possible:
+            train_dataloader.set_skip_read(True)
+            train_dataloader.set_label_cache_mode(LabelCacheMode.read)
+            if val_dataloader:
+                val_dataloader.set_skip_read(True)
+                val_dataloader.set_label_cache_mode(LabelCacheMode.read)
 
         return True
 
@@ -307,6 +348,7 @@ class CacheMixin:
 
     @classmethod
     def save_cache(cls, dir_path: str, encoders: Dict[str, Encoder]):
+        os.makedirs(dir_path, exist_ok=True)
         for key, encoder in encoders.items():
             if isinstance(encoder, CacheEncoder):
                 encoder.save_cache(os.path.join(dir_path, key))

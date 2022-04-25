@@ -1,14 +1,14 @@
 from collections import defaultdict
 from typing import Dict, List, Any, Hashable
 
-from quaterion.dataset.train_collater import TrainCollater
+from quaterion.dataset.train_collater import TrainCollator
 from quaterion_models.types import CollateFnType
 
 from quaterion.train.cache.cache_config import KeyExtractorType
 from quaterion.train.cache.cache_encoder import CacheMode
 
 
-class CacheTrainCollater(TrainCollater):
+class CacheTrainCollator(TrainCollator):
     """:meta private:"""
 
     def __init__(

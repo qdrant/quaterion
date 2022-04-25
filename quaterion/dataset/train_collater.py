@@ -5,7 +5,7 @@ from quaterion.dataset import SimilarityPairSample, SimilarityGroupSample
 from quaterion_models.types import CollateFnType
 
 
-class TrainCollater:
+class TrainCollator:
     """Functional object, that aggregates all required information for performing collate on train
     batches.
 

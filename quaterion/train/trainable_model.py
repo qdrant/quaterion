@@ -13,7 +13,7 @@ from quaterion_models.types import TensorInterchange
 from torch import Tensor
 
 from quaterion.dataset import SimilarityDataLoader
-from quaterion.dataset.train_collater import TrainCollater
+from quaterion.dataset.train_collater import TrainCollator
 from quaterion.loss import SimilarityLoss
 from quaterion.train.cache import (
     CacheConfig,
@@ -277,7 +277,7 @@ class TrainableModel(pl.LightningModule, CacheMixin):
             for key, encoder in self.model.encoders.items()
         )
 
-        collater = TrainCollater(
+        collater = TrainCollator(
             pre_collate_fn=dataloader.collate_fn,
             encoder_collates=encoder_collate_fns,
         )

@@ -12,7 +12,7 @@ from loguru import logger
 from quaterion_models.encoders import Encoder
 from torch.utils.data import DataLoader
 
-from quaterion.train.cache.cache_train_collater import CacheTrainCollater
+from quaterion.train.cache.cache_train_collater import CacheTrainCollator
 from quaterion.dataset.similarity_data_loader import SimilarityDataLoader
 from quaterion.train.cache import (
     CacheConfig,
@@ -166,7 +166,7 @@ class CacheMixin:
         else:
             key_extractors = cache_config.key_extractors
 
-        cache_collater = CacheTrainCollater(
+        cache_collater = CacheTrainCollator(
             pre_collate_fn=train_dataloader.pre_collate_fn,
             encoder_collates={
                 name: encoder.get_collate_fn() for name, encoder in encoders.items()

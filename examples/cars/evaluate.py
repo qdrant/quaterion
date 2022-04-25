@@ -7,7 +7,7 @@ import torchvision
 from quaterion.eval.group import RetrievalRPrecision
 from quaterion_models import MetricModel
 
-from cars.data import get_dataloaders
+from .data import get_dataloaders
 
 
 def eval_base_encoder(test_dl, device):

@@ -6,8 +6,8 @@ import torch
 from pytorch_lightning.callbacks import ModelCheckpoint
 from quaterion import Quaterion
 
-from cars.data import get_dataloaders
-from cars.models import Model
+from .data import get_dataloaders
+from .models import Model
 
 
 def train(
@@ -39,7 +39,6 @@ def train(
 
     trainer = pl.Trainer(
         gpus=1 if torch.cuda.is_available() else 0,
-        num_nodes=1,
         max_epochs=epochs,
         callbacks=[checkpoint_callback],
     )

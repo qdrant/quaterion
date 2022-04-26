@@ -1,9 +1,7 @@
-import glob
 import os.path
-import tempfile
 
 import pytorch_lightning as pl
-import shutil
+import tempfile
 import torch
 from pytorch_lightning.callbacks.model_checkpoint import ModelCheckpoint
 from quaterion_models.encoders import Encoder

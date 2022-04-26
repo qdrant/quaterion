@@ -19,6 +19,9 @@ class IndexingDataset(Dataset[Tuple[Any, T_co]]):
         else:
             self.salt = salt
 
+        # If item is already cached - it might be much faster to just return an id without items
+        self._skip_read = False
+
     def __len__(self) -> int:
         if isinstance(self._dataset, Sized):
             return len(self._dataset)
@@ -26,12 +29,18 @@ class IndexingDataset(Dataset[Tuple[Any, T_co]]):
             raise NotImplementedError()
 
     def __getitem__(self, index) -> Tuple[Any, T_co]:
-        item = self._dataset.__getitem__(index)
+        if self._skip_read:
+            item = None
+        else:
+            item = self._dataset.__getitem__(index)
         hashed_index = _hashit(index, self.salt)
         return hashed_index, item
 
     def set_salt(self, salt):
         self.salt = salt
+
+    def set_skip_read(self, skip: bool):
+        self._skip_read = skip
 
 
 class IndexingIterableDataset(IterableDataset[Tuple[Any, T_co]]):
@@ -41,6 +50,9 @@ class IndexingIterableDataset(IterableDataset[Tuple[Any, T_co]]):
             self.salt = random.randint(0, 2**31)
         else:
             self.salt = salt
+
+        # If item is already cached - it might be much faster to just return an id without items
+        self._skip_read = False
 
     def __len__(self) -> int:
         if isinstance(self._dataset, Sized):
@@ -57,9 +69,17 @@ class IndexingIterableDataset(IterableDataset[Tuple[Any, T_co]]):
         if worker_info is not None:
             worker_info = (worker_info.id, worker_info.num_workers, worker_info.salt)
 
-        for idx, item in enumerate(self._dataset):
-            record_hash = _hashit((worker_info, idx), self.salt)
-            yield record_hash, item
+        if self._skip_read and isinstance(self._dataset, Sized):
+            for idx in range(len(self._dataset)):
+                record_hash = _hashit((worker_info, idx), self.salt)
+                yield record_hash, None
+        else:
+            for idx, item in enumerate(self._dataset):
+                record_hash = _hashit((worker_info, idx), self.salt)
+                yield record_hash, item
 
     def set_salt(self, salt):
         self.salt = salt
+
+    def set_skip_read(self, skip: bool):
+        self._skip_read = skip

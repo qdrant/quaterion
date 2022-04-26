@@ -10,6 +10,11 @@ from quaterion.dataset.similarity_samples import (
     SimilarityPairSample,
     SimilarityGroupSample,
 )
+from quaterion.dataset.label_cache_dataset import (
+    LabelCacheDataset,
+    LabelCacheIterableDataset,
+    LabelCacheMode,
+)
 
 
 class SimilarityDataLoader(DataLoader, Generic[T_co]):
@@ -34,17 +39,50 @@ class SimilarityDataLoader(DataLoader, Generic[T_co]):
         self._original_dataset = dataset
         self._original_params = kwargs
         self._indexing_dataset_layer = self._wrap_indexing_dataset(dataset)
-        super().__init__(self._indexing_dataset_layer, **kwargs)
+        self._label_cache_layer = self._wrap_label_cache_dataset(
+            self._indexing_dataset_layer
+        )
+        super().__init__(self._label_cache_layer, **kwargs)
 
     def set_salt(self, salt):
-        """
-        Assigns a new salt to the IndexingDataset.
+        """Assigns a new salt to the IndexingDataset.
         Might be useful to distinguish cache sequential keys for train and validation datasets.
 
         Args:
             salt: salt for index generation
         """
         self._indexing_dataset_layer.set_salt(salt)
+
+    def set_skip_read(self, skip: bool):
+        """Disable reading items in IndexingDataset.
+        If cache is already filled and sequential key is used -
+        it is not necessary to read dataset items the second time
+
+        Args:
+            skip: if True - do not read items, only indexes
+
+        """
+        self._indexing_dataset_layer.set_skip_read(skip)
+
+    def set_label_cache_mode(self, mode: LabelCacheMode):
+        """Manges how label caching works"""
+        self._label_cache_layer.set_mode(mode)
+
+    def save_label_cache(self, path: str):
+        self._label_cache_layer.save(path)
+
+    def load_label_cache(self, path: str):
+        self._label_cache_layer.load(path)
+
+    @classmethod
+    def _wrap_label_cache_dataset(
+        cls, dataset: Union[IndexingIterableDataset, IndexingDataset]
+    ) -> Union[LabelCacheDataset, LabelCacheIterableDataset]:
+        if isinstance(dataset, IndexingDataset):
+            return LabelCacheDataset(dataset)
+        if isinstance(dataset, IndexingIterableDataset):
+            return LabelCacheIterableDataset(dataset)
+        raise NotImplementedError()
 
     @classmethod
     def _wrap_indexing_dataset(

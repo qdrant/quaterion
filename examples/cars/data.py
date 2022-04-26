@@ -52,8 +52,8 @@ def get_dataloaders(
     # create train and test transforms
     train_transform = transforms.Compose(
         [
-            transforms.Resize((input_size, input_size)),
-            transforms.RandomCrop((input_size, input_size), padding=4),
+            # transforms.Resize((input_size, input_size)),
+            transforms.RandomResizedCrop((input_size, input_size)),
             transforms.RandomHorizontalFlip(),
             transforms.ToTensor(),
             transforms.Normalize(mean, std),
@@ -94,6 +94,9 @@ class CarsDataset(Dataset):
     def __init__(self, dataset: Dataset, transform: Callable):
         self._dataset = dataset
         self._transform = transform
+
+    def __len__(self) -> int:
+        return len(self._dataset)
 
     def __getitem__(self, index) -> SimilarityGroupSample:
         image, label = self._dataset[index]

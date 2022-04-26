@@ -343,14 +343,13 @@ class CacheMixin:
     def check_encoders_persisted(
         cls, dir_path: Optional[str], encoders: Dict[str, Encoder]
     ):
-        if dir_path:
-            encoders_path = cls._encoders_cache_path(dir_path)
-            for key, encoder in encoders.items():
-                if not os.path.exists(os.path.join(encoders_path, key)):
-                    return False
-            return True
-        else:
+        if not dir_path:
             return False
+        encoders_path = cls._encoders_cache_path(dir_path)
+        for key, encoder in encoders.items():
+            if not os.path.exists(os.path.join(encoders_path, key)):
+                return False
+        return True
 
     @classmethod
     def save_cache(
@@ -360,17 +359,18 @@ class CacheMixin:
         train_dataloader: SimilarityDataLoader,
         val_dataloader: Optional[SimilarityDataLoader],
     ):
-        if dir_path:
-            encoders_path = cls._encoders_cache_path(dir_path)
-            os.makedirs(encoders_path, exist_ok=True)
-            for key, encoder in encoders.items():
-                if isinstance(encoder, CacheEncoder):
-                    encoder.save_cache(os.path.join(encoders_path, key))
+        if not dir_path:
+            return
+        encoders_path = cls._encoders_cache_path(dir_path)
+        os.makedirs(encoders_path, exist_ok=True)
+        for key, encoder in encoders.items():
+            if isinstance(encoder, CacheEncoder):
+                encoder.save_cache(os.path.join(encoders_path, key))
 
-            train_dataloader.save_label_cache(os.path.join(dir_path, "train_labels"))
-            if val_dataloader:
-                val_dataloader.save_label_cache(os.path.join(dir_path, "val_labels"))
-            logger.debug(f"Cache saved to {dir_path}")
+        train_dataloader.save_label_cache(os.path.join(dir_path, "train_labels"))
+        if val_dataloader:
+            val_dataloader.save_label_cache(os.path.join(dir_path, "val_labels"))
+        logger.debug(f"Cache saved to {dir_path}")
 
     @classmethod
     def load_cache(
@@ -380,19 +380,20 @@ class CacheMixin:
         train_dataloader: SimilarityDataLoader,
         val_dataloader: Optional[SimilarityDataLoader],
     ):
-        if dir_path:
-            encoders_path = cls._encoders_cache_path(dir_path)
-            for key, encoder in encoders.items():
-                if isinstance(encoder, CacheEncoder):
-                    encoder_cache_path = os.path.join(encoders_path, key)
-                    if not os.path.exists(encoder_cache_path):
-                        raise RuntimeError(
-                            "Encoder cache was configured, but not found. "
-                            f"Expected to find cache at {encoder_cache_path}, but file does not exists!"
-                        )
-                    encoder.load_cache(encoder_cache_path)
+        if not dir_path:
+            return
+        encoders_path = cls._encoders_cache_path(dir_path)
+        for key, encoder in encoders.items():
+            if isinstance(encoder, CacheEncoder):
+                encoder_cache_path = os.path.join(encoders_path, key)
+                if not os.path.exists(encoder_cache_path):
+                    raise RuntimeError(
+                        "Encoder cache was configured, but not found. "
+                        f"Expected to find cache at {encoder_cache_path}, but file does not exists!"
+                    )
+                encoder.load_cache(encoder_cache_path)
 
-            train_dataloader.load_label_cache(os.path.join(dir_path, "train_labels"))
-            if val_dataloader:
-                val_dataloader.load_label_cache(os.path.join(dir_path, "val_labels"))
-            logger.debug(f"Cache loaded from: {dir_path}")
+        train_dataloader.load_label_cache(os.path.join(dir_path, "train_labels"))
+        if val_dataloader:
+            val_dataloader.load_label_cache(os.path.join(dir_path, "val_labels"))
+        logger.debug(f"Cache loaded from: {dir_path}")

@@ -1,9 +1,11 @@
+import shutil
+
 import argparse
 import os
 
 import pytorch_lightning as pl
 import torch
-from pytorch_lightning.callbacks import ModelCheckpoint
+from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
 from quaterion import Quaterion
 
 from .data import get_dataloaders
@@ -11,7 +13,6 @@ from .models import Model
 
 
 def train(
-    embedding_size: int,
     lr: float,
     mining: str,
     batch_size: int,
@@ -22,7 +23,6 @@ def train(
 ):
 
     model = Model(
-        embedding_size=embedding_size,
         lr=lr,
         mining=mining,
     )
@@ -37,10 +37,17 @@ def train(
         auto_insert_metric_name=False,
     )
 
+    early_stopping = EarlyStopping(
+        monitor="validation_loss",
+        patience=30,
+    )
+
     trainer = pl.Trainer(
         gpus=1 if torch.cuda.is_available() else 0,
         max_epochs=epochs,
-        callbacks=[checkpoint_callback],
+        callbacks=[early_stopping],  # [checkpoint_callback],
+        enable_checkpointing=False,
+        log_every_n_steps=1,
     )
 
     Quaterion.fit(
@@ -50,32 +57,29 @@ def train(
         val_dataloader=val_dataloader,
     )
 
+    shutil.rmtree(save_dir, ignore_errors=True)
     model.save_servable(save_dir)
 
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("--batch-size", type=int, default=384, help="Batch size")
-
-    ap.add_argument(
-        "--embedding-size", type=int, default=512, help="Size of the embedding vector"
-    )
+    ap.add_argument("--batch-size", type=int, default=1024, help="Batch size")
 
     ap.add_argument(
         "--epochs",
         type=int,
-        default=30,
+        default=1000,
         help="Maximum number of epochs to run training",
     )
 
     ap.add_argument(
         "--input-size",
         type=int,
-        default=128,
+        default=336,
         help="Images will be resized to this dimension",
     )
 
-    ap.add_argument("--lr", type=float, default=7e-5, help="Learning rate")
+    ap.add_argument("--lr", type=float, default=1e-3, help="Learning rate")
 
     ap.add_argument(
         "--mining",
@@ -94,14 +98,13 @@ if __name__ == "__main__":
     ap.add_argument(
         "--shuffle",
         type=bool,
-        default=True,
+        default=False,
         help="Whether or not to shuffle dataset during for each epoch",
     )
 
     args = ap.parse_args()
 
     train(
-        args.embedding_size,
         args.lr,
         args.mining,
         args.batch_size,

@@ -24,15 +24,15 @@ class PairMetric(BaseMetric):
 
     @property
     def pairs(self):
-        return self._pairs
+        return torch.cat(self._pairs)
 
     @property
     def labels(self):
-        return self._labels
+        return torch.cat(self._labels)
 
     @property
     def subgroups(self):
-        return self._subgroups
+        return torch.cat(self._subgroups)
 
     def compute(self) -> Tensor:
         raise NotImplementedError()

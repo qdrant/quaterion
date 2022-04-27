@@ -18,9 +18,21 @@ class PairMetric(BaseMetric):
 
     def __init__(self, distance_metric_name: Distance = Distance.COSINE):
         super().__init__(distance_metric_name)
-        self.pairs = LongTensor()
-        self.labels = Tensor()
-        self.subgroups = Tensor()
+        self._pairs = []
+        self._labels = []
+        self._subgroups = []
+
+    @property
+    def pairs(self):
+        return self._pairs
+
+    @property
+    def labels(self):
+        return self._labels
+
+    @property
+    def subgroups(self):
+        return self._subgroups
 
     def compute(self) -> Tensor:
         raise NotImplementedError()
@@ -29,9 +41,11 @@ class PairMetric(BaseMetric):
         """Perform distance matrix calculation and create an interaction matrix based on labels."""
         distance_matrix = self.calculate_distances()
         target = torch.zeros_like(distance_matrix)
+        pairs = self.pairs
+        labels = self.labels
         # todo: subgroups should also be taken into account
-        target[self.pairs[:, 0], self.pairs[:, 1]] = self.labels
-        target[self.pairs[:, 1], self.pairs[:, 0]] = self.labels
+        target[pairs[:, 0], pairs[:, 1]] = labels
+        target[pairs[:, 1], pairs[:, 0]] = labels
         return distance_matrix, target
 
     def update(
@@ -51,16 +65,23 @@ class PairMetric(BaseMetric):
             subgroups: subgroups to find related objects among different pairs
             device: device to store calculated embeddings and labels on.
         """
-        self.embeddings = torch.cat(
-            [self.embeddings.to(device), embeddings.detach().to(device)]
-        )
-        self.pairs = torch.cat([self.pairs.to(device), pairs.to(device)])
-        self.labels = torch.cat([self.labels.to(device), labels.to(device)])
-        self.subgroups = torch.cat([self.subgroups.to(device), subgroups.to(device)])
+        embeddings = embeddings.detach()
+        pairs = pairs.detach()
+        labels = labels.detach()
+        subgroups = subgroups.detach()
+        if device:
+            embeddings = embeddings.to(device)
+            pairs = pairs.to(device)
+            labels = labels.to(device)
+            subgroups = subgroups.to(device)
+        self._embeddings.append(embeddings)
+        self._pairs.append(pairs)
+        self._labels.append(labels)
+        self._subgroups.append(subgroups)
 
     def reset(self):
         """Reset accumulated embeddings and labels"""
         super().reset()
-        self.pairs = LongTensor()
-        self.labels = Tensor()
-        self.subgroups = Tensor()
+        self._pairs = []
+        self._labels = []
+        self._subgroups = []

@@ -24,5 +24,5 @@ class SimilarityGroupDataset(Dataset[SimilarityGroupSample]):
             raise NotImplementedError
 
     def __getitem__(self, index) -> SimilarityGroupSample:
-        record, label = self._dataset.__getitem__(index=index)
+        record, label = self._dataset.__getitem__(index)
         return SimilarityGroupSample(obj=record, group=label)

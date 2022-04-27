@@ -1,34 +1,48 @@
 import argparse
+import numpy as np
 import os
 
 import torch
 import torch.nn as nn
 import torchvision
+import tqdm
+
 from quaterion.eval.group import RetrievalRPrecision
 from quaterion_models import MetricModel
 
 from .data import get_dataloaders
 
+BATCH_SIZE = 32
+METRIC_BATCH = 1024
+
 
 def eval_base_encoder(test_dl, device):
     print("Evaluating base encoder...")
-    base_encoder = torchvision.models.resnet18(pretrained=True)
+    base_encoder = torchvision.models.resnet152(pretrained=True)
     base_encoder.fc = nn.Identity()
     base_encoder = base_encoder.to(device)
     base_encoder.eval()
 
+    all_metrics = []
+    num_metric_batches = 0
     metric = RetrievalRPrecision()
 
-    for i, (_, images, labels) in enumerate(test_dl):
+    for i, (_, images, labels) in enumerate(tqdm.tqdm(test_dl)):
         with torch.no_grad():
             images = torch.stack(images).to(device)
             embeddings = base_encoder(images)
-            metric.update(embeddings, labels["groups"])
+            metric.update(embeddings, labels["groups"].to(device))
 
-            running_score = float(metric.compute())
-            print(f"Running score at step {i}: {running_score:.4f}")
+            num_metric_batches += 1
 
-    final_score = float(metric.compute())
+            if METRIC_BATCH / BATCH_SIZE <= num_metric_batches:
+                running_score = float(metric.compute())
+                all_metrics.append(running_score)
+                print(f"Running score at step {i}: {running_score:.4f}")
+                metric.reset()
+                num_metric_batches = 0
+
+    final_score = np.mean(all_metrics)
     print(f"Final Retrieval R-Precision score for base encoder: {final_score:.4f}")
 
 
@@ -39,18 +53,27 @@ def eval_tuned_encoder(test_dl, device):
     ).to(device)
     tuned_encoder.eval()
 
+    all_metrics = []
+    num_metric_batches = 0
     metric = RetrievalRPrecision()
 
-    for i, (_, images, labels) in enumerate(test_dl):
+    for i, (_, images, labels) in enumerate(tqdm.tqdm(test_dl)):
         with torch.no_grad():
             # images = torch.stack(images).to(device)
-            embeddings = tuned_encoder.encode(images, batch_size=384, to_numpy=False)
-            metric.update(embeddings, labels["groups"])
+            embeddings = tuned_encoder.encode(
+                images, batch_size=BATCH_SIZE, to_numpy=False
+            )
+            metric.update(embeddings, labels["groups"].to(device))
+            num_metric_batches += 1
 
-            running_score = float(metric.compute())
-            print(f"Running score at step {i}: {running_score:.4f}")
+            if METRIC_BATCH / BATCH_SIZE <= num_metric_batches:
+                running_score = float(metric.compute())
+                all_metrics.append(running_score)
+                print(f"Running score at step {i}: {running_score:.4f}")
+                metric.reset()
+                num_metric_batches = 0
 
-    final_score = float(metric.compute())
+    final_score = np.mean(all_metrics)
     print(f"Final Retrieval R-Precision score for tuned encoder: {final_score:.4f}")
 
 
@@ -68,7 +91,7 @@ if __name__ == "__main__":
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
     print("Preparing test data loader...")
-    test_dl, _ = get_dataloaders(batch_size=384, shuffle=False)
+    _, test_dl = get_dataloaders(batch_size=BATCH_SIZE, shuffle=False, input_size=336)
 
     if args.model == "base":
         eval_base_encoder(test_dl, device)

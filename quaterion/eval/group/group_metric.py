@@ -17,11 +17,13 @@ class GroupMetric(BaseMetric):
 
     def __init__(self, distance_metric_name: Distance = Distance.COSINE):
         super().__init__(distance_metric_name)
-        self.groups = torch.LongTensor()
+        self._groups = []
 
-    def update(
-        self, embeddings: Tensor, groups: torch.LongTensor, device="cpu"
-    ) -> None:
+    @property
+    def groups(self):
+        return torch.cat(self._groups)
+
+    def update(self, embeddings: Tensor, groups: torch.LongTensor, device=None) -> None:
         """Process and accumulate batch
 
         Args:
@@ -29,10 +31,14 @@ class GroupMetric(BaseMetric):
             groups: groups to distinguish similar and dissimilar objects.
             device: device to store calculated embeddings and groups on.
         """
-        self.embeddings = torch.cat(
-            [self.embeddings.to(device), embeddings.detach().to(device)]
-        )
-        self.groups = torch.cat([self.groups.to(device), groups.to(device)])
+        embeddings = embeddings.detach()
+        groups = groups.detach()
+        if device:
+            embeddings = embeddings.to(device)
+            groups = groups.to(device)
+
+        self._embeddings.append(embeddings)
+        self._groups.append(groups)
 
     def compute(self) -> Tensor:
         raise NotImplementedError()
@@ -40,4 +46,4 @@ class GroupMetric(BaseMetric):
     def reset(self):
         """Reset accumulated embeddings and groups"""
         super().reset()
-        self.groups = torch.LongTensor()
+        self._groups = []

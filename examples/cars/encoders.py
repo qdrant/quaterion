@@ -9,7 +9,7 @@ class CarsEncoder(Encoder):
     def __init__(self, encoder_model: nn.Module):
         super().__init__()
         self._encoder = encoder_model
-        self._embedding_size = 512  # last dimension from the MobileNetV3 model
+        self._embedding_size = 2048  # last dimension from the ResNet model
 
     @property
     def trainable(self) -> bool:
@@ -20,7 +20,8 @@ class CarsEncoder(Encoder):
         return self._embedding_size
 
     def forward(self, images):
-        return self._encoder.forward(images)
+        embeddins = self._encoder.forward(images)
+        return embeddins
 
     def save(self, output_path: str):
         os.makedirs(output_path, exist_ok=True)

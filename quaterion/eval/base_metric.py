@@ -1,3 +1,4 @@
+import torch
 from torch import Tensor
 
 from quaterion.distances import Distance
@@ -17,7 +18,11 @@ class BaseMetric:
     def __init__(self, distance_metric_name: Distance = Distance.COSINE):
         super().__init__()
         self.distance_metric = Distance.get_by_name(distance_metric_name)
-        self.embeddings = Tensor()
+        self._embeddings = []
+
+    @property
+    def embeddings(self) -> Tensor:
+        return torch.cat(self._embeddings)
 
     def compute(self) -> Tensor:
         """Calculates metric
@@ -45,4 +50,4 @@ class BaseMetric:
 
     def reset(self):
         """Reset accumulated metric state"""
-        self.embeddings = Tensor()
+        self._embeddings = []

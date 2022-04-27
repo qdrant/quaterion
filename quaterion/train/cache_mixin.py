@@ -160,7 +160,10 @@ class CacheMixin:
         # Check if all encoders are cachable, and we don't use custom key extractor.
         # If so, we can also cache whole dataset and avoid reading from it
         is_full_cache_possible = (
-            len(cache_encoders) == len(encoders) and not cache_config.key_extractors
+            len(cache_encoders) == len(encoders)
+            and not cache_config.key_extractors
+            and train_dataloader.num_workers == 0
+            and (val_dataloader.num_workers == 0 if val_dataloader else True)
         )
         if is_full_cache_possible:
             logger.debug("Using full cache")

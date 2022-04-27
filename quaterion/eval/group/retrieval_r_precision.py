@@ -38,13 +38,16 @@ class RetrievalRPrecision(GroupMetric):
         distance_matrix[torch.eye(distance_matrix.shape[0], dtype=torch.bool)] = (
             torch.max(distance_matrix) + 1
         )
-        group_matrix = self.groups.repeat(self.groups.shape[0], 1)
+        groups: Tensor = self.groups
+        group_matrix: Tensor = groups.repeat(groups.shape[0], 1)
         # objects with the same groups are true, others are false
 
-        group_mask = torch.BoolTensor(group_matrix == self.groups.unsqueeze(1))
+        group_mask = (group_matrix == groups.unsqueeze(1)).bool()
         # exclude obj
-        group_mask[torch.eye(group_mask.shape[0], dtype=torch.bool)] = False
-        return retrieval_r_precision(distance_matrix, group_mask.float())
+        group_mask[
+            torch.eye(group_mask.shape[0], dtype=torch.bool, device=groups.device)
+        ] = False
+        return retrieval_r_precision(distance_matrix, group_mask.float()).detach()
 
 
 def retrieval_r_precision(distance_matrix: torch.Tensor, labels: torch.Tensor):
@@ -62,7 +65,9 @@ def retrieval_r_precision(distance_matrix: torch.Tensor, labels: torch.Tensor):
     nearest_to_furthest_ind = torch.argsort(distance_matrix, dim=-1, descending=False)
     sorted_by_distance = torch.gather(labels, dim=-1, index=nearest_to_furthest_ind)
     top_k_mask = (
-        torch.arange(0, labels.shape[0], step=1).repeat(labels.shape[0], 1)
+        torch.arange(0, labels.shape[0], step=1, device=distance_matrix.device).repeat(
+            labels.shape[0], 1
+        )
         < relevant_numbers
     )
     metric = sorted_by_distance[top_k_mask].float()

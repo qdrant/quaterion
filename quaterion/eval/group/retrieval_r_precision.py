@@ -1,4 +1,4 @@
-from typing import Optional, Callable
+from typing import Optional, Callable, Dict
 
 import torch
 from torch import Tensor
@@ -39,18 +39,28 @@ class RetrievalRPrecision(GroupMetric):
 
         super().__init__(
             compute_on_step=compute_on_step,
-            distance=distance_metric_name,
+            distance_metric_name=distance_metric_name,
             reduce_func=reduce_func,
         )
 
-    def _compute(self, embeddings, *, sample_indices=None, **target):
-        """Calculates retrieval R-precision
+    def _compute(self, embeddings: torch.Tensor, *, sample_indices=None, **targets):
+        """Compute retrieval-r precision
+
+        Directly compute metric value.
+        All additional logic: embeddings and targets preparations, using of cached result etc.
+        should be done outside.
+
+        Args:
+            embeddings: embeddings to calculate metrics on
+            sample_indices: indices of embeddings to sample if metric should be computed only on
+                part of accumulated embeddings
+            **targets: groups to compute final labels
 
         Returns:
-            Tensor: zero-size tensor
+            torch.Tensor - computed metric
         """
         labels, distance_matrix = self.precompute(
-            embeddings, target["groups"], sample_indices=sample_indices
+            embeddings, targets["groups"], sample_indices=sample_indices
         )
         return retrieval_r_precision(distance_matrix, labels)
 

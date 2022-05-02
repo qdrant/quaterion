@@ -49,24 +49,58 @@ class TrainableModel(pl.LightningModule, CacheMixin):
         self._loss = self.configure_loss()
 
     def configure_metrics(self) -> Union[AttachedMetric, List[AttachedMetric]]:
+        """Method to configure batch-wise metrics for a training process
+
+        Use this method to attach batch-wise metrics to a training process.
+        Provided metrics have to have similar to
+        :class:`~quaterion.eval.pair.pair_metric.PairMetric` or
+        :class:`~quaterion.eval.group.group_metric.GroupMetric`
+
+        Returns:
+            Union[
+                :class:`~quaterion.eval.attached_metric.AttachedMetric`,
+                List[:class:`~quaterion.eval.attached_metric.AttachedMetric`]
+            ]: metrics attached to the model
+        """
         return []
 
     def configure_estimators(self) -> Union[Estimator, List[Estimator]]:
+        """Method to configure estimators
+
+        Use this method to configure estimators.
+        Estimators compute metrics based on accumulated
+        during an epoch embeddings.
+        It might be time-consuming, consider using only at the end of
+        a training process.
+        Each stage (train, val) to be estimated has to have a separate Estimator object
+
+        Returns:
+            Union[
+                :class:`~quaterion.eval.estimator.Estimator`,
+                List[:class:`~quaterion.eval.estimator.Estimator`]
+            ]: estimators
+        """
         return []
 
     def estimate(
-        self,
-        embeddings: Tensor,
-        targets: Dict[str, Any],
-        stage: TrainStage,
-    ):
+        self, embeddings: Tensor, targets: Dict[str, Any], stage: TrainStage,
+    ) -> None:
+        """Method to calculate and log metrics, accumulate embeddings in estimators
+
+        Calculate current stage and batch metrics, accumulate embeddings in corresponding
+        estimators. Metrics being reset after each batch processing.
+
+        Args:
+            embeddings: current batch embeddings
+            targets: objects to calculate labels for similarity samples
+            stage: training, validation, etc.
+        """
         for metric in self.metrics:
-            value = metric.update(embeddings, **targets)
-            self.log(
-                f"{metric.name}_{stage}",
-                value.mean(),
-                **metric.log_options,
-            )
+            if stage in metric.stages:
+                value = metric.update(embeddings, **targets)
+                self.log(
+                    f"{metric.name}_{stage}", value.mean(), **metric.log_options,
+                )
 
         for estimator in self.estimators:
             if stage in estimator.name:
@@ -319,9 +353,8 @@ class TrainableModel(pl.LightningModule, CacheMixin):
             for key, encoder in self.model.encoders.items()
         )
 
-        collater = TrainCollator(
-            pre_collate_fn=dataloader.collate_fn,
-            encoder_collates=encoder_collate_fns,
+        collator = TrainCollator(
+            pre_collate_fn=dataloader.collate_fn, encoder_collates=encoder_collate_fns,
         )
 
-        dataloader.collate_fn = collater
+        dataloader.collate_fn = collator

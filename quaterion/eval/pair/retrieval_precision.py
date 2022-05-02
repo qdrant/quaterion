@@ -1,4 +1,4 @@
-from typing import Optional, Callable
+from typing import Optional, Callable, Dict
 
 import torch
 
@@ -10,9 +10,13 @@ class RetrievalPrecision(PairMetric):
     """Calculates retrieval precision@k for pair based datasets
 
     Args:
+        k: number of documents among which to search a relevant one
+        compute_on_step: flag if metric should be calculated on each batch
         distance_metric_name: name of a distance metric to calculate distance or similarity
             matrices. Available names could be found in :class:`~quaterion.distances.Distance`.
-        k: number of documents among which to search a relevant one
+        reduce_func: function to reduce calculated metric. E.g. `torch.mean`, `torch.max` and
+            others. `functools.partial` might be useful if you want to capture some custom
+            arguments.
 
     Example:
 
@@ -28,17 +32,39 @@ class RetrievalPrecision(PairMetric):
         self,
         k=1,
         compute_on_step=True,
-        distance: Distance = Distance.COSINE,
+        distance_metric_name: Distance = Distance.COSINE,
         reduce_func: Optional[Callable] = torch.mean,
     ):
         super().__init__(
-            compute_on_step=compute_on_step, distance=distance, reduce_func=reduce_func
+            compute_on_step=compute_on_step,
+            distance_metric_name=distance_metric_name,
+            reduce_func=reduce_func,
         )
         self.k = k
         if self.k < 1:
             raise ValueError("k must be greater than 0")
 
-    def _compute(self, embeddings, sample_indices=None, **targets):
+    def _compute(
+        self,
+        embeddings: torch.Tensor,
+        sample_indices: Optional[torch.Tensor] = None,
+        **targets
+    ):
+        """Compute retrieval precision
+
+        Directly compute metric value.
+        All additional logic: embeddings and targets preparations, using of cached result etc.
+        should be done outside.
+
+        Args:
+            embeddings: embeddings to calculate metrics on
+            sample_indices: indices of embeddings to sample if metric should be computed only on
+                part of accumulated embeddings
+            **targets: labels, pairs and subgroups to compute final labels
+
+        Returns:
+            torch.Tensor - computed metric
+        """
         labels, distance_matrix = self.precompute(
             embeddings,
             targets["labels"],
@@ -49,7 +75,7 @@ class RetrievalPrecision(PairMetric):
         return retrieval_precision(distance_matrix, labels, self.k)
 
 
-def retrieval_precision(distance_matrix, labels, k):
+def retrieval_precision(distance_matrix: torch.Tensor, labels: torch.Tensor, k: int):
     """Calculates retrieval precision@k given distance matrix, labels and k
 
     Args:

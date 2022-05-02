@@ -32,7 +32,10 @@ class MetricsCallback(Callback):
 
             if estimator.policy and current_epoch % estimator.policy == 0:
                 trainable_model.log(
-                    estimator.name, estimator.estimate(), logger=estimator.logger, prog_bar=True
+                    estimator.name,
+                    estimator.estimate(),
+                    logger=estimator.logger,
+                    prog_bar=True,
                 )
 
             if last_epoch:
@@ -40,7 +43,9 @@ class MetricsCallback(Callback):
             else:
                 estimator.reset()
 
-    def on_sanity_check_end(self, trainer: "pl.Trainer", trainable_model: "pl.LightningModule") -> None:
+    def on_sanity_check_end(
+        self, trainer: "pl.Trainer", trainable_model: "pl.LightningModule"
+    ) -> None:
         self.reset_estimators(trainable_model, TrainStage.VALIDATION)
 
     def on_train_batch_start(
@@ -106,7 +111,9 @@ class MetricsCallback(Callback):
             trainable_model, trainer.current_epoch, last_epoch=True
         )
 
-    def on_test_end(self, trainer: "pl.Trainer", trainable_model: "pl.LightningModule") -> None:
+    def on_test_end(
+        self, trainer: "pl.Trainer", trainable_model: "pl.LightningModule"
+    ) -> None:
         self.log_and_reset_estimator(
             trainable_model, trainer.current_epoch, last_epoch=True
         )

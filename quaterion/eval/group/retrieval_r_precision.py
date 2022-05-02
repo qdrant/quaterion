@@ -33,7 +33,9 @@ class RetrievalRPrecision(GroupMetric):
         reduce_func: Optional[Callable] = None,
     ):
         if reduce_func is not None:
-            raise ValueError("RetrievalRPrecision does not support custom `reduce_func`")
+            raise ValueError(
+                "RetrievalRPrecision does not support custom `reduce_func`"
+            )
 
         super().__init__(
             compute_on_step=compute_on_step,

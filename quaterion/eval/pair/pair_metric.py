@@ -71,9 +71,7 @@ class PairMetric(BaseMetric):
             distance_matrix = self.calculate_distance_matrix(embeddings)
             self_mask = torch.eye(distance_matrix.shape[1], dtype=torch.bool)
 
-        distance_matrix[self_mask] = (
-                torch.max(distance_matrix) + 1
-        )
+        distance_matrix[self_mask] = torch.max(distance_matrix) + 1
         return labels, distance_matrix
 
     def compute_labels(self, labels=None, pairs=None, _=None):
@@ -82,7 +80,9 @@ class PairMetric(BaseMetric):
             labels = self.labels
 
         num_of_embeddings = pairs.shape[0] * 2
-        target = torch.zeros((num_of_embeddings, num_of_embeddings), device=labels.device)
+        target = torch.zeros(
+            (num_of_embeddings, num_of_embeddings), device=labels.device
+        )
         # todo: subgroups should also be taken into account
         target[pairs[:, 0], pairs[:, 1]] = labels
         target[pairs[:, 1], pairs[:, 0]] = labels

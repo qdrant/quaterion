@@ -66,7 +66,9 @@ class BaseMetric:
         self._embeddings = []
 
     def calculate_distance_matrix(
-        self, embeddings, ref_embeddings=None,
+        self,
+        embeddings,
+        ref_embeddings=None,
     ):
         if ref_embeddings is None:
             distance_matrix = self.distance.distance_matrix(embeddings)

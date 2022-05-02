@@ -36,7 +36,9 @@ class Estimator:
 
         embeddings_num = self.metric.embeddings.shape[0]
         # todo: remove replacement
-        sample_indices = torch.randint(high=embeddings_num, size=(max(self.batch_size, embeddings_num),))
+        sample_indices = torch.randint(
+            high=embeddings_num, size=(max(self.batch_size, embeddings_num),)
+        )
         return self.metric.compute(sample_indices=sample_indices)
 
     def update(self, embeddings, **targets):

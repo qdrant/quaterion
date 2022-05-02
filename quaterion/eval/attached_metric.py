@@ -17,6 +17,7 @@ class AttachedMetric:
         stages: stages to calculate metric on. Training, validation, etc.
         **log_options: additional kwargs to be passed to model's log.
     """
+
     def __init__(
         self,
         name: str,

@@ -83,7 +83,10 @@ class TrainableModel(pl.LightningModule, CacheMixin):
         return []
 
     def estimate(
-        self, embeddings: Tensor, targets: Dict[str, Any], stage: TrainStage,
+        self,
+        embeddings: Tensor,
+        targets: Dict[str, Any],
+        stage: TrainStage,
     ) -> None:
         """Method to calculate and log metrics, accumulate embeddings in estimators
 
@@ -99,7 +102,9 @@ class TrainableModel(pl.LightningModule, CacheMixin):
             if stage in metric.stages:
                 value = metric.update(embeddings, **targets)
                 self.log(
-                    f"{metric.name}_{stage}", value.mean(), **metric.log_options,
+                    f"{metric.name}_{stage}",
+                    value.mean(),
+                    **metric.log_options,
                 )
 
         for estimator in self.estimators:
@@ -354,7 +359,8 @@ class TrainableModel(pl.LightningModule, CacheMixin):
         )
 
         collator = TrainCollator(
-            pre_collate_fn=dataloader.collate_fn, encoder_collates=encoder_collate_fns,
+            pre_collate_fn=dataloader.collate_fn,
+            encoder_collates=encoder_collate_fns,
         )
 
         dataloader.collate_fn = collator

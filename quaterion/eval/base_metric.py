@@ -103,7 +103,9 @@ class BaseMetric:
         self._embeddings = []
 
     def calculate_distance_matrix(
-        self, embeddings: torch.Tensor, ref_embeddings: Optional[torch.Tensor] = None,
+        self,
+        embeddings: torch.Tensor,
+        ref_embeddings: Optional[torch.Tensor] = None,
     ) -> torch.Tensor:
         """Calculate distance matrix
 

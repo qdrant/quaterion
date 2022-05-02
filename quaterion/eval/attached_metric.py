@@ -35,5 +35,5 @@ class AttachedMetric:
             return getattr(self._metric, item)
         except AttributeError as ae:
             raise AttributeError(
-                f"`BuiltinMetric` object (<{self.name}>) has no attribute {item}"
+                f"`AttachedMetric` object (<{self.name}>) has no attribute {item}"
             ) from ae

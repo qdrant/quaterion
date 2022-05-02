@@ -1,3 +1,5 @@
+from typing import Optional, Callable
+
 import torch
 
 from quaterion.eval.pair import PairMetric
@@ -22,18 +24,27 @@ class RetrievalPrecision(PairMetric):
         have score < 1.
     """
 
-    def __init__(self, distance_metric_name: Distance = Distance.COSINE, k=1):
-        super().__init__(distance_metric_name)
+    def __init__(
+        self,
+        k=1,
+        compute_on_step=True,
+        distance: Distance = Distance.COSINE,
+        reduce_func: Optional[Callable] = torch.mean,
+    ):
+        super().__init__(
+            compute_on_step=compute_on_step, distance=distance, reduce_func=reduce_func
+        )
         self.k = k
         if self.k < 1:
             raise ValueError("k must be greater than 0")
 
-    def compute(self):
-        """Calculates retrieval precision@k"""
-        distance_matrix, labels = self.precompute()
-        # assign max dist to obj on diag to ignore distance from obj to itself
-        distance_matrix[torch.eye(distance_matrix.shape[0], dtype=torch.bool)] = (
-            torch.max(distance_matrix) + 1
+    def _compute(self, embeddings, sample_indices=None, **targets):
+        labels, distance_matrix = self.precompute(
+            embeddings,
+            targets["labels"],
+            targets["pairs"],
+            targets["subgroups"],
+            sample_indices,
         )
         return retrieval_precision(distance_matrix, labels, self.k)
 
@@ -50,7 +61,7 @@ def retrieval_precision(distance_matrix, labels, k):
         torch.Tensor: retrieval precision@k for each row in tensor
     """
     metric = (
-        labels.gather(1, distance_matrix.topk(k, dim=1, largest=False)[1])
+        labels.gather(1, distance_matrix.topk(k, dim=-1, largest=False)[1])
         .sum(dim=1)
         .float()
     ) / k

@@ -1,11 +1,8 @@
 from __future__ import annotations
-from typing import Dict, Any, Union, Optional
+from typing import Dict, Any, Union, Optional, List
 
 import pytorch_lightning as pl
-from pytorch_lightning.utilities.types import (
-    TRAIN_DATALOADERS,
-    EVAL_DATALOADERS,
-)
+
 from quaterion_models import MetricModel
 from quaterion_models.encoders import Encoder
 from quaterion_models.heads import EncoderHead
@@ -14,6 +11,8 @@ from torch import Tensor
 
 from quaterion.dataset import SimilarityDataLoader
 from quaterion.dataset.train_collater import TrainCollator
+from quaterion.eval.attached_metric import AttachedMetric
+from quaterion.eval.estimator import Estimator
 from quaterion.loss import SimilarityLoss
 from quaterion.train.cache import (
     CacheConfig,
@@ -36,8 +35,37 @@ class TrainableModel(pl.LightningModule, CacheMixin):
 
         head = self.configure_head(MetricModel.get_encoders_output_size(encoders))
 
+        metrics = self.configure_metrics()
+        self.metrics: List[AttachedMetric] = [metrics] if isinstance(
+            metrics, AttachedMetric
+        ) else metrics
+        estimators = self.configure_estimators()
+
+        self.estimators: List[Estimator] = [estimators] if isinstance(
+            estimators, Estimator
+        ) else estimators
+
         self._model = MetricModel(encoders=encoders, head=head)
         self._loss = self.configure_loss()
+
+    def configure_metrics(self) -> Union[AttachedMetric, List[AttachedMetric]]:
+        return []
+
+    def configure_estimators(self) -> Union[Estimator, List[Estimator]]:
+        return []
+
+    def estimate(
+        self, embeddings: Tensor, targets: Dict[str, Any], stage: TrainStage,
+    ):
+        for metric in self.metrics:
+            value = metric.update(embeddings, **targets)
+            self.log(
+                f"{metric.name}_{stage}", value.mean(), **metric.log_options,
+            )
+
+        for estimator in self.estimators:
+            if stage in estimator.name:
+                estimator.update(embeddings, **targets)
 
     @property
     def model(self) -> MetricModel:
@@ -208,9 +236,15 @@ class TrainableModel(pl.LightningModule, CacheMixin):
             Tensor: computed loss value
         """
         features, targets = batch
+
         embeddings = self.model(features)
         loss = self.loss(embeddings=embeddings, **targets)
         self.log(f"{stage}_loss", loss)
+
+        self.estimate(
+            embeddings=embeddings, targets=targets, stage=stage,
+        )
+
         self.process_results(
             embeddings=embeddings,
             targets=targets,
@@ -218,6 +252,7 @@ class TrainableModel(pl.LightningModule, CacheMixin):
             stage=stage,
             **kwargs,
         )
+
         return loss
 
     def save_servable(self, path: str):
@@ -278,28 +313,7 @@ class TrainableModel(pl.LightningModule, CacheMixin):
         )
 
         collater = TrainCollator(
-            pre_collate_fn=dataloader.collate_fn,
-            encoder_collates=encoder_collate_fns,
+            pre_collate_fn=dataloader.collate_fn, encoder_collates=encoder_collate_fns,
         )
 
         dataloader.collate_fn = collater
-
-    # region anchors
-    # https://github.com/PyTorchLightning/pytorch-lightning/issues/10667
-    def train_dataloader(self) -> TRAIN_DATALOADERS:
-        """:meta private:"""
-        pass
-
-    def test_dataloader(self) -> EVAL_DATALOADERS:
-        """:meta private:"""
-        pass
-
-    def val_dataloader(self) -> EVAL_DATALOADERS:
-        """:meta private:"""
-        pass
-
-    def predict_dataloader(self) -> EVAL_DATALOADERS:
-        """:meta private:"""
-        pass
-
-    # endregion

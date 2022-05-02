@@ -1,3 +1,5 @@
+from typing import Optional, Callable
+
 import torch
 from torch import Tensor
 
@@ -24,27 +26,31 @@ class RetrievalRPrecision(GroupMetric):
 
     """
 
-    def __init__(self, distance_metric_name: Distance = Distance.COSINE):
-        super().__init__(distance_metric_name)
+    def __init__(
+        self,
+        compute_on_step=True,
+        distance_metric_name: Distance = Distance.COSINE,
+        reduce_func: Optional[Callable] = None,
+    ):
+        if reduce_func is not None:
+            raise ValueError("RetrievalRPrecision does not support custom `reduce_func`")
 
-    def compute(self) -> Tensor:
+        super().__init__(
+            compute_on_step=compute_on_step,
+            distance=distance_metric_name,
+            reduce_func=reduce_func,
+        )
+
+    def _compute(self, embeddings, *, sample_indices=None, **target):
         """Calculates retrieval R-precision
 
         Returns:
             Tensor: zero-size tensor
         """
-        distance_matrix = self.calculate_distances()
-        # assign max dist to obj on diag to ignore distance from obj to itself
-        distance_matrix[torch.eye(distance_matrix.shape[0], dtype=torch.bool)] = (
-            torch.max(distance_matrix) + 1
+        labels, distance_matrix = self.precompute(
+            embeddings, target["groups"], sample_indices=sample_indices
         )
-        group_matrix = self.groups.repeat(self.groups.shape[0], 1)
-        # objects with the same groups are true, others are false
-
-        group_mask = torch.BoolTensor(group_matrix == self.groups.unsqueeze(1))
-        # exclude obj
-        group_mask[torch.eye(group_mask.shape[0], dtype=torch.bool)] = False
-        return retrieval_r_precision(distance_matrix, group_mask.float())
+        return retrieval_r_precision(distance_matrix, labels)
 
 
 def retrieval_r_precision(distance_matrix: torch.Tensor, labels: torch.Tensor):

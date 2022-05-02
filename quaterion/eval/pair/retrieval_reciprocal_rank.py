@@ -1,3 +1,5 @@
+from typing import Optional, Callable
+
 import torch
 
 from quaterion.distances import Distance
@@ -21,27 +23,37 @@ class RetrievalReciprocalRank(PairMetric):
 
     """
 
-    def __init__(self, distance_metric_name: Distance = Distance.COSINE):
-        super().__init__(distance_metric_name)
+    def __init__(
+        self,
+        compute_on_step=True,
+        distance: Distance = Distance.COSINE,
+        reduce_func: Optional[Callable] = torch.mean,
+    ):
+        super().__init__(
+            compute_on_step=compute_on_step, distance=distance, reduce_func=reduce_func
+        )
 
-    def compute(self):
-        """Calculates retrieval reciprocal rank"""
-        distance_matrix, labels = self.precompute()
-        distance_matrix[torch.eye(distance_matrix.shape[0], dtype=torch.bool)] = (
-            torch.max(distance_matrix) + 1
+    def _compute(self, embeddings, sample_indices=None, **targets):
+
+        labels, distance_matrix = self.precompute(
+            embeddings,
+            targets["labels"],
+            targets["pairs"],
+            targets["subgroups"],
+            sample_indices,
         )
         return retrieval_reciprocal_rank(distance_matrix, labels)
 
 
 def retrieval_reciprocal_rank(distance_matrix, labels):
-    """Calculates retrieval precision@k given distance matrix, labels and k
+    """Calculates retrieval reciprocal rank given distance matrix and labels
 
     Args:
         distance_matrix: distance matrix having max possible distance value on a diagonal
         labels: labels matrix having False or 0. on a diagonal
 
     Returns:
-        torch.Tensor: retrieval precision@k for each row in tensor
+        torch.Tensor: retrieval reciprocal rank
     """
     indices = torch.argsort(distance_matrix, dim=1)
     target = labels.gather(1, indices)

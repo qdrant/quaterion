@@ -49,8 +49,7 @@ def test_evaluator():
         batch_size=2,
     )
     evaluator.update(
-        torch.Tensor([[1, 1, 1, 1], [1, 2, 3, 4]]),
-        groups=torch.Tensor([1, 1])
+        torch.Tensor([[1, 1, 1, 1], [1, 2, 3, 4]]), groups=torch.Tensor([1, 1])
     )
     evaluator.update(
         torch.Tensor([[10, 10, 10, 10], [11, 11, 11, 11]]), groups=torch.Tensor([2, 2])

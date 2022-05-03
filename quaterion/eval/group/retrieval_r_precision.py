@@ -85,11 +85,11 @@ def retrieval_r_precision(distance_matrix: torch.Tensor, labels: torch.Tensor):
         torch.Tensor: mean retrieval r precision
     """
     # number of members for group which is on i-th position in groups
-    relevant_numbers = labels.sum(dim=-1)
+    relevant_numbers = labels.sum(dim=-1).view(labels.shape[0], 1)
     nearest_to_furthest_ind = torch.argsort(distance_matrix, dim=-1, descending=False)
     sorted_by_distance = torch.gather(labels, dim=-1, index=nearest_to_furthest_ind)
     top_k_mask = (
-        torch.arange(0, labels.shape[0], step=1).repeat(labels.shape[0], 1)
+        torch.arange(0, labels.shape[1], step=1).repeat(labels.shape[0], 1)
         < relevant_numbers
     )
     metric = sorted_by_distance[top_k_mask].float()

@@ -63,10 +63,9 @@ class GroupMetric(BaseMetric):
 
         self._embeddings.append(embeddings)
         self._groups.append(groups)
-        self._updated = True
 
         if self.compute_on_step:
-            self.compute(embeddings=embeddings, groups=groups)
+            return self.compute(embeddings=embeddings, groups=groups)
 
     def reset(self):
         """Reset accumulated embeddings, groups and cached result"""
@@ -96,15 +95,19 @@ class GroupMetric(BaseMetric):
         labels = self.compute_labels(groups)
 
         if sample_indices is not None:
-            labels = labels[sample_indices]
-            ref_embeddings = embeddings[sample_indices]
-            distance_matrix = self.calculate_distance_matrix(ref_embeddings, embeddings)
+            labels = labels[sample_indices]  # shape (sample_indices.shape[0], embeddings.shape[0])
+            ref_embeddings = embeddings[sample_indices]  # shape
+            # (sample_indices.shape[0], embeddings.shape[1])
+
+            distance_matrix = self.calculate_distance_matrix(
+                embeddings, ref_embeddings=ref_embeddings
+            )  # shape (ref_embeddings.shape[0], embeddings.shape[0])
+            index_matrix = torch.arange(0, embeddings.shape[0]).repeat(ref_embeddings.shape[0], 1)
+            self_mask = index_matrix == sample_indices.view(ref_embeddings.shape[0], 1)
         else:
             distance_matrix = self.calculate_distance_matrix(embeddings)
-
-        distance_matrix[torch.eye(distance_matrix.shape[1], dtype=torch.bool)] = (
-            torch.max(distance_matrix) + 1
-        )
+            self_mask = torch.eye(distance_matrix.shape[0], dtype=torch.bool)
+        distance_matrix[self_mask] = torch.max(distance_matrix) + 1
         return labels.float(), distance_matrix
 
     def prepare_input(
@@ -167,7 +170,7 @@ class GroupMetric(BaseMetric):
 
         Directly compute metric value.
         This method should be overridden in implementations of a particular metric.
-        All additional logic: embeddings and targets preparations, using of cached result etc.
+        All additional logic: embeddings and targets preparations.
         should be done outside.
 
         Args:

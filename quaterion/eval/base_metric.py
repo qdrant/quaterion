@@ -31,8 +31,6 @@ class BaseMetric:
         self._reduce_func = reduce_func
         self._distance_metric_name = distance_metric_name
         self._embeddings = []
-        self._cached_result = None
-        self._updated = True
 
     @property
     def embeddings(self):
@@ -83,13 +81,8 @@ class BaseMetric:
                 )
             return None
 
-        if not self._updated and embeddings is None:
-            return self._cached_result
-        self._updated = False
-
         embeddings, targets = self.prepare_input(embeddings, **targets)
         raw_value = self._compute(embeddings, sample_indices=sample_indices, **targets)
-
         if self._reduce_func is None or raw_value is None:
             return raw_value
 
@@ -98,9 +91,8 @@ class BaseMetric:
     def reset(self):
         """Reset accumulated state
 
-        Use to reset accumulated embeddings, labels and cached result
+        Use to reset accumulated embeddings, labels
         """
-        self._cached_result = None
         self._embeddings = []
 
     def calculate_distance_matrix(

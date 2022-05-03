@@ -45,7 +45,7 @@ def test_evaluator():
             compute_on_step=False,
             distance_metric_name=Distance.MANHATTAN,
         ),
-        "RetrievalPrecisionEvaluator",
+        "RetrievalRPrecisionEvaluator",
         batch_size=2,
     )
     evaluator.update(

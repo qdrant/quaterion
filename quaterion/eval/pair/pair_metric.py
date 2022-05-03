@@ -192,7 +192,6 @@ class PairMetric(BaseMetric):
         self._labels.append(labels)
         self._pairs.append(pairs)
         self._subgroups.append(subgroups)
-        self._updated = True
 
         if self.compute_on_step:
             return self.compute(
@@ -202,7 +201,7 @@ class PairMetric(BaseMetric):
     def reset(self):
         """Reset accumulated state
 
-        Reset embeddings, labels, pairs, subgroups and cached result.
+        Reset embeddings, labels, pairs, subgroups.
         """
         super().reset()
         self._labels = []
@@ -220,7 +219,7 @@ class PairMetric(BaseMetric):
 
         Directly compute metric value.
         This method should be overridden in implementations of a particular metric.
-        All additional logic: embeddings and targets preparations, using of cached result etc.
+        All additional logic: embeddings and targets preparations.
         should be done outside.
 
         Args:

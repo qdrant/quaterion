@@ -39,7 +39,9 @@ def test_retrieval_r_precision():
     exp_metric = torch.Tensor([0.75])
     metric = RetrievalRPrecision(distance_metric_name=Distance.MANHATTAN)
     metric.update(embeddings, groups)
-    assert metric.compute() == exp_metric
+    result = metric.compute()
+
+    assert result == exp_metric
     # endregion single batch
 
     # region multiple batches

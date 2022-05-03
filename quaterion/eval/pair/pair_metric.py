@@ -23,8 +23,8 @@ class PairMetric(BaseMetric):
 
     def __init__(
         self,
-        compute_on_step=True,
         distance_metric_name: Distance = Distance.COSINE,
+        compute_on_step=True,
         reduce_func: Optional[Callable] = torch.mean,
     ):
         self._labels = []

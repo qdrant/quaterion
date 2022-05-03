@@ -12,9 +12,9 @@ class RetrievalReciprocalRank(PairMetric):
     Calculates the reciprocal of the rank at which the first relevant document was retrieved.
 
     Args:
-        compute_on_step: flag if metric should be calculated on each batch
         distance_metric_name: name of a distance metric to calculate distance or similarity
             matrices. Available names could be found in :class:`~quaterion.distances.Distance`.
+        compute_on_step: flag if metric should be calculated on each batch
         reduce_func: function to reduce calculated metric. E.g. `torch.mean`, `torch.max` and
             others. `functools.partial` might be useful if you want to capture some custom arguments.
 
@@ -28,13 +28,13 @@ class RetrievalReciprocalRank(PairMetric):
 
     def __init__(
         self,
-        compute_on_step=True,
         distance_metric_name: Distance = Distance.COSINE,
+        compute_on_step=True,
         reduce_func: Optional[Callable] = torch.mean,
     ):
         super().__init__(
-            compute_on_step=compute_on_step,
             distance_metric_name=distance_metric_name,
+            compute_on_step=compute_on_step,
             reduce_func=reduce_func,
         )
 

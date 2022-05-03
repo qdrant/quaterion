@@ -23,8 +23,8 @@ class GroupMetric(BaseMetric):
 
     def __init__(
         self,
-        compute_on_step=True,
         distance_metric_name: Distance = Distance.COSINE,
+        compute_on_step=True,
         reduce_func: Optional[Callable] = torch.mean,
     ):
         super().__init__(
@@ -66,7 +66,7 @@ class GroupMetric(BaseMetric):
         self._updated = True
 
         if self.compute_on_step:
-            self.compute(embeddings, groups=groups)
+            self.compute(embeddings=embeddings, groups=groups)
 
     def reset(self):
         """Reset accumulated embeddings, groups and cached result"""

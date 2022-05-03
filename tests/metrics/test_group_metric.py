@@ -37,7 +37,7 @@ def test_retrieval_r_precision():
     # one mismatch - (2, 3), correct pair is (2, 0).
     groups = torch.LongTensor([1, 2, 1, 2])
     exp_metric = torch.Tensor([0.75])
-    metric = RetrievalRPrecision(Distance.MANHATTAN)
+    metric = RetrievalRPrecision(distance_metric_name=Distance.MANHATTAN)
     metric.update(embeddings, groups)
     assert metric.compute() == exp_metric
     # endregion single batch

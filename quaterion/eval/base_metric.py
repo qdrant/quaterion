@@ -49,7 +49,7 @@ class BaseMetric:
     def compute(
         self,
         *,
-        sample_indices: torch.Tensor = None,
+        sample_indices: torch.LongTensor = None,
         embeddings: Optional[torch.Tensor] = None,
         **targets
     ) -> Optional[torch.Tensor]:

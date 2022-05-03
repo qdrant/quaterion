@@ -1,7 +1,7 @@
 from typing import Optional, Callable, Dict, Tuple
 
 import torch
-from torch import Tensor
+from torch import Tensor, LongTensor
 
 from quaterion.distances import Distance
 from quaterion.eval.base_metric import BaseMetric
@@ -77,8 +77,8 @@ class GroupMetric(BaseMetric):
         self,
         embeddings: Tensor,
         groups: Tensor,
-        sample_indices: Optional[Tensor] = None,
-    ) -> Tuple[torch.Tensor, torch.Tensor]:
+        sample_indices: Optional[LongTensor] = None,
+    ) -> Tuple[Tensor, Tensor]:
         """Prepares data for computation
 
         Compute distance matrix and final labels based on groups.
@@ -157,7 +157,7 @@ class GroupMetric(BaseMetric):
         return group_mask
 
     def _compute(
-        self, embeddings: Tensor, *, sample_indices: Optional[Tensor] = None, **targets
+        self, embeddings: Tensor, *, sample_indices: Optional[LongTensor] = None, **targets
     ):
         """Compute metric value
 

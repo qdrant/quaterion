@@ -47,7 +47,7 @@ class Estimator:
 
         self._has_been_reset = True
         loguru.logger.warning(
-            f"{metric.compute_on_step} is True in {self.name}. "
+            f"`metric.compute_on_step` is True in {self.name}. "
             f"It might cause a significant overhead."
         )
 
@@ -61,7 +61,7 @@ class Estimator:
 
         embeddings_num = self.metric.embeddings.shape[0]
 
-        sample_indices = torch.Tensor(
+        sample_indices = torch.LongTensor(
             random.sample(range(embeddings_num), k=max(self.batch_size, embeddings_num))
         )
         return self.metric.compute(sample_indices=sample_indices)

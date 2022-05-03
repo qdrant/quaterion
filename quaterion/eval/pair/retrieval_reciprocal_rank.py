@@ -41,7 +41,7 @@ class RetrievalReciprocalRank(PairMetric):
     def _compute(
         self,
         embeddings: torch.Tensor,
-        sample_indices: Optional[torch.Tensor] = None,
+        sample_indices: Optional[torch.LongTensor] = None,
         **targets
     ):
         """Compute retrieval reciprocal precision

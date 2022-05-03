@@ -109,7 +109,7 @@ class PairMetric(BaseMetric):
         labels: torch.Tensor,
         pairs: torch.LongTensor,
         subgroups: torch.Tensor,
-        sample_indices: Optional[torch.Tensor] = None,
+        sample_indices: Optional[torch.LongTensor] = None,
     ):
         """Prepares data for computation
 
@@ -213,7 +213,7 @@ class PairMetric(BaseMetric):
         self,
         embeddings: torch.Tensor,
         *,
-        sample_indices: Optional[torch.Tensor] = None,
+        sample_indices: Optional[torch.LongTensor] = None,
         **targets
     ):
         """Compute metric value

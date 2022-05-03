@@ -1,4 +1,4 @@
-from typing import Optional, Callable, Dict
+from typing import Optional, Callable
 
 import torch
 
@@ -47,7 +47,7 @@ class RetrievalPrecision(PairMetric):
     def _compute(
         self,
         embeddings: torch.Tensor,
-        sample_indices: Optional[torch.Tensor] = None,
+        sample_indices: Optional[torch.LongTensor] = None,
         **targets
     ):
         """Compute retrieval precision

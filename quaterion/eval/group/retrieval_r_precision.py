@@ -1,7 +1,6 @@
-from typing import Optional, Callable, Dict
+from typing import Optional, Callable
 
 import torch
-from torch import Tensor
 
 from quaterion.distances import Distance
 from quaterion.eval.group import GroupMetric
@@ -47,7 +46,13 @@ class RetrievalRPrecision(GroupMetric):
             reduce_func=reduce_func,
         )
 
-    def _compute(self, embeddings: torch.Tensor, *, sample_indices=None, **targets):
+    def _compute(
+        self,
+        embeddings: torch.Tensor,
+        *,
+        sample_indices: Optional[torch.LongTensor] = None,
+        **targets
+    ):
         """Compute retrieval-r precision
 
         Directly compute metric value.

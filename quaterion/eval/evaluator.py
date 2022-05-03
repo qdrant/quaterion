@@ -63,7 +63,7 @@ class Evaluator:
         embeddings_num = self.metric.embeddings.shape[0]
 
         sample_indices = torch.LongTensor(
-            random.sample(range(embeddings_num), k=max(self.batch_size, embeddings_num))
+            random.sample(range(embeddings_num), k=min(self.batch_size, embeddings_num))
         )
         return self.metric.compute(sample_indices=sample_indices)
 

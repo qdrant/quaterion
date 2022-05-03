@@ -85,9 +85,9 @@ class BaseMetric:
 
         if not self._updated and embeddings is None:
             return self._cached_result
+        self._updated = False
 
         embeddings, targets = self.prepare_input(embeddings, **targets)
-
         raw_value = self._compute(embeddings, sample_indices=sample_indices, **targets)
 
         if self._reduce_func is None or raw_value is None:

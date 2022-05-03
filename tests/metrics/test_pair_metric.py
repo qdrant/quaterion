@@ -69,7 +69,9 @@ def test_retrieval_precision():
     # region k = 2
     k = 2
     exp_metric = torch.Tensor([0.5, 0.5, 0.5, 0.5])
-    metric = RetrievalPrecision(k=k, distance_metric_name=Distance.MANHATTAN, reduce_func=None)
+    metric = RetrievalPrecision(
+        k=k, distance_metric_name=Distance.MANHATTAN, reduce_func=None
+    )
     metric.update(
         embeddings=embeddings, pairs=pairs, labels=labels, subgroups=subgroups
     )

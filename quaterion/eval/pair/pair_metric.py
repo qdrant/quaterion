@@ -104,50 +104,14 @@ class PairMetric(BaseMetric):
 
         return embeddings, targets
 
-    def precompute(
-        self,
-        embeddings: torch.Tensor,
-        labels: torch.Tensor,
-        pairs: torch.LongTensor,
-        subgroups: torch.Tensor,
-        sample_indices: Optional[torch.LongTensor] = None,
-    ):
-        """Prepares data for computation
-
-        Compute distance matrix and final labels based on labels and pairs.
-        Sample embeddings and labels if metric should be computed only on part of the data.
-
-        Args:
-            embeddings: embeddings to compute metric value
-            labels: labels to distinguish similar and dissimilar objects
-            pairs: indices to determine objects of one pair
-            subgroups: subgroups numbers to determine which samples can be considered negative
-            sample_indices: indices to sample embeddings and labels if metric has to be computed
-                on part of the data
-
-        Returns:
-            torch.Tensor, torch.Tensor - labels and distance matrix
-        """
-        labels = self.compute_labels(labels, pairs, subgroups)
-        if sample_indices is not None:
-            labels = labels[sample_indices]
-            ref_embeddings = embeddings[sample_indices]
-            distance_matrix = self.calculate_distance_matrix(ref_embeddings, embeddings)
-            self_mask = sample_indices
-        else:
-            distance_matrix = self.calculate_distance_matrix(embeddings)
-            self_mask = torch.eye(distance_matrix.shape[1], dtype=torch.bool)
-
-        distance_matrix[self_mask] = torch.max(distance_matrix) + 1
-        return labels, distance_matrix
-
-    def compute_labels(self, labels=None, pairs=None, _=None) -> torch.Tensor:
+    def compute_labels(self, labels=None, pairs=None, subgroups=None) -> torch.Tensor:
         """Compute metric labels based on samples labels and pairs
 
         Args:
             labels: labels to distinguish similar and dissimilar objects
             pairs: indices to determine objects belong to the same pair
-            _: subgroups. Currently, they are not used for labels computation
+            subgroups: indices to determine negative examples. Currently, they are not used for
+                labels computation.
 
         Returns:
             target: torch.Tensor -  labels to be used during metric computation

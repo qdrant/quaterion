@@ -61,10 +61,10 @@ class RetrievalReciprocalRank(PairMetric):
         """
         labels, distance_matrix = self.precompute(
             embeddings,
-            targets["labels"],
-            targets["pairs"],
-            targets["subgroups"],
-            sample_indices,
+            labels=targets["labels"],
+            pairs=targets["pairs"],
+            subgroups=targets["subgroups"],
+            sample_indices=sample_indices,
         )
         return retrieval_reciprocal_rank(distance_matrix, labels)
 

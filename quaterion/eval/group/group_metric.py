@@ -72,48 +72,6 @@ class GroupMetric(BaseMetric):
         super().reset()
         self._groups = []
 
-    def precompute(
-        self,
-        embeddings: Tensor,
-        groups: Tensor,
-        sample_indices: Optional[LongTensor] = None,
-    ) -> Tuple[Tensor, Tensor]:
-        """Prepares data for computation
-
-        Compute distance matrix and final labels based on groups.
-        Sample embeddings and labels if metric should be computed only on part of the data.
-
-        Args:
-            embeddings: embeddings to compute metric value
-            groups: groups to distinguish similar and dissimilar objects
-            sample_indices: indices to sample embeddings and labels if metric has to be computed
-                on part of the data
-
-        Returns:
-            torch.Tensor, torch.Tensor - labels and distance matrix
-        """
-        labels = self.compute_labels(groups)
-
-        if sample_indices is not None:
-            labels = labels[
-                sample_indices
-            ]  # shape (sample_indices.shape[0], embeddings.shape[0])
-            ref_embeddings = embeddings[sample_indices]  # shape
-            # (sample_indices.shape[0], embeddings.shape[1])
-
-            distance_matrix = self.calculate_distance_matrix(
-                embeddings, ref_embeddings=ref_embeddings
-            )  # shape (ref_embeddings.shape[0], embeddings.shape[0])
-            index_matrix = torch.arange(0, embeddings.shape[0]).repeat(
-                ref_embeddings.shape[0], 1
-            )
-            self_mask = index_matrix == sample_indices.view(ref_embeddings.shape[0], 1)
-        else:
-            distance_matrix = self.calculate_distance_matrix(embeddings)
-            self_mask = torch.eye(distance_matrix.shape[0], dtype=torch.bool)
-        distance_matrix[self_mask] = torch.max(distance_matrix) + 1
-        return labels.float(), distance_matrix
-
     def prepare_input(
         self, embeddings: Optional[Tensor], **targets
     ) -> Tuple[torch.Tensor, Dict[str, torch.Tensor]]:

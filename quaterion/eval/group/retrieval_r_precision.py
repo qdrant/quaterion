@@ -69,7 +69,7 @@ class RetrievalRPrecision(GroupMetric):
             torch.Tensor - computed metric
         """
         labels, distance_matrix = self.precompute(
-            embeddings, targets["groups"], sample_indices=sample_indices
+            embeddings, groups=targets["groups"], sample_indices=sample_indices
         )
         return retrieval_r_precision(distance_matrix, labels)
 

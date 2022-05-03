@@ -150,6 +150,59 @@ class BaseMetric:
         """
         raise NotImplementedError()
 
+    def precompute(
+        self,
+        embeddings: torch.Tensor,
+        sample_indices: Optional[torch.LongTensor] = None,
+        **targets
+    ) -> Tuple[torch.Tensor, torch.Tensor]:
+        """Prepares data for computation
+
+        Compute distance matrix and final labels based on groups.
+        Sample embeddings and labels if metric should be computed only on part of the data.
+
+        Args:
+            embeddings: embeddings to compute metric value
+            targets: objects to compute final labels
+            sample_indices: indices to sample embeddings and labels if metric has to be computed
+                on part of the data
+
+        Returns:
+            torch.Tensor, torch.Tensor - labels and distance matrix
+        """
+        labels = self.compute_labels(**targets)
+
+        if sample_indices is not None:
+            labels = labels[
+                sample_indices
+            ]  # shape (sample_indices.shape[0], embeddings.shape[0])
+            ref_embeddings = embeddings[sample_indices]  # shape
+            # (sample_indices.shape[0], embeddings.shape[1])
+
+            distance_matrix = self.calculate_distance_matrix(
+                embeddings, ref_embeddings=ref_embeddings
+            )  # shape (ref_embeddings.shape[0], embeddings.shape[0])
+            index_matrix = torch.arange(0, embeddings.shape[0]).repeat(
+                ref_embeddings.shape[0], 1
+            )
+            self_mask = index_matrix == sample_indices.view(ref_embeddings.shape[0], 1)
+        else:
+            distance_matrix = self.calculate_distance_matrix(embeddings)
+            self_mask = torch.eye(distance_matrix.shape[0], dtype=torch.bool)
+        distance_matrix[self_mask] = torch.max(distance_matrix) + 1
+        return labels.float(), distance_matrix
+
+    def compute_labels(self, **targets) -> torch.Tensor:
+        """Compute metric labels
+
+        Args:
+            **targets: objects to compute final labels. `**targets` in PairMetric consists of
+                `labels`, `pairs` and `subgroups`, in GroupMetric - of `groups`.
+        Returns:
+            target: torch.Tensor -  labels to be used during metric computation
+        """
+        raise NotImplementedError()
+
     def _compute(
         self,
         embeddings: torch.Tensor,

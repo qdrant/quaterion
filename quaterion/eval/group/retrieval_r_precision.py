@@ -51,7 +51,7 @@ class RetrievalRPrecision(GroupMetric):
         embeddings: torch.Tensor,
         *,
         sample_indices: Optional[torch.LongTensor] = None,
-        **targets
+        groups: torch.Tensor = None
     ):
         """Compute retrieval-r precision
 
@@ -63,13 +63,16 @@ class RetrievalRPrecision(GroupMetric):
             embeddings: embeddings to calculate metrics on
             sample_indices: indices of embeddings to sample if metric should be computed only on
                 part of accumulated embeddings
-            **targets: groups to compute final labels
+            groups: groups to compute final labels
 
         Returns:
             torch.Tensor - computed metric
         """
+        if groups is None:
+            raise ValueError("`groups` has to be specified")
+
         labels, distance_matrix = self.precompute(
-            embeddings, groups=targets["groups"], sample_indices=sample_indices
+            embeddings, groups=groups, sample_indices=sample_indices
         )
         return retrieval_r_precision(distance_matrix, labels)
 

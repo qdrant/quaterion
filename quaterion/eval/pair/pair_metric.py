@@ -74,7 +74,11 @@ class PairMetric(BaseMetric):
         return torch.cat(self._pairs) if len(self._pairs) else torch.Tensor()
 
     def prepare_input(
-        self, embeddings: Optional[torch.Tensor], **targets
+        self,
+        embeddings: Optional[torch.Tensor],
+        labels: Optional[torch.Tensor] = None,
+        pairs: Optional[torch.LongTensor] = None,
+        subgroups: Optional[torch.Tensor] = None,
     ) -> Tuple[torch.Tensor, Dict[str, torch.Tensor]]:
         """Prepare input before computation
 
@@ -82,14 +86,19 @@ class PairMetric(BaseMetric):
 
         Args:
             embeddings: embeddings to evaluate
-            targets: labels, pairs and subgroups to compute final labels
+            labels: labels to distinguish similar and dissimilar objects.
+            pairs: indices to determine objects of one pair
+            subgroups: subgroups numbers to determine which samples can be considered negative
 
         Returns:
             embeddings, targets: Tuple[torch.Tensor, Dict[str, torch.Tensor]] - prepared embeddings
                 and dict with labels, pairs and subgroups to compute final labels
         """
+        targets = {}
         embeddings_passed = embeddings is not None
-        targets_passed = bool(targets)
+        targets_passed = (
+            labels is not None and pairs is not None and subgroups is not None
+        )
         if embeddings_passed != targets_passed:
             raise ValueError(
                 "If `embeddings` were passed to `compute`, corresponding `labels`, `subgroups` "
@@ -98,13 +107,22 @@ class PairMetric(BaseMetric):
 
         if not embeddings_passed:
             embeddings = self.embeddings
-            targets["labels"] = self.labels
-            targets["pairs"] = self.pairs
-            targets["subgroups"] = self.subgroups
+            labels = self.labels
+            pairs = self.pairs
+            subgroups = self.subgroups
+
+        targets["labels"] = labels
+        targets["pairs"] = pairs
+        targets["subgroups"] = subgroups
 
         return embeddings, targets
 
-    def compute_labels(self, labels=None, pairs=None, subgroups=None) -> torch.Tensor:
+    def compute_labels(
+        self,
+        labels: Optional[torch.Tensor] = None,
+        pairs: Optional[torch.LongTensor] = None,
+        subgroups: Optional[torch.Tensor] = None,
+    ) -> torch.Tensor:
         """Compute metric labels based on samples labels and pairs
 
         Args:
@@ -180,7 +198,9 @@ class PairMetric(BaseMetric):
         embeddings: torch.Tensor,
         *,
         sample_indices: Optional[torch.LongTensor] = None,
-        **targets
+        labels: Optional[torch.Tensor] = None,
+        pairs: Optional[torch.LongTensor] = None,
+        subgroups: Optional[torch.Tensor] = None
     ):
         """Compute metric value
 
@@ -193,7 +213,9 @@ class PairMetric(BaseMetric):
             embeddings: embeddings to calculate metrics on
             sample_indices: indices of embeddings to sample if metric should be computed only on
                 part of accumulated embeddings
-            **targets: labels, pairs and subgroups to compute final labels
+            labels: labels to distinguish similar and dissimilar objects.
+            pairs: indices to determine objects of one pair
+            subgroups: subgroups numbers to determine which samples can be considered negative
 
         Returns:
             torch.Tensor - computed metric

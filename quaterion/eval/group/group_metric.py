@@ -73,7 +73,7 @@ class GroupMetric(BaseMetric):
         self._groups = []
 
     def prepare_input(
-        self, embeddings: Optional[Tensor], **targets
+        self, embeddings: Optional[Tensor], groups: Optional[torch.Tensor] = None
     ) -> Tuple[torch.Tensor, Dict[str, torch.Tensor]]:
         """Prepare input before computation
 
@@ -81,14 +81,14 @@ class GroupMetric(BaseMetric):
 
         Args:
             embeddings: embeddings to evaluate
-            targets: groups
+            groups: group numbers to distinguish similar objects from dissimilar
 
         Returns:
             embeddings, targets: Tuple[torch.Tensor, Dict[str, torch.Tensor]] - prepared embeddings
                 and groups dict
         """
         embeddings_passed = embeddings is not None
-        targets_passed = bool(targets)
+        targets_passed = groups is not None
         if embeddings_passed != targets_passed:
             raise ValueError(
                 "If `embeddings` were passed to `compute`, corresponding `groups` have to be "
@@ -97,9 +97,9 @@ class GroupMetric(BaseMetric):
 
         if not embeddings_passed:
             embeddings = self.embeddings
-            targets["groups"] = self.groups
+            groups = self.groups
 
-        return embeddings, targets
+        return embeddings, {"groups": groups}
 
     def compute_labels(self, groups: Optional[Tensor] = None):
         """Compute metric labels based on samples groups
@@ -126,7 +126,7 @@ class GroupMetric(BaseMetric):
         embeddings: Tensor,
         *,
         sample_indices: Optional[LongTensor] = None,
-        **targets
+        groups: Tensor = None
     ):
         """Compute metric value
 
@@ -139,7 +139,7 @@ class GroupMetric(BaseMetric):
             embeddings: embeddings to calculate metrics on
             sample_indices: indices of embeddings to sample if metric should be computed only on
                 part of accumulated embeddings
-            **targets: groups to compute final labels
+            groups: groups to compute final labels
 
         Returns:
             torch.Tensor - computed metric

@@ -48,7 +48,9 @@ class RetrievalPrecision(PairMetric):
         self,
         embeddings: torch.Tensor,
         sample_indices: Optional[torch.LongTensor] = None,
-        **targets
+        labels: torch.Tensor = None,
+        pairs: torch.LongTensor = None,
+        subgroups: torch.Tensor = None,
     ):
         """Compute retrieval precision
 
@@ -60,16 +62,21 @@ class RetrievalPrecision(PairMetric):
             embeddings: embeddings to calculate metrics on
             sample_indices: indices of embeddings to sample if metric should be computed only on
                 part of accumulated embeddings
-            **targets: labels, pairs and subgroups to compute final labels
+            labels: labels to distinguish similar and dissimilar objects.
+            pairs: indices to determine objects of one pair
+            subgroups: subgroups numbers to determine which samples can be considered negative
 
         Returns:
             torch.Tensor - computed metric
         """
+        if labels is None or pairs is None or subgroups is None:
+            raise ValueError("`labels`, `pairs` and `subgroups` have to be specified")
+
         labels, distance_matrix = self.precompute(
             embeddings,
-            labels=targets["labels"],
-            pairs=targets["pairs"],
-            subgroups=targets["subgroups"],
+            labels=labels,
+            pairs=pairs,
+            subgroups=subgroups,
             sample_indices=sample_indices,
         )
         return retrieval_precision(distance_matrix, labels, self.k)

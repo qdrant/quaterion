@@ -16,7 +16,7 @@ class MetricsCallback(Callback):
 
     @staticmethod
     def reset_metrics(trainable_model):
-        for metric in trainable_model.metrics:
+        for metric in trainable_model.attached_metrics:
             metric.reset()
 
     @staticmethod

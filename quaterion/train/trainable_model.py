@@ -36,7 +36,7 @@ class TrainableModel(pl.LightningModule, CacheMixin):
         head = self.configure_head(MetricModel.get_encoders_output_size(encoders))
 
         metrics = self.configure_metrics()
-        self.metrics: List[AttachedMetric] = (
+        self.attached_metrics: List[AttachedMetric] = (
             [metrics] if isinstance(metrics, AttachedMetric) else metrics
         )
         evaluators = self.configure_evaluators()
@@ -98,7 +98,7 @@ class TrainableModel(pl.LightningModule, CacheMixin):
             targets: objects to calculate labels for similarity samples
             stage: training, validation, etc.
         """
-        for metric in self.metrics:
+        for metric in self.attached_metrics:
             if stage in metric.stages:
                 value = metric.update(embeddings, **targets)
                 self.log(

@@ -55,19 +55,21 @@ def serve_tuned_embeddings(dataloader, model_path):
 
 
 def save_images(dataset, save_dir):
-    labels_path = os.path.join(save_dir, 'labels.jsonl')
-    images_path = os.path.join(save_dir, 'imgs')
-    with open(labels_path, 'w') as out:
+    labels_path = os.path.join(save_dir, "labels.jsonl")
+    images_path = os.path.join(save_dir, "imgs")
+    with open(labels_path, "w") as out:
         for image_id in tqdm.tqdm(range(0, len(dataset))):
             sample = dataset[image_id]
             image: PIL.Image.Image = sample[0]
             label = sample[1]
             out.write(json.dumps({"label": label}))
-            out.write('\n')
-            image.save(open(os.path.join(images_path, f"{image_id}.jpg"), 'wb'), format="jpeg")
+            out.write("\n")
+            image.save(
+                open(os.path.join(images_path, f"{image_id}.jpg"), "wb"), format="jpeg"
+            )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument(
         "--tuned-model",
@@ -88,7 +90,9 @@ if __name__ == '__main__':
     save_images(test_dataset, args.save_dir)
 
     print("Preparing test data loader...")
-    _, test_dl = get_dataloaders(batch_size=BATCH_SIZE, shuffle=False, input_size=IMAGE_SIZE)
+    _, test_dl = get_dataloaders(
+        batch_size=BATCH_SIZE, shuffle=False, input_size=IMAGE_SIZE
+    )
 
     embeddings = serve_pretrained_embeddings(test_dl)
 
@@ -97,6 +101,3 @@ if __name__ == '__main__':
     embeddings = serve_tuned_embeddings(test_dl, args.tuned_model)
 
     np.save(os.path.join(args.save_dir, "tuned.npy"), embeddings, allow_pickle=False)
-
-
-

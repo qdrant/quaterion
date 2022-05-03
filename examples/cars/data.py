@@ -18,10 +18,7 @@ np.random.seed(42)
 dataset_path = os.path.join(".", "torchvision", "datasets")
 
 
-def get_raw_dataset(
-    input_size: int,
-    split_cache_path="split_cache.pkl"
-):
+def get_raw_dataset(input_size: int, split_cache_path="split_cache.pkl"):
     """
     Create dataset for extracting images, associated with vectors.
     Args:
@@ -31,13 +28,17 @@ def get_raw_dataset(
     Returns:
 
     """
-    transform = transforms.Compose([
-        transforms.Resize(input_size, max_size=input_size + 1),
-    ])
+    transform = transforms.Compose(
+        [
+            transforms.Resize(input_size, max_size=input_size + 1),
+        ]
+    )
 
     full_dataset = datasets.StanfordCars(
         root=dataset_path, split="train", download=True, transform=transform
-    ) + datasets.StanfordCars(root=dataset_path, split="test", download=True, transform=transform)
+    ) + datasets.StanfordCars(
+        root=dataset_path, split="test", download=True, transform=transform
+    )
 
     # Use same indexes, as was used for training
     train_indices, test_indices = pickle.load(open(split_cache_path, "rb"))

@@ -92,7 +92,9 @@ if __name__ == "__main__":
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
     print("Preparing test data loader...")
-    _, test_dl = get_dataloaders(batch_size=BATCH_SIZE, shuffle=False, input_size=IMAGE_SIZE)
+    _, test_dl = get_dataloaders(
+        batch_size=BATCH_SIZE, shuffle=False, input_size=IMAGE_SIZE
+    )
 
     if args.model == "base":
         eval_base_encoder(test_dl, device)

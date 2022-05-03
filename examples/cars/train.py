@@ -56,7 +56,9 @@ def train(
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("--batch-size", type=int, default=TRAIN_BATCH_SIZE, help="Batch size")
+    ap.add_argument(
+        "--batch-size", type=int, default=TRAIN_BATCH_SIZE, help="Batch size"
+    )
 
     ap.add_argument(
         "--epochs",

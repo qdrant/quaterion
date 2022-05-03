@@ -95,14 +95,18 @@ class GroupMetric(BaseMetric):
         labels = self.compute_labels(groups)
 
         if sample_indices is not None:
-            labels = labels[sample_indices]  # shape (sample_indices.shape[0], embeddings.shape[0])
+            labels = labels[
+                sample_indices
+            ]  # shape (sample_indices.shape[0], embeddings.shape[0])
             ref_embeddings = embeddings[sample_indices]  # shape
             # (sample_indices.shape[0], embeddings.shape[1])
 
             distance_matrix = self.calculate_distance_matrix(
                 embeddings, ref_embeddings=ref_embeddings
             )  # shape (ref_embeddings.shape[0], embeddings.shape[0])
-            index_matrix = torch.arange(0, embeddings.shape[0]).repeat(ref_embeddings.shape[0], 1)
+            index_matrix = torch.arange(0, embeddings.shape[0]).repeat(
+                ref_embeddings.shape[0], 1
+            )
             self_mask = index_matrix == sample_indices.view(ref_embeddings.shape[0], 1)
         else:
             distance_matrix = self.calculate_distance_matrix(embeddings)

@@ -33,13 +33,13 @@ class MetricsCallback(Callback):
             if evaluator.policy and current_epoch % evaluator.policy == 0:
                 trainable_model.log(
                     evaluator.name,
-                    evaluator.estimate(),
+                    evaluator.evaluate(),
                     logger=evaluator.logger,
                     prog_bar=True,
                 )
 
             if last_epoch:
-                logger.info(f"{evaluator.name} result: {evaluator.estimate()}")
+                logger.info(f"{evaluator.name} result: {evaluator.evaluate()}")
             else:
                 evaluator.reset()
 

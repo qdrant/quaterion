@@ -55,7 +55,7 @@ class Evaluator:
     def has_been_reset(self) -> bool:
         return self._has_been_reset
 
-    def estimate(self) -> torch.Tensor:
+    def evaluate(self) -> torch.Tensor:
         if self.batch_size == -1:
             return self.metric.compute()
 

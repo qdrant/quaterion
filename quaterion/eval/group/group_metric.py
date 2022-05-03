@@ -157,7 +157,11 @@ class GroupMetric(BaseMetric):
         return group_mask
 
     def _compute(
-        self, embeddings: Tensor, *, sample_indices: Optional[LongTensor] = None, **targets
+        self,
+        embeddings: Tensor,
+        *,
+        sample_indices: Optional[LongTensor] = None,
+        **targets
     ):
         """Compute metric value
 

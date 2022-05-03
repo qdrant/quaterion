@@ -9,10 +9,10 @@ from quaterion.utils.enums import TrainStage
 
 class MetricsCallback(Callback):
     @staticmethod
-    def reset_estimators(trainable_model, stage=None):
-        for estimator in trainable_model.estimators:
-            if not stage or stage in estimator.name:
-                estimator.reset()
+    def reset_evaluators(trainable_model, stage=None):
+        for evaluator in trainable_model.evaluators:
+            if not stage or stage in evaluator.name:
+                evaluator.reset()
 
     @staticmethod
     def reset_metrics(trainable_model):
@@ -20,33 +20,33 @@ class MetricsCallback(Callback):
             metric.reset()
 
     @staticmethod
-    def log_and_reset_estimator(
+    def log_and_reset_evaluator(
         trainable_model, current_epoch, stage=None, last_epoch=False
     ):
-        for estimator in trainable_model.estimators:
-            if stage and stage not in estimator.name:
+        for evaluator in trainable_model.evaluators:
+            if stage and stage not in evaluator.name:
                 continue
 
-            if estimator.has_been_reset:
+            if evaluator.has_been_reset:
                 continue
 
-            if estimator.policy and current_epoch % estimator.policy == 0:
+            if evaluator.policy and current_epoch % evaluator.policy == 0:
                 trainable_model.log(
-                    estimator.name,
-                    estimator.estimate(),
-                    logger=estimator.logger,
+                    evaluator.name,
+                    evaluator.estimate(),
+                    logger=evaluator.logger,
                     prog_bar=True,
                 )
 
             if last_epoch:
-                logger.info(f"{estimator.name} result: {estimator.estimate()}")
+                logger.info(f"{evaluator.name} result: {evaluator.estimate()}")
             else:
-                estimator.reset()
+                evaluator.reset()
 
     def on_sanity_check_end(
         self, trainer: "pl.Trainer", trainable_model: "pl.LightningModule"
     ) -> None:
-        self.reset_estimators(trainable_model, TrainStage.VALIDATION)
+        self.reset_evaluators(trainable_model, TrainStage.VALIDATION)
 
     def on_train_batch_start(
         self,
@@ -77,7 +77,7 @@ class MetricsCallback(Callback):
     def on_train_epoch_end(
         self, trainer: "pl.Trainer", trainable_model: "pl.LightningModule"
     ) -> None:
-        self.log_and_reset_estimator(
+        self.log_and_reset_evaluator(
             trainable_model,
             trainer.current_epoch,
             stage=TrainStage.TRAIN,
@@ -87,7 +87,7 @@ class MetricsCallback(Callback):
     def on_validation_epoch_end(
         self, trainer: "pl.Trainer", trainable_model: "pl.LightningModule"
     ) -> None:
-        self.log_and_reset_estimator(
+        self.log_and_reset_evaluator(
             trainable_model,
             trainer.current_epoch,
             stage=TrainStage.VALIDATION,
@@ -97,7 +97,7 @@ class MetricsCallback(Callback):
     def on_test_epoch_end(
         self, trainer: "pl.Trainer", trainable_model: "pl.LightningModule"
     ) -> None:
-        self.log_and_reset_estimator(
+        self.log_and_reset_evaluator(
             trainable_model,
             trainer.current_epoch,
             stage=TrainStage.TEST,
@@ -107,13 +107,13 @@ class MetricsCallback(Callback):
     def on_fit_end(
         self, trainer: "pl.Trainer", trainable_model: "pl.LightningModule"
     ) -> None:
-        self.log_and_reset_estimator(
+        self.log_and_reset_evaluator(
             trainable_model, trainer.current_epoch, last_epoch=True
         )
 
     def on_test_end(
         self, trainer: "pl.Trainer", trainable_model: "pl.LightningModule"
     ) -> None:
-        self.log_and_reset_estimator(
+        self.log_and_reset_evaluator(
             trainable_model, trainer.current_epoch, last_epoch=True
         )

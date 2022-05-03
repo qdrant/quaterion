@@ -9,12 +9,12 @@ from quaterion.eval.pair import PairMetric
 from quaterion.utils.enums import TrainStage
 
 
-class Estimator:
+class Evaluator:
     """Class to calculate metrics on whole datasets
 
-    Estimator accumulates embeddings and calculates metric on all, or on fixed-size part of them.
+    Evaluator accumulates embeddings and calculates metric on all, or on fixed-size part of them.
     Estimation might be time and memory consuming operation.
-    Estimator can be attached to :class:`quaterion.train.trainable_model.TrainableModel` or used
+    Evaluator can be attached to :class:`quaterion.train.trainable_model.TrainableModel` or used
         on its own.
 
     Args:

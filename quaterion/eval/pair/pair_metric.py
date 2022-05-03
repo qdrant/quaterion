@@ -35,6 +35,7 @@ class PairMetric(BaseMetric):
             distance_metric_name=distance_metric_name,
             reduce_func=reduce_func,
         )
+        self._accumulated_size = 0
 
     @property
     def labels(self):
@@ -190,9 +191,10 @@ class PairMetric(BaseMetric):
 
         self._embeddings.append(embeddings)
         self._labels.append(labels)
-        self._pairs.append(pairs)
+        self._pairs.append(pairs + self._accumulated_size)
         self._subgroups.append(subgroups)
 
+        self._accumulated_size += pairs.shape[0]
         if self.compute_on_step:
             return self.compute(
                 embeddings=embeddings, labels=labels, pairs=pairs, subgroups=subgroups
@@ -201,12 +203,13 @@ class PairMetric(BaseMetric):
     def reset(self):
         """Reset accumulated state
 
-        Reset embeddings, labels, pairs, subgroups.
+        Reset embeddings, labels, pairs, subgroups, etc.
         """
         super().reset()
         self._labels = []
         self._pairs = []
         self._subgroups = []
+        self._accumulated_size = 0
 
     def _compute(
         self,

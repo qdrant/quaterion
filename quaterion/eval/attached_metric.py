@@ -26,7 +26,9 @@ class AttachedMetric:
         **log_options,
     ):
         if not metric.compute_on_step:
-            raise ValueError("`metric.compute_on_step` must be `True` in `AttachedMetric`")
+            raise ValueError(
+                "`metric.compute_on_step` must be `True` in `AttachedMetric`"
+            )
 
         self._metric = metric
         self.stages = [stages] if isinstance(stages, TrainStage) else stages

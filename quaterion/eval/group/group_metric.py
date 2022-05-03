@@ -95,7 +95,7 @@ class GroupMetric(BaseMetric):
         """
         labels = self.compute_labels(groups)
 
-        if sample_indices:
+        if sample_indices is not None:
             labels = labels[sample_indices]
             ref_embeddings = embeddings[sample_indices]
             distance_matrix = self.calculate_distance_matrix(ref_embeddings, embeddings)

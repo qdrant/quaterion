@@ -46,10 +46,11 @@ class Evaluator:
         self.policy = policy
 
         self._has_been_reset = True
-        loguru.logger.warning(
-            f"`metric.compute_on_step` is True in {self.name}. "
-            f"It might cause a significant overhead."
-        )
+        if metric.compute_on_step:
+            loguru.logger.warning(
+                f"`metric.compute_on_step` is True in {self.name}. "
+                f"It might cause a significant overhead."
+            )
 
     @property
     def has_been_reset(self) -> bool:

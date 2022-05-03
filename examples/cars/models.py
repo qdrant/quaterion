@@ -41,14 +41,10 @@ class Model(TrainableModel):
         return CarsEncoder(pre_trained_encoder)
 
     def configure_head(self, input_embedding_size) -> EncoderHead:
-        # return WideningHead(input_embedding_size, expansion_factor=0.5)
-        return SkipConnectionHead(input_embedding_size)
+        return SkipConnectionHead(input_embedding_size, dropout=0.1)
 
     def configure_loss(self) -> SimilarityLoss:
         return TripletLoss(mining=self._mining, margin=0.5)
-        # loss = losses.MultiSimilarityLoss()
-        # miner = miners.MultiSimilarityMiner()
-        # return PytorchMetricLearningWrapper(loss, miner)
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.model.parameters(), self._lr)

@@ -1,13 +1,12 @@
-import shutil
-
 import argparse
 import os
-
 import pytorch_lightning as pl
+import shutil
 import torch
-from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
-from quaterion import Quaterion
+from pytorch_lightning.callbacks import EarlyStopping
 
+from examples.cars.config import TRAIN_BATCH_SIZE, IMAGE_SIZE
+from quaterion import Quaterion
 from .data import get_dataloaders
 from .models import Model
 
@@ -31,21 +30,15 @@ def train(
         batch_size=batch_size, input_size=input_size, shuffle=shuffle
     )
 
-    checkpoint_callback = ModelCheckpoint(
-        filename="epoch{epoch}-step{step}-val_loss{validation_loss:.4f}",
-        monitor="validation_loss",
-        auto_insert_metric_name=False,
-    )
-
     early_stopping = EarlyStopping(
         monitor="validation_loss",
-        patience=30,
+        patience=50,
     )
 
     trainer = pl.Trainer(
         gpus=1 if torch.cuda.is_available() else 0,
         max_epochs=epochs,
-        callbacks=[early_stopping],  # [checkpoint_callback],
+        callbacks=[early_stopping],
         enable_checkpointing=False,
         log_every_n_steps=1,
     )
@@ -63,7 +56,7 @@ def train(
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("--batch-size", type=int, default=1024, help="Batch size")
+    ap.add_argument("--batch-size", type=int, default=TRAIN_BATCH_SIZE, help="Batch size")
 
     ap.add_argument(
         "--epochs",
@@ -75,11 +68,11 @@ if __name__ == "__main__":
     ap.add_argument(
         "--input-size",
         type=int,
-        default=336,
+        default=IMAGE_SIZE,
         help="Images will be resized to this dimension",
     )
 
-    ap.add_argument("--lr", type=float, default=1e-3, help="Learning rate")
+    ap.add_argument("--lr", type=float, default=3e-3, help="Learning rate")
 
     ap.add_argument(
         "--mining",

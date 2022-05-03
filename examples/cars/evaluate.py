@@ -7,6 +7,7 @@ import torch.nn as nn
 import torchvision
 import tqdm
 
+from examples.cars.config import IMAGE_SIZE
 from quaterion.eval.group import RetrievalRPrecision
 from quaterion_models import MetricModel
 
@@ -91,7 +92,7 @@ if __name__ == "__main__":
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
     print("Preparing test data loader...")
-    _, test_dl = get_dataloaders(batch_size=BATCH_SIZE, shuffle=False, input_size=336)
+    _, test_dl = get_dataloaders(batch_size=BATCH_SIZE, shuffle=False, input_size=IMAGE_SIZE)
 
     if args.model == "base":
         eval_base_encoder(test_dl, device)

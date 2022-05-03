@@ -1,61 +1,52 @@
-import pickle
-
+import numpy as np
 import os
+import pickle
 import tqdm
+from torch.utils.data import Dataset, Subset
+from torchvision import datasets, transforms
 from typing import Callable
 
-import numpy as np
 from quaterion.dataset import (
     GroupSimilarityDataLoader,
     SimilarityGroupSample,
-    SimilarityGroupDataset,
 )
-from torch.utils.data import Dataset, Subset
-from torchvision import datasets, transforms
 
 # set seed to deterministically sample train and test categories later on
 np.random.seed(42)
 
+# dataset will be downloaded to this directory under local directory
+dataset_path = os.path.join(".", "torchvision", "datasets")
 
-def get_dataset_original(input_size: int, split_cache_path="split_cache.pkl"):
-    # Use Mean and std values for the ImageNet dataset as the base model was pretrained on it.
-    # taken from https://www.geeksforgeeks.org/how-to-normalize-images-in-pytorch/
-    mean = [0.485, 0.456, 0.406]
-    std = [0.229, 0.224, 0.225]
 
-    # create train and test transforms
-    train_transform = transforms.Compose(
-        [
-            transforms.Resize((input_size, input_size)),
-            # transforms.RandomResizedCrop((input_size, input_size)),
-            # transforms.RandomHorizontalFlip(),
-            transforms.ToTensor(),
-            transforms.Normalize(mean, std),
-        ]
-    )
+def get_raw_dataset(
+    input_size: int,
+    split_cache_path="split_cache.pkl"
+):
+    """
+    Create dataset for extracting images, associated with vectors.
+    Args:
+        input_size: Resize images to this size
+        split_cache_path: Path to train split
 
-    test_transform = transforms.Compose(
-        [
-            transforms.Resize((input_size, input_size)),
-            transforms.ToTensor(),
-            transforms.Normalize(mean, std),
-        ]
-    )
+    Returns:
 
-    # dataset will be downloaded to this directory under local directory
-    path = os.path.join(".", "torchvision", "datasets")
+    """
+    transform = transforms.Compose([
+        transforms.Resize(input_size, max_size=input_size + 1),
+    ])
 
-    # we need to merge train and test splits into a full dataset first,
-    # and then we will split it to two subsets again with each one composed of distinct labels.
-    return SimilarityGroupDataset(
-        datasets.StanfordCars(
-            root=path, split="train", download=True, transform=train_transform
-        )
-    ), SimilarityGroupDataset(
-        datasets.StanfordCars(
-            root=path, split="test", download=True, transform=test_transform
-        )
-    )
+    full_dataset = datasets.StanfordCars(
+        root=dataset_path, split="train", download=True, transform=transform
+    ) + datasets.StanfordCars(root=dataset_path, split="test", download=True, transform=transform)
+
+    # Use same indexes, as was used for training
+    train_indices, test_indices = pickle.load(open(split_cache_path, "rb"))
+
+    train_dataset = Subset(full_dataset, train_indices)
+
+    test_dataset = Subset(full_dataset, test_indices)
+
+    return train_dataset, test_dataset
 
 
 def get_datasets(
@@ -86,14 +77,11 @@ def get_datasets(
         ]
     )
 
-    # dataset will be downloaded to this directory under local directory
-    path = os.path.join(".", "torchvision", "datasets")
-
     # we need to merge train and test splits into a full dataset first,
     # and then we will split it to two subsets again with each one composed of distinct labels.
     full_dataset = datasets.StanfordCars(
-        root=path, split="train", download=True
-    ) + datasets.StanfordCars(root=path, split="test", download=True)
+        root=dataset_path, split="train", download=True
+    ) + datasets.StanfordCars(root=dataset_path, split="test", download=True)
 
     train_indices, test_indices = None, None
 

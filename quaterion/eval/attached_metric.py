@@ -25,6 +25,9 @@ class AttachedMetric:
         stages: Union[TrainStage, List[TrainStage]],
         **log_options,
     ):
+        if not metric.compute_on_step:
+            raise ValueError("`metric.compute_on_step` must be `True` in `AttachedMetric`")
+
         self._metric = metric
         self.stages = [stages] if isinstance(stages, TrainStage) else stages
         self.name = name

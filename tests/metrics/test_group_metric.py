@@ -110,5 +110,7 @@ def test_retrieval_r_precision():
     same_dist_metric = RetrievalRPrecision(Distance.MANHATTAN)
 
     diff_dist_metric = RetrievalRPrecision(Distance.MANHATTAN)
-    assert same_dist_metric.compute(same_dist_embeddings, groups) <= diff_dist_metric.compute(diff_dist_embeddings, groups)
+    assert same_dist_metric.compute(
+        same_dist_embeddings, groups
+    ) <= diff_dist_metric.compute(diff_dist_embeddings, groups)
     # endregion random sampling

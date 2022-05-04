@@ -69,7 +69,9 @@ class BaseMetric:
         """Perform metric computation with accumulated state"""
         raise NotImplementedError()
 
-    def raw_compute(self, distance_matrix: torch.Tensor, labels: torch.Tensor) -> torch.Tensor:
+    def raw_compute(
+        self, distance_matrix: torch.Tensor, labels: torch.Tensor
+    ) -> torch.Tensor:
         raise NotImplementedError()
 
     def precompute(
@@ -119,9 +121,7 @@ class BaseMetric:
         """
         return self.distance.distance_matrix(embeddings)
 
-    def calculate_similarity_matrix(
-        self, embeddings: torch.Tensor
-    ) -> torch.Tensor:
+    def calculate_similarity_matrix(self, embeddings: torch.Tensor) -> torch.Tensor:
         """Calculate similarity matrix
 
         Args:

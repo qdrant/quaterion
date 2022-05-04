@@ -87,14 +87,14 @@ class GroupMetric(BaseMetric):
         Returns:
             torch.Tensor - computed metric
         """
-        labels, distance_matrix = self.precompute(
-            embeddings, groups=groups
-        )
+        labels, distance_matrix = self.precompute(embeddings, groups=groups)
         return self.raw_compute(distance_matrix, labels)
 
     def evaluate(self) -> torch.Tensor:
         """Perform metric computation with accumulated state"""
         return self.compute(self.embeddings, self.groups)
 
-    def raw_compute(self, distance_matrix: torch.Tensor, labels: torch.Tensor) -> torch.Tensor:
+    def raw_compute(
+        self, distance_matrix: torch.Tensor, labels: torch.Tensor
+    ) -> torch.Tensor:
         raise NotImplementedError()

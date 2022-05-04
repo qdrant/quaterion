@@ -41,11 +41,7 @@ class RetrievalPrecision(PairMetric):
         if self.k < 1:
             raise ValueError("k must be greater than 0")
 
-    def raw_compute(
-        self,
-        distance_matrix: torch.Tensor,
-        labels: torch.Tensor
-    ):
+    def raw_compute(self, distance_matrix: torch.Tensor, labels: torch.Tensor):
         """Compute retrieval precision
 
         Args:

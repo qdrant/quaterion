@@ -17,12 +17,15 @@ class PairMetric(BaseMetric):
     """
 
     def __init__(
-        self, distance_metric_name: Distance = Distance.COSINE,
+        self,
+        distance_metric_name: Distance = Distance.COSINE,
     ):
         self._labels = []
         self._pairs = []
         self._subgroups = []
-        super().__init__(distance_metric_name=distance_metric_name,)
+        super().__init__(
+            distance_metric_name=distance_metric_name,
+        )
         self._accumulated_size = 0
 
     @property

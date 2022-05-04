@@ -35,11 +35,7 @@ class RetrievalReciprocalRank(PairMetric):
             distance_metric_name=distance_metric_name,
         )
 
-    def raw_compute(
-        self,
-        distance_matrix: torch.Tensor,
-        labels: torch.Tensor
-    ):
+    def raw_compute(self, distance_matrix: torch.Tensor, labels: torch.Tensor):
         """Compute retrieval precision
 
         Args:

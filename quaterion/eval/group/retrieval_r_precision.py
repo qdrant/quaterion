@@ -31,7 +31,9 @@ class RetrievalRPrecision(GroupMetric):
             distance_metric_name=distance_metric_name,
         )
 
-    def raw_compute(self, distance_matrix: torch.Tensor, labels: torch.Tensor) -> torch.Tensor:
+    def raw_compute(
+        self, distance_matrix: torch.Tensor, labels: torch.Tensor
+    ) -> torch.Tensor:
         return retrieval_r_precision(distance_matrix, labels)
 
 

@@ -57,7 +57,7 @@ class GroupMetric(BaseMetric):
         self._groups.append(groups)
 
     def reset(self):
-        """Reset accumulated embeddings, groups and cached result"""
+        """Reset accumulated embeddings, groups"""
         super().reset()
         self._groups = []
 

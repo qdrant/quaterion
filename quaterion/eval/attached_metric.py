@@ -14,7 +14,6 @@ class AttachedMetric:
     Args:
         name: name of an attached metric to be used in log.
         metric: metric to be calculated.
-        stages: stages to calculate metric on. Training, validation, etc.
         **log_options: additional kwargs to be passed to model's log.
     """
 

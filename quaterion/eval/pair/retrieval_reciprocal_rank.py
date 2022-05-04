@@ -31,7 +31,9 @@ class RetrievalReciprocalRank(PairMetric):
         reduce_func: Optional[Callable] = torch.mean,
     ):
         self.reduce_func = reduce_func
-        super().__init__(distance_metric_name=distance_metric_name,)
+        super().__init__(
+            distance_metric_name=distance_metric_name,
+        )
 
     def _compute(
         self,

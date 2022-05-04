@@ -55,16 +55,23 @@ def test_attach():
 
     class OneMetricDummyModel(DummyModel):
         def configure_metrics(self) -> Union[AttachedMetric, List[AttachedMetric]]:
-            return AttachedMetric("DummyMetric", RetrievalPrecision(), )
+            return AttachedMetric(
+                "DummyMetric",
+                RetrievalPrecision(),
+            )
 
     assert len(OneMetricDummyModel().attached_metrics) == 1
 
     class TwoMetricsDummyModel(DummyModel):
         def configure_metrics(self) -> Union[AttachedMetric, List[AttachedMetric]]:
             return [
-                AttachedMetric("DummyMetric_1", RetrievalPrecision(), ),
                 AttachedMetric(
-                    "DummyMetric_2", RetrievalReciprocalRank(),
+                    "DummyMetric_1",
+                    RetrievalPrecision(),
+                ),
+                AttachedMetric(
+                    "DummyMetric_2",
+                    RetrievalReciprocalRank(),
                 ),
             ]
 
@@ -73,7 +80,8 @@ def test_attach():
 
 def test_attached_metric():
     metric = AttachedMetric(
-        "DummyMetric_2", RetrievalPrecision(),
+        "DummyMetric_2",
+        RetrievalPrecision(),
     )
     assert len(metric.stages) == 2
 
@@ -90,9 +98,7 @@ def test_attached_metric():
         metric.log_options[key] == value for key, value in exp_log_options.items()
     )
 
-    metric = AttachedMetric(
-        "DummyMetric_4", RetrievalReciprocalRank()
-    )
+    metric = AttachedMetric("DummyMetric_4", RetrievalReciprocalRank())
     getattr(metric, "update")
     getattr(metric, "reset")
     getattr(metric, "compute")

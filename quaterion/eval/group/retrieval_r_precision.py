@@ -1,5 +1,4 @@
 import torch
-from torch import Tensor
 
 from quaterion.distances import Distance
 from quaterion.eval.group import GroupMetric
@@ -24,27 +23,18 @@ class RetrievalRPrecision(GroupMetric):
 
     """
 
-    def __init__(self, distance_metric_name: Distance = Distance.COSINE):
-        super().__init__(distance_metric_name)
-
-    def compute(self) -> Tensor:
-        """Calculates retrieval R-precision
-
-        Returns:
-            Tensor: zero-size tensor
-        """
-        distance_matrix = self.calculate_distances()
-        # assign max dist to obj on diag to ignore distance from obj to itself
-        distance_matrix[torch.eye(distance_matrix.shape[0], dtype=torch.bool)] = (
-            torch.max(distance_matrix) + 1
+    def __init__(
+        self,
+        distance_metric_name: Distance = Distance.COSINE,
+    ):
+        super().__init__(
+            distance_metric_name=distance_metric_name,
         )
-        group_matrix = self.groups.repeat(self.groups.shape[0], 1)
-        # objects with the same groups are true, others are false
 
-        group_mask = torch.BoolTensor(group_matrix == self.groups.unsqueeze(1))
-        # exclude obj
-        group_mask[torch.eye(group_mask.shape[0], dtype=torch.bool)] = False
-        return retrieval_r_precision(distance_matrix, group_mask.float())
+    def raw_compute(
+        self, distance_matrix: torch.Tensor, labels: torch.Tensor
+    ) -> torch.Tensor:
+        return retrieval_r_precision(distance_matrix, labels)
 
 
 def retrieval_r_precision(distance_matrix: torch.Tensor, labels: torch.Tensor):
@@ -58,11 +48,11 @@ def retrieval_r_precision(distance_matrix: torch.Tensor, labels: torch.Tensor):
         torch.Tensor: mean retrieval r precision
     """
     # number of members for group which is on i-th position in groups
-    relevant_numbers = labels.sum(dim=-1)
+    relevant_numbers = labels.sum(dim=-1).view(labels.shape[0], 1)
     nearest_to_furthest_ind = torch.argsort(distance_matrix, dim=-1, descending=False)
     sorted_by_distance = torch.gather(labels, dim=-1, index=nearest_to_furthest_ind)
     top_k_mask = (
-        torch.arange(0, labels.shape[0], step=1).repeat(labels.shape[0], 1)
+        torch.arange(0, labels.shape[1], step=1).repeat(labels.shape[0], 1)
         < relevant_numbers
     )
     metric = sorted_by_distance[top_k_mask].float()

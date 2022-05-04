@@ -61,18 +61,24 @@ def test_retrieval_precision():
     subgroups = torch.Tensor([0, 0, 0, 0])
 
     exp_metric = torch.Tensor([1, 1, 0, 1])
-    metric = RetrievalPrecision(Distance.MANHATTAN, k)
-    metric.update(embeddings, pairs, labels, subgroups)
-    assert torch.allclose(metric.compute(), exp_metric)
+    metric = RetrievalPrecision(k, Distance.MANHATTAN, reduce_func=None)
+    assert torch.allclose(
+        metric.compute(embeddings, labels, pairs, subgroups), exp_metric
+    )
     # endregion k = 1
 
     # region k = 2
     k = 2
     exp_metric = torch.Tensor([0.5, 0.5, 0.5, 0.5])
-    metric = RetrievalPrecision(Distance.MANHATTAN, k)
-
-    metric.update(embeddings, pairs, labels, subgroups)
-    assert torch.allclose(metric.compute(), exp_metric)
+    metric = RetrievalPrecision(
+        k=k, distance_metric_name=Distance.MANHATTAN, reduce_func=None
+    )
+    assert torch.allclose(
+        metric.compute(
+            embeddings=embeddings, pairs=pairs, labels=labels, subgroups=subgroups
+        ),
+        exp_metric,
+    )
     # endregion k = 2
 
     # region k = 1, ideal case
@@ -91,9 +97,10 @@ def test_retrieval_precision():
     subgroups = torch.Tensor([0, 0, 0, 0])
 
     exp_metric = torch.Tensor([1, 1, 1, 1])
-    metric = RetrievalPrecision(Distance.MANHATTAN, k)
-    metric.update(embeddings, pairs, labels, subgroups)
-    assert torch.allclose(metric.compute(), exp_metric)
+    metric = RetrievalPrecision(k, Distance.MANHATTAN, reduce_func=None)
+    assert torch.allclose(
+        metric.compute(embeddings, labels, pairs, subgroups), exp_metric
+    )
     # endregion k = 1, ideal case
 
     # region k = 1, worst case
@@ -112,9 +119,10 @@ def test_retrieval_precision():
     subgroups = torch.Tensor([0, 0, 0, 0])
 
     exp_metric = torch.Tensor([0, 0, 0, 0])
-    metric = RetrievalPrecision(Distance.MANHATTAN, k)
-    metric.update(embeddings, pairs, labels, subgroups)
-    assert torch.allclose(metric.compute(), exp_metric)
+    metric = RetrievalPrecision(k, Distance.MANHATTAN, reduce_func=None)
+    assert torch.allclose(
+        metric.compute(embeddings, labels, pairs, subgroups), exp_metric
+    )
     # endregion k = 1, worst case
 
     # region random sampling
@@ -128,12 +136,12 @@ def test_retrieval_precision():
     same_dist_embeddings, diff_dist_embeddings = sample_embeddings(
         mean=1, std=1, mean_coef=1.1, num_of_pairs=num_of_pairs, embedding_dim=10
     )
-    same_dist_metric = RetrievalPrecision(Distance.MANHATTAN, k=1)
-    same_dist_metric.update(same_dist_embeddings, pairs, labels, subgroups)
+    same_dist_metric = RetrievalPrecision(k=1, distance_metric_name=Distance.MANHATTAN)
+    same_dist_metric.update(same_dist_embeddings, labels, pairs, subgroups)
 
-    diff_dist_metric = RetrievalPrecision(Distance.MANHATTAN, k=1)
-    diff_dist_metric.update(diff_dist_embeddings, pairs, labels, subgroups)
-    assert same_dist_metric.compute().mean() <= diff_dist_metric.compute().mean()
+    diff_dist_metric = RetrievalPrecision(k=1, distance_metric_name=Distance.MANHATTAN)
+    diff_dist_metric.update(diff_dist_embeddings, labels, pairs, subgroups)
+    assert same_dist_metric.evaluate() <= diff_dist_metric.evaluate()
     # endregion random sampling
     # endregion single batch
 
@@ -159,9 +167,13 @@ def test_retrieval_reciprocal_rank():
     subgroups = torch.Tensor([0, 0, 0, 0])
     exp_metric = torch.Tensor([1, 1, 0.5, 1])
 
-    metric = RetrievalReciprocalRank(Distance.MANHATTAN)
-    metric.update(embeddings, pairs, labels, subgroups)
-    assert torch.allclose(metric.compute(), exp_metric)
+    metric = RetrievalReciprocalRank(Distance.MANHATTAN, reduce_func=None)
+    assert torch.allclose(
+        metric.compute(
+            embeddings=embeddings, pairs=pairs, labels=labels, subgroups=subgroups
+        ),
+        exp_metric,
+    )
     # endregion common case
 
     # region ideal case
@@ -179,9 +191,10 @@ def test_retrieval_reciprocal_rank():
     subgroups = torch.Tensor([0, 0, 0, 0])
     exp_metric = torch.Tensor([1, 1, 1, 1])
 
-    metric = RetrievalReciprocalRank(Distance.MANHATTAN)
-    metric.update(embeddings, pairs, labels, subgroups)
-    assert torch.allclose(metric.compute(), exp_metric)
+    metric = RetrievalReciprocalRank(Distance.MANHATTAN, reduce_func=None)
+    assert torch.allclose(
+        metric.compute(embeddings, labels, pairs, subgroups), exp_metric
+    )
     # endregion ideal case
 
     # region worst case
@@ -200,8 +213,9 @@ def test_retrieval_reciprocal_rank():
     exp_metric = torch.Tensor([1 / 3, 1 / 3, 1 / 3, 1 / 3])
 
     metric = RetrievalReciprocalRank(Distance.MANHATTAN)
-    metric.update(embeddings, pairs, labels, subgroups)
-    assert torch.allclose(metric.compute(), exp_metric)
+    assert torch.allclose(
+        metric.compute(embeddings, labels, pairs, subgroups), exp_metric
+    )
     # endregion worst case
 
     # region random sampling
@@ -216,10 +230,10 @@ def test_retrieval_reciprocal_rank():
         mean=1, std=1, mean_coef=1.1, num_of_pairs=num_of_pairs, embedding_dim=10
     )
     same_dist_metric = RetrievalReciprocalRank(Distance.MANHATTAN)
-    same_dist_metric.update(same_dist_embeddings, pairs, labels, subgroups)
+    same_dist_metric.update(same_dist_embeddings, labels, pairs, subgroups)
 
     diff_dist_metric = RetrievalReciprocalRank(Distance.MANHATTAN)
-    diff_dist_metric.update(diff_dist_embeddings, pairs, labels, subgroups)
-    assert same_dist_metric.compute().mean() <= diff_dist_metric.compute().mean()
+    diff_dist_metric.update(diff_dist_embeddings, labels, pairs, subgroups)
+    assert same_dist_metric.evaluate() <= diff_dist_metric.evaluate()
     # endregion random sampling
     # endregion single batch

@@ -16,6 +16,7 @@ Submodules
 .. toctree::
    :maxdepth: 4
 
+   quaterion.eval.attached_metric
    quaterion.eval.base_metric
 
 Module contents

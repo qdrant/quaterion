@@ -17,6 +17,7 @@ Submodules
 
    quaterion.train.cache_mixin
    quaterion.train.cleanup_callback
+   quaterion.train.metrics_callback
    quaterion.train.trainable_model
 
 Module contents

@@ -37,7 +37,14 @@ class BaseMetric:
         return torch.cat(self._embeddings) if len(self._embeddings) else torch.Tensor()
 
     def update(self, **kwargs) -> None:
-        """Accumulate batch"""
+        """Accumulate batch
+
+        Args:
+            **kwargs - embeddings and objects required for label calculation. E.g. for
+            :class:`~quaterion.eval.pair.pair_metric.PairMetric` it is `labels`, `pairs`,
+            `subgroups` and for :class:`~quaterion.eval.group.group_metric.GroupMetric` it is
+            `groups`.
+        """
         raise NotImplementedError()
 
     def compute(

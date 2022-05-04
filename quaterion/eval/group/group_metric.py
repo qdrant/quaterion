@@ -61,36 +61,7 @@ class GroupMetric(BaseMetric):
         super().reset()
         self._groups = []
 
-    def prepare_input(
-        self, embeddings: Optional[Tensor], groups: Optional[torch.Tensor] = None
-    ) -> Tuple[torch.Tensor, Dict[str, torch.Tensor]]:
-        """Prepare input before computation
-
-        If input haven't been passed, substitute accumulated state (embeddings and groups).
-
-        Args:
-            embeddings: embeddings to evaluate
-            groups: group numbers to distinguish similar objects from dissimilar
-
-        Returns:
-            embeddings, targets: Tuple[torch.Tensor, Dict[str, torch.Tensor]] - prepared embeddings
-                and groups dict
-        """
-        embeddings_passed = embeddings is not None
-        targets_passed = groups is not None
-        if embeddings_passed != targets_passed:
-            raise ValueError(
-                "If `embeddings` were passed to `compute`, corresponding `groups` have to be "
-                "passed too"
-            )
-
-        if not embeddings_passed:
-            embeddings = self.embeddings
-            groups = self.groups
-
-        return embeddings, {"groups": groups}
-
-    def compute_labels(self, groups: Optional[Tensor] = None):
+    def compute_labels(self, groups: Tensor):
         """Compute metric labels based on samples groups
 
         Args:
@@ -99,9 +70,6 @@ class GroupMetric(BaseMetric):
         Returns:
             target: torch.Tensor -  labels to be used during metric computation
         """
-        if groups is None:
-            groups = self.groups
-
         group_matrix = groups.repeat(groups.shape[0], 1)
         # objects with the same groups are true, others are false
 
@@ -110,27 +78,23 @@ class GroupMetric(BaseMetric):
         group_mask[torch.eye(group_mask.shape[0], dtype=torch.bool)] = False
         return group_mask
 
-    def _compute(
-        self,
-        embeddings: Tensor,
-        *,
-        sample_indices: Optional[LongTensor] = None,
-        groups: Tensor = None
-    ):
+    def compute(self, embeddings: torch.Tensor, groups: torch.Tensor) -> torch.Tensor:
         """Compute metric value
-
-        Directly compute metric value.
-        This method should be overridden in implementations of a particular metric.
-        All additional logic: embeddings and targets preparations.
-        should be done outside.
 
         Args:
             embeddings: embeddings to calculate metrics on
-            sample_indices: indices of embeddings to sample if metric should be computed only on
-                part of accumulated embeddings
-            groups: groups to compute final labels
-
+            groups: groups to calculate labels
         Returns:
             torch.Tensor - computed metric
         """
+        labels, distance_matrix = self.precompute(
+            embeddings, groups=groups
+        )
+        return self.raw_compute(distance_matrix, labels)
+
+    def evaluate(self) -> torch.Tensor:
+        """Perform metric computation with accumulated state"""
+        return self.compute(self.embeddings, self.groups)
+
+    def raw_compute(self, distance_matrix: torch.Tensor, labels: torch.Tensor) -> torch.Tensor:
         raise NotImplementedError()

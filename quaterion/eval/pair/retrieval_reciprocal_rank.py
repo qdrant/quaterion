@@ -35,41 +35,22 @@ class RetrievalReciprocalRank(PairMetric):
             distance_metric_name=distance_metric_name,
         )
 
-    def _compute(
+    def raw_compute(
         self,
-        embeddings: torch.Tensor,
-        sample_indices: Optional[torch.LongTensor] = None,
-        labels: torch.Tensor = None,
-        pairs: torch.LongTensor = None,
-        subgroups: torch.Tensor = None,
+        distance_matrix: torch.Tensor,
+        labels: torch.Tensor
     ):
-        """Compute retrieval reciprocal precision
-
-        Directly compute metric value.
-        All additional logic: embeddings and targets preparations, using of cached result etc.
-        should be done outside.
+        """Compute retrieval precision
 
         Args:
-            embeddings: embeddings to calculate metrics on
-            sample_indices: indices of embeddings to sample if metric should be computed only on
-                part of accumulated embeddings
-            labels: labels to distinguish similar and dissimilar objects.
-            pairs: indices to determine objects of one pair
-            subgroups: subgroups numbers to determine which samples can be considered negative
+            distance_matrix: matrix with distances between embeddings. Assumed that distance from
+                embedding to itself is meaningless. (e.g. equal to max element of matrix + 1)
+            labels: labels to compute metric. Assumed that label from object to itself has been
+                made meaningless. (E.g. was set to 0)
 
         Returns:
             torch.Tensor - computed metric
         """
-        if labels is None or pairs is None or subgroups is None:
-            raise ValueError("`labels`, `pairs` and `subgroups` have to be specified")
-
-        labels, distance_matrix = self.precompute(
-            embeddings,
-            labels=labels,
-            pairs=pairs,
-            subgroups=subgroups,
-            sample_indices=sample_indices,
-        )
         value = retrieval_reciprocal_rank(distance_matrix, labels)
         if self.reduce_func is not None:
             value = self.reduce_func(value)

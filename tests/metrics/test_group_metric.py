@@ -38,8 +38,7 @@ def test_retrieval_r_precision():
     groups = torch.LongTensor([1, 2, 1, 2])
     exp_metric = torch.Tensor([0.75])
     metric = RetrievalRPrecision(distance_metric_name=Distance.MANHATTAN)
-    metric.update(embeddings, groups)
-    result = metric.compute()
+    result = metric.compute(embeddings, groups)
 
     assert result == exp_metric
     # endregion single batch
@@ -65,7 +64,7 @@ def test_retrieval_r_precision():
     for batch in (first_batch, second_batch):
         embeddings, groups = batch
         metric.update(embeddings, groups)
-    assert metric.compute() == exp_metric
+    assert metric.evaluate() == exp_metric
     # endregion multiple batches
 
     # region ideal case
@@ -80,8 +79,7 @@ def test_retrieval_r_precision():
     groups = torch.LongTensor([1, 2, 1, 2])
     exp_metric = torch.Tensor([1.0])
     metric = RetrievalRPrecision(Distance.MANHATTAN)
-    metric.update(embeddings, groups)
-    assert metric.compute() == exp_metric
+    assert metric.compute(embeddings, groups) == exp_metric
     # endregion ideal case
 
     # region worst case
@@ -96,8 +94,7 @@ def test_retrieval_r_precision():
     groups = torch.LongTensor([1, 2, 1, 2])
     exp_metric = torch.Tensor([0.0])
     metric = RetrievalRPrecision(Distance.MANHATTAN)
-    metric.update(embeddings, groups)
-    assert metric.compute() == exp_metric
+    assert metric.compute(embeddings, groups) == exp_metric
     # endregion worst case
 
     # region random sampling
@@ -111,9 +108,7 @@ def test_retrieval_r_precision():
         embedding_dim=10,
     )
     same_dist_metric = RetrievalRPrecision(Distance.MANHATTAN)
-    same_dist_metric.update(same_dist_embeddings, groups)
 
     diff_dist_metric = RetrievalRPrecision(Distance.MANHATTAN)
-    diff_dist_metric.update(diff_dist_embeddings, groups)
-    assert same_dist_metric.compute() <= diff_dist_metric.compute()
+    assert same_dist_metric.compute(same_dist_embeddings, groups) <= diff_dist_metric.compute(diff_dist_embeddings, groups)
     # endregion random sampling

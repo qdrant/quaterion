@@ -1,4 +1,4 @@
-from typing import Optional, Tuple, Dict
+from typing import Tuple
 
 import torch
 
@@ -47,46 +47,6 @@ class BaseMetric:
         """
         raise NotImplementedError()
 
-    def compute(
-        self,
-        *,
-        sample_indices: torch.LongTensor = None,
-        embeddings: Optional[torch.Tensor] = None,
-        **targets
-    ) -> Optional[torch.Tensor]:
-        """Compute metric value
-
-        Following cases are supported:
-            - compute value without arguments passed (explicit call by user)
-            - compute value for compute_on_step behaviour (batch items passed)
-            - compute value for estimator's call (sample_indices might be passed to calculate
-                metric on part of a dataset)
-
-        Args:
-            sample_indices: indices of accumulated values for partial metric computation
-            embeddings: embeddings to compute metric without accumulated ones
-            **targets: targets to compute metric without accumulated ones
-
-        Returns:
-            Optional[torch.Tensor] - computed metric value
-        """
-
-        if sample_indices is not None and embeddings is not None:
-            raise ValueError(
-                "`sample_indices` can't be used with `embeddings`. Put `embeddings` into metric"
-                "state and call `compute` with `sample_indices` instead."
-            )
-
-        if len(self._embeddings) == 0 and embeddings is None:
-            if sample_indices is not None:
-                raise ValueError(
-                    "sample_indices were passed but there is no accumulated embeddings"
-                )
-            return None
-
-        embeddings, targets = self.prepare_input(embeddings, **targets)
-        return self._compute(embeddings, sample_indices=sample_indices, **targets)
-
     def reset(self):
         """Reset accumulated state
 
@@ -94,100 +54,43 @@ class BaseMetric:
         """
         self._embeddings = []
 
-    def calculate_distance_matrix(
-        self,
-        embeddings: torch.Tensor,
-        ref_embeddings: Optional[torch.Tensor] = None,
-    ) -> torch.Tensor:
-        """Calculate distance matrix
+    def compute(self, *args, **kwargs) -> torch.Tensor:
+        """Compute metric value
 
         Args:
-            embeddings: accumulated embeddings
-            ref_embeddings: sample of accumulated embeddings
+            *args, **kwargs - contain embeddings and targets required to compute metric.
 
         Returns:
-            distance_matrix: torch.Tensor - Shape: (ref_embeddings, embeddings) - distance matrix
+            torch.Tensor - computed metric
         """
+        raise NotImplementedError()
 
-        ref_embeddings = embeddings if ref_embeddings is None else ref_embeddings
-        distance_matrix = self.distance.distance_matrix(ref_embeddings, embeddings)
+    def evaluate(self) -> torch.Tensor:
+        """Perform metric computation with accumulated state"""
+        raise NotImplementedError()
 
-        return distance_matrix
-
-    def calculate_similarity_matrix(
-        self, embeddings: torch.Tensor, ref_embeddings: Optional[torch.Tensor] = None
-    ) -> torch.Tensor:
-        """Calculate similarity matrix
-
-        Args:
-            embeddings: accumulated embeddings
-            ref_embeddings: sample of accumulated embeddings
-
-        Returns:
-            similarity_matrix: torch.Tensor - Shape: (ref_embeddings, embeddings) - similarity
-                matrix
-        """
-        ref_embeddings = embeddings if ref_embeddings is None else ref_embeddings
-        similarity_matrix = self.distance.similarity_matrix(ref_embeddings, embeddings)
-
-        return similarity_matrix
-
-    def prepare_input(
-        self, embeddings: Optional[torch.Tensor], **targets
-    ) -> Tuple[torch.Tensor, Dict[str, torch.Tensor]]:
-        """Prepare input before computation
-
-        If input haven't been passed, substitute accumulated state.
-
-        Args:
-            embeddings: embeddings to evaluate
-            targets: objects to compute labels for similarity samples
-
-        Returns:
-            embeddings, targets: Tuple[torch.Tensor, Dict[str, torch.Tensor]] - prepared embeddings
-                and targets
-        """
+    def raw_compute(self, distance_matrix: torch.Tensor, labels: torch.Tensor) -> torch.Tensor:
         raise NotImplementedError()
 
     def precompute(
         self,
         embeddings: torch.Tensor,
-        sample_indices: Optional[torch.LongTensor] = None,
-        **targets
+        **targets,
     ) -> Tuple[torch.Tensor, torch.Tensor]:
         """Prepares data for computation
 
         Compute distance matrix and final labels based on groups.
-        Sample embeddings and labels if metric should be computed only on part of the data.
 
         Args:
             embeddings: embeddings to compute metric value
             targets: objects to compute final labels
-            sample_indices: indices to sample embeddings and labels if metric has to be computed
-                on part of the data
 
         Returns:
             torch.Tensor, torch.Tensor - labels and distance matrix
         """
         labels = self.compute_labels(**targets)
-
-        if sample_indices is not None:
-            labels = labels[
-                sample_indices
-            ]  # shape (sample_indices.shape[0], embeddings.shape[0])
-            ref_embeddings = embeddings[sample_indices]  # shape
-            # (sample_indices.shape[0], embeddings.shape[1])
-
-            distance_matrix = self.calculate_distance_matrix(
-                embeddings, ref_embeddings=ref_embeddings
-            )  # shape (ref_embeddings.shape[0], embeddings.shape[0])
-            index_matrix = torch.arange(0, embeddings.shape[0]).repeat(
-                ref_embeddings.shape[0], 1
-            )
-            self_mask = index_matrix == sample_indices.view(ref_embeddings.shape[0], 1)
-        else:
-            distance_matrix = self.calculate_distance_matrix(embeddings)
-            self_mask = torch.eye(distance_matrix.shape[0], dtype=torch.bool)
+        distance_matrix = self.calculate_distance_matrix(embeddings)
+        self_mask = torch.eye(distance_matrix.shape[0], dtype=torch.bool)
         distance_matrix[self_mask] = torch.max(distance_matrix) + 1
         return labels.float(), distance_matrix
 
@@ -202,27 +105,30 @@ class BaseMetric:
         """
         raise NotImplementedError()
 
-    def _compute(
+    def calculate_distance_matrix(
         self,
         embeddings: torch.Tensor,
-        *,
-        sample_indices: Optional[torch.Tensor] = None,
-        **targets
     ) -> torch.Tensor:
-        """Compute metric value
-
-        Directly compute metric value.
-        This method should be overridden in implementations of a particular metric.
-        All additional logic: embeddings and targets preparations, using of cached result etc.
-        should be done outside.
+        """Calculate distance matrix
 
         Args:
-            embeddings: embeddings to calculate metrics on
-            sample_indices: indices of embeddings to sample if metric should be computed only on
-                part of accumulated embeddings
-            **targets: dict of objects to compute final labels
+            embeddings: accumulated embeddings
 
         Returns:
-            torch.Tensor - computed metric
+            distance_matrix: torch.Tensor - Shape: (embeddings, embeddings) - distance matrix
         """
-        raise NotImplementedError()
+        return self.distance.distance_matrix(embeddings)
+
+    def calculate_similarity_matrix(
+        self, embeddings: torch.Tensor
+    ) -> torch.Tensor:
+        """Calculate similarity matrix
+
+        Args:
+            embeddings: accumulated embeddings
+
+        Returns:
+            similarity_matrix: torch.Tensor - Shape: (embeddings, embeddings) - similarity
+                matrix
+        """
+        return self.distance.similarity_matrix(embeddings)

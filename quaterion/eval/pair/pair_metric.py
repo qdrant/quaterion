@@ -1,6 +1,5 @@
-from typing import Optional, Callable, Dict, Tuple
-
 import torch
+from torch import Tensor, LongTensor
 
 from quaterion.distances import Distance
 from quaterion.eval.base_metric import BaseMetric
@@ -18,15 +17,12 @@ class PairMetric(BaseMetric):
     """
 
     def __init__(
-        self,
-        distance_metric_name: Distance = Distance.COSINE,
+        self, distance_metric_name: Distance = Distance.COSINE,
     ):
         self._labels = []
         self._pairs = []
         self._subgroups = []
-        super().__init__(
-            distance_metric_name=distance_metric_name,
-        )
+        super().__init__(distance_metric_name=distance_metric_name,)
         self._accumulated_size = 0
 
     @property
@@ -54,7 +50,7 @@ class PairMetric(BaseMetric):
         return torch.cat(self._subgroups) if len(self._subgroups) else torch.Tensor()
 
     @property
-    def pairs(self):
+    def pairs(self) -> torch.LongTensor:
         """Concatenate list of pairs to Tensor
 
         Help to avoid concatenating pairs for each batch during accumulation. Instead,
@@ -63,57 +59,13 @@ class PairMetric(BaseMetric):
         Returns:
             torch.Tensor: batch of pairs
         """
-        return torch.cat(self._pairs) if len(self._pairs) else torch.Tensor()
-
-    def prepare_input(
-        self,
-        embeddings: Optional[torch.Tensor],
-        labels: Optional[torch.Tensor] = None,
-        pairs: Optional[torch.LongTensor] = None,
-        subgroups: Optional[torch.Tensor] = None,
-    ) -> Tuple[torch.Tensor, Dict[str, torch.Tensor]]:
-        """Prepare input before computation
-
-        If input haven't been passed, substitute accumulated state.
-
-        Args:
-            embeddings: embeddings to evaluate
-            labels: labels to distinguish similar and dissimilar objects.
-            pairs: indices to determine objects of one pair
-            subgroups: subgroups numbers to determine which samples can be considered negative
-
-        Returns:
-            embeddings, targets: Tuple[torch.Tensor, Dict[str, torch.Tensor]] - prepared embeddings
-                and dict with labels, pairs and subgroups to compute final labels
-        """
-        targets = {}
-        embeddings_passed = embeddings is not None
-        targets_passed = (
-            labels is not None and pairs is not None and subgroups is not None
-        )
-        if embeddings_passed != targets_passed:
-            raise ValueError(
-                "If `embeddings` were passed to `compute`, corresponding `labels`, `subgroups` "
-                "and `pairs` have to be passed too"
-            )
-
-        if not embeddings_passed:
-            embeddings = self.embeddings
-            labels = self.labels
-            pairs = self.pairs
-            subgroups = self.subgroups
-
-        targets["labels"] = labels
-        targets["pairs"] = pairs
-        targets["subgroups"] = subgroups
-
-        return embeddings, targets
+        return torch.cat(self._pairs) if len(self._pairs) else torch.LongTensor()
 
     def compute_labels(
         self,
-        labels: Optional[torch.Tensor] = None,
-        pairs: Optional[torch.LongTensor] = None,
-        subgroups: Optional[torch.Tensor] = None,
+        labels: torch.Tensor,
+        pairs: torch.LongTensor,
+        subgroups: torch.Tensor,
     ) -> torch.Tensor:
         """Compute metric labels based on samples labels and pairs
 
@@ -126,10 +78,6 @@ class PairMetric(BaseMetric):
         Returns:
             target: torch.Tensor -  labels to be used during metric computation
         """
-        if labels is None or pairs is None:
-            pairs = self.pairs
-            labels = self.labels
-
         num_of_embeddings = pairs.shape[0] * 2
         target = torch.zeros(
             (num_of_embeddings, num_of_embeddings), device=labels.device
@@ -181,26 +129,13 @@ class PairMetric(BaseMetric):
         self._subgroups = []
         self._accumulated_size = 0
 
-    def _compute(
-        self,
-        embeddings: torch.Tensor,
-        *,
-        sample_indices: Optional[torch.LongTensor] = None,
-        labels: Optional[torch.Tensor] = None,
-        pairs: Optional[torch.LongTensor] = None,
-        subgroups: Optional[torch.Tensor] = None
+    def compute(
+        self, embeddings: Tensor, labels: Tensor, pairs: LongTensor, subgroups: Tensor
     ):
         """Compute metric value
 
-        Directly compute metric value.
-        This method should be overridden in implementations of a particular metric.
-        All additional logic: embeddings and targets preparations.
-        should be done outside.
-
         Args:
             embeddings: embeddings to calculate metrics on
-            sample_indices: indices of embeddings to sample if metric should be computed only on
-                part of accumulated embeddings
             labels: labels to distinguish similar and dissimilar objects.
             pairs: indices to determine objects of one pair
             subgroups: subgroups numbers to determine which samples can be considered negative
@@ -208,4 +143,16 @@ class PairMetric(BaseMetric):
         Returns:
             torch.Tensor - computed metric
         """
+        labels, distance_matrix = self.precompute(
+            embeddings, labels=labels, pairs=pairs, subgroups=subgroups
+        )
+        return self.raw_compute(distance_matrix, labels)
+
+    def evaluate(self) -> torch.Tensor:
+        """Perform metric computation with accumulated state"""
+        return self.compute(self.embeddings, self.labels, self.pairs, self.subgroups)
+
+    def raw_compute(
+        self, distance_matrix: torch.Tensor, labels: torch.Tensor
+    ) -> torch.Tensor:
         raise NotImplementedError()

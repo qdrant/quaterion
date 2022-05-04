@@ -1,5 +1,3 @@
-from typing import Optional, Callable
-
 import torch
 
 from quaterion.distances import Distance
@@ -33,34 +31,7 @@ class RetrievalRPrecision(GroupMetric):
             distance_metric_name=distance_metric_name,
         )
 
-    def _compute(
-        self,
-        embeddings: torch.Tensor,
-        *,
-        sample_indices: Optional[torch.LongTensor] = None,
-        groups: torch.Tensor = None
-    ):
-        """Compute retrieval-r precision
-
-        Directly compute metric value.
-        All additional logic: embeddings and targets preparations, using of cached result etc.
-        should be done outside.
-
-        Args:
-            embeddings: embeddings to calculate metrics on
-            sample_indices: indices of embeddings to sample if metric should be computed only on
-                part of accumulated embeddings
-            groups: groups to compute final labels
-
-        Returns:
-            torch.Tensor - computed metric
-        """
-        if groups is None:
-            raise ValueError("`groups` has to be specified")
-
-        labels, distance_matrix = self.precompute(
-            embeddings, groups=groups, sample_indices=sample_indices
-        )
+    def raw_compute(self, distance_matrix: torch.Tensor, labels: torch.Tensor) -> torch.Tensor:
         return retrieval_r_precision(distance_matrix, labels)
 
 

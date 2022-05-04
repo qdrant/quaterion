@@ -1,7 +1,5 @@
-from typing import Optional, Dict, Tuple
-
 import torch
-from torch import Tensor, LongTensor
+from torch import Tensor
 
 from quaterion.distances import Distance
 from quaterion.eval.base_metric import BaseMetric

@@ -64,8 +64,8 @@ class PairMetric(BaseMetric):
         """
         return torch.cat(self._pairs) if len(self._pairs) else torch.LongTensor()
 
+    @staticmethod
     def compute_labels(
-        self,
         labels: torch.Tensor,
         pairs: torch.LongTensor,
         subgroups: torch.Tensor,

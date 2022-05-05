@@ -16,6 +16,7 @@ class PairSampler(BaseSampler):
             matrix size quadratically.
 
     """
+
     def __init__(self, sample_size=-1, distinguish=False):
         super().__init__(sample_size)
         self.distinguish = distinguish

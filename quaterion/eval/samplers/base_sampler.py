@@ -16,6 +16,7 @@ class BaseSampler:
             sample_size: amount of objects to select.
 
     """
+
     def __init__(self, sample_size=-1):
         self.sample_size = sample_size
 

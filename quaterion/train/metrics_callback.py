@@ -14,7 +14,7 @@ class MetricsCallback(Callback):
 
     @staticmethod
     def log_and_reset_evaluator(
-            trainable_model, current_epoch, stage=None, last_epoch=False
+        trainable_model, current_epoch, stage=None, last_epoch=False
     ):
         for evaluator in trainable_model.evaluators:
             if stage != evaluator.stage:
@@ -23,7 +23,10 @@ class MetricsCallback(Callback):
             if evaluator.has_been_reset:
                 continue
 
-            if evaluator.epoch_eval_period and current_epoch % evaluator.epoch_eval_period == 0:
+            if (
+                evaluator.epoch_eval_period
+                and current_epoch % evaluator.epoch_eval_period == 0
+            ):
                 trainable_model.log(
                     evaluator.name,
                     evaluator.evaluate(),

@@ -9,6 +9,7 @@ from quaterion.eval.samplers import BaseSampler
 
 class GroupSampler(BaseSampler):
     """Perform selection of embeddings and targets for group based tasks."""
+
     def __init__(self, sample_size=-1):
         super().__init__(sample_size)
 

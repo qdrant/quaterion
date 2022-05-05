@@ -91,7 +91,7 @@ class BaseMetric:
             torch.Tensor, torch.Tensor - labels and distance matrix
         """
         labels = self.compute_labels(**targets)
-        distance_matrix = self.calculate_distance_matrix(embeddings)
+        distance_matrix = self.distance.distance_matrix(embeddings)
         self_mask = torch.eye(distance_matrix.shape[0], dtype=torch.bool)
         distance_matrix[self_mask] = torch.max(distance_matrix) + 1
         return labels.float(), distance_matrix
@@ -107,29 +107,3 @@ class BaseMetric:
             target: torch.Tensor -  labels to be used during metric computation
         """
         raise NotImplementedError()
-
-    def calculate_distance_matrix(
-        self,
-        embeddings: torch.Tensor,
-    ) -> torch.Tensor:
-        """Calculate distance matrix
-
-        Args:
-            embeddings: accumulated embeddings
-
-        Returns:
-            distance_matrix: torch.Tensor - Shape: (embeddings, embeddings) - distance matrix
-        """
-        return self.distance.distance_matrix(embeddings)
-
-    def calculate_similarity_matrix(self, embeddings: torch.Tensor) -> torch.Tensor:
-        """Calculate similarity matrix
-
-        Args:
-            embeddings: accumulated embeddings
-
-        Returns:
-            similarity_matrix: torch.Tensor - Shape: (embeddings, embeddings) - similarity
-                matrix
-        """
-        return self.distance.similarity_matrix(embeddings)

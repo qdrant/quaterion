@@ -12,6 +12,7 @@ from torch import Tensor
 from quaterion.dataset import SimilarityDataLoader
 from quaterion.dataset.train_collater import TrainCollator
 from quaterion.eval.attached_metric import AttachedMetric
+from quaterion.eval.evaluator import Evaluator
 from quaterion.loss import SimilarityLoss
 from quaterion.train.cache import (
     CacheConfig,
@@ -37,6 +38,11 @@ class TrainableModel(pl.LightningModule, CacheMixin):
         metrics = self.configure_metrics()
         self.attached_metrics: List[AttachedMetric] = (
             [metrics] if isinstance(metrics, AttachedMetric) else metrics
+        )
+
+        evaluators = self.configure_evaluators()
+        self.evaluators: List[Evaluator] = (
+            [evaluators] if isinstance(evaluators, Evaluator) else evaluators
         )
 
         self._model = MetricModel(encoders=encoders, head=head)
@@ -73,6 +79,41 @@ class TrainableModel(pl.LightningModule, CacheMixin):
         """
         return []
 
+    def configure_evaluators(self) -> Union[Evaluator, List[Evaluator]]:
+        """Method to configure evaluators
+
+        Use this method to configure evaluators.
+        Evaluators compute metrics based on accumulated during an epoch embeddings.
+        It might be time-consuming, consider using only at the end of a training process.
+        Each stage (train, val) to be estimated has to have a separate Evaluator object
+
+        Returns:
+            Union[:class:`~quaterion.eval.evaluator.Evaluator`,
+            List[:class:`~quaterion.eval.evaluator.Evaluator`]] - evaluators
+
+        Examples::
+
+            return [
+                Evaluator(
+                    "RetrievalPrecisionEvaluator",
+                    RetrievalPrecision(k=1),
+                    prog_bar=True,
+                    on_step=True,
+                    on_epoch=True
+                    stage=TrainStage.TRAIN
+                ),
+                Evaluator(
+                    "RetrievalPrecisionEvaluator",
+                    RetrievalPrecision(k=1),
+                    prog_bar=True,
+                    on_step=False
+                    on_epoch=True,
+                    stage=TrainStage.VALIDATION
+                ),
+            ]
+        """
+        return []
+
     def evaluate(
         self,
         embeddings: Tensor,
@@ -82,7 +123,7 @@ class TrainableModel(pl.LightningModule, CacheMixin):
         """Method to calculate and log metrics, accumulate embeddings in estimators
 
         Calculate current stage and batch metrics, accumulate embeddings in corresponding
-        estimators. Metrics being reset after each batch processing.
+        evaluators.
 
         Args:
             embeddings: current batch embeddings
@@ -96,6 +137,10 @@ class TrainableModel(pl.LightningModule, CacheMixin):
                     metric.compute(embeddings, **targets),
                     **metric.log_options,
                 )
+
+        for evaluator in self.evaluators:
+            if stage in evaluator.name:
+                evaluator.update(embeddings, **targets)
 
     @property
     def model(self) -> MetricModel:

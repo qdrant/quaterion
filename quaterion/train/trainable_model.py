@@ -105,6 +105,7 @@ class TrainableModel(pl.LightningModule, CacheMixin):
                 Evaluator(
                     "RetrievalPrecisionEvaluator",
                     RetrievalPrecision(k=1),
+                    epoch_eval_period=5,
                     prog_bar=True,
                     on_step=False
                     on_epoch=True,

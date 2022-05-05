@@ -51,10 +51,25 @@ class TrainableModel(pl.LightningModule, CacheMixin):
         :class:`~quaterion.eval.group.group_metric.GroupMetric`
 
         Returns:
-            Union[
-                :class:`~quaterion.eval.attached_metric.AttachedMetric`,
-                List[:class:`~quaterion.eval.attached_metric.AttachedMetric`]
-            ]: metrics attached to the model
+            Union[:class:`~quaterion.eval.attached_metric.AttachedMetric`,
+            List[:class:`~quaterion.eval.attached_metric.AttachedMetric`]] -
+            metrics attached to the model
+
+        Examples::
+
+            return [
+                AttachedMetric(
+                    "RetrievalPrecision",
+                    RetrievalPrecision(k=1),
+                    prog_bar=True,
+                    on_epoch=True,
+                ),
+                AttachedMetric(
+                    "RetrievalReciprocalRank",
+                    RetrievalReciprocalRank(),
+                    prog_bar=True,
+                ),
+            ]
         """
         return []
 

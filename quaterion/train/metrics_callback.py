@@ -17,7 +17,7 @@ class MetricsCallback(Callback):
         trainable_model, current_epoch, stage=None, last_epoch=False
     ):
         for evaluator in trainable_model.evaluators:
-            if stage != evaluator.stage:
+            if stage and stage != evaluator.stage:
                 continue
 
             if evaluator.has_been_reset:
@@ -33,7 +33,6 @@ class MetricsCallback(Callback):
                     logger=evaluator.logger,
                     prog_bar=True,
                 )
-
             if last_epoch:
                 logger.info(f"{evaluator.name} result: {evaluator.evaluate()}")
             else:

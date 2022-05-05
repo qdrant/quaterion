@@ -9,6 +9,7 @@ from quaterion.dataset.similarity_data_loader import (
 )
 from quaterion.loss import GroupLoss, PairwiseLoss
 from quaterion.train.cleanup_callback import CleanupCallback
+from quaterion.train.metrics_callback import MetricsCallback
 from quaterion.train.trainable_model import TrainableModel
 
 
@@ -55,6 +56,7 @@ class Quaterion:
                 )
 
         trainer.callbacks.append(CleanupCallback())
+        trainer.callbacks.append(MetricsCallback())
         # Prepare data loaders for training
 
         trainable_model.setup_dataloader(train_dataloader)

@@ -139,7 +139,7 @@ class TrainableModel(pl.LightningModule, CacheMixin):
                 )
 
         for evaluator in self.evaluators:
-            if stage in evaluator.name:
+            if stage == evaluator.stage:
                 evaluator.update(embeddings, **targets)
 
     @property

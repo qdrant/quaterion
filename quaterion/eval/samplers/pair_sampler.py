@@ -3,8 +3,12 @@ from typing import Tuple
 
 import torch
 
+from quaterion.eval.accumulators import PairAccumulator
 from quaterion.eval.pair import PairMetric
 from quaterion.eval.samplers import BaseSampler
+from torch.utils.data import Dataset, DataLoader
+from quaterion_models import MetricModel
+from quaterion.dataset.similarity_data_loader import PairsSimilarityDataLoader
 
 
 class PairSampler(BaseSampler):
@@ -17,23 +21,53 @@ class PairSampler(BaseSampler):
 
     """
 
-    def __init__(self, sample_size=-1, distinguish=False):
+    def __init__(self, sample_size=-1, distinguish=False, encode_batch_size=16):
         super().__init__(sample_size)
+        self.encode_batch_size = encode_batch_size
         self.distinguish = distinguish
+        self.accumulator = PairAccumulator()
 
-    def sample(self, metric: PairMetric) -> Tuple[torch.Tensor, torch.Tensor]:
+    def accumulate(self, dataset, model):
+        dataloader = DataLoader(dataset, batch_size=self.encode_batch_size)
+        collate_labels = PairsSimilarityDataLoader.collate_labels
+
+        for batch in dataloader:
+            objects = []
+            # preserve the same order as in `collate_labels`
+            for similarity_pair_sample in batch:
+                objects.append(similarity_pair_sample.obj_a)
+
+            for similarity_pair_sample in batch:
+                objects.append(similarity_pair_sample.obj_b)
+
+            batch_labels = collate_labels(batch)
+            self.accumulator.update(model.encode(objects), **batch_labels)
+
+        self.accumulator.set_filled()
+
+    def reset(self):
+        self.accumulator.reset()
+
+    def sample(
+        self, dataset: Dataset, metric: PairMetric, model: MetricModel
+    ) -> Tuple[torch.Tensor, torch.Tensor]:
         """Sample embeddings and targets for pairs based tasks.
 
         Args:
+            dataset: ...
             metric: PairMetric instance with accumulated embeddings, labels, pairs and subgroups
+            model: ...
 
         Returns:
             torch.Tensor, torch.Tensor: metrics labels and computed distance matrix
         """
-        embeddings = metric.embeddings
-        pairs = metric.pairs
+        if not self.accumulator.filled:
+            self.accumulate(dataset, model)
 
-        labels = metric.compute_labels(metric.labels, pairs, metric.subgroups)
+        embeddings = self.accumulator.embeddings
+        pairs = self.accumulator.pairs
+
+        labels = metric.compute_labels(self.accumulator.labels, pairs, self.accumulator.subgroups)
 
         embeddings_num = embeddings.shape[0]
         max_sample_size = embeddings_num if not self.distinguish else pairs.shape[0]

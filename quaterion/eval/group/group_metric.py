@@ -3,6 +3,7 @@ from torch import Tensor
 
 from quaterion.distances import Distance
 from quaterion.eval.base_metric import BaseMetric
+from quaterion.eval.accumulators import GroupAccumulator
 
 
 class GroupMetric(BaseMetric):
@@ -16,25 +17,10 @@ class GroupMetric(BaseMetric):
     """
 
     def __init__(
-        self,
-        distance_metric_name: Distance = Distance.COSINE,
+        self, distance_metric_name: Distance = Distance.COSINE,
     ):
-        super().__init__(
-            distance_metric_name=distance_metric_name,
-        )
-        self._groups = []
-
-    @property
-    def groups(self):
-        """Concatenate list of groups to Tensor
-
-        Help to avoid concatenating groups for each batch during accumulation. Instead,
-        concatenate it only on call.
-
-        Returns:
-            torch.Tensor: batch of groups
-        """
-        return torch.cat(self._groups) if len(self._groups) else torch.Tensor()
+        super().__init__(distance_metric_name=distance_metric_name,)
+        self.accumulator = GroupAccumulator()
 
     def update(self, embeddings: Tensor, groups: torch.LongTensor, device=None) -> None:
         """Process and accumulate batch
@@ -44,20 +30,11 @@ class GroupMetric(BaseMetric):
             groups: groups to distinguish similar and dissimilar objects.
             device: device to store calculated embeddings and groups on.
         """
-
-        if device is None:
-            device = embeddings.device
-
-        embeddings = embeddings.detach().to(device)
-        groups = groups.detach().to(device)
-
-        self._embeddings.append(embeddings)
-        self._groups.append(groups)
+        self.accumulator.update(embeddings, groups, device)
 
     def reset(self):
         """Reset accumulated embeddings, groups"""
-        super().reset()
-        self._groups = []
+        self.accumulator.reset()
 
     @staticmethod
     def compute_labels(groups: Tensor):
@@ -91,7 +68,7 @@ class GroupMetric(BaseMetric):
 
     def evaluate(self) -> torch.Tensor:
         """Perform metric computation with accumulated state"""
-        return self.compute(self.embeddings, self.groups)
+        return self.compute(**self.accumulator.state)
 
     def raw_compute(
         self, distance_matrix: torch.Tensor, labels: torch.Tensor

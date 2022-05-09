@@ -1,7 +1,5 @@
-from typing import Tuple
-
-import torch
-
+from torch.utils.data import Dataset
+from quaterion_models import MetricModel
 from quaterion.eval.base_metric import BaseMetric
 
 
@@ -10,7 +8,7 @@ class BaseSampler:
 
     Sampler allows reducing amount of time and resources to calculate a distance matrix.
     Instead of calculation of squared matrix with shape (num_embeddings, num_embeddings), it
-    selects embeddings and computes matrix with shape (sample_size, num_embeddings).
+    selects embeddings and computes matrix of a rectangle shape.
 
         Args:
             sample_size: amount of objects to select.
@@ -20,14 +18,9 @@ class BaseSampler:
     def __init__(self, sample_size=-1):
         self.sample_size = sample_size
 
-    def sample(self, metric: BaseMetric) -> Tuple[torch.Tensor, torch.Tensor]:
-        """Select embeddings and targets
+    def sample(self, dataset: Dataset, metric: BaseMetric, model: MetricModel):
+        pass
 
-        Args:
-            metric: metric instance with accumulated embeddings, targets and with a method
-                to compute final labels based on targets.
-
-        Returns:
-            labels, distance_matrix: metrics labels and computed distance matrix
-        """
-        raise NotImplementedError()
+    def reset(self):
+        """Reset accumulated state if any"""
+        pass

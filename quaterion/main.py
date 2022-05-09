@@ -1,12 +1,14 @@
 from typing import Optional
 
 import pytorch_lightning as pl
+from torch.utils.data import Dataset
 
 from quaterion.dataset.similarity_data_loader import (
     PairsSimilarityDataLoader,
     GroupSimilarityDataLoader,
     SimilarityDataLoader,
 )
+from quaterion.eval.evaluator import Evaluator
 from quaterion.loss import GroupLoss, PairwiseLoss
 from quaterion.train.cleanup_callback import CleanupCallback
 from quaterion.train.metrics_callback import MetricsCallback
@@ -75,3 +77,7 @@ class Quaterion:
             val_dataloaders=val_dataloader,
             ckpt_path=ckpt_path,
         )
+
+    @classmethod
+    def evaluate(cls, evaluator: Evaluator, dataset: Dataset):
+        return evaluator.evaluate(dataset)

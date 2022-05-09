@@ -9,6 +9,7 @@ from quaterion.eval.accumulators import GroupAccumulator
 from quaterion.eval.group import GroupMetric
 from quaterion.eval.samplers import BaseSampler
 from quaterion.dataset.similarity_data_loader import GroupSimilarityDataLoader
+from quaterion.utils.utils import iter_by_batch
 
 
 class GroupSampler(BaseSampler):
@@ -26,17 +27,7 @@ class GroupSampler(BaseSampler):
             model: model to encode objects
             dataset: Sized object, like list, tuple, torch.utils.data.Dataset, etc. to accumulate
         """
-
-        dataset_size = len(dataset)
-        step = min(dataset_size, self.encode_batch_size)
-        for slice_start_index in range(0, dataset_size, step):
-            slice_end_index = slice_start_index + step
-            slice_end_index = (
-                slice_end_index if slice_end_index < dataset_size else dataset_size
-            )
-            input_batch = [
-                dataset[index] for index in range(slice_start_index, slice_end_index)
-            ]
+        for input_batch in iter_by_batch(dataset, self.encode_batch_size):
             batch_labels = GroupSimilarityDataLoader.collate_labels(input_batch)
 
             features = [similarity_sample.obj for similarity_sample in input_batch]

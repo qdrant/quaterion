@@ -81,8 +81,7 @@ class TrainableModel(pl.LightningModule, CacheMixin):
     ) -> None:
         """Method to calculate and log metrics, accumulate embeddings in estimators
 
-        Calculate current stage and batch metrics, accumulate embeddings in corresponding
-        evaluators.
+        Calculate current stage and batch metrics
 
         Args:
             embeddings: current batch embeddings

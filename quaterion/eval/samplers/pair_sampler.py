@@ -9,6 +9,7 @@ from quaterion.eval.pair import PairMetric
 from quaterion.eval.samplers import BaseSampler
 from quaterion_models import MetricModel
 from quaterion.dataset.similarity_data_loader import PairsSimilarityDataLoader
+from quaterion.utils.utils import iter_by_batch
 
 
 class PairSampler(BaseSampler):
@@ -45,16 +46,7 @@ class PairSampler(BaseSampler):
             model: model to encode objects
             dataset: Sized object, like list, tuple, torch.utils.data.Dataset, etc. to accumulate
         """
-        dataset_size = len(dataset)
-        step = min(dataset_size, self.encode_batch_size)
-        for slice_start_index in range(0, dataset_size, step):
-            slice_end_index = slice_start_index + step
-            slice_end_index = (
-                slice_end_index if slice_end_index < dataset_size else dataset_size
-            )
-            input_batch = [
-                dataset[index] for index in range(slice_start_index, slice_end_index)
-            ]
+        for input_batch in iter_by_batch(dataset, self.encode_batch_size):
             batch_labels = PairsSimilarityDataLoader.collate_labels(input_batch)
 
             objects_a, objects_b = [], []

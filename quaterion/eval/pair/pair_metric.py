@@ -13,8 +13,8 @@ class PairMetric(BaseMetric):
         distance_metric_name: name of a distance metric to calculate distance or similarity
             matrices. Available names could be found in :class:`~quaterion.distances.Distance`.
 
-    Provides default implementations for embeddings and labels accumulation, distance and
-    interaction matrices calculation.
+    Provides default implementations for distance and interaction matrices calculation.
+    Accumulates embeddings and labels in an accumulator.
     """
 
     def __init__(
@@ -85,6 +85,15 @@ class PairMetric(BaseMetric):
     def raw_compute(
         self, distance_matrix: torch.Tensor, labels: torch.Tensor
     ) -> torch.Tensor:
+        """Perform metric computation on ready distance_matrix and labels
+
+        Args:
+            distance_matrix: distance matrix ready to metric computation
+            labels: labels ready to metric computation
+
+        Returns:
+            torch.Tensor - calculated metric value
+        """
         raise NotImplementedError()
 
     def update(
@@ -102,6 +111,6 @@ class PairMetric(BaseMetric):
             labels: labels to distinguish similar and dissimilar objects.
             pairs: indices to determine objects of one pair
             subgroups: subgroups numbers to determine which samples can be considered negative
-            device: device to store calculated embeddings and groups on.
+            device: device to store calculated embeddings and targets on.
         """
         self.accumulator.update(embeddings, labels, pairs, subgroups, device)

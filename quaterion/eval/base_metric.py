@@ -40,6 +40,15 @@ class BaseMetric:
     def raw_compute(
         self, distance_matrix: torch.Tensor, labels: torch.Tensor
     ) -> torch.Tensor:
+        """Perform metric computation on ready distance_matrix and labels
+
+        Args:
+            distance_matrix: distance matrix ready to metric computation
+            labels: labels ready to metric computation
+
+        Returns:
+            torch.Tensor - calculated metric value
+        """
         raise NotImplementedError()
 
     def precompute(

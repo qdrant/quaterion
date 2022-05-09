@@ -9,11 +9,12 @@ from quaterion.eval.accumulators import GroupAccumulator
 class GroupMetric(BaseMetric):
     """Base class for group metrics
 
-    Provide default implementation for embeddings and groups accumulation.
-
     Args:
         distance_metric_name: name of a distance metric to calculate distance or similarity
             matrices. Available names could be found in :class:`~quaterion.distances.Distance`.
+
+    Provides default implementations for distance and interaction matrices calculation.
+    Accumulates embeddings and groups in an accumulator.
     """
 
     def __init__(
@@ -76,4 +77,13 @@ class GroupMetric(BaseMetric):
     def raw_compute(
         self, distance_matrix: torch.Tensor, labels: torch.Tensor
     ) -> torch.Tensor:
+        """Perform metric computation on ready distance_matrix and labels
+
+        Args:
+            distance_matrix: distance matrix ready to metric computation
+            labels: labels ready to metric computation
+
+        Returns:
+            torch.Tensor - calculated metric value
+        """
         raise NotImplementedError()

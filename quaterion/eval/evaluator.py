@@ -1,11 +1,10 @@
-from typing import Dict
+from typing import Dict, Sized
 
 import torch
-from torch.utils.data import Dataset
+from quaterion_models import MetricModel
 
 from quaterion.eval.samplers import BaseSampler
 from quaterion.eval.base_metric import BaseMetric
-from quaterion_models import MetricModel
 
 
 class Evaluator:
@@ -15,9 +14,9 @@ class Evaluator:
     Evaluation might be time and memory consuming operation.
 
     Args:
-        metric: metric instance for computation
+        metrics: dictionary of metrics instances for calculation
         sampler: sampler selects embeddings and labels to perform partial evaluation
-        dataset: dataset instance to evaluate
+        model: metric model instance to perform objects encoding
     """
 
     def __init__(
@@ -30,8 +29,16 @@ class Evaluator:
         self.sampler = sampler
         self.model = model
 
-    def evaluate(self, dataset: Dataset) -> Dict[str, torch.Tensor]:
+    def evaluate(self, dataset: Sized) -> Dict[str, torch.Tensor]:
+        """Compute metrics on a dataset
 
+        Args:
+            dataset: Sized object, like list, tuple, torch.utils.data.Dataset, etc. to compute
+                metrics
+
+        Returns:
+            Dict[str, torch.Tensor] - dict of computed metrics
+        """
         results = {}
         for metric_name, metric in self.metrics.items():
 

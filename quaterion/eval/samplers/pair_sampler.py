@@ -14,10 +14,16 @@ from quaterion.dataset.similarity_data_loader import PairsSimilarityDataLoader
 class PairSampler(BaseSampler):
     """Perform selection of embeddings and targets for pairs based tasks.
 
+    Sampler allows reducing amount of time and resources to calculate a distance matrix.
+    Instead of calculation of squared matrix with shape (num_embeddings, num_embeddings), it
+    selects embeddings and computes matrix of a rectangle shape.
+
     Args:
+        sample_size: int - amount of objects to select
         distinguish: bool - determines whether to compare all objects each-to-each, or to
             compare only `obj_a` to `obj_b`. If true - compare only `obj_a` to `obj_b`. Reduces
             matrix size quadratically.
+        encode_batch_size: int - batch size to use during encoding
 
     """
 
@@ -33,7 +39,12 @@ class PairSampler(BaseSampler):
         self.accumulator = PairAccumulator()
 
     def accumulate(self, model: MetricModel, dataset: Sized):
+        """Encodes objects and accumulates embeddings with the corresponding raw labels
 
+        Args:
+            model: model to encode objects
+            dataset: Sized object, like list, tuple, torch.utils.data.Dataset, etc. to accumulate
+        """
         for start_index in range(0, len(dataset), self.encode_batch_size):
             input_batch = dataset[start_index : start_index + self.encode_batch_size]
             batch_labels = PairsSimilarityDataLoader.collate_labels(input_batch)
@@ -52,6 +63,7 @@ class PairSampler(BaseSampler):
         self.accumulator.set_filled()
 
     def reset(self):
+        """Reset accumulated state"""
         self.accumulator.reset()
 
     def sample(
@@ -60,9 +72,9 @@ class PairSampler(BaseSampler):
         """Sample embeddings and targets for pairs based tasks.
 
         Args:
-            dataset: ...
-            metric: PairMetric instance with accumulated embeddings, labels, pairs and subgroups
-            model: ...
+            dataset: Sized object, like list, tuple, torch.utils.data.Dataset, etc. to sample
+            metric: PairMetric instance to compute final labels representation
+            model: model to encode objects
 
         Returns:
             torch.Tensor, torch.Tensor: metrics labels and computed distance matrix

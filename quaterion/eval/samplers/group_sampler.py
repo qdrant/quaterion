@@ -20,7 +20,12 @@ class GroupSampler(BaseSampler):
         self.accumulator = GroupAccumulator()
 
     def accumulate(self, model: MetricModel, dataset: Sized):
+        """Encodes objects and accumulates embeddings with the corresponding raw labels
 
+        Args:
+            model: model to encode objects
+            dataset: Sized object, like list, tuple, torch.utils.data.Dataset, etc. to accumulate
+        """
         for start_index in range(0, len(dataset), self.encode_batch_size):
             input_batch = dataset[start_index : start_index + self.encode_batch_size]
             batch_labels = GroupSimilarityDataLoader.collate_labels(input_batch)
@@ -35,6 +40,7 @@ class GroupSampler(BaseSampler):
         self.accumulator.set_filled()
 
     def reset(self):
+        """Reset accumulated state"""
         self.accumulator.reset()
 
     def sample(
@@ -43,9 +49,9 @@ class GroupSampler(BaseSampler):
         """Sample embeddings and targets for groups based tasks.
 
         Args:
-            dataset: ...,
-            metric: GroupMetric instance with accumulated embeddings and groups
-            model: ...,
+            dataset: Sized object, like list, tuple, torch.utils.data.Dataset, etc. to sample
+            metric: GroupMetric instance to compute final labels representation
+            model: model to encode objects
 
         Returns:
             torch.Tensor, torch.Tensor: metrics labels and computed distance matrix

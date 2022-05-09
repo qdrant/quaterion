@@ -1,5 +1,8 @@
-from torch.utils.data import Dataset
+from typing import Sized, Tuple
+
+from torch import Tensor
 from quaterion_models import MetricModel
+
 from quaterion.eval.base_metric import BaseMetric
 
 
@@ -18,7 +21,19 @@ class BaseSampler:
     def __init__(self, sample_size=-1):
         self.sample_size = sample_size
 
-    def sample(self, dataset: Dataset, metric: BaseMetric, model: MetricModel):
+    def sample(
+        self, dataset: Sized, metric: BaseMetric, model: MetricModel
+    ) -> Tuple[Tensor, Tensor]:
+        """Sample objects and labels to calculate metrics
+
+        Args:
+            dataset: Sized object, like list, tuple, torch.utils.data.Dataset, etc. to sample
+            metric: metric instance to compute final labels representation
+            model: model to encode objects
+
+        Returns:
+            Tensor, Tensor: metrics labels and computed distance matrix
+        """
         pass
 
     def reset(self):

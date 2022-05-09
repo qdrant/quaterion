@@ -6,6 +6,12 @@ from quaterion.eval.accumulators import Accumulator
 
 
 class PairAccumulator(Accumulator):
+    """Accumulate calculated embeddings and corresponding targets for metrics and evaluators
+
+    Accumulate embeddings, labels, pairs and subgroups for pair-based tasks.
+    Keep track of current size to properly handle pairs.
+    """
+
     def __init__(self):
         super().__init__()
         self._labels = []
@@ -15,6 +21,11 @@ class PairAccumulator(Accumulator):
 
     @property
     def state(self) -> Dict[str, torch.Tensor]:
+        """Accumulated state
+
+        Returns:
+            Dict[str, torch.Tensor] - dictionary accumulates embeddings, labels, pairs, subgroups.
+        """
         state = super().state
         state.update(
             {"labels": self.labels, "pairs": self.pairs, "subgroups": self._subgroups}
@@ -29,7 +40,9 @@ class PairAccumulator(Accumulator):
         subgroups: torch.Tensor,
         device=None,
     ):
-        """Process and accumulate batch
+        """Update accumulator state.
+
+        Move provided embeddings and groups to proper device and add to accumulated state.
 
         Args:
             embeddings: embeddings to accumulate
@@ -53,6 +66,10 @@ class PairAccumulator(Accumulator):
         self._accumulated_size += pairs.shape[0]
 
     def reset(self):
+        """Reset accumulator state
+
+        Reset accumulator status and size, accumulated embeddings, labels, pairs and subgroups
+        """
         super().reset()
         self._labels = []
         self._pairs = []

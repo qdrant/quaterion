@@ -6,17 +6,35 @@ from quaterion.eval.accumulators import Accumulator
 
 
 class GroupAccumulator(Accumulator):
+    """Accumulate calculated embeddings and corresponding targets for metrics and evaluators
+
+    Accumulate embeddings and groups for group-based tasks.
+    """
     def __init__(self):
         super().__init__()
         self._groups = []
 
     @property
     def state(self) -> Dict[str, torch.Tensor]:
+        """Accumulated state
+
+        Returns:
+            Dict[str, torch.Tensor] - dictionary with embeddings and groups.
+        """
         state = super().state
         state.update({"groups": self.groups})
         return state
 
     def update(self, embeddings: torch.Tensor, groups: torch.Tensor, device=None):
+        """Update accumulator state.
+
+        Move provided embeddings and groups to proper device and add to accumulated state.
+
+        Args:
+            embeddings: embeddings to accumulate
+            groups: corresponding groups to accumulate
+            device: device to store tensors on
+        """
         if device is None:
             device = embeddings.device
 
@@ -27,6 +45,10 @@ class GroupAccumulator(Accumulator):
         self._groups.append(groups)
 
     def reset(self):
+        """Reset accumulator state
+
+        Reset accumulator status, accumulated embeddings and groups
+        """
         super().reset()
         self._groups = []
 

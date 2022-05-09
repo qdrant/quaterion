@@ -73,7 +73,7 @@ class TrainableModel(pl.LightningModule, CacheMixin):
         """
         return []
 
-    def evaluate(
+    def _evaluate(
         self,
         embeddings: Tensor,
         targets: Dict[str, Any],
@@ -270,7 +270,7 @@ class TrainableModel(pl.LightningModule, CacheMixin):
         loss = self.loss(embeddings=embeddings, **targets)
         self.log(f"{stage}_loss", loss)
 
-        self.evaluate(
+        self._evaluate(
             embeddings=embeddings,
             targets=targets,
             stage=stage,

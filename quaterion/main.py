@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Union, Sized, Iterable
 
 import pytorch_lightning as pl
 from torch.utils.data import Dataset
@@ -79,5 +79,5 @@ class Quaterion:
         )
 
     @classmethod
-    def evaluate(cls, evaluator: Evaluator, dataset: Dataset):
+    def evaluate(cls, evaluator: Evaluator, dataset: Union[Sized, Iterable, Dataset]):
         return evaluator.evaluate(dataset)

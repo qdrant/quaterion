@@ -76,7 +76,9 @@ def test_pair_sampler(dummy_model):
 
     # full dataset
     pair_sampler = PairSampler()
-    metric_labels, distance_matrix = pair_sampler.sample(pair_samples, metric, dummy_model)
+    metric_labels, distance_matrix = pair_sampler.sample(
+        pair_samples, metric, dummy_model
+    )
     assert distance_matrix.shape == torch.Size(
         (len(objects_to_encode), len(objects_to_encode))
     )
@@ -85,15 +87,17 @@ def test_pair_sampler(dummy_model):
     # part of dataset
     sample_size = 4
     pair_sampler = PairSampler(sample_size=sample_size)
-    metric_labels, distance_matrix = pair_sampler.sample(pair_samples, metric, dummy_model)
-    assert distance_matrix.shape == torch.Size(
-        (sample_size, len(objects_to_encode))
+    metric_labels, distance_matrix = pair_sampler.sample(
+        pair_samples, metric, dummy_model
     )
+    assert distance_matrix.shape == torch.Size((sample_size, len(objects_to_encode)))
     assert metric_labels.shape == distance_matrix.shape
 
     # # full dataset distinguish
     pair_sampler = PairSampler(distinguish=True)
-    metric_labels, distance_matrix = pair_sampler.sample(pair_samples, metric, dummy_model)
+    metric_labels, distance_matrix = pair_sampler.sample(
+        pair_samples, metric, dummy_model
+    )
     assert distance_matrix.shape == torch.Size(
         (len(objects_to_encode) // 2, len(objects_to_encode) // 2)
     )
@@ -102,7 +106,9 @@ def test_pair_sampler(dummy_model):
     # part of dataset distinguish
     sample_size = 4
     pair_sampler = PairSampler(sample_size=sample_size, distinguish=True)
-    metric_labels, distance_matrix = pair_sampler.sample(pair_samples, metric, dummy_model)
+    metric_labels, distance_matrix = pair_sampler.sample(
+        pair_samples, metric, dummy_model
+    )
     assert distance_matrix.shape == torch.Size(
         (sample_size, len(objects_to_encode) // 2)
     )
@@ -111,7 +117,14 @@ def test_pair_sampler(dummy_model):
 
 def test_group_sampler(dummy_model):
     metric = RetrievalRPrecision()
-    embeddings = [[0, 1, 2], [3, 4, 5], [7, 8, 9], [10, 11, 12], [13, 14, 15], [16, 17, 18],]
+    embeddings = [
+        [0, 1, 2],
+        [3, 4, 5],
+        [7, 8, 9],
+        [10, 11, 12],
+        [13, 14, 15],
+        [16, 17, 18],
+    ]
 
     groups = torch.LongTensor([0, 0, 0, 1, 1, 1])
 
@@ -125,17 +138,17 @@ def test_group_sampler(dummy_model):
         )
     # full dataset
     group_sampler = GroupSampler()
-    distance_matrix, metric_labels = group_sampler.sample(group_samples, metric, dummy_model)
-    assert distance_matrix.shape == torch.Size(
-        (len(embeddings), len(embeddings))
+    distance_matrix, metric_labels = group_sampler.sample(
+        group_samples, metric, dummy_model
     )
+    assert distance_matrix.shape == torch.Size((len(embeddings), len(embeddings)))
     assert metric_labels.shape == distance_matrix.shape
 
     # part of dataset
     sample_size = 4
     group_sampler = GroupSampler(sample_size=sample_size)
-    metric_labels, distance_matrix = group_sampler.sample(group_samples, metric, dummy_model)
-    assert distance_matrix.shape == torch.Size(
-        (sample_size, len(embeddings))
+    metric_labels, distance_matrix = group_sampler.sample(
+        group_samples, metric, dummy_model
     )
+    assert distance_matrix.shape == torch.Size((sample_size, len(embeddings)))
     assert metric_labels.shape == distance_matrix.shape

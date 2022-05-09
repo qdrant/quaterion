@@ -22,12 +22,14 @@ class GroupSampler(BaseSampler):
     def accumulate(self, model: MetricModel, dataset: Sized):
 
         for start_index in range(0, len(dataset), self.encode_batch_size):
-            input_batch = dataset[start_index: start_index + self.encode_batch_size]
+            input_batch = dataset[start_index : start_index + self.encode_batch_size]
             batch_labels = GroupSimilarityDataLoader.collate_labels(input_batch)
 
             features = [similarity_sample.obj for similarity_sample in input_batch]
 
-            embeddings = model.encode(features, batch_size=self.encode_batch_size, to_numpy=False)
+            embeddings = model.encode(
+                features, batch_size=self.encode_batch_size, to_numpy=False
+            )
             self.accumulator.update(embeddings, **batch_labels)
 
         self.accumulator.set_filled()

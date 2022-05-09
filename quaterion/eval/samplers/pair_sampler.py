@@ -35,7 +35,7 @@ class PairSampler(BaseSampler):
     def accumulate(self, model: MetricModel, dataset: Sized):
 
         for start_index in range(0, len(dataset), self.encode_batch_size):
-            input_batch = dataset[start_index: start_index + self.encode_batch_size]
+            input_batch = dataset[start_index : start_index + self.encode_batch_size]
             batch_labels = PairsSimilarityDataLoader.collate_labels(input_batch)
 
             objects_a, objects_b = [], []
@@ -44,7 +44,9 @@ class PairSampler(BaseSampler):
                 objects_b.append(similarity_sample.obj_b)
 
             features = objects_a + objects_b
-            embeddings = model.encode(features, batch_size=self.encode_batch_size, to_numpy=False)
+            embeddings = model.encode(
+                features, batch_size=self.encode_batch_size, to_numpy=False
+            )
             self.accumulator.update(embeddings, **batch_labels)
 
         self.accumulator.set_filled()

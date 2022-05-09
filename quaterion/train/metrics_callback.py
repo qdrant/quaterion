@@ -1,42 +1,8 @@
 import pytorch_lightning as pl
-from loguru import logger
 from pytorch_lightning.callbacks.base import Callback
-
-from quaterion.utils.enums import TrainStage
 
 
 class MetricsCallback(Callback):
-    @staticmethod
-    def reset_evaluators(trainable_model, stage=None):
-        for evaluator in trainable_model.evaluators:
-            if not stage or stage in evaluator.name:
-                evaluator.reset()
-
-    @staticmethod
-    def log_and_reset_evaluator(
-        trainable_model, current_epoch, stage=None, last_epoch=False
-    ):
-        for evaluator in trainable_model.evaluators:
-            if stage and stage != evaluator.stage:
-                continue
-
-            if evaluator.has_been_reset:
-                continue
-
-            if (
-                evaluator.epoch_eval_period
-                and current_epoch % evaluator.epoch_eval_period == 0
-            ):
-                trainable_model.log(
-                    evaluator.name,
-                    evaluator.evaluate(),
-                    logger=evaluator.logger,
-                    prog_bar=True,
-                )
-            if last_epoch:
-                logger.info(f"{evaluator.name} result: {evaluator.evaluate()}")
-            else:
-                evaluator.reset()
 
     @staticmethod
     def reset_metrics(trainable_model):
@@ -47,7 +13,6 @@ class MetricsCallback(Callback):
         self, trainer: "pl.Trainer", trainable_model: "pl.LightningModule"
     ) -> None:
         self.reset_metrics(trainable_model)
-        self.reset_evaluators(trainable_model, TrainStage.VALIDATION)
 
     def on_train_epoch_start(
         self, trainer: "pl.Trainer", trainable_model: "pl.LightningModule"
@@ -58,39 +23,13 @@ class MetricsCallback(Callback):
         self, trainer: "pl.Trainer", trainable_model: "pl.LightningModule"
     ) -> None:
         self.reset_metrics(trainable_model)
-        self.log_and_reset_evaluator(
-            trainable_model,
-            trainer.current_epoch,
-            stage=TrainStage.TRAIN,
-            last_epoch=False,
-        )
 
     def on_validation_epoch_start(
         self, trainer: "pl.Trainer", trainable_model: "pl.LightningModule"
     ) -> None:
         self.reset_metrics(trainable_model)
-        self.log_and_reset_evaluator(
-            trainable_model,
-            trainer.current_epoch,
-            stage=TrainStage.VALIDATION,
-            last_epoch=False,
-        )
 
     def on_validation_epoch_end(
         self, trainer: "pl.Trainer", trainable_model: "pl.LightningModule"
     ) -> None:
         self.reset_metrics(trainable_model)
-
-    def on_fit_end(
-        self, trainer: "pl.Trainer", trainable_model: "pl.LightningModule"
-    ) -> None:
-        self.log_and_reset_evaluator(
-            trainable_model, trainer.current_epoch, last_epoch=True
-        )
-
-    def on_test_end(
-        self, trainer: "pl.Trainer", trainable_model: "pl.LightningModule"
-    ) -> None:
-        self.log_and_reset_evaluator(
-            trainable_model, trainer.current_epoch, last_epoch=True
-        )

@@ -26,8 +26,13 @@ class GroupSampler(BaseSampler):
             model: model to encode objects
             dataset: Sized object, like list, tuple, torch.utils.data.Dataset, etc. to accumulate
         """
-        for start_index in range(0, len(dataset), self.encode_batch_size):
-            input_batch = dataset[start_index : start_index + self.encode_batch_size]
+
+        dataset_size = len(dataset)
+        step = min(dataset_size, self.encode_batch_size)
+        for slice_start_index in range(0, dataset_size, step):
+            slice_end_index = slice_start_index + step
+            slice_end_index = slice_end_index if slice_end_index < dataset_size else dataset_size
+            input_batch = [dataset[index] for index in range(slice_start_index, slice_end_index)]
             batch_labels = GroupSimilarityDataLoader.collate_labels(input_batch)
 
             features = [similarity_sample.obj for similarity_sample in input_batch]

@@ -35,11 +35,7 @@ class Evaluator:
         results = {}
         for metric_name, metric in self.metrics.items():
 
-            distance_matrix, labels = self.sampler.sample(
-                dataset,
-                metric,
-                self.model
-            )
+            distance_matrix, labels = self.sampler.sample(dataset, metric, self.model)
             results[metric_name] = metric.raw_compute(distance_matrix, labels)
 
         self.sampler.reset()

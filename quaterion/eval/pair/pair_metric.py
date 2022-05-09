@@ -18,14 +18,19 @@ class PairMetric(BaseMetric):
     """
 
     def __init__(
-        self, distance_metric_name: Distance = Distance.COSINE,
+        self,
+        distance_metric_name: Distance = Distance.COSINE,
     ):
-        super().__init__(distance_metric_name=distance_metric_name,)
+        super().__init__(
+            distance_metric_name=distance_metric_name,
+        )
         self.accumulator = PairAccumulator()
 
     @staticmethod
     def compute_labels(
-        labels: torch.Tensor, pairs: torch.LongTensor, subgroups: torch.Tensor,
+        labels: torch.Tensor,
+        pairs: torch.LongTensor,
+        subgroups: torch.Tensor,
     ) -> torch.Tensor:
         """Compute metric labels based on samples labels and pairs
 
@@ -75,9 +80,7 @@ class PairMetric(BaseMetric):
 
     def evaluate(self) -> torch.Tensor:
         """Perform metric computation with accumulated state"""
-        return self.compute(
-            **self.accumulator.state
-        )
+        return self.compute(**self.accumulator.state)
 
     def raw_compute(
         self, distance_matrix: torch.Tensor, labels: torch.Tensor

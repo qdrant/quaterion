@@ -67,7 +67,9 @@ class PairSampler(BaseSampler):
         embeddings = self.accumulator.embeddings
         pairs = self.accumulator.pairs
 
-        labels = metric.compute_labels(self.accumulator.labels, pairs, self.accumulator.subgroups)
+        labels = metric.compute_labels(
+            self.accumulator.labels, pairs, self.accumulator.subgroups
+        )
 
         embeddings_num = embeddings.shape[0]
         max_sample_size = embeddings_num if not self.distinguish else pairs.shape[0]

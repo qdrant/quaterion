@@ -16,11 +16,9 @@ class PairAccumulator(Accumulator):
     @property
     def state(self) -> Dict[str, torch.Tensor]:
         state = super().state
-        state.update({
-            "labels": self.labels,
-            "pairs": self.pairs,
-            "subgroups": self._subgroups
-        })
+        state.update(
+            {"labels": self.labels, "pairs": self.pairs, "subgroups": self._subgroups}
+        )
         return state
 
     def update(

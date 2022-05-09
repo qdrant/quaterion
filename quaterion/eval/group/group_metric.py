@@ -17,9 +17,12 @@ class GroupMetric(BaseMetric):
     """
 
     def __init__(
-        self, distance_metric_name: Distance = Distance.COSINE,
+        self,
+        distance_metric_name: Distance = Distance.COSINE,
     ):
-        super().__init__(distance_metric_name=distance_metric_name,)
+        super().__init__(
+            distance_metric_name=distance_metric_name,
+        )
         self.accumulator = GroupAccumulator()
 
     def update(self, embeddings: Tensor, groups: torch.LongTensor, device=None) -> None:

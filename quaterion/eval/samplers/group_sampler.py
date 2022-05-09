@@ -1,5 +1,5 @@
 import random
-from typing import Tuple
+from typing import Tuple, Sized
 
 import torch
 
@@ -8,7 +8,6 @@ from quaterion_models import MetricModel
 from quaterion.eval.accumulators import GroupAccumulator
 from quaterion.eval.group import GroupMetric
 from quaterion.eval.samplers import BaseSampler
-from torch.utils.data import Dataset, DataLoader
 from quaterion.dataset.similarity_data_loader import GroupSimilarityDataLoader
 
 
@@ -20,17 +19,24 @@ class GroupSampler(BaseSampler):
         self.encode_batch_size = encode_batch_size
         self.accumulator = GroupAccumulator()
 
-    def accumulate(self, dataset: Dataset, model):
-        dataloader = DataLoader(dataset, batch_size=self.encode_batch_size)
-        collate_labels = GroupSimilarityDataLoader.collate_labels
+    def accumulate(self, model: MetricModel, dataset: Sized):
 
-        for batch in dataloader:
-            objects = [sample.object for sample in batch]
-            self.accumulator.update(model.encode(objects), **collate_labels(batch))
+        for start_index in range(0, len(dataset), self.encode_batch_size):
+            input_batch = dataset[start_index: start_index + self.encode_batch_size]
+            batch_labels = GroupSimilarityDataLoader.collate_labels(input_batch)
+
+            features = [similarity_sample.obj for similarity_sample in input_batch]
+
+            embeddings = model.encode(features, batch_size=self.encode_batch_size, to_numpy=False)
+            self.accumulator.update(embeddings, **batch_labels)
+
         self.accumulator.set_filled()
 
+    def reset(self):
+        self.accumulator.reset()
+
     def sample(
-        self, dataset: Dataset, metric: GroupMetric, model: MetricModel
+        self, dataset: Sized, metric: GroupMetric, model: MetricModel
     ) -> Tuple[torch.Tensor, torch.Tensor]:
         """Sample embeddings and targets for groups based tasks.
 
@@ -43,7 +49,7 @@ class GroupSampler(BaseSampler):
             torch.Tensor, torch.Tensor: metrics labels and computed distance matrix
         """
         if not self.accumulator.filled:
-            self.accumulate(dataset, model)
+            self.accumulate(model, dataset)
 
         embeddings = self.accumulator.embeddings
         labels = metric.compute_labels(self.accumulator.groups)
@@ -63,6 +69,3 @@ class GroupSampler(BaseSampler):
             embeddings[sample_indices], embeddings
         )
         return labels.float(), distance_matrix
-
-    def reset(self):
-        self.accumulator.reset()

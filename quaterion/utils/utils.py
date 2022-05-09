@@ -176,5 +176,3 @@ def iter_by_batch(sequence: Union[Sized, Iterable, Dataset], batch_size: int):
         if len(batch) > 0:
             yield batch
         return
-
-

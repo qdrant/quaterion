@@ -40,11 +40,6 @@ class TrainableModel(pl.LightningModule, CacheMixin):
             [metrics] if isinstance(metrics, AttachedMetric) else metrics
         )
 
-        evaluators = self.configure_evaluators()
-        self.evaluators: List[Evaluator] = (
-            [evaluators] if isinstance(evaluators, Evaluator) else evaluators
-        )
-
         self._model = MetricModel(encoders=encoders, head=head)
         self._loss = self.configure_loss()
 
@@ -79,42 +74,6 @@ class TrainableModel(pl.LightningModule, CacheMixin):
         """
         return []
 
-    def configure_evaluators(self) -> Union[Evaluator, List[Evaluator]]:
-        """Method to configure evaluators
-
-        Use this method to configure evaluators.
-        Evaluators compute metrics based on accumulated during an epoch embeddings.
-        It might be time-consuming, consider using only at the end of a training process.
-        Each stage (train, val) to be estimated has to have a separate Evaluator object
-
-        Returns:
-            Union[:class:`~quaterion.eval.evaluator.Evaluator`,
-            List[:class:`~quaterion.eval.evaluator.Evaluator`]] - evaluators
-
-        Examples::
-
-            return [
-                Evaluator(
-                    "RetrievalPrecisionEvaluator",
-                    RetrievalPrecision(k=1),
-                    prog_bar=True,
-                    on_step=True,
-                    on_epoch=True
-                    stage=TrainStage.TRAIN
-                ),
-                Evaluator(
-                    "RetrievalPrecisionEvaluator",
-                    RetrievalPrecision(k=1),
-                    epoch_eval_period=5,
-                    prog_bar=True,
-                    on_step=False
-                    on_epoch=True,
-                    stage=TrainStage.VALIDATION
-                ),
-            ]
-        """
-        return []
-
     def evaluate(
         self,
         embeddings: Tensor,
@@ -138,10 +97,6 @@ class TrainableModel(pl.LightningModule, CacheMixin):
                     metric.compute(embeddings, **targets),
                     **metric.log_options,
                 )
-
-        for evaluator in self.evaluators:
-            if stage == evaluator.stage:
-                evaluator.update(embeddings, **targets)
 
     @property
     def model(self) -> MetricModel:

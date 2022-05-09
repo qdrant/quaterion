@@ -10,6 +10,7 @@ class GroupAccumulator(Accumulator):
 
     Accumulate embeddings and groups for group-based tasks.
     """
+
     def __init__(self):
         super().__init__()
         self._groups = []

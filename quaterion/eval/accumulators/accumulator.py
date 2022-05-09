@@ -5,6 +5,7 @@ import torch
 
 class Accumulator:
     """Accumulate calculated embeddings and corresponding targets for metrics and evaluators"""
+
     def __init__(self):
         self._embeddings = []
         self._filled = False

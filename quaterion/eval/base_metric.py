@@ -49,7 +49,9 @@ class BaseMetric:
 
         Args:
             distance_matrix: distance matrix ready to metric computation
-            labels: labels ready to metric computation
+            labels: labels ready to metric computation with the same shape as `distance_matrix`.
+                For `PairMetric` values are taken from `SimilarityPairSample.score`, for
+                `GroupMetric` the possible values are in {0, 1}.
 
         Returns:
             torch.Tensor - calculated metric value

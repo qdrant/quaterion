@@ -65,7 +65,7 @@ class GroupSampler(BaseSampler):
             self.accumulate(model, dataset)
 
         embeddings = self.accumulator.embeddings
-        labels = metric.compute_labels(self.accumulator.groups)
+        labels = metric.prepare_labels(self.accumulator.groups)
 
         max_sample_size = embeddings.shape[0]
 

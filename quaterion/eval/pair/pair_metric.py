@@ -27,7 +27,7 @@ class PairMetric(BaseMetric):
         self.accumulator = PairAccumulator()
 
     @staticmethod
-    def compute_labels(
+    def prepare_labels(
         labels: torch.Tensor,
         pairs: torch.LongTensor,
         subgroups: torch.Tensor,

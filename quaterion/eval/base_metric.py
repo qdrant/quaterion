@@ -67,14 +67,14 @@ class BaseMetric:
         Returns:
             torch.Tensor, torch.Tensor - labels and distance matrix
         """
-        labels = self.compute_labels(**targets)
+        labels = self.prepare_labels(**targets)
         distance_matrix = self.distance.distance_matrix(embeddings)
         self_mask = torch.eye(distance_matrix.shape[0], dtype=torch.bool)
         distance_matrix[self_mask] = torch.max(distance_matrix) + 1
         return labels.float(), distance_matrix
 
     @staticmethod
-    def compute_labels(**targets) -> torch.Tensor:
+    def prepare_labels(**targets) -> torch.Tensor:
         """Compute metric labels
 
         Args:

@@ -41,7 +41,7 @@ class GroupMetric(BaseMetric):
         self.accumulator.reset()
 
     @staticmethod
-    def compute_labels(groups: Tensor):
+    def prepare_labels(groups: Tensor):
         """Compute metric labels based on samples groups
 
         Args:

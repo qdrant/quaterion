@@ -86,7 +86,7 @@ class PairSampler(BaseSampler):
         embeddings = self.accumulator.embeddings
         pairs = self.accumulator.pairs
 
-        labels = metric.compute_labels(
+        labels = metric.prepare_labels(
             self.accumulator.labels, pairs, self.accumulator.subgroups
         )
 

@@ -42,6 +42,11 @@ class BaseMetric:
     ) -> torch.Tensor:
         """Perform metric computation on ready distance_matrix and labels
 
+        This method does not make any data and labels preparation.
+        It is assumed that `distance_matrix` has already been calculated, required changes such
+        masking distance from an element to itself have already been applied and corresponding
+        `labels` have been prepared.
+
         Args:
             distance_matrix: distance matrix ready to metric computation
             labels: labels ready to metric computation

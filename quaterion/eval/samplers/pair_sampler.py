@@ -106,12 +106,20 @@ class PairSampler(BaseSampler):
             ref_embeddings = embeddings[pairs[sample_indices][:, 0]]
             embeddings = embeddings[pairs[:, 1]]
             labels = labels[:, pairs[:, 1]]
-            distance_matrix = metric.distance.distance_matrix(ref_embeddings, embeddings)
+            distance_matrix = metric.distance.distance_matrix(
+                ref_embeddings, embeddings
+            )
         else:
             ref_embeddings = embeddings[sample_indices]
-            distance_matrix = metric.distance.distance_matrix(ref_embeddings, embeddings)
-            self_mask = torch.arange(0, distance_matrix.shape[0], dtype=torch.long).view(-1, 1)
+            distance_matrix = metric.distance.distance_matrix(
+                ref_embeddings, embeddings
+            )
+            self_mask = torch.arange(
+                0, distance_matrix.shape[0], dtype=torch.long
+            ).view(-1, 1)
             self_mask = torch.cat([self_mask, sample_indices.view(-1, 1)], dim=1)
-            distance_matrix[self_mask[:, 0], self_mask[:, 1]] = distance_matrix.max() + 1
+            distance_matrix[self_mask[:, 0], self_mask[:, 1]] = (
+                distance_matrix.max() + 1
+            )
 
         return labels.float(), distance_matrix

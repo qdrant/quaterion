@@ -136,7 +136,10 @@ def test_group_sampler(dummy_model):
     group_samples = []
     for index in range(len(embeddings)):
         group_samples.append(
-            SimilarityGroupSample(obj=embeddings[index], group=groups[index],)
+            SimilarityGroupSample(
+                obj=embeddings[index],
+                group=groups[index],
+            )
         )
     # full dataset
     group_sampler = GroupSampler()

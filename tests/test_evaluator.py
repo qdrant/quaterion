@@ -96,4 +96,3 @@ def test_evaluator(dummy_model):
     pair_sampler = PairSampler(sample_size=sample_size, distinguish=True)
     evaluator = Evaluator(metrics={"rrk": metric}, sampler=pair_sampler)
     assert evaluator.evaluate(pair_samples, dummy_model) == {"rrk": 1.0}
-

@@ -2,6 +2,7 @@ from typing import Optional, Union, Sized, Iterable
 
 import pytorch_lightning as pl
 from torch.utils.data import Dataset
+from quaterion_models import MetricModel
 
 from quaterion.dataset.similarity_data_loader import (
     PairsSimilarityDataLoader,
@@ -79,5 +80,10 @@ class Quaterion:
         )
 
     @classmethod
-    def evaluate(cls, evaluator: Evaluator, dataset: Union[Sized, Iterable, Dataset]):
-        return evaluator.evaluate(dataset)
+    def evaluate(
+        cls,
+        evaluator: Evaluator,
+        dataset: Union[Sized, Iterable, Dataset],
+        model: MetricModel,
+    ):
+        return evaluator.evaluate(dataset, model)

@@ -76,4 +76,6 @@ class GroupSampler(BaseSampler):
         distance_matrix = metric.distance.distance_matrix(
             embeddings[sample_indices], embeddings
         )
+        self_mask = torch.arange(0, distance_matrix.shape[0]).view(-1, 1).repeat(1, 2)
+        distance_matrix[self_mask[:, 0], self_mask[:, 1]] = distance_matrix.max() + 1
         return labels.float(), distance_matrix

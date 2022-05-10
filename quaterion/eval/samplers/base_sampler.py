@@ -20,7 +20,9 @@ class BaseSampler:
     """
 
     def __init__(
-        self, sample_size=-1, device: Union[torch.device, str, None] = None,
+        self,
+        sample_size=-1,
+        device: Union[torch.device, str, None] = None,
     ):
         self.sample_size = sample_size
         self.device = device

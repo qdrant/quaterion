@@ -1,5 +1,5 @@
 import random
-from typing import Tuple
+from typing import Tuple, Union
 from collections.abc import Sized
 
 import torch
@@ -33,8 +33,9 @@ class PairSampler(BaseSampler):
         sample_size: int = -1,
         distinguish: bool = False,
         encode_batch_size: int = 16,
+        device: Union[torch.device, str, None] = None,
     ):
-        super().__init__(sample_size)
+        super().__init__(sample_size, device)
         self.encode_batch_size = encode_batch_size
         self.distinguish = distinguish
         self.accumulator = PairAccumulator()
@@ -58,7 +59,7 @@ class PairSampler(BaseSampler):
             embeddings = model.encode(
                 features, batch_size=self.encode_batch_size, to_numpy=False
             )
-            self.accumulator.update(embeddings, **batch_labels)
+            self.accumulator.update(embeddings, **batch_labels, device=self.device)
 
         self.accumulator.set_filled()
 
@@ -114,9 +115,14 @@ class PairSampler(BaseSampler):
             distance_matrix = metric.distance.distance_matrix(
                 ref_embeddings, embeddings
             )
-            self_mask = torch.arange(
-                0, distance_matrix.shape[0], dtype=torch.long
-            ).view(-1, 1)
+            device = embeddings.device
+            self_mask = (
+                torch.arange(
+                    0, distance_matrix.shape[0], dtype=torch.long, device=device
+                )
+                .view(-1, 1)
+                .to(device)
+            )
             self_mask = torch.cat([self_mask, sample_indices.view(-1, 1)], dim=1)
             distance_matrix[self_mask[:, 0], self_mask[:, 1]] = (
                 distance_matrix.max() + 1

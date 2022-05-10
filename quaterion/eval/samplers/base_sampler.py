@@ -1,5 +1,6 @@
-from typing import Sized, Tuple
+from typing import Sized, Tuple, Union
 
+import torch
 from torch import Tensor
 from quaterion_models import MetricModel
 
@@ -18,8 +19,11 @@ class BaseSampler:
 
     """
 
-    def __init__(self, sample_size=-1):
+    def __init__(
+        self, sample_size=-1, device: Union[torch.device, str, None] = None,
+    ):
         self.sample_size = sample_size
+        self.device = device
 
     def sample(
         self, dataset: Sized, metric: BaseMetric, model: MetricModel

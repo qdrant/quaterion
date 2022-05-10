@@ -1,5 +1,5 @@
 import random
-from typing import Tuple, Sized
+from typing import Tuple, Sized, Union
 
 import torch
 
@@ -15,8 +15,13 @@ from quaterion.utils.utils import iter_by_batch
 class GroupSampler(BaseSampler):
     """Perform selection of embeddings and targets for group based tasks."""
 
-    def __init__(self, sample_size=-1, encode_batch_size=16):
-        super().__init__(sample_size)
+    def __init__(
+        self,
+        sample_size=-1,
+        encode_batch_size=16,
+        device: Union[torch.device, str, None] = None,
+    ):
+        super().__init__(sample_size, device)
         self.encode_batch_size = encode_batch_size
         self.accumulator = GroupAccumulator()
 
@@ -35,7 +40,7 @@ class GroupSampler(BaseSampler):
             embeddings = model.encode(
                 features, batch_size=self.encode_batch_size, to_numpy=False
             )
-            self.accumulator.update(embeddings, **batch_labels)
+            self.accumulator.update(embeddings, **batch_labels, device=self.device)
 
         self.accumulator.set_filled()
 
@@ -76,6 +81,12 @@ class GroupSampler(BaseSampler):
         distance_matrix = metric.distance.distance_matrix(
             embeddings[sample_indices], embeddings
         )
-        self_mask = torch.arange(0, distance_matrix.shape[0]).view(-1, 1).repeat(1, 2)
+        device = embeddings.device
+        self_mask = (
+            torch.arange(0, distance_matrix.shape[0])
+            .view(-1, 1)
+            .repeat(1, 2)
+            .to(device)
+        )
         distance_matrix[self_mask[:, 0], self_mask[:, 1]] = distance_matrix.max() + 1
         return labels.float(), distance_matrix

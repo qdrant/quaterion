@@ -81,6 +81,6 @@ class BaseMetric:
             **targets: objects to compute final labels. `**targets` in PairMetric consists of
                 `labels`, `pairs` and `subgroups`, in GroupMetric - of `groups`.
         Returns:
-            target: torch.Tensor -  labels to be used during metric computation
+            targets: torch.Tensor -  labels to be used during metric computation
         """
         raise NotImplementedError()

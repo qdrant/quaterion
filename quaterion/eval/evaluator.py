@@ -20,7 +20,9 @@ class Evaluator:
     """
 
     def __init__(
-        self, metrics: Union[BaseMetric, Dict[str, BaseMetric]], sampler: BaseSampler,
+        self,
+        metrics: Union[BaseMetric, Dict[str, BaseMetric]],
+        sampler: BaseSampler,
     ):
         self.metrics = (
             metrics
@@ -30,7 +32,9 @@ class Evaluator:
         self.sampler = sampler
 
     def evaluate(
-        self, dataset: Union[Sized, Iterable, Dataset], model: MetricModel,
+        self,
+        dataset: Union[Sized, Iterable, Dataset],
+        model: MetricModel,
     ) -> Dict[str, torch.Tensor]:
         """Compute metrics on a dataset
 

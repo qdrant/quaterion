@@ -2,6 +2,7 @@ import torch
 from torch import Tensor, LongTensor
 
 from quaterion.distances import Distance
+from quaterion.eval.accumulators import PairAccumulator
 from quaterion.eval.base_metric import BaseMetric
 
 
@@ -12,60 +13,21 @@ class PairMetric(BaseMetric):
         distance_metric_name: name of a distance metric to calculate distance or similarity
             matrices. Available names could be found in :class:`~quaterion.distances.Distance`.
 
-    Provides default implementations for embeddings and labels accumulation, distance and
-    interaction matrices calculation.
+    Provides default implementations for distance and interaction matrices calculation.
+    Accumulates embeddings and labels in an accumulator.
     """
 
     def __init__(
         self,
         distance_metric_name: Distance = Distance.COSINE,
     ):
-        self._labels = []
-        self._pairs = []
-        self._subgroups = []
         super().__init__(
             distance_metric_name=distance_metric_name,
         )
-        self._accumulated_size = 0
+        self.accumulator = PairAccumulator()
 
-    @property
-    def labels(self):
-        """Concatenate list of labels to Tensor
-
-        Help to avoid concatenating labels for each batch during accumulation. Instead,
-        concatenate it only on call.
-
-        Returns:
-            torch.Tensor: batch of labels
-        """
-        return torch.cat(self._labels) if len(self._labels) else torch.Tensor()
-
-    @property
-    def subgroups(self):
-        """Concatenate list of subgroups to Tensor
-
-        Help to avoid concatenating subgroups for each batch during accumulation. Instead,
-        concatenate it only on call.
-
-        Returns:
-            torch.Tensor: batch of subgroups
-        """
-        return torch.cat(self._subgroups) if len(self._subgroups) else torch.Tensor()
-
-    @property
-    def pairs(self) -> torch.LongTensor:
-        """Concatenate list of pairs to Tensor
-
-        Help to avoid concatenating pairs for each batch during accumulation. Instead,
-        concatenate it only on call.
-
-        Returns:
-            torch.Tensor: batch of pairs
-        """
-        return torch.cat(self._pairs) if len(self._pairs) else torch.LongTensor()
-
-    def compute_labels(
-        self,
+    @staticmethod
+    def prepare_labels(
         labels: torch.Tensor,
         pairs: torch.LongTensor,
         subgroups: torch.Tensor,
@@ -90,47 +52,12 @@ class PairMetric(BaseMetric):
         target[pairs[:, 1], pairs[:, 0]] = labels
         return target
 
-    def update(
-        self,
-        embeddings: torch.Tensor,
-        labels: torch.Tensor,
-        pairs: torch.LongTensor,
-        subgroups: torch.Tensor,
-        device=None,
-    ):
-        """Process and accumulate batch
-
-        Args:
-            embeddings: embeddings to accumulate
-            labels: labels to distinguish similar and dissimilar objects.
-            pairs: indices to determine objects of one pair
-            subgroups: subgroups numbers to determine which samples can be considered negative
-            device: device to store calculated embeddings and groups on.
-        """
-        device = device if device else embeddings.device
-
-        embeddings = embeddings.detach().to(device)
-        labels = labels.detach().to(device)
-        pairs = pairs.detach().to(device)
-        subgroups = subgroups.detach().to(device)
-
-        self._embeddings.append(embeddings)
-        self._labels.append(labels)
-        self._pairs.append(pairs + self._accumulated_size)
-        self._subgroups.append(subgroups)
-
-        self._accumulated_size += pairs.shape[0]
-
     def reset(self):
         """Reset accumulated state
 
         Reset embeddings, labels, pairs, subgroups, etc.
         """
-        super().reset()
-        self._labels = []
-        self._pairs = []
-        self._subgroups = []
-        self._accumulated_size = 0
+        self.accumulator.reset()
 
     def compute(
         self, embeddings: Tensor, labels: Tensor, pairs: LongTensor, subgroups: Tensor
@@ -153,9 +80,43 @@ class PairMetric(BaseMetric):
 
     def evaluate(self) -> torch.Tensor:
         """Perform metric computation with accumulated state"""
-        return self.compute(self.embeddings, self.labels, self.pairs, self.subgroups)
+        return self.compute(**self.accumulator.state)
 
     def raw_compute(
         self, distance_matrix: torch.Tensor, labels: torch.Tensor
     ) -> torch.Tensor:
+        """Perform metric computation on ready distance_matrix and labels
+
+        This method does not make any data and labels preparation.
+        It is assumed that `distance_matrix` has already been calculated, required changes such
+        masking distance from an element to itself have already been applied and corresponding
+        `labels` have been prepared.
+
+        Args:
+            distance_matrix: distance matrix ready to metric computation
+            labels: labels ready to metric computation with the same shape as `distance_matrix`.
+                Values are taken from `SimilarityPairSample.score`.
+
+        Returns:
+            torch.Tensor - calculated metric value
+        """
         raise NotImplementedError()
+
+    def update(
+        self,
+        embeddings: torch.Tensor,
+        labels: torch.Tensor,
+        pairs: torch.LongTensor,
+        subgroups: torch.Tensor,
+        device=None,
+    ):
+        """Process and accumulate batch
+
+        Args:
+            embeddings: embeddings to accumulate
+            labels: labels to distinguish similar and dissimilar objects.
+            pairs: indices to determine objects of one pair
+            subgroups: subgroups numbers to determine which samples can be considered negative
+            device: device to store calculated embeddings and targets on.
+        """
+        self.accumulator.update(embeddings, labels, pairs, subgroups, device)

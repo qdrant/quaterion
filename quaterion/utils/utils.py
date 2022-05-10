@@ -1,6 +1,7 @@
-from typing import Union
+from typing import Union, Sized, Iterable
 
 import torch
+from torch.utils.data import Dataset
 
 
 def info_value_of_dtype(dtype: torch.dtype) -> Union[torch.finfo, torch.iinfo]:
@@ -145,3 +146,33 @@ def get_anchor_negative_mask(labels: torch.Tensor) -> torch.Tensor:
     mask = torch.logical_not(labels_equal)
 
     return mask
+
+
+def iter_by_batch(sequence: Union[Sized, Iterable, Dataset], batch_size: int):
+    """Iterate through index-able or iterable by batches
+
+    Try to iterate by indices, if fail - via iterable interface.
+    """
+
+    try:
+        sequence.__getitem__(0)
+        size = len(sequence)
+        step = batch_size if batch_size < size else size
+        for slice_start_index in range(0, size, step):
+            slice_end_index = slice_start_index + step
+            slice_end_index = slice_end_index if slice_end_index < size else size
+            input_batch = [
+                sequence[index] for index in range(slice_start_index, slice_end_index)
+            ]
+            yield input_batch
+
+    except (AttributeError, NotImplementedError, IndexError):
+        batch = []
+        for item in sequence:
+            batch.append(item)
+            if len(batch) == batch_size:
+                yield batch
+                batch = []
+        if len(batch) > 0:
+            yield batch
+        return

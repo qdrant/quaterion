@@ -3,16 +3,18 @@ from torch import Tensor
 
 from quaterion.distances import Distance
 from quaterion.eval.base_metric import BaseMetric
+from quaterion.eval.accumulators import GroupAccumulator
 
 
 class GroupMetric(BaseMetric):
     """Base class for group metrics
 
-    Provide default implementation for embeddings and groups accumulation.
-
     Args:
         distance_metric_name: name of a distance metric to calculate distance or similarity
             matrices. Available names could be found in :class:`~quaterion.distances.Distance`.
+
+    Provides default implementations for distance and interaction matrices calculation.
+    Accumulates embeddings and groups in an accumulator.
     """
 
     def __init__(
@@ -22,19 +24,7 @@ class GroupMetric(BaseMetric):
         super().__init__(
             distance_metric_name=distance_metric_name,
         )
-        self._groups = []
-
-    @property
-    def groups(self):
-        """Concatenate list of groups to Tensor
-
-        Help to avoid concatenating groups for each batch during accumulation. Instead,
-        concatenate it only on call.
-
-        Returns:
-            torch.Tensor: batch of groups
-        """
-        return torch.cat(self._groups) if len(self._groups) else torch.Tensor()
+        self.accumulator = GroupAccumulator()
 
     def update(self, embeddings: Tensor, groups: torch.LongTensor, device=None) -> None:
         """Process and accumulate batch
@@ -44,22 +34,14 @@ class GroupMetric(BaseMetric):
             groups: groups to distinguish similar and dissimilar objects.
             device: device to store calculated embeddings and groups on.
         """
-
-        if device is None:
-            device = embeddings.device
-
-        embeddings = embeddings.detach().to(device)
-        groups = groups.detach().to(device)
-
-        self._embeddings.append(embeddings)
-        self._groups.append(groups)
+        self.accumulator.update(embeddings, groups, device)
 
     def reset(self):
         """Reset accumulated embeddings, groups"""
-        super().reset()
-        self._groups = []
+        self.accumulator.reset()
 
-    def compute_labels(self, groups: Tensor):
+    @staticmethod
+    def prepare_labels(groups: Tensor):
         """Compute metric labels based on samples groups
 
         Args:
@@ -90,9 +72,24 @@ class GroupMetric(BaseMetric):
 
     def evaluate(self) -> torch.Tensor:
         """Perform metric computation with accumulated state"""
-        return self.compute(self.embeddings, self.groups)
+        return self.compute(**self.accumulator.state)
 
     def raw_compute(
         self, distance_matrix: torch.Tensor, labels: torch.Tensor
     ) -> torch.Tensor:
+        """Perform metric computation on ready distance_matrix and labels
+
+        This method does not make any data and labels preparation.
+        It is assumed that `distance_matrix` has already been calculated, required changes such
+        masking distance from an element to itself have already been applied and corresponding
+        `labels` have been prepared.
+
+        Args:
+            distance_matrix: distance matrix ready to metric computation
+            labels:  labels ready to metric computation with the same shape as `distance_matrix`.
+                Possible values are in {0, 1}.
+
+        Returns:
+            torch.Tensor - calculated metric value
+        """
         raise NotImplementedError()

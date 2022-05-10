@@ -73,7 +73,7 @@ class TrainableModel(pl.LightningModule, CacheMixin):
         """
         return []
 
-    def evaluate(
+    def _evaluate(
         self,
         embeddings: Tensor,
         targets: Dict[str, Any],
@@ -81,8 +81,7 @@ class TrainableModel(pl.LightningModule, CacheMixin):
     ) -> None:
         """Method to calculate and log metrics, accumulate embeddings in estimators
 
-        Calculate current stage and batch metrics, accumulate embeddings in corresponding
-        estimators. Metrics being reset after each batch processing.
+        Calculate current stage and batch metrics
 
         Args:
             embeddings: current batch embeddings
@@ -271,7 +270,7 @@ class TrainableModel(pl.LightningModule, CacheMixin):
         loss = self.loss(embeddings=embeddings, **targets)
         self.log(f"{stage}_loss", loss)
 
-        self.evaluate(
+        self._evaluate(
             embeddings=embeddings,
             targets=targets,
             stage=stage,

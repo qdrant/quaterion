@@ -1,14 +1,18 @@
-from typing import Optional
+from typing import Optional, Union, Sized, Iterable
 
 import pytorch_lightning as pl
+from torch.utils.data import Dataset
+from quaterion_models import MetricModel
 
 from quaterion.dataset.similarity_data_loader import (
     PairsSimilarityDataLoader,
     GroupSimilarityDataLoader,
     SimilarityDataLoader,
 )
+from quaterion.eval.evaluator import Evaluator
 from quaterion.loss import GroupLoss, PairwiseLoss
 from quaterion.train.cleanup_callback import CleanupCallback
+from quaterion.train.metrics_callback import MetricsCallback
 from quaterion.train.trainable_model import TrainableModel
 
 
@@ -55,6 +59,7 @@ class Quaterion:
                 )
 
         trainer.callbacks.append(CleanupCallback())
+        trainer.callbacks.append(MetricsCallback())
         # Prepare data loaders for training
 
         trainable_model.setup_dataloader(train_dataloader)
@@ -73,3 +78,12 @@ class Quaterion:
             val_dataloaders=val_dataloader,
             ckpt_path=ckpt_path,
         )
+
+    @classmethod
+    def evaluate(
+        cls,
+        evaluator: Evaluator,
+        dataset: Union[Sized, Iterable, Dataset],
+        model: MetricModel,
+    ):
+        return evaluator.evaluate(dataset, model)

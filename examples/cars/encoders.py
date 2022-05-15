@@ -20,8 +20,8 @@ class CarsEncoder(Encoder):
         return self._embedding_size
 
     def forward(self, images):
-        embeddins = self._encoder.forward(images)
-        return embeddins
+        embeddings = self._encoder.forward(images)
+        return embeddings
 
     def save(self, output_path: str):
         os.makedirs(output_path, exist_ok=True)

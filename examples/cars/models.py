@@ -55,5 +55,5 @@ class Model(TrainableModel):
             metric=RetrievalRPrecision(),
             prog_bar=True,
             on_epoch=True,
-            on_step=False
+            on_step=False,
         )

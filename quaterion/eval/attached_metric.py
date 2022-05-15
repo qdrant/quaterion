@@ -40,7 +40,7 @@ class AttachedMetric:
             "prog_bar": prog_bar,
             "on_step": on_step,
             "on_epoch": on_epoch,
-            **log_options
+            **log_options,
         }
 
     def __getattr__(self, item: str):

@@ -5,6 +5,7 @@ import tqdm
 from torch.utils.data import Dataset, Subset
 from torchvision import datasets, transforms
 from typing import Callable
+from pytorch_lightning import seed_everything
 
 from quaterion.dataset import (
     GroupSimilarityDataLoader,
@@ -12,7 +13,7 @@ from quaterion.dataset import (
 )
 
 # set seed to deterministically sample train and test categories later on
-np.random.seed(42)
+seed_everything(seed=42)
 
 # dataset will be downloaded to this directory under local directory
 dataset_path = os.path.join(".", "torchvision", "datasets")
@@ -63,8 +64,6 @@ def get_datasets(
     train_transform = transforms.Compose(
         [
             transforms.Resize((input_size, input_size)),
-            # transforms.RandomResizedCrop((input_size, input_size)),
-            # transforms.RandomHorizontalFlip(),
             transforms.ToTensor(),
             transforms.Normalize(mean, std),
         ]
@@ -131,11 +130,11 @@ def get_dataloaders(
     train_dataset, test_dataset = get_datasets(input_size, split_cache_path)
 
     train_dataloader = GroupSimilarityDataLoader(
-        train_dataset, batch_size=batch_size, shuffle=shuffle, num_workers=0
+        train_dataset, batch_size=batch_size, shuffle=shuffle
     )
 
     test_dataloader = GroupSimilarityDataLoader(
-        test_dataset, batch_size=batch_size, shuffle=False, num_workers=0
+        test_dataset, batch_size=batch_size, shuffle=False
     )
 
     return train_dataloader, test_dataloader

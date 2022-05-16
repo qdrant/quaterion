@@ -57,7 +57,6 @@ def retrieval_r_precision(distance_matrix: torch.Tensor, labels: torch.Tensor):
             labels.shape[1],
             step=1,
             device=distance_matrix.device,
-            requires_grad=False,
         ).repeat(labels.shape[0], 1)
         < relevant_numbers
     )

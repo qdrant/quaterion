@@ -1,5 +1,4 @@
 import random
-import tqdm
 from typing import Tuple, Sized, Union, Iterable
 
 import torch
@@ -11,10 +10,7 @@ from quaterion.eval.group import GroupMetric
 from quaterion.eval.samplers import BaseSampler
 from quaterion.dataset.similarity_data_loader import GroupSimilarityDataLoader
 from quaterion.utils.utils import iter_by_batch
-
-
-class Dataset:
-    pass
+from torch.utils.data import Dataset
 
 
 class GroupSampler(BaseSampler):

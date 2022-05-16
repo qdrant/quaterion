@@ -37,16 +37,12 @@ def eval_base_encoder(test_dl, device):
     Quaterion.evaluate(
         evaluator=Evaluator(
             metrics=RetrievalRPrecision(),
-            sampler=GroupSampler(
-                sample_size=1000,
-                device=device
-            )
+            sampler=GroupSampler(sample_size=1000, device=device),
         ),
         model=MetricModel(
-            encoders=cars_encoder,
-            head=EmptyHead(cars_encoder.embedding_size)
+            encoders=cars_encoder, head=EmptyHead(cars_encoder.embedding_size)
         ),
-        dataset=test_dl.dataset
+        dataset=test_dl.dataset,
     )
 
 

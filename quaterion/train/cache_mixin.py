@@ -163,7 +163,9 @@ class CacheMixin:
             len(cache_encoders) == len(encoders)
             and not cache_config.key_extractors
             and train_dataloader.num_workers == 0
-            and (val_dataloader.num_workers == 0 if val_dataloader is not None else True)
+            and (
+                val_dataloader.num_workers == 0 if val_dataloader is not None else True
+            )
         )
         if is_full_cache_possible:
             logger.debug("Using full cache")

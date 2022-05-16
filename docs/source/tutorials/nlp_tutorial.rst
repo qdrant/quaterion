@@ -270,4 +270,4 @@ Further learning
 In the case you followed the tutorial step-by-step you might be surprised by the speed of the training
 process with Quaterion.
 This is mainly the merit of the cache and frozen encoder.
-Checkout our `Awesome cache tutorial <http://localhost:63342/quaterion/docs/html/tutorials/cache_tutorial.html>`_.
+Checkout our `Awesome cache tutorial </quaterion/docs/html/tutorials/cache_tutorial.html>`_.

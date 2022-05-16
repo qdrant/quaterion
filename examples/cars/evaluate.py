@@ -8,9 +8,17 @@ import torchvision
 import tqdm
 
 from examples.cars.config import IMAGE_SIZE
+from examples.cars.encoders import CarsEncoder
+from quaterion import Quaterion
+from quaterion.eval.evaluator import Evaluator
 from quaterion.eval.group import RetrievalRPrecision
 from quaterion_models import MetricModel
 
+from quaterion_models.encoders import Encoder
+
+from quaterion_models.heads import EmptyHead
+
+from quaterion.eval.samplers.group_sampler import GroupSampler
 from .data import get_dataloaders
 
 BATCH_SIZE = 32
@@ -21,30 +29,25 @@ def eval_base_encoder(test_dl, device):
     print("Evaluating base encoder...")
     base_encoder = torchvision.models.resnet152(pretrained=True)
     base_encoder.fc = nn.Identity()
-    base_encoder = base_encoder.to(device)
-    base_encoder.eval()
 
-    all_metrics = []
-    num_metric_batches = 0
-    metric = RetrievalRPrecision()
+    cars_encoder = CarsEncoder(base_encoder)
+    cars_encoder.to(device=device)
+    cars_encoder.eval()
 
-    for i, (_, images, labels) in enumerate(tqdm.tqdm(test_dl)):
-        with torch.no_grad():
-            images = torch.stack(images).to(device)
-            embeddings = base_encoder(images)
-            metric.update(embeddings, labels["groups"].to(device))
-
-            num_metric_batches += 1
-
-            if METRIC_BATCH / BATCH_SIZE <= num_metric_batches:
-                running_score = float(metric.evaluate())
-                all_metrics.append(running_score)
-                print(f"Running score at step {i}: {running_score:.4f}")
-                metric.reset()
-                num_metric_batches = 0
-
-    final_score = np.mean(all_metrics)
-    print(f"Final Retrieval R-Precision score for base encoder: {final_score:.4f}")
+    Quaterion.evaluate(
+        evaluator=Evaluator(
+            metrics=RetrievalRPrecision(),
+            sampler=GroupSampler(
+                sample_size=1000,
+                device=device
+            )
+        ),
+        model=MetricModel(
+            encoders=cars_encoder,
+            head=EmptyHead(cars_encoder.embedding_size)
+        ),
+        dataset=test_dl.dataset
+    )
 
 
 def eval_tuned_encoder(test_dl, device):

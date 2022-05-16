@@ -37,7 +37,7 @@ def eval_base_encoder(test_dl, device):
             num_metric_batches += 1
 
             if METRIC_BATCH / BATCH_SIZE <= num_metric_batches:
-                running_score = float(metric.compute())
+                running_score = float(metric.evaluate())
                 all_metrics.append(running_score)
                 print(f"Running score at step {i}: {running_score:.4f}")
                 metric.reset()
@@ -68,7 +68,7 @@ def eval_tuned_encoder(test_dl, device):
             num_metric_batches += 1
 
             if METRIC_BATCH / BATCH_SIZE <= num_metric_batches:
-                running_score = float(metric.compute())
+                running_score = float(metric.evaluate())
                 all_metrics.append(running_score)
                 print(f"Running score at step {i}: {running_score:.4f}")
                 metric.reset()

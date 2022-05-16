@@ -1,4 +1,5 @@
-from typing import Optional, Union, Sized, Iterable
+import torch
+from typing import Optional, Union, Sized, Iterable, Dict
 
 import pytorch_lightning as pl
 from torch.utils.data import Dataset
@@ -85,5 +86,18 @@ class Quaterion:
         evaluator: Evaluator,
         dataset: Union[Sized, Iterable, Dataset],
         model: MetricModel,
-    ):
+    ) -> Dict[str, torch.Tensor]:
+        """
+        Compute metrics on a dataset
+
+        Args:
+            evaluator: Object which holds the configuration of which metrics to use and how to obtain samples for them
+            dataset: Sized object, like list, tuple, torch.utils.data.Dataset, etc. to compute metrics
+            model: MetricModel instance to perform objects encoding
+
+        Returns:
+            Dict[str, torch.Tensor] - dict of computed metrics.
+            Where key - name of the metric and value - metric estimated values
+
+        """
         return evaluator.evaluate(dataset, model)

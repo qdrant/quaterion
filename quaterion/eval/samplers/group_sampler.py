@@ -1,5 +1,5 @@
 import random
-from typing import Tuple, Sized, Union
+from typing import Tuple, Sized, Union, Iterable
 
 import torch
 
@@ -10,6 +10,7 @@ from quaterion.eval.group import GroupMetric
 from quaterion.eval.samplers import BaseSampler
 from quaterion.dataset.similarity_data_loader import GroupSimilarityDataLoader
 from quaterion.utils.utils import iter_by_batch
+from torch.utils.data import Dataset
 
 
 class GroupSampler(BaseSampler):
@@ -20,19 +21,22 @@ class GroupSampler(BaseSampler):
         sample_size=-1,
         encode_batch_size=16,
         device: Union[torch.device, str, None] = None,
+        log_progress: bool = True,
     ):
-        super().__init__(sample_size, device)
+        super().__init__(sample_size, device, log_progress)
         self.encode_batch_size = encode_batch_size
         self.accumulator = GroupAccumulator()
 
-    def accumulate(self, model: MetricModel, dataset: Sized):
+    def accumulate(self, model: MetricModel, dataset: Union[Sized, Iterable, Dataset]):
         """Encodes objects and accumulates embeddings with the corresponding raw labels
 
         Args:
             model: model to encode objects
             dataset: Sized object, like list, tuple, torch.utils.data.Dataset, etc. to accumulate
         """
-        for input_batch in iter_by_batch(dataset, self.encode_batch_size):
+        for input_batch in iter_by_batch(
+            dataset, self.encode_batch_size, self.log_progress
+        ):
             batch_labels = GroupSimilarityDataLoader.collate_labels(input_batch)
 
             features = [similarity_sample.obj for similarity_sample in input_batch]

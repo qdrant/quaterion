@@ -115,7 +115,7 @@ class TripletLoss(GroupLoss):
                 # Division by the minimal distance between negative samples scales target distances
                 # # and prevents vector collapse
                 (hardest_positive_dists - hardest_negative_dists)
-                / torch.max(hardest_negative_dists.min(), torch.tensor(1e-16))
+                / hardest_negative_dists.mean()
                 + self._margin
             )
 

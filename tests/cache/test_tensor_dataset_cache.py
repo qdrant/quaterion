@@ -86,6 +86,7 @@ def test_tensor_dataset_cache():
 
     dataset = SimilarityGroupDataset(FakeData(size=100, transform=transform))
     dataloader = GroupSimilarityDataLoader(dataset, batch_size=4)
+    val_dataloader = GroupSimilarityDataLoader(dataset, batch_size=4)
 
     model = Model(
         embedding_size=128,
@@ -99,7 +100,12 @@ def test_tensor_dataset_cache():
         max_epochs=1,
     )
 
-    Quaterion.fit(trainable_model=model, trainer=trainer, train_dataloader=dataloader)
+    Quaterion.fit(
+        trainable_model=model,
+        trainer=trainer,
+        train_dataloader=dataloader,
+        val_dataloader=val_dataloader,
+    )
 
     # Same, but with checkpoint
     print("--------- with checkpoint ----------")

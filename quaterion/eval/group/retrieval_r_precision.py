@@ -52,7 +52,12 @@ def retrieval_r_precision(distance_matrix: torch.Tensor, labels: torch.Tensor):
     nearest_to_furthest_ind = torch.argsort(distance_matrix, dim=-1, descending=False)
     sorted_by_distance = torch.gather(labels, dim=-1, index=nearest_to_furthest_ind)
     top_k_mask = (
-        torch.arange(0, labels.shape[1], step=1).repeat(labels.shape[0], 1)
+        torch.arange(
+            0,
+            labels.shape[1],
+            step=1,
+            device=distance_matrix.device,
+        ).repeat(labels.shape[0], 1)
         < relevant_numbers
     )
     metric = sorted_by_distance[top_k_mask].float()

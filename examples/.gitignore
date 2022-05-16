@@ -1,0 +1,5 @@
+# gitignore directory that ends in _encoders
+# these directories may hold saved model files
+*_encoders/
+# dataset is downloaded to a local directory now
+torchvision/

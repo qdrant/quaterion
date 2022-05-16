@@ -1,3 +1,4 @@
+import tqdm
 from typing import Union, Sized, Iterable
 
 import torch
@@ -148,7 +149,11 @@ def get_anchor_negative_mask(labels: torch.Tensor) -> torch.Tensor:
     return mask
 
 
-def iter_by_batch(sequence: Union[Sized, Iterable, Dataset], batch_size: int):
+def iter_by_batch(
+    sequence: Union[Sized, Iterable, Dataset],
+    batch_size: int,
+    log_progress: bool = True,
+):
     """Iterate through index-able or iterable by batches
 
     Try to iterate by indices, if fail - via iterable interface.
@@ -158,7 +163,12 @@ def iter_by_batch(sequence: Union[Sized, Iterable, Dataset], batch_size: int):
         sequence.__getitem__(0)
         size = len(sequence)
         step = batch_size if batch_size < size else size
-        for slice_start_index in range(0, size, step):
+        if log_progress:
+            iterator = tqdm.tqdm(range(0, size, step), total=size / step)
+        else:
+            iterator = range(0, size, step)
+
+        for slice_start_index in iterator:
             slice_end_index = slice_start_index + step
             slice_end_index = slice_end_index if slice_end_index < size else size
             input_batch = [
@@ -168,7 +178,11 @@ def iter_by_batch(sequence: Union[Sized, Iterable, Dataset], batch_size: int):
 
     except (AttributeError, NotImplementedError, IndexError):
         batch = []
-        for item in sequence:
+        if log_progress:
+            iterator = tqdm.tqdm(sequence)
+        else:
+            iterator = sequence
+        for item in iterator:
             batch.append(item)
             if len(batch) == batch_size:
                 yield batch

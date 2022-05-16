@@ -1,6 +1,6 @@
 import random
 import tqdm
-from typing import Tuple, Sized, Union
+from typing import Tuple, Sized, Union, Iterable
 
 import torch
 
@@ -13,6 +13,10 @@ from quaterion.dataset.similarity_data_loader import GroupSimilarityDataLoader
 from quaterion.utils.utils import iter_by_batch
 
 
+class Dataset:
+    pass
+
+
 class GroupSampler(BaseSampler):
     """Perform selection of embeddings and targets for group based tasks."""
 
@@ -21,22 +25,21 @@ class GroupSampler(BaseSampler):
         sample_size=-1,
         encode_batch_size=16,
         device: Union[torch.device, str, None] = None,
+        log_progress: bool = True,
     ):
-        super().__init__(sample_size, device)
+        super().__init__(sample_size, device, log_progress)
         self.encode_batch_size = encode_batch_size
         self.accumulator = GroupAccumulator()
 
-    def accumulate(self, model: MetricModel, dataset: Sized):
+    def accumulate(self, model: MetricModel, dataset: Union[Sized, Iterable, Dataset]):
         """Encodes objects and accumulates embeddings with the corresponding raw labels
 
         Args:
             model: model to encode objects
             dataset: Sized object, like list, tuple, torch.utils.data.Dataset, etc. to accumulate
         """
-        for input_batch in tqdm.tqdm(
-            iter_by_batch(dataset, self.encode_batch_size),
-            desc="Generating embeddings",
-            total=len(dataset) / self.encode_batch_size,
+        for input_batch in iter_by_batch(
+            dataset, self.encode_batch_size, self.log_progress
         ):
             batch_labels = GroupSimilarityDataLoader.collate_labels(input_batch)
 

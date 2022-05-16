@@ -23,7 +23,9 @@ class BaseSampler:
         self,
         sample_size=-1,
         device: Union[torch.device, str, None] = None,
+        log_progress: bool = True,
     ):
+        self.log_progress = log_progress
         self.sample_size = sample_size
         self.device = device
 

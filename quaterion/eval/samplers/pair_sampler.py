@@ -34,8 +34,9 @@ class PairSampler(BaseSampler):
         distinguish: bool = False,
         encode_batch_size: int = 16,
         device: Union[torch.device, str, None] = None,
+        log_progress: bool = True,
     ):
-        super().__init__(sample_size, device)
+        super().__init__(sample_size, device, log_progress)
         self.encode_batch_size = encode_batch_size
         self.distinguish = distinguish
         self.accumulator = PairAccumulator()
@@ -47,7 +48,9 @@ class PairSampler(BaseSampler):
             model: model to encode objects
             dataset: Sized object, like list, tuple, torch.utils.data.Dataset, etc. to accumulate
         """
-        for input_batch in iter_by_batch(dataset, self.encode_batch_size):
+        for input_batch in iter_by_batch(
+            dataset, self.encode_batch_size, self.log_progress
+        ):
             batch_labels = PairsSimilarityDataLoader.collate_labels(input_batch)
 
             objects_a, objects_b = [], []

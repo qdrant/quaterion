@@ -788,7 +788,7 @@ resolved_reference = "79266c4940edd3f44e465561ce05f3357e0d5330"
 
 [[package]]
 name = "quaterion-models"
-version = "0.1.8"
+version = "0.1.9"
 description = "The collection of building blocks building fine-tunable metric learning models"
 category = "main"
 optional = false
@@ -1947,8 +1947,8 @@ pyyaml = [
 ]
 qdrant-sphinx-theme = []
 quaterion-models = [
-    {file = "quaterion-models-0.1.8.tar.gz", hash = "sha256:84cc9eef5efbb8694d08235a88a85be6d84415527c5ef1e721c5b107d3676d14"},
-    {file = "quaterion_models-0.1.8-py3-none-any.whl", hash = "sha256:547551c8f1c152b36c2a44feec73d7a654863a7f8c0eb96c11a7e9fe0103aae6"},
+    {file = "quaterion-models-0.1.9.tar.gz", hash = "sha256:d7caa166087c3c5b2ad3aeb6909a2e653d5a766ea4e083e5e316c7f385bc0d5b"},
+    {file = "quaterion_models-0.1.9-py3-none-any.whl", hash = "sha256:9168931588af0222b15e0653032764bf4ad28de8412e3127324d2594f453e9e3"},
 ]
 requests = [
     {file = "requests-2.27.1-py2.py3-none-any.whl", hash = "sha256:f22fa1e554c9ddfd16e6e41ac79759e17be9e492b3587efa038054674760e72d"},

@@ -1,6 +1,6 @@
 import pytest
 import torch
-from quaterion_models import MetricModel
+from quaterion_models import SimilarityModel
 from quaterion_models.encoders import Encoder
 from quaterion_models.heads import EmptyHead
 
@@ -16,7 +16,7 @@ from quaterion.eval.samplers.pair_sampler import PairSampler
 def dummy_model():
     encoder = DummyEncoder()
     head = EmptyHead(encoder.embedding_size)
-    yield MetricModel(encoder, head)
+    yield SimilarityModel(encoder, head)
 
 
 class DummyEncoder(Encoder):

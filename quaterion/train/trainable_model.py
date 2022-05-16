@@ -3,7 +3,7 @@ from typing import Dict, Any, Union, Optional, List
 
 import pytorch_lightning as pl
 
-from quaterion_models import MetricModel
+from quaterion_models import SimilarityModel
 from quaterion_models.encoders import Encoder
 from quaterion_models.heads import EncoderHead
 from quaterion_models.types import TensorInterchange
@@ -32,14 +32,14 @@ class TrainableModel(pl.LightningModule, CacheMixin):
             cache_type=CacheType.NONE
         )
 
-        head = self.configure_head(MetricModel.get_encoders_output_size(encoders))
+        head = self.configure_head(SimilarityModel.get_encoders_output_size(encoders))
 
         metrics = self.configure_metrics()
         self.attached_metrics: List[AttachedMetric] = (
             [metrics] if isinstance(metrics, AttachedMetric) else metrics
         )
 
-        self._model = MetricModel(encoders=encoders, head=head)
+        self._model = SimilarityModel(encoders=encoders, head=head)
         self._loss = self.configure_loss()
 
     def configure_metrics(self) -> Union[AttachedMetric, List[AttachedMetric]]:
@@ -97,11 +97,11 @@ class TrainableModel(pl.LightningModule, CacheMixin):
                 )
 
     @property
-    def model(self) -> MetricModel:
+    def model(self) -> SimilarityModel:
         """Origin model to be trained
 
         Returns:
-            :class:`~quaterion_models.model.MetricModel`: model to be trained
+            :class:`~quaterion_models.model.SimilarityModel`: model to be trained
         """
         return self._model
 

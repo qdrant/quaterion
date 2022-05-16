@@ -3,7 +3,7 @@ from typing import Optional, Union, Sized, Iterable, Dict
 
 import pytorch_lightning as pl
 from torch.utils.data import Dataset
-from quaterion_models import MetricModel
+from quaterion_models import SimilarityModel
 
 from quaterion.dataset.similarity_data_loader import (
     PairsSimilarityDataLoader,
@@ -85,7 +85,7 @@ class Quaterion:
         cls,
         evaluator: Evaluator,
         dataset: Union[Sized, Iterable, Dataset],
-        model: MetricModel,
+        model: SimilarityModel,
     ) -> Dict[str, torch.Tensor]:
         """
         Compute metrics on a dataset
@@ -93,7 +93,7 @@ class Quaterion:
         Args:
             evaluator: Object which holds the configuration of which metrics to use and how to obtain samples for them
             dataset: Sized object, like list, tuple, torch.utils.data.Dataset, etc. to compute metrics
-            model: MetricModel instance to perform objects encoding
+            model: SimilarityModel instance to perform objects encoding
 
         Returns:
             Dict[str, torch.Tensor] - dict of computed metrics.

@@ -2,7 +2,7 @@ from typing import Sized, Tuple, Union
 
 import torch
 from torch import Tensor
-from quaterion_models import MetricModel
+from quaterion_models import SimilarityModel
 
 from quaterion.eval.base_metric import BaseMetric
 
@@ -30,7 +30,7 @@ class BaseSampler:
         self.device = device
 
     def sample(
-        self, dataset: Sized, metric: BaseMetric, model: MetricModel
+        self, dataset: Sized, metric: BaseMetric, model: SimilarityModel
     ) -> Tuple[Tensor, Tensor]:
         """Sample objects and labels to calculate metrics
 

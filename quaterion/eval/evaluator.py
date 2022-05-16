@@ -2,7 +2,7 @@ from typing import Dict, Sized, Union, Iterable
 
 import torch
 from torch.utils.data import Dataset
-from quaterion_models import MetricModel
+from quaterion_models import SimilarityModel
 
 from quaterion.eval.samplers import BaseSampler
 from quaterion.eval.base_metric import BaseMetric
@@ -34,14 +34,14 @@ class Evaluator:
     def evaluate(
         self,
         dataset: Union[Sized, Iterable, Dataset],
-        model: MetricModel,
+        model: SimilarityModel,
     ) -> Dict[str, torch.Tensor]:
         """Compute metrics on a dataset
 
         Args:
             dataset: Sized object, like list, tuple, torch.utils.data.Dataset, etc. to compute
                 metrics
-            model: MetricModel instance to perform objects encoding
+            model: SimilarityModel instance to perform objects encoding
 
         Returns:
             Dict[str, torch.Tensor] - dict of computed metrics

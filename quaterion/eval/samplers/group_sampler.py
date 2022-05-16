@@ -1,4 +1,5 @@
 import random
+import tqdm
 from typing import Tuple, Sized, Union
 
 import torch
@@ -32,7 +33,11 @@ class GroupSampler(BaseSampler):
             model: model to encode objects
             dataset: Sized object, like list, tuple, torch.utils.data.Dataset, etc. to accumulate
         """
-        for input_batch in iter_by_batch(dataset, self.encode_batch_size):
+        for input_batch in tqdm.tqdm(
+            iter_by_batch(dataset, self.encode_batch_size),
+            desc="Generating embeddings",
+            total=len(dataset) / self.encode_batch_size,
+        ):
             batch_labels = GroupSimilarityDataLoader.collate_labels(input_batch)
 
             features = [similarity_sample.obj for similarity_sample in input_batch]

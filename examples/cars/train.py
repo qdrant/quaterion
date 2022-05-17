@@ -3,7 +3,7 @@ import os
 import pytorch_lightning as pl
 import shutil
 import torch
-from pytorch_lightning.callbacks import EarlyStopping
+from pytorch_lightning.callbacks import EarlyStopping, ModelSummary
 
 from examples.cars.config import TRAIN_BATCH_SIZE, IMAGE_SIZE
 from quaterion import Quaterion
@@ -25,6 +25,8 @@ def train(
         lr=lr,
         mining=mining,
     )
+    import warnings
+    warnings.filterwarnings("ignore", ".*does not have many workers.*")
 
     train_dataloader, val_dataloader = get_dataloaders(
         batch_size=batch_size, input_size=input_size, shuffle=shuffle
@@ -38,9 +40,10 @@ def train(
     trainer = pl.Trainer(
         gpus=1 if torch.cuda.is_available() else 0,
         max_epochs=epochs,
-        callbacks=[early_stopping],
+        callbacks=[early_stopping, ModelSummary(max_depth=3)],
         enable_checkpointing=False,
         log_every_n_steps=1,
+        enable_model_summary=False,
     )
 
     Quaterion.fit(

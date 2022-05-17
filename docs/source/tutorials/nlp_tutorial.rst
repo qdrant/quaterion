@@ -15,7 +15,7 @@ Usual pipeline in Quaterion includes the following steps:
 
 1. Download and prepare a dataset
 2. Create `Encoders <https://quaterion-models.qdrant.tech/quaterion_models.encoders.encoder.html#quaterion_models.encoders.encoder.Encoder>`_
-3. Construct `TrainableModel </quaterion/docs/html/quaterion.train.trainable_model.html#quaterion.train.trainable_model.TrainableModel>`_
+3. Construct `TrainableModel </quaterion.train.trainable_model.html#quaterion.train.trainable_model.TrainableModel>`_
 4. Train
 5. Evaluate
 
@@ -37,7 +37,7 @@ Example of pairs presented in dataset:
 
         answer: aws lambda functions powered by aws graviton2 processors are 20% cheaper compared to x86-based lambda functions
 
-Data have to be represented as `SimilaritySample </quaterion/docs/html/quaterion.dataset.similarity_samples.html>`_ instances.
+Data have to be represented as `SimilaritySample </quaterion.dataset.similarity_samples.html>`_ instances.
 We will use `torch.utils.data.Dataset <https://pytorch.org/docs/stable/data.html>`_ to convert data and feed it to the model.
 
 Code to split the data is omitted but can be found in the `repo <https://github.com/qdrant/demo-cloud-faq/blob/tutorial/faq/train_val_split.py>`_.
@@ -203,9 +203,9 @@ Train & Evaluate
 We will merge the last 2 steps and perform training and evaluation in one function.
 For the training process we need to create `pytorch_lightning.Trainer <https://pytorch-lightning.readthedocs.io/en/latest/common/trainer.html>`_ instance to handle training routine,
 also datasets and data loaders instances to prepare our data and feed it to the model.
-Finally, to launch the training process all of these should be passed to `Quaterion.fit </quaterion/docs/html/quaterion.main.html#quaterion.main.Quaterion.fit>`_.
+Finally, to launch the training process all of these should be passed to `Quaterion.fit </quaterion.main.html#quaterion.main.Quaterion.fit>`_.
 Batch-wise evaluation will be performed during training, but it can fluctuate a lot depending on a batch size.
-More representative results from larger part of data can be obtained via `Evaluator </quaterion/docs/html/quaterion.eval.evaluator.html#quaterion.eval.evaluator.Evaluator>`_ and `Quaterion.evaluate </quaterion/docs/html/quaterion.main.html#quaterion.main.Quaterion.evaluate>`_.
+More representative results from larger part of data can be obtained via `Evaluator </quaterion.eval.evaluator.html#quaterion.eval.evaluator.Evaluator>`_ and `Quaterion.evaluate </quaterion.main.html#quaterion.main.Quaterion.evaluate>`_.
 
 At the end trained model being saved under `servable` dir.
 

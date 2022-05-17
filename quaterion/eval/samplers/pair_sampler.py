@@ -7,7 +7,7 @@ import torch
 from quaterion.eval.accumulators import PairAccumulator
 from quaterion.eval.pair import PairMetric
 from quaterion.eval.samplers import BaseSampler
-from quaterion_models import MetricModel
+from quaterion_models import SimilarityModel
 from quaterion.dataset.similarity_data_loader import PairsSimilarityDataLoader
 from quaterion.utils.utils import iter_by_batch
 
@@ -41,7 +41,7 @@ class PairSampler(BaseSampler):
         self.distinguish = distinguish
         self.accumulator = PairAccumulator()
 
-    def accumulate(self, model: MetricModel, dataset: Sized):
+    def accumulate(self, model: SimilarityModel, dataset: Sized):
         """Encodes objects and accumulates embeddings with the corresponding raw labels
 
         Args:
@@ -71,7 +71,7 @@ class PairSampler(BaseSampler):
         self.accumulator.reset()
 
     def sample(
-        self, dataset: Sized, metric: PairMetric, model: MetricModel
+        self, dataset: Sized, metric: PairMetric, model: SimilarityModel
     ) -> Tuple[torch.Tensor, torch.Tensor]:
         """Sample embeddings and targets for pairs based tasks.
 

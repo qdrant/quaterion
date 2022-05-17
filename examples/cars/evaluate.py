@@ -3,7 +3,7 @@ import os
 import torch
 import torch.nn as nn
 import torchvision
-from quaterion_models import MetricModel
+from quaterion_models import SimilarityModel
 from quaterion_models.heads import EmptyHead
 
 from examples.cars.config import IMAGE_SIZE
@@ -32,7 +32,7 @@ def eval_base_encoder(dataset, device):
             metrics=RetrievalRPrecision(),
             sampler=GroupSampler(sample_size=1000, device=device, log_progress=True),
         ),
-        model=MetricModel(
+        model=SimilarityModel(
             encoders=cars_encoder, head=EmptyHead(cars_encoder.embedding_size)
         ),
         dataset=dataset,
@@ -43,7 +43,7 @@ def eval_base_encoder(dataset, device):
 
 def eval_tuned_encoder(dataset, device):
     print("Evaluating tuned encoder...")
-    tuned_cars_model = MetricModel.load(
+    tuned_cars_model = SimilarityModel.load(
         os.path.join(os.path.dirname(__file__), "best_cars_encoders")
     ).to(device)
     tuned_cars_model.eval()

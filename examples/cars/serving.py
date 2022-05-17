@@ -8,7 +8,7 @@ import numpy as np
 import os
 import torch
 import tqdm
-from quaterion_models import MetricModel
+from quaterion_models import SimilarityModel
 from quaterion_models.heads import EncoderHead, EmptyHead
 
 from examples.cars.config import IMAGE_SIZE
@@ -46,7 +46,7 @@ def serve_pretrained_embeddings(dataloader):
 
 
 def serve_tuned_embeddings(dataloader, model_path):
-    model = MetricModel.load(model_path)
+    model = SimilarityModel.load(model_path)
     model.eval()
     device = "cuda" if torch.cuda.is_available() else "cpu"
     model.to(device)

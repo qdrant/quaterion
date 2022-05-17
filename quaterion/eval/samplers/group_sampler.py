@@ -3,7 +3,7 @@ from typing import Tuple, Sized, Union, Iterable
 
 import torch
 
-from quaterion_models import MetricModel
+from quaterion_models import SimilarityModel
 
 from quaterion.eval.accumulators import GroupAccumulator
 from quaterion.eval.group import GroupMetric
@@ -27,7 +27,9 @@ class GroupSampler(BaseSampler):
         self.encode_batch_size = encode_batch_size
         self.accumulator = GroupAccumulator()
 
-    def accumulate(self, model: MetricModel, dataset: Union[Sized, Iterable, Dataset]):
+    def accumulate(
+        self, model: SimilarityModel, dataset: Union[Sized, Iterable, Dataset]
+    ):
         """Encodes objects and accumulates embeddings with the corresponding raw labels
 
         Args:
@@ -53,7 +55,7 @@ class GroupSampler(BaseSampler):
         self.accumulator.reset()
 
     def sample(
-        self, dataset: Sized, metric: GroupMetric, model: MetricModel
+        self, dataset: Sized, metric: GroupMetric, model: SimilarityModel
     ) -> Tuple[torch.Tensor, torch.Tensor]:
         """Sample embeddings and targets for groups based tasks.
 

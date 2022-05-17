@@ -27,7 +27,9 @@ class GroupSampler(BaseSampler):
         self.encode_batch_size = encode_batch_size
         self.accumulator = GroupAccumulator()
 
-    def accumulate(self, model: SimilarityModel, dataset: Union[Sized, Iterable, Dataset]):
+    def accumulate(
+        self, model: SimilarityModel, dataset: Union[Sized, Iterable, Dataset]
+    ):
         """Encodes objects and accumulates embeddings with the corresponding raw labels
 
         Args:

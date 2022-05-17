@@ -8,7 +8,9 @@ cd "$(dirname "$0")/../"
 # install CPU torch, cause it is smaller
 pip install torch --extra-index-url https://download.pytorch.org/whl/cpu
 
-pip install quaterion
+pip install poetry
+poetry build
+pip install $(ls dist | grep .whl)
 
 pip install sphinx>=4.4.0
 pip install "git+https://github.com/qdrant/qdrant_sphinx_theme.git@master#egg=qdrant-sphinx-theme"

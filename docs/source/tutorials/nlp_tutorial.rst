@@ -7,9 +7,9 @@ Intro
 In this tutorial we will solve a Q&A problem to show how common NLP tasks can be tackled with
 similarity learning and Quaterion.
 
-We will use `cloud-faq-dataset <https://github.com/qdrant/dataset-cloud-platform-faq>`_
-which we scrapped ourselves from popular cloud providers F.A.Q. pages.
-This dataset contains nearly 8.5k pairs of questions and answers.
+We will use `cloud-faq-dataset <https://github.com/qdrant/dataset-cloud-platform-faq>`_.
+This is a collection of almost 8.5k pairs of questions and answers from F.A.Q. pages of popular cloud providers.
+
 
 Usual pipeline in Quaterion includes the following steps:
 
@@ -21,6 +21,8 @@ Usual pipeline in Quaterion includes the following steps:
 
 
 Let's stick with it and implement step-by-step.
+
+(For ones who is not interested in text - here is a `repo <https://github.com/qdrant/demo-cloud-faq/blob/tutorial/>`_ with the whole tutorial code.)
 
 Download & prepare dataset
 ==========================
@@ -39,8 +41,8 @@ Example of pairs presented in dataset:
 
 Data have to be represented as `SimilaritySample </quaterion.dataset.similarity_samples.html>`_ instances.
 With questions and answers we can use `SimilarityPairSample </quaterion.dataset.similarity_samples.SimilarityPairSample>`_.
-`SimilarityPairSample` contains 2 objects - `obj_a` and `obj_b`, `score` - float to represent similarity between objects
-and `subgroup` - special field to determine which objects can be considered as negative examples.
+It contains 2 objects - ``obj_a`` and ``obj_b``, ``score`` - float to represent similarity between objects
+and ``subgroup`` - int to determine which objects can be considered as negative examples.
 
 We will use `torch.utils.data.Dataset <https://pytorch.org/docs/stable/data.html>`_ to convert data and feed it to the model.
 
@@ -65,8 +67,7 @@ Code to split the data is omitted but can be found in the `repo <https://github.
             # All questions have a unique subgroup
             # Meaning that all other answers are considered negative pairs
             subgroup = hash(question)
-            score = 1  # usually score is converted into bool: True for similar objects and False
-            #  for dissimilar ones
+            score = 1  # usually score is converted into bool: True for similar objects and False for dissimilar ones
             return SimilarityPairSample(
                 obj_a=question, obj_b=line["answer"], score=score, subgroup=subgroup
             )
@@ -115,8 +116,7 @@ We are going to use pretrained ``all-MiniLM-L6-v2`` from `sentence-transformers 
             return self.encoder(batch)["sentence_embedding"]
 
         def get_collate_fn(self) -> CollateFnType:
-            # `collate_fn` is a function that converts input samples into Tensor(s) for use as
-            # encoder input.
+            # `collate_fn` is a function that converts input samples into Tensor(s) for use as encoder input.
             return self.transformer.tokenize
 
         @staticmethod
@@ -178,8 +178,7 @@ Here we need to configure encoders, heads, loss, optimizer, metrics, cache, etc.
             super().__init__(*args, **kwargs)
 
         def configure_metrics(self):
-            # attach batch-wise metrics which will be automatically computed and logged during
-            # training
+            # attach batch-wise metrics which will be automatically computed and logged during training
             return [
                 AttachedMetric(
                     "RetrievalPrecision",
@@ -199,8 +198,7 @@ Here we need to configure encoders, heads, loss, optimizer, metrics, cache, etc.
             return Adam(self.model.parameters(), lr=self.lr)
 
         def configure_loss(self) -> SimilarityLoss:
-            # `symmetric` means that we take into account correctness of both the closest answer to
-            # a question and the closest question to an answer
+            # `symmetric` means that we take into account correctness of both the closest answer to a question and the closest question to an answer
             return MultipleNegativesRankingLoss(symmetric=True)
 
         def configure_encoders(self) -> Union[Encoder, Dict[str, Encoder]]:
@@ -214,10 +212,8 @@ Here we need to configure encoders, heads, loss, optimizer, metrics, cache, etc.
             return SkipConnectionHead(input_embedding_size)
 
         def configure_caches(self) -> Optional[CacheConfig]:
-            # Cache stores frozen encoder embeddings to prevent repeated calculations and reduce
-            # training speed.
-            # AUTO preserves current encoder's device as a storage, batch-size does not affect
-            # training, and used only to fill cache before training.
+            # Cache stores frozen encoder embeddings to prevent repeated calculations and reduce training speed.
+            # AUTO preserves current encoder's device as a storage, batch-size does not affect training, and used only to fill cache before training.
             return CacheConfig(CacheType.AUTO, batch_size=1024)
 
 
@@ -251,8 +247,7 @@ At the end trained model being saved under `servable` dir.
 
         trainer = pl.Trainer(
             min_epochs=params.get("min_epochs", 1),
-            max_epochs=params.get("max_epochs", 500),  # cache makes it possible to use a huge
-            # amount of epochs
+            max_epochs=params.get("max_epochs", 500),  # cache makes it possible to use a huge amount of epochs
             auto_select_gpus=use_gpu,
             log_every_n_steps=params.get("log_every_n_steps", 10),  # increase to speed up training
             gpus=int(use_gpu),
@@ -270,8 +265,7 @@ At the end trained model being saved under `servable` dir.
         }
         sampler = PairSampler()
         evaluator = Evaluator(metrics, sampler)
-        results = Quaterion.evaluate(evaluator, val_dataset, model.model)  # calculate metrics
-        # on the whole dataset and to obtain more representative metrics values
+        results = Quaterion.evaluate(evaluator, val_dataset, model.model)  # calculate metrics on the whole dataset and to obtain more representative metrics values
         print(f"results: {results}")
 
 
@@ -287,6 +281,17 @@ At the end trained model being saved under `servable` dir.
         val_path = os.path.join(DATA_DIR, "val_cloud_faq_dataset.jsonl")
         run(faq_model, train_path, val_path, {})
         faq_model.save_servable(os.path.join(ROOT_DIR, "servable"))
+
+Here are some of the plots observed during training. As you can see, the loss decreased, while the metrics grew steadily.
+
+.. image:: loss.svg
+    :alt: validation loss image
+
+.. image:: mrr.svg
+    :alt: validation MRR image
+
+.. image:: precision.svg
+    :alt: validation Precision@1 image
 
 That's it! We've just trained similarity learning model to solve Question Answering problem!
 

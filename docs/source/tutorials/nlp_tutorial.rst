@@ -169,7 +169,6 @@ Here we need to configure encoders, heads, loss, optimizer, metrics, cache, etc.
     from quaterion_models.encoders import Encoder
     from quaterion_models.heads import EncoderHead
     from quaterion_models.heads.skip_connection_head import SkipConnectionHead
-    from faq.encoder import FAQEncoder
 
 
     class FAQModel(TrainableModel):
@@ -238,8 +237,6 @@ At the end trained model being saved under `servable` dir.
     from quaterion.eval.evaluator import Evaluator
     from quaterion.eval.pair import RetrievalReciprocalRank, RetrievalPrecision
     from quaterion.eval.samplers.pair_sampler import PairSampler
-
-    from faq.dataset import FAQDataset
 
 
     def run(model, train_dataset_path, val_dataset_path, params):

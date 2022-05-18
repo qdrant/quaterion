@@ -63,7 +63,7 @@ class PairAccumulator(Accumulator):
         self._pairs.append(pairs + self._accumulated_size)
         self._subgroups.append(subgroups)
 
-        self._accumulated_size += pairs.shape[0]
+        self._accumulated_size += embeddings.shape[0]
 
     def reset(self):
         """Reset accumulator state

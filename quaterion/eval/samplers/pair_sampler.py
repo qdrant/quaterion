@@ -22,8 +22,8 @@ class PairSampler(BaseSampler):
     Args:
         sample_size: int - amount of objects to select
         distinguish: bool - determines whether to compare all objects each-to-each, or to
-            compare only `obj_a` to `obj_b`. If true - compare only `obj_a` to `obj_b`. Reduces
-            matrix size quadratically.
+            compare only `obj_a` to `obj_b`. If true - compare only `obj_a` to `obj_b`.
+            Significantly reduces matrix size.
         encode_batch_size: int - batch size to use during encoding
 
     """
@@ -49,7 +49,7 @@ class PairSampler(BaseSampler):
             dataset: Sized object, like list, tuple, torch.utils.data.Dataset, etc. to accumulate
         """
         for input_batch in iter_by_batch(
-            dataset, self.encode_batch_size, self.log_progress
+            dataset, self.encode_batch_size // 2, self.log_progress
         ):
             batch_labels = PairsSimilarityDataLoader.collate_labels(input_batch)
 

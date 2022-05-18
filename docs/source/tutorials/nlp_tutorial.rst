@@ -1,4 +1,4 @@
-Question Answering tutorial with similarity learning
+Question Answering with similarity learning
 ++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 

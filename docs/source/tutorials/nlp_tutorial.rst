@@ -120,12 +120,12 @@ We are going to use pretrained ``all-MiniLM-L6-v2`` from `sentence-transformers 
             return self.transformer.tokenize
 
         @staticmethod
-        def _transformer_path(path: str):
+        def _transformer_path(path: str) -> str:
             # just an additional method to reduce amount of repeated code
             return os.path.join(path, "transformer")
 
         @staticmethod
-        def _pooling_path(path: str):
+        def _pooling_path(path: str) -> str:
             return os.path.join(path, "pooling")
 
         def save(self, output_path: str):
@@ -156,18 +156,14 @@ Here we need to configure encoders, heads, loss, optimizer, metrics, cache, etc.
 
 .. code-block:: python
 
-    from typing import Union, Dict, Optional
-
     from quaterion.eval.attached_metric import AttachedMetric
     from torch.optim import Adam
     from quaterion import TrainableModel
     from quaterion.train.cache import CacheConfig, CacheType
-    from quaterion.loss import MultipleNegativesRankingLoss, SimilarityLoss
+    from quaterion.loss import MultipleNegativesRankingLoss
     from sentence_transformers import SentenceTransformer
     from quaterion.eval.pair import RetrievalPrecision, RetrievalReciprocalRank
     from sentence_transformers.models import Transformer, Pooling
-    from quaterion_models.encoders import Encoder
-    from quaterion_models.heads import EncoderHead
     from quaterion_models.heads.skip_connection_head import SkipConnectionHead
 
 
@@ -196,21 +192,21 @@ Here we need to configure encoders, heads, loss, optimizer, metrics, cache, etc.
         def configure_optimizers(self):
             return Adam(self.model.parameters(), lr=self.lr)
 
-        def configure_loss(self) -> SimilarityLoss:
+        def configure_loss(self):
             # `symmetric` means that we take into account correctness of both the closest answer to a question and the closest question to an answer
             return MultipleNegativesRankingLoss(symmetric=True)
 
-        def configure_encoders(self) -> Union[Encoder, Dict[str, Encoder]]:
+        def configure_encoders(self):
             pre_trained_model = SentenceTransformer("all-MiniLM-L6-v2")
             transformer: Transformer = pre_trained_model[0]
             pooling: Pooling = pre_trained_model[1]
             encoder = FAQEncoder(transformer, pooling)
             return encoder
 
-        def configure_head(self, input_embedding_size: int) -> EncoderHead:
+        def configure_head(self, input_embedding_size: int):
             return SkipConnectionHead(input_embedding_size)
 
-        def configure_caches(self) -> Optional[CacheConfig]:
+        def configure_caches(self):
             # Cache stores frozen encoder embeddings to prevent repeated calculations and increase training speed.
             # AUTO preserves the current encoder's device as storage, batch size does not affect training and is used only to fill the cache before training.
             return CacheConfig(CacheType.AUTO, batch_size=1024)
@@ -229,6 +225,8 @@ At the end trained model is saved under `servable` dir.
 
 .. code-block:: python
 
+    import os
+
     import torch
     import pytorch_lightning as pl
 
@@ -238,13 +236,15 @@ At the end trained model is saved under `servable` dir.
     from quaterion.eval.pair import RetrievalReciprocalRank, RetrievalPrecision
     from quaterion.eval.samplers.pair_sampler import PairSampler
 
+    DATA_DIR = 'data'
+
 
     def run(model, train_dataset_path, val_dataset_path, params):
         use_gpu = params.get("cuda", torch.cuda.is_available())
 
         trainer = pl.Trainer(
             min_epochs=params.get("min_epochs", 1),
-            max_epochs=params.get("max_epochs", 500),  # cache makes it possible to use a huge amount of epochs
+            max_epochs=params.get("max_epochs", 300),  # cache makes it possible to use a huge amount of epochs
             auto_select_gpus=use_gpu,
             log_every_n_steps=params.get("log_every_n_steps", 10),  # increase to speed up training
             gpus=int(use_gpu),
@@ -266,18 +266,12 @@ At the end trained model is saved under `servable` dir.
         print(f"results: {results}")
 
 
-    if __name__ == "__main__":
-        import os
-        from pytorch_lightning import seed_everything
-        from faq.model import FAQModel
-        from faq.config import DATA_DIR, ROOT_DIR
-
-        seed_everything(42, workers=True)
-        faq_model = FAQModel()
-        train_path = os.path.join(DATA_DIR, "train_cloud_faq_dataset.jsonl")
-        val_path = os.path.join(DATA_DIR, "val_cloud_faq_dataset.jsonl")
-        run(faq_model, train_path, val_path, {})
-        faq_model.save_servable(os.path.join(ROOT_DIR, "servable"))
+    pl.seed_everything(42, workers=True)
+    faq_model = FAQModel()
+    train_path = os.path.join(DATA_DIR, "train_cloud_faq_dataset.jsonl")
+    val_path = os.path.join(DATA_DIR, "val_cloud_faq_dataset.jsonl")
+    run(faq_model, train_path, val_path, {})
+    faq_model.save_servable("servable")
 
 Here are some of the plots observed during training. As you can see, the loss decreased, while the metrics grew steadily.
 
@@ -289,6 +283,57 @@ Here are some of the plots observed during training. As you can see, the loss de
 
 .. image:: precision.svg
     :alt: validation Precision@1 image
+
+Let's see how we can apply our model to the real data.
+
+.. code-block:: python
+
+    import os
+    import json
+
+    import torch
+    from quaterion_models.model import SimilarityModel
+    from quaterion.distances import Distance
+
+    DATA_DIR = 'data'
+
+    device = "cuda:0" if torch.cuda.is_available() else "cpu"
+    model = SimilarityModel.load(os.path.join(ROOT_DIR, "servable"))
+    model.to(device)
+    dataset_path = os.path.join(DATA_DIR, "val_cloud_faq_dataset.jsonl")
+
+    # no need to load questions
+    with open(dataset_path) as fd:
+        answers = [json.loads(json_line)["answer"] for json_line in fd]
+    answer_embeddings = model.encode(answers, to_numpy=False)
+
+    # Some prepared questions and answers to check the model
+    questions = [
+        "what is the pricing of aws lambda functions powered by aws graviton2 processors?",
+        "can i run a cluster or job for a long time?",
+        "what is the dell open manage system administrator suite (omsa)?",
+        "what are the differences between the event streams standard and event streams enterprise plans?",
+    ]
+    ground_truth_answers = [
+        "aws lambda functions powered by aws graviton2 processors are 20% cheaper compared to x86-based lambda functions",
+        "yes, you can run a cluster for as long as is required",
+        "omsa enables you to perform certain hardware configuration tasks and to monitor the hardware directly via the operating system",
+        "to find out more information about the different event streams plans, see choosing your plan",
+    ]
+
+    # encode our questions and find the closest to them answer embeddings
+    question_embeddings = model.encode(questions, to_numpy=False)
+    distance = Distance.get_by_name(Distance.COSINE)
+    question_answers_distances = distance.distance_matrix(
+        question_embeddings, answer_embeddings
+    )
+    answers_indices = question_answers_distances.min(dim=1)[1]
+    for q_ind, a_ind in enumerate(answers_indices):
+        print("Q:", questions[q_ind])
+        print("A:", answers[a_ind], end="\n\n")
+        assert (
+            answers[a_ind] == ground_truth_answers[q_ind]
+        ), f"<{answers[a_ind]}> != <{ground_truth_answers[q_ind]}>"
 
 That's it! We've just trained similarity learning model to solve Question Answering problem!
 

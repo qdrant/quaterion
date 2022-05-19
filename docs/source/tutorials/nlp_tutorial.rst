@@ -327,9 +327,6 @@ Let's see how we can apply our model to the real data.
     for q_ind, a_ind in enumerate(answers_indices):
         print("Q:", questions[q_ind])
         print("A:", answers[a_ind], end="\n\n")
-        assert (
-            answers[a_ind] == ground_truth_answers[q_ind]
-        ), f"<{answers[a_ind]}> != <{ground_truth_answers[q_ind]}>"
 
 That's it! We've just trained similarity learning model to solve Question Answering problem!
 

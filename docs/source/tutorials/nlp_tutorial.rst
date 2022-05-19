@@ -165,7 +165,7 @@ Here we need to configure encoders, heads, loss, optimizer, metrics, cache, etc.
 ``TrainableModel`` is actually `pytorch_lightning.LightningModule <https://pytorch-lightning.readthedocs.io/en/latest/common/lightning_module.html>`_, hence obtains all ``LightningModule`` features.
 
 .. code-block:: python
-    :caption: `model.py https://github.com/qdrant/demo-cloud-faq/blob/tutorial/faq/model.py`_
+    :caption: `model.py <https://github.com/qdrant/demo-cloud-faq/blob/tutorial/faq/model.py>`_
 
     from quaterion.eval.attached_metric import AttachedMetric
     from torch.optim import Adam
@@ -288,19 +288,13 @@ At the end trained model is saved under `servable` dir.
 
 Here are some of the plots observed during training. As you can see, the loss decreased, while the metrics grew steadily.
 
-.. image:: loss.svg
-    :alt: validation loss image
-
-.. image:: mrr.svg
-    :alt: validation MRR image
-
-.. image:: precision.svg
-    :alt: validation Precision@1 image
+.. image:: loss_mrr_precision.png
+    :alt: training plots
 
 Let's see how we can apply our model to the real data.
 
 .. code-block:: python
-    :caption: `serve.py <https://github.com/qdrant/demo-cloud-faq/blob/tutorial/faq/serve.py`_
+    :caption: `serve.py <https://github.com/qdrant/demo-cloud-faq/blob/tutorial/faq/serve.py>`_
 
     import os
     import json

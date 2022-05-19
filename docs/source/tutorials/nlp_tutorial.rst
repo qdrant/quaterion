@@ -309,15 +309,11 @@ Let's see how we can apply our model to the real data.
 
     # Some prepared questions and answers to check the model
     questions = [
-        "what is the pricing of aws lambda functions powered by aws graviton2 processors?",
         "can i run a cluster or job for a long time?",
-        "what is the dell open manage system administrator suite (omsa)?",
         "what are the differences between the event streams standard and event streams enterprise plans?",
     ]
     ground_truth_answers = [
-        "aws lambda functions powered by aws graviton2 processors are 20% cheaper compared to x86-based lambda functions",
         "yes, you can run a cluster for as long as is required",
-        "omsa enables you to perform certain hardware configuration tasks and to monitor the hardware directly via the operating system",
         "to find out more information about the different event streams plans, see choosing your plan",
     ]
 

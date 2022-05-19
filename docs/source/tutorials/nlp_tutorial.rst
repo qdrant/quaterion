@@ -41,8 +41,15 @@ Example of pairs presented in dataset:
 
 Data have to be represented as `SimilaritySample </quaterion.dataset.similarity_samples.html>`_ instances.
 With questions and answers we can use `SimilarityPairSample </quaterion.dataset.similarity_samples.SimilarityPairSample>`_.
-It contains 2 objects - ``obj_a`` and ``obj_b``, ``score`` - float to represent similarity between objects
-and ``subgroup`` - int to determine which objects can be considered as negative examples.
+
+.. code-block:: python
+    class SimilarityPairSample:
+        obj_a: Any  # question
+        obj_b: Any  # answer
+        score: float = 1.0  # Measure of similarity. Usually converted to bool
+        # Consider all examples outside this group as negative samples.
+        # By default, all samples belong to group 0 - therefore other samples could not be used as negative examples.
+        subgroup: int = 0
 
 We will use `torch.utils.data.Dataset <https://pytorch.org/docs/stable/data.html>`_ to convert data and feed it to the model.
 
@@ -67,7 +74,7 @@ Code to split the data is omitted but can be found in the `repo <https://github.
             # All questions have a unique subgroup
             # Meaning that all other answers are considered negative pairs
             subgroup = hash(question)
-            score = 1  # usually score is converted into bool: True for similar objects and False for dissimilar ones
+            score = 1
             return SimilarityPairSample(
                 obj_a=question, obj_b=line["answer"], score=score, subgroup=subgroup
             )
@@ -266,6 +273,7 @@ At the end trained model is saved under `servable` dir.
         print(f"results: {results}")
 
 
+    # launch training
     pl.seed_everything(42, workers=True)
     faq_model = FAQModel()
     train_path = os.path.join(DATA_DIR, "train_cloud_faq_dataset.jsonl")

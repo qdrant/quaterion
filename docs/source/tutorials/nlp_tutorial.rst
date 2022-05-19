@@ -11,7 +11,7 @@ We will use `cloud-faq-dataset <https://github.com/qdrant/dataset-cloud-platform
 This is a collection of almost 8.5k pairs of questions and answers from F.A.Q. pages of popular cloud providers.
 
 
-Usual pipeline in Quaterion includes the following steps:
+The usual pipeline in Quaterion includes the following steps:
 
 1. Download and prepare a dataset
 2. Create `Encoders <https://quaterion-models.qdrant.tech/quaterion_models.encoders.encoder.html#quaterion_models.encoders.encoder.Encoder>`_
@@ -22,7 +22,7 @@ Usual pipeline in Quaterion includes the following steps:
 
 Let's stick with it and implement step-by-step.
 
-(For ones who is not interested in text - here is a `repo <https://github.com/qdrant/demo-cloud-faq/blob/tutorial/>`_ with the whole tutorial code.)
+(For ones who is not interested in the text - here is a `repo <https://github.com/qdrant/demo-cloud-faq/tree/tutorial/faq>`_ with the whole tutorial code.)
 
 Download & prepare dataset
 ==========================
@@ -145,11 +145,11 @@ We are going to use pretrained ``all-MiniLM-L6-v2`` from `sentence-transformers 
             pooling = Pooling.load(cls._pooling_path(input_path))
             return cls(transformer=transformer, pooling=pooling)
 
-We return ``False`` in ``trainable`` - it means that our encoder is frozen and encoder's weights won't change during training.
+We return ``False`` in ``trainable`` - it means that our encoder is frozen and the encoder's weights won't change during training.
 
 Trainable model constructing
 ============================
-On of the main entities in Quaterion is ``TrainableModel``.
+One of the main entities in Quaterion is ``TrainableModel``.
 It handles the majority of the training routine and constructs the final model from blocks.
 Here we need to configure encoders, heads, loss, optimizer, metrics, cache, etc.
 ``TrainableModel`` is actually `pytorch_lightning.LightningModule <https://pytorch-lightning.readthedocs.io/en/latest/common/lightning_module.html>`_, hence obtains all ``LightningModule`` features.
@@ -211,8 +211,8 @@ Here we need to configure encoders, heads, loss, optimizer, metrics, cache, etc.
             return SkipConnectionHead(input_embedding_size)
 
         def configure_caches(self) -> Optional[CacheConfig]:
-            # Cache stores frozen encoder embeddings to prevent repeated calculations and reduce training speed.
-            # AUTO preserves current encoder's device as a storage, batch-size does not affect training, and used only to fill cache before training.
+            # Cache stores frozen encoder embeddings to prevent repeated calculations and increase training speed.
+            # AUTO preserves the current encoder's device as storage, batch size does not affect training and is used only to fill the cache before training.
             return CacheConfig(CacheType.AUTO, batch_size=1024)
 
 
@@ -223,9 +223,9 @@ For the training process we need to create `pytorch_lightning.Trainer <https://p
 also datasets and data loaders instances to prepare our data and feed it to the model.
 Finally, to launch the training process all of these should be passed to `Quaterion.fit </quaterion.main.html#quaterion.main.Quaterion.fit>`_.
 Batch-wise evaluation will be performed during training, but it can fluctuate a lot depending on a batch size.
-More representative results from larger part of data can be obtained via `Evaluator </quaterion.eval.evaluator.html#quaterion.eval.evaluator.Evaluator>`_ and `Quaterion.evaluate </quaterion.main.html#quaterion.main.Quaterion.evaluate>`_.
+More representative results from larger part of the data can be obtained via `Evaluator </quaterion.eval.evaluator.html#quaterion.eval.evaluator.Evaluator>`_ and `Quaterion.evaluate </quaterion.main.html#quaterion.main.Quaterion.evaluate>`_.
 
-At the end trained model being saved under `servable` dir.
+At the end trained model is saved under `servable` dir.
 
 .. code-block:: python
 
@@ -262,7 +262,7 @@ At the end trained model being saved under `servable` dir.
         }
         sampler = PairSampler()
         evaluator = Evaluator(metrics, sampler)
-        results = Quaterion.evaluate(evaluator, val_dataset, model.model)  # calculate metrics on the whole dataset and to obtain more representative metrics values
+        results = Quaterion.evaluate(evaluator, val_dataset, model.model)  # calculate metrics on the whole dataset to obtain more representative metrics values
         print(f"results: {results}")
 
 
@@ -297,4 +297,4 @@ Further learning
 In the case you followed the tutorial step-by-step you might be surprised by the speed of the training
 process with Quaterion.
 This is mainly the merit of the cache and frozen encoder.
-Checkout our `Awesome cache tutorial </quaterion/docs/html/tutorials/cache_tutorial.html>`_.
+Check out our `Awesome cache tutorial </quaterion/docs/html/tutorials/cache_tutorial.html>`_.

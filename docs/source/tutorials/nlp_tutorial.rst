@@ -43,6 +43,7 @@ Data have to be represented as `SimilaritySample </quaterion.dataset.similarity_
 With questions and answers we can use `SimilarityPairSample </quaterion.dataset.similarity_samples.SimilarityPairSample>`_.
 
 .. code-block:: python
+
     class SimilarityPairSample:
         obj_a: Any  # question
         obj_b: Any  # answer
@@ -56,6 +57,7 @@ We will use `torch.utils.data.Dataset <https://pytorch.org/docs/stable/data.html
 Code to split the data is omitted but can be found in the `repo <https://github.com/qdrant/demo-cloud-faq/blob/tutorial/faq/train_val_split.py>`_.
 
 .. code-block:: python
+    :caption: `dataset.py <https://github.com/qdrant/demo-cloud-faq/blob/tutorial/faq/dataset.py>`_
 
     import json
     from typing import List, Dict
@@ -95,6 +97,7 @@ Encoder definition
 We are going to use pretrained ``all-MiniLM-L6-v2`` from `sentence-transformers <https://www.sbert.net/>`_ library as our text encoder.
 
 .. code-block:: python
+    :caption: `encoder.py <https://github.com/qdrant/demo-cloud-faq/blob/tutorial/faq/encoder.py>`_
 
     import os
     from torch import Tensor, nn
@@ -162,6 +165,7 @@ Here we need to configure encoders, heads, loss, optimizer, metrics, cache, etc.
 ``TrainableModel`` is actually `pytorch_lightning.LightningModule <https://pytorch-lightning.readthedocs.io/en/latest/common/lightning_module.html>`_, hence obtains all ``LightningModule`` features.
 
 .. code-block:: python
+    :caption: `model.py https://github.com/qdrant/demo-cloud-faq/blob/tutorial/faq/model.py`_
 
     from quaterion.eval.attached_metric import AttachedMetric
     from torch.optim import Adam
@@ -231,6 +235,7 @@ More representative results from larger part of the data can be obtained via `Ev
 At the end trained model is saved under `servable` dir.
 
 .. code-block:: python
+    :caption: `train.py <https://github.com/qdrant/demo-cloud-faq/blob/tutorial/faq/train.py>`_
 
     import os
 
@@ -295,6 +300,7 @@ Here are some of the plots observed during training. As you can see, the loss de
 Let's see how we can apply our model to the real data.
 
 .. code-block:: python
+    :caption: `serve.py <https://github.com/qdrant/demo-cloud-faq/blob/tutorial/faq/serve.py`_
 
     import os
     import json

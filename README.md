@@ -13,8 +13,7 @@ It is designed to combine the performance of pre-trained models with specializat
 * 🌀 **Warp-speed fast**: With the built-in caching mechanism, Quaterion enables you to train thousands of epochs with huge batch sizes even on *laptop GPU*.
 
 <p align="center">
-  <img alt="Regular Fine-Tuning" src="./docs/imgs/demo_slow-min-2.gif" width="48%">
-  <img alt="Fine-Tuning with Cache" src="./docs/imgs/demo_cached-min-2.gif" width="49%">
+  <img alt="Regular vs Cached Fine-Tuning" src="./docs/imgs/merged-demo.gif">
 </p>
 
 * 🐈‍ **Small data compatible**: Pre-trained models with specially designed head layers allow you to benefit even from a dataset you can label *in one day*.

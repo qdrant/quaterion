@@ -44,7 +44,6 @@ def train(
         callbacks=[early_stopping, ModelSummary(max_depth=3)],
         enable_checkpointing=False,
         log_every_n_steps=1,
-        enable_model_summary=False,
     )
 
     Quaterion.fit(

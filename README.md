@@ -22,7 +22,7 @@ It is designed to combine the performance of pre-trained models with specializat
 * 🏗️ **Customizable**: Quaterion allows you to re-define any part of the framework, making it flexible even for large-scale and sophisticated training pipelines.
 
 ## Installation
-,
+
 TL;DR:
 
 For training:

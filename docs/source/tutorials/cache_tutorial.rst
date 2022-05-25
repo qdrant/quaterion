@@ -1,6 +1,8 @@
 The cache tutorial
 ++++++++++++++++++
 
+.. _Main idea:
+
 Main idea
 =========
 One of the most intriguing features in Quaterion is the caching mechanism.
@@ -57,7 +59,7 @@ The first part of the options includes ``batch_size`` and ``num_workers`` - thes
 
 ``batch_size`` does not affect training stage at all, you can tune it freely.
 
-``num_workers`` can decrease time of cache filling, but increase training time.
+``num_workers`` determines number of processes to be used during cache filling.
 
 .. code-block:: python
     :caption: tune cache filling speed
@@ -91,30 +93,7 @@ If you don't specify a directory for saving embeddings, they won't be saved to d
                 save_dir='cache'
             )
 
-The third part of the cache settings is a kind of advanced one.
-
-By default, `key_extractor` uses index of an item in a dataset as a key in the cache.
-This is usually sufficient, however, it has its drawbacks that you may want to avoid.
-
-For instance, in some cases data-independent keys may not be acceptable or desirable, and you may want to establish such a connection between them.
-
-You can provide custom ``key_extractors`` and extract keys from features in your own way to obtain desired properties.
-(Here, by features we mean raw data written into a corresponding ``obj`` field in ``SimilaritySample``)
-Custom `key_extractor` also limits cache capabilities likewise ``num_workers``.
-See the details in :ref:`Subsequent ideas`.
-
-.. code-block:: python
-    :caption: provide custom key extractor
-
-    def configure_caches(self) -> Optional[CacheConfig]:
-        def custom_key_extractor(feature):
-            return feature['filename']
-
-        return CacheConfig(
-                key_extractor=custom_key_extractor  # use feature's filename as a key
-            )
-
-.. _Subsequent ideas:
+The third part of the cache settings is a kind of advanced one and covered in :ref:`Limitations`.
 
 Subsequent ideas
 ================
@@ -132,14 +111,61 @@ Just imagine that you need to read an image every time you want to get labels.
 Sounds wasteful.
 
 A possible improvement here is to avoid reading the dataset and keep the labels during cache filling too.
-It will be done automatically if your setup meets several conditions:
+It will be done automatically and bring a noticeable increase in training speed if cache is enabled and limitations described in the following chapter are met.
 
-1. Cache is enabled.
-2. All of encoders are frozen.
-3. Multiprocessing is not used.
-4. Key extraction is not overridden.
 
-If all points are met, you will get a noticeable increase in speed.
+.. _Limitations:
+
+Limitations
+===========
+
+As it was mentioned in :ref:`Main idea`, the main limitation of using cache is that encoders which is meant to be cached have to be frozen.
+
+If they are frozen, you are already able to calculate embeddings only once per training.
+
+Labels caching has more strict rules:
+
+1. All encoders have to be frozen. If at least one is not frozen, we can't cache labels.
+2. Multiprocessing is not allowed.
+3. Key extraction is not overridden.
+
+Multiprocessing
+---------------
+
+Labels are stored in a dataset instance.
+This instance, and therefore the label cache, is bound to the process in which it was created.
+If we use multiprocessing, then the label cache is filled in a child process.
+We simply don't have access to our label cache from the parent process during training, which makes it impossible to use multiprocessing in this case.
+
+Speaking about the code, this limitation requires `num_workers=None` (default value).
+
+Key extractor
+-------------
+
+The key extractor is the function used to get the key for the entry we want to store in the cache.
+By default, `key_extractor` uses the index of the item in the dataset as the cache key.
+This is usually sufficient, however it has its drawbacks that you may want to avoid.
+
+For instance, in some cases data-independent keys may not be acceptable or desirable, and you may want to establish such a connection between them.
+
+You can provide custom ``key_extractors`` and extract keys from features in your own way to obtain desired properties.
+(Here, by features we mean raw data written into a corresponding ``obj`` field in ``SimilaritySample``)
+
+If you're using a custom key extractor, you'll need to access the features during training to get the key from it.
+But retrieving features from a dataset is exactly what we wanted to avoid when caching labels.
+Hence, usage of a custom key extractor makes labels caching meaningless.
+
+.. code-block:: python
+    :caption: provide custom key extractor
+
+    def configure_caches(self) -> Optional[CacheConfig]:
+        def custom_key_extractor(feature):
+            return feature['filename']  # let's assume we have a dict as a feature
+
+        return CacheConfig(
+                key_extractor=custom_key_extractor  # use feature's filename as a key
+            )
+
 
 Comprehensive example
 =====================

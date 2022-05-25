@@ -23,6 +23,12 @@ This is the main idea of the cache.
 
 The main `limitation` of its usage have been already mentioned - your `encoders have to be frozen`.
 
+
+.. image:: ../../imgs/merged-demo.gif
+    :height: 250px
+    :alt: regular vs cache gif
+
+
 How to use it?
 ==============
 

@@ -180,3 +180,5 @@ But with text data, it's not that important to avoid `I/O` because strings aren'
 More examples can be found at
 `configure_caches <quaterion.train.trainable_model.html#quaterion.train.trainable_model.TrainableModel.configure_caches>`_
 documentation.
+
+Full training pipeline utilising cache can be found in `NLP tutorial </tutorials/nlp_tutorial.html>`_.

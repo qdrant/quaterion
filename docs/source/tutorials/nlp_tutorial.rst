@@ -54,7 +54,7 @@ With questions and answers we can use `SimilarityPairSample </quaterion.dataset.
 
 We will use `torch.utils.data.Dataset <https://pytorch.org/docs/stable/data.html>`_ to convert data and feed it to the model.
 
-Code to split the data is omitted but can be found in the `repo <https://github.com/qdrant/demo-cloud-faq/blob/tutorial/faq/train_val_split.py>`_.
+Code to split the data is omitted but can be found in the `repository <https://github.com/qdrant/demo-cloud-faq/blob/tutorial/faq/train_val_split.py>`_.
 
 .. code-block:: python
     :caption: `dataset.py <https://github.com/qdrant/demo-cloud-faq/blob/tutorial/faq/dataset.py>`_
@@ -220,7 +220,7 @@ Here we need to configure encoders, heads, loss, optimizer, metrics, cache, etc.
         def configure_caches(self):
             # Cache stores frozen encoder embeddings to prevent repeated calculations and increase training speed.
             # AUTO preserves the current encoder's device as storage, batch size does not affect training and is used only to fill the cache before training.
-            return CacheConfig(CacheType.AUTO, batch_size=1024)
+            return CacheConfig(CacheType.AUTO, batch_size=256)
 
 
 Train & Evaluate
@@ -288,53 +288,25 @@ At the end trained model is saved under `servable` dir.
 
 Here are some of the plots observed during training. As you can see, the loss decreased, while the metrics grew steadily.
 
-.. image:: loss_mrr_precision.png
+.. image:: ../../imgs/loss_mrr_precision.png
     :alt: training plots
 
-Let's see how we can apply our model to the real data.
+Additionally, let's take a look at our model's performance:
 
-.. code-block:: python
-    :caption: `serve.py <https://github.com/qdrant/demo-cloud-faq/blob/tutorial/faq/serve.py>`_
+.. code-block::
+  :caption: Output of `serve.py <https://github.com/qdrant/demo-cloud-faq/blob/tutorial/faq/serve.py>`_
 
-    import os
-    import json
+    Q: what is the pricing of aws lambda functions powered by aws graviton2 processors?
+    A: aws lambda functions powered by aws graviton2 processors are 20% cheaper compared to x86-based lambda functions
 
-    import torch
-    from quaterion_models.model import SimilarityModel
-    from quaterion.distances import Distance
+    Q: can i run a cluster or job for a long time?
+    A: yes, you can run a cluster for as long as is required
 
-    DATA_DIR = 'data'
+    Q: what is the dell open manage system administrator suite (omsa)?
+    A: omsa enables you to perform certain hardware configuration tasks and to monitor the hardware directly via the operating system
 
-    device = "cuda:0" if torch.cuda.is_available() else "cpu"
-    model = SimilarityModel.load(os.path.join(ROOT_DIR, "servable"))
-    model.to(device)
-    dataset_path = os.path.join(DATA_DIR, "val_cloud_faq_dataset.jsonl")
-
-    # no need to load questions
-    with open(dataset_path) as fd:
-        answers = [json.loads(json_line)["answer"] for json_line in fd]
-    answer_embeddings = model.encode(answers, to_numpy=False)
-
-    # Some prepared questions and answers to check the model
-    questions = [
-        "can i run a cluster or job for a long time?",
-        "what are the differences between the event streams standard and event streams enterprise plans?",
-    ]
-    ground_truth_answers = [
-        "yes, you can run a cluster for as long as is required",
-        "to find out more information about the different event streams plans, see choosing your plan",
-    ]
-
-    # encode our questions and find the closest to them answer embeddings
-    question_embeddings = model.encode(questions, to_numpy=False)
-    distance = Distance.get_by_name(Distance.COSINE)
-    question_answers_distances = distance.distance_matrix(
-        question_embeddings, answer_embeddings
-    )
-    answers_indices = question_answers_distances.min(dim=1)[1]
-    for q_ind, a_ind in enumerate(answers_indices):
-        print("Q:", questions[q_ind])
-        print("A:", answers[a_ind], end="\n\n")
+    Q: what are the differences between the event streams standard and event streams enterprise plans?
+    A: to find out more information about the different event streams plans, see choosing your plan
 
 That's it! We've just trained similarity learning model to solve Question Answering problem!
 

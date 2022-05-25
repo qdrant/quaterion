@@ -7,3 +7,6 @@ Text tutorial intro
 
 Image tutorial intro
 ====================
+
+Cache tutorial intro
+====================

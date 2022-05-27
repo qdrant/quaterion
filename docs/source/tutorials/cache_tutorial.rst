@@ -26,7 +26,6 @@ It opens a room for significant improvement - we can calculate these embeddings 
 This is the main idea of the cache.
 
 .. image:: ../../imgs/merged-demo.gif
-    :height: 250px
     :alt: regular vs cache gif
 
 
@@ -118,7 +117,7 @@ Limitations
 
 There are several conditions required to use the cache:
 
-- At least one encoder should be frozen
+- At least one encoder should be frozen.
 - Dataset should be the same on each epoch.
     This unfortunately means that dynamic augmentations are not supported by the cache.
 

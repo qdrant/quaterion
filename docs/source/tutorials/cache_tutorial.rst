@@ -124,9 +124,9 @@ There are several conditions required to use the cache:
 
 Dataset caching has more strict rules:
 
-1. All encoders have to be frozen. If at least one is not, we can't cache labels.
-2. Multiprocessing is not allowed.
-3. Key extraction is not overridden.
+- All encoders have to be frozen. If at least one is not, we can't cache labels.
+- Multiprocessing is not allowed.
+- Key extraction is not overridden.
 
 Multiprocessing
 ---------------
@@ -136,7 +136,7 @@ Therefore, this instance, and consequently the label cache, is bound to the proc
 If we use multiprocessing, then the label cache is filled in a child process.
 We simply don't have access to our label cache from the parent process during training, which makes it difficult to use multiprocessing in this case.
 
-You can use `num_workers=None` in cache configuration to prevent multiprocessing during the cache population.
+You can use ``num_workers=None`` in cache configuration to prevent multiprocessing during the cache population.
 It is preferred to use single process cache in case if you training process is I/O bound.
 For example, reading images from a disk could be a bottleneck in cached training.
 But for NLP tasks having more CPU for pre-processing might be more influential than I/O speed.

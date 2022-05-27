@@ -5,26 +5,25 @@ The cache tutorial
 
 Main idea
 =========
-One of the most intriguing features in Quaterion is the caching mechanism.
+
+One of the most intriguing features of Quaterion is the caching mechanism.
 A tool which can make experimenting blazing fast.
 
-During fine-tuning you use a pretrained model and attach one or more layers upon it.
-The most resource intensive part of such a model is running the data through these pretrained layers.
-They have a really huge number of parameters.
+During fine-tuning, you use a pre-trained model and attach one or more layers on top of it.
+The most resource-intensive part of this setup is inferring through the pre-trained layers.
+They usually have a vast amount of parameters.
 
-However, it is not always necessary to tune these pretrained parameters and calculate gradients for them.
-You might be able to train faster and get similar quality if you freeze them.
+However, in many cases you don't even want to update pre-trained weights.
+If you don't have much data, it might be preferable to only tune the head layer to prevent over-fitting and `catastrophic forgetting <https://en.wikipedia.org/wiki/Catastrophic_interference>`_.
+Frozen layers do not require gradient calculation. Therefore you could perform training faster.
 
-In Quaterion, the underlying pre-trained models used for producing embeddings.
-For this reason, we call them encoders.
-If encoder's weights are frozen, then it is deterministic and emits the same embeddings for the same input every epoch.
-It opens a room for improvement.
-We can calculate these embeddings one time and cache them for fast access.
+Quaterion, meanwhile, takes it one more step further.
+
+In Quaterion, pre-trained models are used as encoders.
+If the encoder's weights are frozen, then it is deterministic and emits the same embeddings for the same input every epoch.
+It opens a room for significant improvement - we can calculate these embeddings once and re-use them during training.
 
 This is the main idea of the cache.
-
-The main `limitation` of its usage have been already mentioned - your `encoders have to be frozen`.
-
 
 .. image:: ../../imgs/merged-demo.gif
     :height: 250px
@@ -46,9 +45,13 @@ This method should return `CacheConfig <quaterion.train.cache.cache_config.Cache
     def configure_caches(self) -> Optional[CacheConfig]:
         return CacheConfig(...)
 
+If configuration is provided, Quaterion will perform a single pass through all datasets to populate the cache.
+After that, the trainer will use only cached embeddings.
+If you also provide the persistence parameters, the next run of the training will not require filling the cache.
+
 Cache settings can be divided into parts according to their purpose:
 
-1. Manage speed of initial cache filling
+1. Manage parameters of initial cache filling
 2. Choose storage for embeddings
 3. Customize how an object is cached
 
@@ -57,7 +60,8 @@ Options overview
 
 The first part of the options includes ``batch_size`` and ``num_workers`` - these are directly passed to dataloader and used in the process of filling the cache.
 
-``batch_size`` does not affect training stage at all, you can tune it freely.
+``batch_size`` - used for cached encoder inference and does not affect the training process.
+Might be useful to adjust memory/speed balance.
 
 ``num_workers`` determines number of processes to be used during cache filling.
 
@@ -72,16 +76,16 @@ The first part of the options includes ``batch_size`` and ``num_workers`` - thes
 
 Storage settings are ``cache_type``, ``mapping`` and ``save_dir``.
 
-The first two options configure the device your cached embeddings will be stored during the run.
+The first two options configure the device to store the cached embeddings.
 
 ``cache_type`` set a default storage type for all encoders which will be cached.
-
-``mapping`` provides a way to specify devices per encoder.
-
 Currently, you can store your embeddings on `CPU` or on `GPU`.
 
-The latter option, ``save_dir``, sets up a directory on disk to store embeddings on subsequent runs.
-If you don't specify a directory for saving embeddings, they won't be saved to disk.
+``mapping`` provides a way to define ``cache_type`` for each encoder separately.
+
+
+The latter option, ``save_dir``, sets up a directory on disk to store embeddings for subsequent runs.
+If you don't specify a directory for saving embeddings, Quaterion will populate the cache each time you start training.
 
 .. code-block:: python
     :caption: tune storage
@@ -93,51 +97,49 @@ If you don't specify a directory for saving embeddings, they won't be saved to d
                 save_dir='cache'
             )
 
-The third part of the cache settings is a kind of advanced one and covered in :ref:`Limitations`.
+The third part of the cache settings is aimed at advanced users and will be covered in :ref:`Limitations`.
 
-Subsequent ideas
-================
+Further optimizations
+=====================
 
-Despite eliminating the most time-consuming operations via cache, there may still be places that prevent your training loop from speeding up.
+Despite eliminating the most time-consuming operations via cache, there may still be places that prevent your training loop from warp speed 🌀.
 
-What does the data we extract from the dataset contain? - Labels and features.
-
-In a typical setup, we use features only to create embeddings.
-Assume we already read all the features and stored embeddings, it's time to train.
-
-During training we need to retrieve labels from the dataset for each sample to form a batch.
-This can include `I/O`, which is often the bottleneck.
-Just imagine that you need to read an image every time you want to get labels.
-Sounds wasteful.
+Dataset usually contains features and labels for training, and in typical setup features are only used to create embeddings.
+If we already have all the embeddings, raw features are not actually required anymore.
+Moreover, reading the features from the disk can have significant I/O overhead and be a bottleneck during training.
 
 A possible improvement here is to avoid reading the dataset and keep the labels during cache filling too.
-It will be done automatically and bring a noticeable increase in training speed if cache is enabled and limitations described in the following chapter are met.
-
+Quaterion will do it automatically and bring a noticeable increase in training speed if cache is enabled and limitations described in the following chapter are met.
 
 .. _Limitations:
 
 Limitations
 ===========
 
-As it was mentioned in :ref:`Main idea`, the main limitation of using cache is that encoders which is meant to be cached have to be frozen.
+There are several conditions required to use the cache:
 
-If they are frozen, you are already able to calculate embeddings only once per training.
+- At least one encoder should be frozen
+- Dataset should be the same on each epoch.
+    This unfortunately means that dynamic augmentations are not supported by the cache.
 
-Labels caching has more strict rules:
+Dataset caching has more strict rules:
 
-1. All encoders have to be frozen. If at least one is not frozen, we can't cache labels.
+1. All encoders have to be frozen. If at least one is not, we can't cache labels.
 2. Multiprocessing is not allowed.
 3. Key extraction is not overridden.
 
 Multiprocessing
 ---------------
 
-Labels are stored in a dataset instance.
-This instance, and therefore the label cache, is bound to the process in which it was created.
+Cached labels are stored in an associated dataset instance.
+Therefore, this instance, and consequently the label cache, is bound to the process in which it was created.
 If we use multiprocessing, then the label cache is filled in a child process.
-We simply don't have access to our label cache from the parent process during training, which makes it impossible to use multiprocessing in this case.
+We simply don't have access to our label cache from the parent process during training, which makes it difficult to use multiprocessing in this case.
 
-Speaking about the code, this limitation requires `num_workers=None` (default value).
+You can use `num_workers=None` in cache configuration to prevent multiprocessing during the cache population.
+It is preferred to use single process cache in case if you training process is I/O bound.
+For example, reading images from a disk could be a bottleneck in cached training.
+But for NLP tasks having more CPU for pre-processing might be more influential than I/O speed.
 
 Key extractor
 -------------
@@ -146,14 +148,13 @@ The key extractor is the function used to get the key for the entry we want to s
 By default, `key_extractor` uses the index of the item in the dataset as the cache key.
 This is usually sufficient, however it has its drawbacks that you may want to avoid.
 
-For instance, in some cases data-independent keys may not be acceptable or desirable, and you may want to establish such a connection between them.
+For instance, in some cases data-independent keys may not be acceptable or desirable.
 
-You can provide custom ``key_extractors`` and extract keys from features in your own way to obtain desired properties.
-(Here, by features we mean raw data written into a corresponding ``obj`` field in ``SimilaritySample``)
+You can provide custom ``key_extractors`` and extract keys from features in your own way to obtain desired behavior.
 
 If you're using a custom key extractor, you'll need to access the features during training to get the key from it.
 But retrieving features from a dataset is exactly what we wanted to avoid when caching labels.
-Hence, usage of a custom key extractor makes labels caching meaningless.
+Hence, usage of a custom key extractor makes labels caching impossible.
 
 .. code-block:: python
     :caption: provide custom key extractor

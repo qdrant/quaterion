@@ -9,15 +9,19 @@ from typing import Optional, Dict, Any, Union
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks.progress.rich_progress import (
     RichProgressBar,
-    RichProgressBarTheme, CustomBarColumn, BatchesProcessedColumn, CustomTimeColumn, ProcessingSpeedColumn,
+    RichProgressBarTheme,
+    CustomBarColumn,
+    BatchesProcessedColumn,
+    CustomTimeColumn,
+    ProcessingSpeedColumn,
 )
 
 from quaterion.train.cache.cache_model import CacheModel
 
 
 class FixedLengthProcessionSpeed(ProcessingSpeedColumn):
-    """Renders processing speed for the progress bar with fixes length
-    """
+    """Renders processing speed for the progress bar with fixes length"""
+
     def __init__(self, style: Union[str, Style]):
         super().__init__(style)
         self.max_length = len("0.00")
@@ -91,10 +95,13 @@ class QuaterionProgressBar(RichProgressBar):
 
     def configure_columns(self, trainer) -> list:
         return [
-            TextColumn("[progress.description]{task.description}", table_column=Column(
-                no_wrap=True,
-                min_width=9  # prevents blinking during validation, length of `Validation `
-            )),
+            TextColumn(
+                "[progress.description]{task.description}",
+                table_column=Column(
+                    no_wrap=True,
+                    min_width=9,  # prevents blinking during validation, length of `Validation `
+                ),
+            ),
             CustomBarColumn(
                 complete_style=self.theme.progress_bar,
                 finished_style=self.theme.progress_bar_finished,

@@ -63,7 +63,9 @@ class Quaterion:
 
         if trainer is None:
             trainer = pl.Trainer(
-                **cls.trainer_defaults(trainable_model=trainable_model, train_dataloader=train_dataloader)
+                **cls.trainer_defaults(
+                    trainable_model=trainable_model, train_dataloader=train_dataloader
+                )
             )
 
         trainer.callbacks.append(CleanupCallback())
@@ -110,7 +112,10 @@ class Quaterion:
         return evaluator.evaluate(dataset, model)
 
     @staticmethod
-    def trainer_defaults(trainable_model: TrainableModel = None, train_dataloader: SimilarityDataLoader = None):
+    def trainer_defaults(
+        trainable_model: TrainableModel = None,
+        train_dataloader: SimilarityDataLoader = None,
+    ):
         """Reasonable default parameters for `pytorch_lightning.Trainer`
 
         This function generates parameter set for Trainer, which are considered
@@ -136,7 +141,7 @@ class Quaterion:
             "gpus": int(use_gpu),
             "auto_select_gpus": use_gpu,
             "max_epochs": -1,
-            "enable_model_summary": False  # We define our custom model summary
+            "enable_model_summary": False,  # We define our custom model summary
         }
 
         # Adjust default parameters according to the dataloader configuration

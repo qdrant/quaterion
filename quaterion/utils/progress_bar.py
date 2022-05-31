@@ -23,7 +23,7 @@ class QuaterionProgressBar(RichProgressBar):
             theme=theme,
             console_kwargs=console_kwargs,
         )
-        self.predict_progress_bar_id: Optional[int] = None
+        self.predict_progress_bar_id = None
         self._caching = False
 
     def on_predict_batch_start(

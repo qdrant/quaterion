@@ -62,7 +62,9 @@ class Quaterion:
                 )
 
         if trainer is None:
-            trainer = pl.Trainer(**cls.trainer_defaults())
+            trainer = pl.Trainer(
+                **cls.trainer_defaults(trainable_model=trainable_model, train_dataloader=train_dataloader)
+            )
 
         trainer.callbacks.append(CleanupCallback())
         trainer.callbacks.append(MetricsCallback())
@@ -108,16 +110,55 @@ class Quaterion:
         return evaluator.evaluate(dataset, model)
 
     @staticmethod
-    def trainer_defaults():
+    def trainer_defaults(trainable_model: TrainableModel = None, train_dataloader: SimilarityDataLoader = None):
+        """Reasonable default parameters for `pytorch_lightning.Trainer`
+
+        This function generates parameter set for Trainer, which are considered
+        "recommended" for most use-cases of Quaterion.
+        Quaterion similarity learning train process has characteristics that differentiate it from
+        regular deep learning model training.
+        This default parameters may be overwritten, if you need some special behaviour for your special task.
+
+        Args:
+            trainable_model: We will try to adjust default params based on model configuration, if provided
+            train_dataloader: If provided, trainer params will be adjusted according to dataset
+
+        Returns:
+            kwargs for `pytorch_lightning.Trainer`
+        """
         use_gpu = torch.cuda.is_available()
         defaults = {
             "callbacks": [
-                QuaterionProgressBar(),
+                QuaterionProgressBar(console_kwargs={"tab_size": 4}),
                 EarlyStopping(f"{TrainStage.VALIDATION}_loss"),
                 ModelSummary(max_depth=3),
             ],
             "gpus": int(use_gpu),
             "auto_select_gpus": use_gpu,
-            "log_every_n_steps": 10,
+            "max_epochs": -1,
+            "enable_model_summary": False  # We define our custom model summary
         }
+
+        # Adjust default parameters according to the dataloader configuration
+        if train_dataloader:
+            try:
+                num_batches = len(train_dataloader)
+                if num_batches > 0:
+                    defaults["log_every_n_steps"] = min(50, num_batches)
+            except Exception:  # If dataset has to length
+                pass
+
+        # Adjust default parameters according to model configuration
+        if trainable_model:
+            # If the cache is enabled and there are no
+            # trainable encoders - checkpointing on each epoch might become a bottleneck
+            disable_checkpoints = all(
+                [
+                    not encoder.trainable
+                    for encoder in trainable_model.model.encoders.values()
+                ]
+            ) and (trainable_model.configure_caches() is not None)
+
+            if disable_checkpoints:
+                defaults["enable_checkpointing"] = False
         return defaults

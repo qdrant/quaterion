@@ -1,8 +1,9 @@
-import torch
 from typing import Optional, Union, Sized, Iterable, Dict
 
+import torch
 import pytorch_lightning as pl
 from torch.utils.data import Dataset
+from pytorch_lightning.callbacks import ModelSummary
 from quaterion_models import SimilarityModel
 
 from quaterion.dataset.similarity_data_loader import (
@@ -12,9 +13,9 @@ from quaterion.dataset.similarity_data_loader import (
 )
 from quaterion.eval.evaluator import Evaluator
 from quaterion.loss import GroupLoss, PairwiseLoss
-from quaterion.train.cleanup_callback import CleanupCallback
-from quaterion.train.metrics_callback import MetricsCallback
 from quaterion.train.trainable_model import TrainableModel
+from quaterion.utils.progress_bar import QuaterionProgressBar
+from quaterion.train.callbacks import CleanupCallback, MetricsCallback
 
 
 class Quaterion:
@@ -24,9 +25,9 @@ class Quaterion:
     def fit(
         cls,
         trainable_model: TrainableModel,
-        trainer: pl.Trainer,
         train_dataloader: SimilarityDataLoader,
         val_dataloader: Optional[SimilarityDataLoader] = None,
+        trainer: Optional[pl.Trainer] = None,
         ckpt_path: Optional[str] = None,
     ):
         """Handle training routine
@@ -35,12 +36,12 @@ class Quaterion:
 
         Args:
             trainable_model: model to fit
-            trainer: `pytorch_lightning.Trainer` instance to handle fitting routine
-                internally
             train_dataloader: DataLoader instance to retrieve samples during training
                 stage
             val_dataloader: Optional DataLoader instance to retrieve samples during
                 validation stage
+            trainer: `pytorch_lightning.Trainer` instance to handle fitting routine
+                internally. If not passed will be created with `Quaterion.trainer_defaults`
             ckpt_path: Path/URL of the checkpoint from which training is resumed. If there is
                 no checkpoint file at the path, an exception is raised. If resuming from mid-epoch checkpoint,
                 training will start from the beginning of the next epoch.
@@ -58,6 +59,9 @@ class Quaterion:
                     "Pair samplers are not implemented yet. "
                     "Try other loss/data loader"
                 )
+
+        if trainer is None:
+            trainer = pl.Trainer(**cls.trainer_defaults())
 
         trainer.callbacks.append(CleanupCallback())
         trainer.callbacks.append(MetricsCallback())
@@ -101,3 +105,15 @@ class Quaterion:
 
         """
         return evaluator.evaluate(dataset, model)
+
+    @staticmethod
+    def trainer_defaults():
+        use_gpu = torch.cuda.is_available()
+        defaults = {
+            "callbacks": [QuaterionProgressBar(), ModelSummary(max_depth=3)],
+            "max_epochs": 1000,
+            "gpus": int(use_gpu),
+            "auto_select_gpus": use_gpu,
+            "log_every_n_steps": 10,
+        }
+        return defaults

@@ -12,6 +12,8 @@ pip install poetry
 poetry build -f wheel
 pip install dist/$(ls -1 dist | grep .whl)
 
+poetry install -e pytorch-metric-learning
+
 pip install sphinx>=4.4.0
 pip install "git+https://github.com/qdrant/qdrant_sphinx_theme.git@master#egg=qdrant-sphinx-theme"
 

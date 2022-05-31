@@ -1,10 +1,8 @@
-from typing import Optional, Union, Sized, Iterable, Dict
-
-import torch
 import pytorch_lightning as pl
+import torch
+from pytorch_lightning.callbacks import EarlyStopping, RichModelSummary
 from torch.utils.data import Dataset
-from pytorch_lightning.callbacks import ModelSummary, EarlyStopping, RichModelSummary
-from quaterion_models import SimilarityModel
+from typing import Optional, Union, Sized, Iterable, Dict
 
 from quaterion.dataset.similarity_data_loader import (
     PairsSimilarityDataLoader,
@@ -13,10 +11,11 @@ from quaterion.dataset.similarity_data_loader import (
 )
 from quaterion.eval.evaluator import Evaluator
 from quaterion.loss import GroupLoss, PairwiseLoss
-from quaterion.train.trainable_model import TrainableModel
 from quaterion.train.callbacks import CleanupCallback, MetricsCallback
+from quaterion.train.trainable_model import TrainableModel
 from quaterion.utils.enums import TrainStage
 from quaterion.utils.progress_bar import QuaterionProgressBar
+from quaterion_models import SimilarityModel
 
 
 class Quaterion:

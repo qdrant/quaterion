@@ -163,7 +163,9 @@ class Quaterion:
                     not encoder.trainable
                     for encoder in trainable_model.model.encoders.values()
                 ]
-            ) and (cache_config is not None and cache_config.cache_type != CacheType.NONE)
+            ) and (
+                cache_config is not None and cache_config.cache_type != CacheType.NONE
+            )
 
             if disable_checkpoints:
                 defaults["enable_checkpointing"] = False

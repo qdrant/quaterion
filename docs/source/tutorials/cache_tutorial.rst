@@ -136,7 +136,7 @@ If we use multiprocessing, then the label cache is filled in a child process.
 We simply don't have access to our label cache from the parent process during training, which makes it difficult to use multiprocessing in this case.
 
 You can use ``num_workers=None`` in cache configuration to prevent multiprocessing during the cache population.
-It is preferred to use single process cache in case if you training process is I/O bound.
+It is preferred to use a single process cache in case your training process is I/O bound.
 For example, reading images from a disk could be a bottleneck in cached training.
 But for NLP tasks having more CPU for pre-processing might be more influential than I/O speed.
 

@@ -6,7 +6,7 @@ import torch
 import pytorch_lightning as pl
 from pytorch_lightning.utilities.warnings import PossibleUserWarning
 from torch.utils.data import Dataset
-from pytorch_lightning.callbacks import ModelSummary, EarlyStopping
+from pytorch_lightning.callbacks import ModelSummary, EarlyStopping, RichModelSummary
 from quaterion_models import SimilarityModel
 
 from quaterion.dataset.similarity_data_loader import (
@@ -145,7 +145,7 @@ class Quaterion:
             "callbacks": [
                 QuaterionProgressBar(console_kwargs={"tab_size": 4}),
                 EarlyStopping(f"{TrainStage.VALIDATION}_loss"),
-                ModelSummary(max_depth=3),
+                RichModelSummary(max_depth=3),
             ],
             "gpus": int(use_gpu),
             "auto_select_gpus": use_gpu,

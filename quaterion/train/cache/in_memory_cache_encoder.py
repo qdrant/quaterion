@@ -1,6 +1,6 @@
 import pickle
 
-from typing import Hashable, List, OrderedDict
+from typing import Hashable, List
 
 import torch
 

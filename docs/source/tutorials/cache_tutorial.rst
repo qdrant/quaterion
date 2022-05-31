@@ -13,7 +13,7 @@ During fine-tuning, you use a pre-trained model and attach one or more layers on
 The most resource-intensive part of this setup is inferring through the pre-trained layers.
 They usually have a vast amount of parameters.
 
-However, in many cases you don't even want to update pre-trained weights.
+However, in many cases, you don't even want to update pre-trained weights.
 If you don't have much data, it might be preferable to only tune the head layer to prevent over-fitting and `catastrophic forgetting <https://en.wikipedia.org/wiki/Catastrophic_interference>`_.
 Frozen layers do not require gradient calculation. Therefore you could perform training faster.
 
@@ -44,7 +44,7 @@ This method should return `CacheConfig <quaterion.train.cache.cache_config.Cache
     def configure_caches(self) -> Optional[CacheConfig]:
         return CacheConfig(...)
 
-If configuration is provided, Quaterion will perform a single pass through all datasets to populate the cache.
+If the configuration is provided, Quaterion will perform a single pass through all datasets to populate the cache.
 After that, the trainer will use only cached embeddings.
 If you also provide the persistence parameters, the next run of the training will not require filling the cache.
 
@@ -62,7 +62,7 @@ The first part of the options includes ``batch_size`` and ``num_workers`` - thes
 ``batch_size`` - used for cached encoder inference and does not affect the training process.
 Might be useful to adjust memory/speed balance.
 
-``num_workers`` determines number of processes to be used during cache filling.
+``num_workers`` determines the number of processes to be used during cache filling.
 
 .. code-block:: python
     :caption: tune cache filling speed
@@ -103,12 +103,12 @@ Further optimizations
 
 Despite eliminating the most time-consuming operations via cache, there may still be places that prevent your training loop from warp speed 🌀.
 
-Dataset usually contains features and labels for training, and in typical setup features are only used to create embeddings.
+Dataset usually contains features and labels for training, and in a typical setup features are only used to create embeddings.
 If we already have all the embeddings, raw features are not actually required anymore.
 Moreover, reading the features from the disk can have significant I/O overhead and be a bottleneck during training.
 
 A possible improvement here is to avoid reading the dataset and keep the labels during cache filling too.
-Quaterion will do it automatically and bring a noticeable increase in training speed if cache is enabled and limitations described in the following chapter are met.
+Quaterion will do it automatically and bring a noticeable increase in training speed if the cache is enabled and limitations described in the following chapter are met.
 
 .. _Limitations:
 
@@ -145,15 +145,15 @@ Key extractor
 
 The key extractor is the function used to get the key for the entry we want to store in the cache.
 By default, `key_extractor` uses the index of the item in the dataset as the cache key.
-This is usually sufficient, however it has its drawbacks that you may want to avoid.
+This is usually sufficient, however, it has its drawbacks that you may want to avoid.
 
-For instance, in some cases data-independent keys may not be acceptable or desirable.
+For instance, in some cases, data-independent keys may not be acceptable or desirable.
 
-You can provide custom ``key_extractors`` and extract keys from features in your own way to obtain desired behavior.
+You can provide custom ``key_extractors`` and extract keys from features in your own way to obtain the desired behavior.
 
 If you're using a custom key extractor, you'll need to access the features during training to get the key from it.
 But retrieving features from a dataset is exactly what we wanted to avoid when caching labels.
-Hence, usage of a custom key extractor makes labels caching impossible.
+Hence, usage of a custom key extractor makes label caching impossible.
 
 .. code-block:: python
     :caption: provide custom key extractor

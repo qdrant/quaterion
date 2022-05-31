@@ -13,6 +13,7 @@ from quaterion.dataset.similarity_data_loader import (
 )
 from quaterion.eval.evaluator import Evaluator
 from quaterion.loss import GroupLoss, PairwiseLoss
+from quaterion.train.cache import CacheType
 from quaterion.train.callbacks import CleanupCallback, MetricsCallback
 from quaterion.train.trainable_model import TrainableModel
 from quaterion.utils.enums import TrainStage
@@ -164,12 +165,13 @@ class Quaterion:
         if trainable_model:
             # If the cache is enabled and there are no
             # trainable encoders - checkpointing on each epoch might become a bottleneck
+            cache_config = trainable_model.configure_caches()
             disable_checkpoints = all(
                 [
                     not encoder.trainable
                     for encoder in trainable_model.model.encoders.values()
                 ]
-            ) and (trainable_model.configure_caches() is not None)
+            ) and (cache_config is not None and cache_config.cache_type != CacheType.NONE)
 
             if disable_checkpoints:
                 defaults["enable_checkpointing"] = False

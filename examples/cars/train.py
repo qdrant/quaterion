@@ -33,22 +33,8 @@ def train(
         batch_size=batch_size, input_size=input_size, shuffle=shuffle
     )
 
-    early_stopping = EarlyStopping(
-        monitor="validation_loss",
-        patience=50,
-    )
-
-    trainer = pl.Trainer(
-        gpus=1 if torch.cuda.is_available() else 0,
-        max_epochs=epochs,
-        callbacks=[early_stopping, ModelSummary(max_depth=3)],
-        enable_checkpointing=False,
-        log_every_n_steps=1,
-    )
-
     Quaterion.fit(
         trainable_model=model,
-        trainer=trainer,
         train_dataloader=train_dataloader,
         val_dataloader=val_dataloader,
     )

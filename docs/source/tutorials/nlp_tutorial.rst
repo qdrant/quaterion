@@ -22,7 +22,7 @@ The usual pipeline in Quaterion includes the following steps:
 
 Let's stick with it and implement step-by-step.
 
-(For ones who is not interested in the text - here is a `repo <https://github.com/qdrant/demo-cloud-faq/tree/tutorial/faq>`_ with the whole tutorial code.)
+(For ones who are not interested in the text - here is a `repo <https://github.com/qdrant/demo-cloud-faq/tree/tutorial/faq>`_ with the whole tutorial code.)
 
 Download & prepare dataset
 ==========================

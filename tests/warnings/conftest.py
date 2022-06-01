@@ -1,5 +1,6 @@
 from typing import Union, Dict, Optional
 
+import pytest
 import torch
 from quaterion_models.encoders import Encoder
 from quaterion_models.heads import EncoderHead, GatedHead
@@ -8,16 +9,11 @@ from torch import Tensor
 from torch.utils.data import Dataset
 from torch.utils.data.dataset import T_co
 
-import pytorch_lightning as pl
 
 from quaterion import TrainableModel
-from quaterion.dataset import SimilarityPairSample, PairsSimilarityDataLoader
+from quaterion.dataset import SimilarityPairSample
 from quaterion.loss import SimilarityLoss, ContrastiveLoss
-from quaterion.train.cache import (
-    CacheConfig,
-    InMemoryCacheEncoder,
-)
-from quaterion_models.model import DEFAULT_ENCODER_KEY
+from quaterion.train.cache import CacheConfig
 
 
 class FakeEncoder(Encoder):
@@ -56,7 +52,7 @@ class FakeEncoder(Encoder):
         return FakeEncoder()
 
 
-class FakeDataset(Dataset):
+class FakePairDataset(Dataset):
     def __len__(self):
         return len(self.data)
 
@@ -108,56 +104,21 @@ class FakeCachableTrainableModel(FakeTrainableModel):
         return CacheConfig()
 
 
-def test_cache_dataloader():
-    batch_size = 3
+@pytest.fixture
+def fake_trainable_model():
+    yield FakeTrainableModel()
 
-    dataset = FakeDataset()
-    dataloader = PairsSimilarityDataLoader(dataset, batch_size=batch_size)
 
-    batch = next(iter(dataloader))
+@pytest.fixture
+def fake_cachable_trainable_model():
+    yield FakeCachableTrainableModel()
 
-    ids, features, labels = batch
 
-    print("")
-    print("ids: ", ids)
-    print("features: ", features)
-    print("labels: ", labels)
+@pytest.fixture
+def fake_pair_dataset():
+    yield FakePairDataset()
 
-    trainer = pl.Trainer(logger=False, gpus=None)
 
-    cache_trainable_model = FakeCachableTrainableModel()
-    cache_trainable_model.setup_cache(
-        trainer=trainer, train_dataloader=dataloader, val_dataloader=None
-    )
-
-    encoder = cache_trainable_model.model.encoders[DEFAULT_ENCODER_KEY]
-
-    assert isinstance(encoder, InMemoryCacheEncoder)
-    assert len(encoder._cache) == len(dataset.data) * 2
-
-    cached_ids, labels = next(iter(dataloader))
-    print("cached_batch: ", cached_ids)
-
-    # check that batch for cache contains only IDs
-    assert isinstance(cached_ids[DEFAULT_ENCODER_KEY], list)
-    assert len(cached_ids[DEFAULT_ENCODER_KEY]) == batch_size * 2
-    assert isinstance(cached_ids[DEFAULT_ENCODER_KEY][0], int)
-
-    cached_result = cache_trainable_model.model.forward(cached_ids)
-    print("cached_result: ", cached_result)
-
-    # Same, without cache
-    dataloader = PairsSimilarityDataLoader(dataset, batch_size=batch_size)
-
-    trainable_model = FakeTrainableModel()
-    trainable_model.setup_dataloader(dataloader)
-
-    features, labels = next(iter(dataloader))
-
-    reference_result = trainable_model.model.forward(features)
-
-    print("reference_result: ", reference_result)
-
-    diff_result = (cached_result - reference_result).sum()
-
-    assert abs(diff_result) < 0.0001
+@pytest.fixture
+def fake_encoder():
+    yield FakeEncoder()

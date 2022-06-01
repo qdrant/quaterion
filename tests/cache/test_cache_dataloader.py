@@ -146,6 +146,7 @@ def test_cache_dataloader():
     cached_result = cache_trainable_model.model.forward(cached_ids)
     print("cached_result: ", cached_result)
 
+    trainer.fit(cache_trainable_model, train_dataloaders=dataloader, val_dataloaders=dataloader)
     # Same, without cache
     dataloader = PairsSimilarityDataLoader(dataset, batch_size=batch_size)
 

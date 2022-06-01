@@ -268,7 +268,7 @@ class TrainableModel(pl.LightningModule, CacheMixin):
 
         embeddings = self.model(features)
         loss = self.loss(embeddings=embeddings, **targets)
-        self.log(f"{stage}_loss", loss)
+        self.log(f"{stage}_loss", loss, batch_size=embeddings.shape[0])
 
         self._evaluate(
             embeddings=embeddings,

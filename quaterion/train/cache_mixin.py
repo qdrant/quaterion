@@ -265,7 +265,7 @@ class CacheMixin:
                 cache_encoders,
             ),
             [cache_train_dataloader, cache_val_dataloader],
-            return_predictions=False,
+            return_predictions=True,
         )
 
     @classmethod

@@ -94,7 +94,7 @@ class TrainableModel(pl.LightningModule, CacheMixin):
                     f"{metric.name}_{stage}",
                     metric.compute(embeddings, **targets),
                     **metric.log_options,
-                    batch_size=embeddings.shape[0]
+                    batch_size=embeddings.shape[0],
                 )
 
     @property

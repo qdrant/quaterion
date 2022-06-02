@@ -30,7 +30,9 @@ from quaterion.dataset.label_cache_dataset import LabelCacheMode
 class CacheMixin:
     @classmethod
     def _apply_cache_config(
-        cls, encoders: Union[Encoder, Dict[str, Encoder]], cache_config: CacheConfig,
+        cls,
+        encoders: Union[Encoder, Dict[str, Encoder]],
+        cache_config: CacheConfig,
     ) -> Union[Encoder, Dict[str, Encoder]]:
         """Applies received cache configuration for cached encoders, remain
         non-cached encoders as is
@@ -62,7 +64,10 @@ class CacheMixin:
             )
 
         if isinstance(encoders, Encoder):
-            return cls._wrap_encoder(encoders, cache_config=cache_config,)
+            return cls._wrap_encoder(
+                encoders,
+                cache_config=cache_config,
+            )
 
         cached_encoders = {}
         for encoder_name, encoder in encoders.items():
@@ -265,7 +270,9 @@ class CacheMixin:
 
         # The actual caching
         trainer.predict(
-            CacheModel(cache_encoders,),
+            CacheModel(
+                cache_encoders,
+            ),
             [cache_train_dataloader, cache_val_dataloader],
             return_predictions=True,
         )
@@ -282,7 +289,9 @@ class CacheMixin:
 
     @classmethod
     def _wrap_cache_dataloader(
-        cls, dataloader: SimilarityDataLoader, cache_config: CacheConfig,
+        cls,
+        dataloader: SimilarityDataLoader,
+        cache_config: CacheConfig,
     ) -> DataLoader:
         """Creates dataloader for caching.
 

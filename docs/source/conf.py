@@ -32,7 +32,7 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.viewcode",
     "sphinx.ext.intersphinx",
-    "sphinx.ext.autosummary"
+    "sphinx.ext.autosummary",
 ]
 
 # mapping to quaterion_models

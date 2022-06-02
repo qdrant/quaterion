@@ -1,6 +1,5 @@
-from typing import Union, Dict, Optional
+from typing import Union, Dict
 
-import pytest
 import torch
 from quaterion_models.encoders import Encoder
 from quaterion_models.heads import EncoderHead, GatedHead
@@ -13,7 +12,6 @@ from torch.utils.data.dataset import T_co
 from quaterion import TrainableModel
 from quaterion.dataset import SimilarityPairSample
 from quaterion.loss import SimilarityLoss, ContrastiveLoss
-from quaterion.train.cache import CacheConfig
 
 
 class FakeEncoder(Encoder):
@@ -97,28 +95,3 @@ class FakeTrainableModel(TrainableModel):
 
     def configure_optimizers(self):
         return torch.optim.Adam(params=self.model.parameters(), lr=0.001)
-
-
-class FakeCachableTrainableModel(FakeTrainableModel):
-    def configure_caches(self) -> Optional[CacheConfig]:
-        return CacheConfig()
-
-
-@pytest.fixture
-def fake_trainable_model():
-    yield FakeTrainableModel()
-
-
-@pytest.fixture
-def fake_cachable_trainable_model():
-    yield FakeCachableTrainableModel()
-
-
-@pytest.fixture
-def fake_pair_dataset():
-    yield FakePairDataset()
-
-
-@pytest.fixture
-def fake_encoder():
-    yield FakeEncoder()

@@ -12,7 +12,7 @@ def test_ambiguous_batch_warning():
     dataloader = PairsSimilarityDataLoader(fake_pair_dataset, batch_size=4)
     fake_trainable_model.setup_dataloader(dataloader)
     trainer = pl.Trainer(max_epochs=1, log_every_n_steps=1)
-    with pytest.warns(UserWarning) as records:
+    with pytest.warns(None) as records:
         trainer.fit(fake_trainable_model, dataloader, val_dataloaders=dataloader)
 
     for record in list(records):

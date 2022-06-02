@@ -32,6 +32,10 @@ class LabelCacheDatasetMixin:
         self._cache = {}
         self._mode = LabelCacheMode.transparent
 
+    @property
+    def mode(self) -> LabelCacheMode:
+        return self._mode
+
     def set_mode(self, mode: LabelCacheMode):
         self._mode = mode
 

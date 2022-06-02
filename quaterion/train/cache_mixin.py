@@ -1,4 +1,5 @@
 import os
+import warnings
 
 from typing import (
     Union,
@@ -8,6 +9,7 @@ from typing import (
 
 import pytorch_lightning as pl
 import torch.cuda
+from pytorch_lightning.utilities.warnings import PossibleUserWarning
 from loguru import logger
 from quaterion_models.encoders import Encoder
 from torch.utils.data import DataLoader
@@ -28,9 +30,7 @@ from quaterion.dataset.label_cache_dataset import LabelCacheMode
 class CacheMixin:
     @classmethod
     def _apply_cache_config(
-        cls,
-        encoders: Union[Encoder, Dict[str, Encoder]],
-        cache_config: CacheConfig,
+        cls, encoders: Union[Encoder, Dict[str, Encoder]], cache_config: CacheConfig,
     ) -> Union[Encoder, Dict[str, Encoder]]:
         """Applies received cache configuration for cached encoders, remain
         non-cached encoders as is
@@ -62,10 +62,7 @@ class CacheMixin:
             )
 
         if isinstance(encoders, Encoder):
-            return cls._wrap_encoder(
-                encoders,
-                cache_config=cache_config,
-            )
+            return cls._wrap_encoder(encoders, cache_config=cache_config,)
 
         cached_encoders = {}
         for encoder_name, encoder in encoders.items():
@@ -208,18 +205,25 @@ class CacheMixin:
                 cls._label_cache_train_mode(train_dataloader, val_dataloader)
 
             cache_collater.mode = CacheMode.FILL
-            cls._fill_cache(
-                trainer=trainer,
-                cache_encoders=cache_encoders,
-                train_dataloader=train_dataloader,
-                val_dataloader=val_dataloader,
-                cache_config=cache_config,
-            )
-            cache_collater.mode = CacheMode.TRAIN
-            logger.debug("Caching has been successfully finished")
-            cls.save_cache(
-                cache_config.save_dir, cache_encoders, train_dataloader, val_dataloader
-            )
+            with warnings.catch_warnings():
+                warnings.filterwarnings(
+                    "ignore", category=PossibleUserWarning, message="The dataloader, .*"
+                )
+                cls._fill_cache(
+                    trainer=trainer,
+                    cache_encoders=cache_encoders,
+                    train_dataloader=train_dataloader,
+                    val_dataloader=val_dataloader,
+                    cache_config=cache_config,
+                )
+                cache_collater.mode = CacheMode.TRAIN
+                logger.debug("Caching has been successfully finished")
+                cls.save_cache(
+                    cache_config.save_dir,
+                    cache_encoders,
+                    train_dataloader,
+                    val_dataloader,
+                )
 
         else:
             cls.load_cache(
@@ -261,9 +265,7 @@ class CacheMixin:
 
         # The actual caching
         trainer.predict(
-            CacheModel(
-                cache_encoders,
-            ),
+            CacheModel(cache_encoders,),
             [cache_train_dataloader, cache_val_dataloader],
             return_predictions=True,
         )
@@ -280,9 +282,7 @@ class CacheMixin:
 
     @classmethod
     def _wrap_cache_dataloader(
-        cls,
-        dataloader: SimilarityDataLoader,
-        cache_config: CacheConfig,
+        cls, dataloader: SimilarityDataLoader, cache_config: CacheConfig,
     ) -> DataLoader:
         """Creates dataloader for caching.
 

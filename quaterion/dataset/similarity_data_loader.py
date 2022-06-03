@@ -159,8 +159,9 @@ class SimilarityDataLoader(DataLoader, Generic[T_co]):
 
 class PairsSimilarityDataLoader(SimilarityDataLoader[SimilarityPairSample]):
     """DataLoader designed to work with data represented as
-        :class:`~quaterion.dataset.similarity_samples.SimilarityPairSample`.
+    :class:`~quaterion.dataset.similarity_samples.SimilarityPairSample`.
     """
+
     def __init__(self, dataset: Dataset[SimilarityPairSample], **kwargs):
         super().__init__(dataset, **kwargs)
 
@@ -231,8 +232,9 @@ class PairsSimilarityDataLoader(SimilarityDataLoader[SimilarityPairSample]):
 
 class GroupSimilarityDataLoader(SimilarityDataLoader[SimilarityGroupSample]):
     """DataLoader designed to work with data represented as
-        :class:`~quaterion.dataset.similarity_samples.SimilarityGroupSample`.
+    :class:`~quaterion.dataset.similarity_samples.SimilarityGroupSample`.
     """
+
     def __init__(self, dataset: Dataset[SimilarityGroupSample], **kwargs):
         super().__init__(dataset, **kwargs)
 

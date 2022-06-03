@@ -44,6 +44,10 @@ class SimilarityDataLoader(DataLoader, Generic[T_co]):
         )
         super().__init__(self._label_cache_layer, **kwargs)
 
+    @property
+    def full_cache_used(self):
+        return self._label_cache_layer.mode != LabelCacheMode.transparent
+
     def set_salt(self, salt):
         """Assigns a new salt to the IndexingDataset.
         Might be useful to distinguish cache sequential keys for train and validation datasets.

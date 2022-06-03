@@ -1,7 +1,10 @@
+import warnings
+
 import torch
 from typing import Optional, Union, Sized, Iterable, Dict
 
 import pytorch_lightning as pl
+from pytorch_lightning.utilities.warnings import PossibleUserWarning
 from torch.utils.data import Dataset
 from quaterion_models import SimilarityModel
 
@@ -73,12 +76,18 @@ class Quaterion:
             val_dataloader=val_dataloader,
         )
 
-        trainer.fit(
-            model=trainable_model,
-            train_dataloaders=train_dataloader,
-            val_dataloaders=val_dataloader,
-            ckpt_path=ckpt_path,
-        )
+        with warnings.catch_warnings():
+            if train_dataloader.full_cache_used:
+                warnings.filterwarnings(
+                    "ignore", category=PossibleUserWarning, message="The dataloader.*"
+                )
+
+            trainer.fit(
+                model=trainable_model,
+                train_dataloaders=train_dataloader,
+                val_dataloaders=val_dataloader,
+                ckpt_path=ckpt_path,
+            )
 
     @classmethod
     def evaluate(

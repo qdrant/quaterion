@@ -1,4 +1,5 @@
 import os
+import warnings
 
 from typing import (
     Union,
@@ -8,6 +9,7 @@ from typing import (
 
 import pytorch_lightning as pl
 import torch.cuda
+from pytorch_lightning.utilities.warnings import PossibleUserWarning
 from loguru import logger
 from quaterion_models.encoders import Encoder
 from torch.utils.data import DataLoader
@@ -208,18 +210,25 @@ class CacheMixin:
                 cls._label_cache_train_mode(train_dataloader, val_dataloader)
 
             cache_collater.mode = CacheMode.FILL
-            cls._fill_cache(
-                trainer=trainer,
-                cache_encoders=cache_encoders,
-                train_dataloader=train_dataloader,
-                val_dataloader=val_dataloader,
-                cache_config=cache_config,
-            )
-            cache_collater.mode = CacheMode.TRAIN
-            logger.debug("Caching has been successfully finished")
-            cls.save_cache(
-                cache_config.save_dir, cache_encoders, train_dataloader, val_dataloader
-            )
+            with warnings.catch_warnings():
+                warnings.filterwarnings(
+                    "ignore", category=PossibleUserWarning, message="The dataloader, .*"
+                )
+                cls._fill_cache(
+                    trainer=trainer,
+                    cache_encoders=cache_encoders,
+                    train_dataloader=train_dataloader,
+                    val_dataloader=val_dataloader,
+                    cache_config=cache_config,
+                )
+                cache_collater.mode = CacheMode.TRAIN
+                logger.debug("Caching has been successfully finished")
+                cls.save_cache(
+                    cache_config.save_dir,
+                    cache_encoders,
+                    train_dataloader,
+                    val_dataloader,
+                )
 
         else:
             cls.load_cache(

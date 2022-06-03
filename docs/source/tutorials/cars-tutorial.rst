@@ -36,7 +36,7 @@ PyTorch datasets that emit ``SimilarityGroupSample`` instances.
 
 N.B.: Currently, Quaterion has two data types to represent samples in a
 dataset. To learn more about ``SimilarityPairSample``, check out the
-`NLP tutorial <https://quaterion.qdrant.tech/>`__
+`NLP tutorial <https://quaterion.qdrant.tech/tutorials/nlp_tutorial.html>`__
 
 .. code:: python
 
@@ -232,7 +232,7 @@ datasets should emit ``SimilarityGroupSample``. Other alternatives are
 implementations of ``PairwiseLoss``, which consume
 ``SimilarityPairSample`` - pair of objects for which similarity is
 specified individually. To see an example of the latter, you may need to
-check out the `NLP Tutorial <https://quaterion.qdrant.tech>`__
+check out the `NLP Tutorial <https://quaterion.qdrant.tech/tutorials/nlp_tutorial.html>`__
 
 .. code:: python
 
@@ -258,7 +258,7 @@ direct usage later on. It provides both a considerable speedup and less
 memory footprint. However, it is quite a bit versatile and has several
 knobs to tune. To get the most out of its potential, it’s recommended
 that you check out the `caching
-tutorial <https://quaterion.qdrant.tech>`__. For the sake of making this
+tutorial <https://quaterion.qdrant.tech/tutorials/cache_tutorial.html>`__. For the sake of making this
 article self-contained, you need to return a
 ```CacheConfig`` <https://quaterion.qdrant.tech/quaterion.train.cache.cache_config.html#quaterion.train.cache.cache_config.CacheConfig>`__
 instance from
@@ -498,3 +498,6 @@ cars from novel categories unseen in the training phase. Then, we
 evaluated it on a test dataset by the Retrieval R-Precision metric. The
 base model scored 0.1207, and our tuned model hit 0.2540, a twice higher
 score. These scored can be seen in the following figure:
+
+.. image:: ../../imgs/cars_metrics.png
+    :alt: Metrics for the base and tuned models

@@ -2,33 +2,30 @@ Similar cars search with similarity learning
 ++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
-The focus of this tutorial is a step-by-step solution of a similarity
-learning problem with Quaterion. Specifically, we will train a similarity model to search for similar cars. This will also help us better
-understand how some of the essential building blocks in Quaterion fit together in a real
-project. Let’s start walking through some of the important parts of the
-code.
+The focus of this tutorial is a step-by-step solution of a similarity learning problem with Quaterion.
+Specifically, we will train a similarity model to search for similar cars.
+This will also help us better understand how some of the essential building blocks in Quaterion fit together in a real project.
+Let’s start walking through some of the important parts of the code.
 
-If you are looking for the complete source code instead, you can find it
-under the
-`examples <https://github.com/qdrant/quaterion/tree/master/examples/cars>`__
+If you are looking for the complete source code instead, you can find it under the
+`examples <https://github.com/qdrant/quaterion/tree/master/examples/cars>`_
 directory in the Quaterion repo.
 
 Dataset
 -------
 
-In this tutorial, we will use the `Stanford
-Cars <https://pytorch.org/vision/main/generated/torchvision.datasets.StanfordCars.html>`__
-dataset. It has 16185 images of cars from 196 classes, and it is split
-into training and testing subsets with almost a 50-50% split. To make
-things even more interesting, however, we will first merge training and
-testing subsets, then we will split it into two again in such a way that
-the half of the 196 classes will be put into the training set and the
-other half will be in the testing set. This will let us test our model
-with samples from novel classes that it has never seen in the training
-phase, which is what supervised classification cannot achieve but
-similarity learning can.
+In this tutorial, we will use the
+`Stanford Cars <https://pytorch.org/vision/main/generated/torchvision.datasets.StanfordCars.html>`__
+dataset. It has 16185 images of cars from 196 classes,
+and it is split into training and testing subsets with almost a 50-50% split.
+To make things even more interesting, however, we will first merge training and testing subsets,
+then we will split it into two again in such a way that
+the half of the 196 classes will be put into the training set
+and the other half will be in the testing set.
+This will let us test our model with samples from novel classes that it has never seen in the training phase,
+which is what supervised classification cannot achieve but similarity learning can.
 
-In the following code borrowed from ``data.py``: - ``get_datasets()``
+In the following code borrowed from `data.py <https://github.com/qdrant/quaterion/blob/master/examples/cars/data.py>`_: - ``get_datasets()``
 function performs the splitting task described above. -
 ``get_dataloaders()`` function creates ``GroupSimilarityDataLoader``
 instances from training and testing datasets. - Datasets are regular
@@ -36,7 +33,7 @@ PyTorch datasets that emit ``SimilarityGroupSample`` instances.
 
 N.B.: Currently, Quaterion has two data types to represent samples in a
 dataset. To learn more about ``SimilarityPairSample``, check out the
-`NLP tutorial <https://quaterion.qdrant.tech/tutorials/nlp_tutorial.html>`__
+`NLP tutorial <https://quaterion.qdrant.tech/tutorials/nlp_tutorial.html>`_.
 
 .. code:: python
 
@@ -58,6 +55,21 @@ dataset. To learn more about ``SimilarityPairSample``, check out the
 
    # dataset will be downloaded to this directory under local directory
    dataset_path = os.path.join(".", "torchvision", "datasets")
+
+
+   class CarsDataset(Dataset):
+       def __init__(self, dataset: Dataset, transform: Callable):
+           self._dataset = dataset
+           self._transform = transform
+
+       def __len__(self) -> int:
+           return len(self._dataset)
+
+       def __getitem__(self, index) -> SimilarityGroupSample:
+           image, label = self._dataset[index]
+           image = self._transform(image)
+
+           return SimilarityGroupSample(obj=image, group=label)
 
 
    def get_datasets(input_size: int):
@@ -129,30 +141,13 @@ dataset. To learn more about ``SimilarityPairSample``, check out the
        return train_dataloader, test_dataloader
 
 
-   class CarsDataset(Dataset):
-       def __init__(self, dataset: Dataset, transform: Callable):
-           self._dataset = dataset
-           self._transform = transform
-
-       def __len__(self) -> int:
-           return len(self._dataset)
-
-       def __getitem__(self, index) -> SimilarityGroupSample:
-           image, label = self._dataset[index]
-           image = self._transform(image)
-
-           return SimilarityGroupSample(obj=image, group=label)
-
 Trainable Model
 ---------------
 
-Now it’s time to review one of the most exciting building blocks of
-Quaterion:
-`TrainableModel <https://quaterion.qdrant.tech/quaterion.train.trainable_model.html#module-quaterion.train.trainable_model>`__.
-It is the base class for models you would like to configure for
-training, and it provides several hook methods starting with
-``configure_`` to set up every aspect of the training phase just like
-```pl.LightningModule`` <https://pytorch-lightning.readthedocs.io/en/stable/api/pytorch_lightning.core.LightningModule.html>`__,
+Now it’s time to review `TrainableModel <https://quaterion.qdrant.tech/quaterion.train.trainable_model.html#module-quaterion.train.trainable_model>`_,
+which is the base class for models you would like to configure for training.
+It provides several hook methods starting with ``configure_`` to set up every aspect of the training phase just like
+```pl.LightningModule`` <https://pytorch-lightning.readthedocs.io/en/stable/api/pytorch_lightning.core.LightningModule.html>`_,
 its own base class. It is central to fine tuning with Quaterion, so we
 will break down this essential code in ``models.py`` and review each
 method separately. Let’s begin with the imports:
@@ -176,11 +171,10 @@ method separately. Let’s begin with the imports:
 
 In the following code snippet, we subclass ``TrainableModel``. You may
 use ``__init__()`` to store some attributes to be used in various
-``configure_*`` methods later on. The more interesting part is, however,
-in the
-```configure_encoders()`` <https://quaterion.qdrant.tech/quaterion.train.trainable_model.html#quaterion.train.trainable_model.TrainableModel.configure_encoders>`__
+``configure_*`` methods later on. The more interesting part is, however, in the
+```configure_encoders()`` <https://quaterion.qdrant.tech/quaterion.train.trainable_model.html#quaterion.train.trainable_model.TrainableModel.configure_encoders>`_
 method. We need to return an instance of
-```Encoder`` <https://quaterion-models.qdrant.tech/quaterion_models.encoders.encoder.html#quaterion_models.encoders.encoder.Encoder>`__
+```Encoder`` <https://quaterion-models.qdrant.tech/quaterion_models.encoders.encoder.html#quaterion_models.encoders.encoder.Encoder>`_
 (or a dictionary with ``Encoder`` instances as values) from this method.
 In our case, it is an instance of ``CarsEncoders``, which we will review
 soon. Notice now how it is created with a pretrained ResNet152 model
@@ -200,15 +194,15 @@ whose classification layer is replaced by an identity function.
            return CarsEncoder(pre_trained_encoder)
 
 In Quaterion, a
-```SimilarityModel`` <https://quaterion-models.qdrant.tech/quaterion_models.model.html#quaterion_models.model.SimilarityModel>`__
+```SimilarityModel`` <https://quaterion-models.qdrant.tech/quaterion_models.model.html#quaterion_models.model.SimilarityModel>`_
 is composed of one or more ``Encoder``\ s and an
-```EncoderHead`` <https://quaterion-models.qdrant.tech/quaterion_models.heads.encoder_head.html#quaterion_models.heads.encoder_head.EncoderHead>`__.
+```EncoderHead`` <https://quaterion-models.qdrant.tech/quaterion_models.heads.encoder_head.html#quaterion_models.heads.encoder_head.EncoderHead>`_.
 ``quaterion_models`` has `several ``EncoderHead``
-implementations <https://quaterion-models.qdrant.tech/quaterion_models.heads.html#module-quaterion_models.heads>`__
+implementations <https://quaterion-models.qdrant.tech/quaterion_models.heads.html#module-quaterion_models.heads>`_
 with a unified API such as a configurable dropout value. You may use one
 of them or create your own subclass of ``EncoderHead``. In either case,
 you need to return an instance of it from
-```configure_head`` <https://quaterion.qdrant.tech/quaterion.train.trainable_model.html#quaterion.train.trainable_model.TrainableModel.configure_head>`__
+```configure_head`` <https://quaterion.qdrant.tech/quaterion.train.trainable_model.html#quaterion.train.trainable_model.TrainableModel.configure_head>`_.
 In this example, we will use a ``SkipConnectionHead``, which is
 lightweight and more resistant to overfitting.
 
@@ -218,13 +212,12 @@ lightweight and more resistant to overfitting.
            return SkipConnectionHead(input_embedding_size, dropout=0.1)
 
 Quaterion has implementations of `some popular loss
-functions <https://quaterion.qdrant.tech/quaterion.loss.html>`__ for
+functions <https://quaterion.qdrant.tech/quaterion.loss.html>`_ for
 similarity learning, all of which subclass either
-```GroupLoss`` <https://quaterion.qdrant.tech/quaterion.loss.group_loss.html#quaterion.loss.group_loss.GroupLoss>`__
-or
-```PairwiseLoss`` <https://quaterion.qdrant.tech/quaterion.loss.pairwise_loss.html#quaterion.loss.pairwise_loss.PairwiseLoss>`__.
+```GroupLoss`` <https://quaterion.qdrant.tech/quaterion.loss.group_loss.html#quaterion.loss.group_loss.GroupLoss>`_
+or ```PairwiseLoss`` <https://quaterion.qdrant.tech/quaterion.loss.pairwise_loss.html#quaterion.loss.pairwise_loss.PairwiseLoss>`_.
 In this example, we will use
-```TripletLoss`` <https://quaterion.qdrant.tech/quaterion.loss.triplet_loss.html#quaterion.loss.triplet_loss.TripletLoss>`__,
+```TripletLoss`` <https://quaterion.qdrant.tech/quaterion.loss.triplet_loss.html#quaterion.loss.triplet_loss.TripletLoss>`_,
 which is a subclass of ``GroupLoss``. In general, subclasses of
 ``GroupLoss`` are used with datasets in which samples are assigned with
 some group (or label). In our example label is a make of the car. Those
@@ -232,7 +225,7 @@ datasets should emit ``SimilarityGroupSample``. Other alternatives are
 implementations of ``PairwiseLoss``, which consume
 ``SimilarityPairSample`` - pair of objects for which similarity is
 specified individually. To see an example of the latter, you may need to
-check out the `NLP Tutorial <https://quaterion.qdrant.tech/tutorials/nlp_tutorial.html>`__
+check out the `NLP Tutorial <https://quaterion.qdrant.tech/tutorials/nlp_tutorial.html>`_.
 
 .. code:: python
 
@@ -258,13 +251,13 @@ direct usage later on. It provides both a considerable speedup and less
 memory footprint. However, it is quite a bit versatile and has several
 knobs to tune. To get the most out of its potential, it’s recommended
 that you check out the `caching
-tutorial <https://quaterion.qdrant.tech/tutorials/cache_tutorial.html>`__. For the sake of making this
+tutorial <https://quaterion.qdrant.tech/tutorials/cache_tutorial.html>`_. For the sake of making this
 article self-contained, you need to return a
-```CacheConfig`` <https://quaterion.qdrant.tech/quaterion.train.cache.cache_config.html#quaterion.train.cache.cache_config.CacheConfig>`__
+```CacheConfig`` <https://quaterion.qdrant.tech/quaterion.train.cache.cache_config.html#quaterion.train.cache.cache_config.CacheConfig>`_
 instance from
-```configure_caches()`` <https://quaterion.qdrant.tech/quaterion.train.trainable_model.html#quaterion.train.trainable_model.TrainableModel.configure_caches>`__
+```configure_caches()`` <https://quaterion.qdrant.tech/quaterion.train.trainable_model.html#quaterion.train.trainable_model.TrainableModel.configure_caches>`_
 to specify cache-related preferences such as: -
-```CacheType`` <https://quaterion.qdrant.tech/quaterion.train.cache.cache_config.html#quaterion.train.cache.cache_config.CacheType>`__,
+```CacheType`` <https://quaterion.qdrant.tech/quaterion.train.cache.cache_config.html#quaterion.train.cache.cache_config.CacheType>`_,
 i.e., whether to store caches on CPU or GPU, - ``save_dir``, i.e., where
 to persist caches for subsequent runs, - ``batch_size``, i.e., batch
 size to be used only when creating caches - the batch size to be used
@@ -281,10 +274,10 @@ We have just configured training-related settings of a
 ``TrainableModel``. However, evaluation is an integral part of
 experimentation in machine learning, and you may configure evaluation
 metrics by returning one or more
-```AttachedMetric`` <https://quaterion.qdrant.tech/quaterion.eval.attached_metric.html#quaterion.eval.attached_metric.AttachedMetric>`__
+```AttachedMetric`` <https://quaterion.qdrant.tech/quaterion.eval.attached_metric.html#quaterion.eval.attached_metric.AttachedMetric>`_
 instances from ``configure_metrics()``. Quaterion has several built-in
-`group <https://quaterion.qdrant.tech/quaterion.eval.group.html>`__ and
-`pairwise <https://quaterion.qdrant.tech/quaterion.eval.pair.html>`__
+`group <https://quaterion.qdrant.tech/quaterion.eval.group.html>`_
+and `pairwise <https://quaterion.qdrant.tech/quaterion.eval.pair.html>`_
 evaluation metrics.
 
 .. code:: python
@@ -310,7 +303,7 @@ lets you benefit from the caching mechanism described above. Another
 important property is ``embedding_size``, which will be passed to
 ``TrainableModel.configure_head()`` as ``input_embedding_size`` to let
 you properly initialize the head layer. Let’s see how an ``Encoder`` is
-implemented in the following code borrowed from ``encoders.py``:
+implemented in the following code borrowed from `encoders.py <https://github.com/qdrant/quaterion/blob/master/examples/cars/encoders.py>`_:
 
 .. code:: python
 
@@ -349,9 +342,9 @@ backbone in this example:
 
 An important step of machine learning development is proper saving and
 loading of models. Quaterion lets you save your ``SimilarityModel`` with
-```TrainableModel.save_servable()`` <https://quaterion.qdrant.tech/quaterion.train.trainable_model.html#quaterion.train.trainable_model.TrainableModel.save_servable>`__
+```TrainableModel.save_servable()`` <https://quaterion.qdrant.tech/quaterion.train.trainable_model.html#quaterion.train.trainable_model.TrainableModel.save_servable>`_
 and restore it with
-```SimilarityModel.load()`` <https://quaterion-models.qdrant.tech/quaterion_models.model.html#quaterion_models.model.SimilarityModel.load>`__.
+```SimilarityModel.load()`` <https://quaterion-models.qdrant.tech/quaterion_models.model.html#quaterion_models.model.SimilarityModel.load>`_.
 To be able to use these two methods, you need to implement ``save()``
 and ``load()`` methods in your ``Encoder``. Additionally, it is also
 important that you define your subclass of ``Encoder`` outside the
@@ -374,12 +367,12 @@ Training
 
 With all essential objects implemented, it is easy to bring them all
 together and run a training loop with the
-```Quaterion.fit()`` <https://quaterion.qdrant.tech/quaterion.main.html#quaterion.main.Quaterion.fit>`__
+```Quaterion.fit()`` <https://quaterion.qdrant.tech/quaterion.main.html#quaterion.main.Quaterion.fit>`_
 method. It expects: - A ``TrainableModel``, - A
-```pl.Trainer`` <https://pytorch-lightning.readthedocs.io/en/stable/common/trainer.html>`__,
-- A
-```SimilarityDataLoader`` <https://quaterion.qdrant.tech/quaterion.dataset.similarity_data_loader.html#quaterion.dataset.similarity_data_loader.SimilarityDataLoader>`__
-for training data, - And optionally, another ``SimilarityDataLoader``
+```pl.Trainer`` <https://pytorch-lightning.readthedocs.io/en/stable/common/trainer.html>`_,
+- A ```SimilarityDataLoader`` <https://quaterion.qdrant.tech/quaterion.dataset.similarity_data_loader.html#quaterion.dataset.similarity_data_loader.SimilarityDataLoader>`_
+for training data,
+- And optionally, another ``SimilarityDataLoader``
 for evaluation data.
 
 We need to import a few objects to prepare all of these:
@@ -451,24 +444,23 @@ the current state of the ``SimilarityModel`` instance:
 Evaluation
 ----------
 
-Let’s see what we have achieved with these simple steps. ``evaluate.py``
+Let’s see what we have achieved with these simple steps. `evaluate.py <https://github.com/qdrant/quaterion/blob/master/examples/cars/evaluate.py>`_
 has two functions to evaluate both the baseline model and the tuned
 similarity model. We will review only the latter for brevity. In
 addition to the ease of restoring a ``SimilarityModel``, this code
 snippet also shows how to use
-```Evaluator`` <https://quaterion.qdrant.tech/quaterion.eval.evaluator.html#quaterion.eval.evaluator.Evaluator>`__
+```Evaluator`` <https://quaterion.qdrant.tech/quaterion.eval.evaluator.html#quaterion.eval.evaluator.Evaluator>`_
 to evaluate the performance of a ``SimilarityModel`` on a given dataset
 by given evaluation metrics. Full evaluation of a dataset usually grows
 exponentially, and thus you may want to perform a partial evaluation on
 a sampled subset. In this case, you may use
-`samplers <https://quaterion.qdrant.tech/quaterion.eval.samplers.html>`__
-to limit the evaluation. Similar to ``Quaterion.fit()`` used for
-training,
-```Quaterion.evaluate()`` <https://quaterion.qdrant.tech/quaterion.main.html#quaterion.main.Quaterion.evaluate>`__
+`samplers <https://quaterion.qdrant.tech/quaterion.eval.samplers.html>`_
+to limit the evaluation. Similar to ``Quaterion.fit()`` used for training,
+```Quaterion.evaluate()`` <https://quaterion.qdrant.tech/quaterion.main.html#quaterion.main.Quaterion.evaluate>`_
 runs a complete evaluation loop. It takes the following as arguments: -
-An ``Evaluator`` instance created with given evaluation metrics,and a
-``Sampler``, - The ``SimilarityModel`` to be evaluated, - And the
-evaluation dataset.
+An ``Evaluator`` instance created with given evaluation metrics,and a ``Sampler``,
+- The ``SimilarityModel`` to be evaluated,
+- And the evaluation dataset.
 
 .. code:: python
 

@@ -43,6 +43,8 @@ extensions = [
 # HTTP URI to an inventory file.
 intersphinx_mapping = {
     "quaterion_models": ("https://quaterion-models.qdrant.tech/", None),
+    "torch": ("https://pytorch.org/docs/stable", None),
+    "pytorch_ligthning": ("https://pytorch-lightning.readthedocs.io/en/stable/", None)
 }
 
 # prevents sphinx from adding full path to type hints

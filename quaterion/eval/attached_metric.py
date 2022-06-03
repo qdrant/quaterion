@@ -5,7 +5,7 @@ from quaterion.eval.base_metric import BaseMetric
 
 
 class AttachedMetric:
-    """Class to attach metric to :class:`~quaterion.train.trainable_model.TrainableModel`
+    """Attach batch-wise metric to :class:`~quaterion.train.trainable_model.TrainableModel`
 
     Contain required parameters to compute and log batch-wise metric during training process.
 

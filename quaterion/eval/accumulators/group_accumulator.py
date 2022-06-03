@@ -6,10 +6,7 @@ from quaterion.eval.accumulators import Accumulator
 
 
 class GroupAccumulator(Accumulator):
-    """Accumulate calculated embeddings and corresponding targets for metrics and evaluators
-
-    Accumulate embeddings and groups for group-based tasks.
-    """
+    """Accumulate embeddings and groups for group-based tasks."""
 
     def __init__(self):
         super().__init__()

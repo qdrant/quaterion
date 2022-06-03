@@ -9,7 +9,7 @@ from quaterion.eval.base_metric import BaseMetric
 
 
 class Evaluator:
-    """Class to calculate metrics on whole datasets
+    """Calculate metrics on the whole datasets
 
     Calculates metric on the whole dataset or on sampled part of it.
     Evaluation might be time and memory consuming operation.

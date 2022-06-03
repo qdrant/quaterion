@@ -5,7 +5,7 @@ from quaterion.loss.similarity_loss import SimilarityLoss
 
 
 class GroupLoss(SimilarityLoss):
-    """Base class for Group losses.
+    """Base class for group losses.
 
     Args:
         distance_metric_name: Name of the distance function, e.g.,

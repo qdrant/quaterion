@@ -6,9 +6,8 @@ from quaterion.eval.accumulators import Accumulator
 
 
 class PairAccumulator(Accumulator):
-    """Accumulate calculated embeddings and corresponding targets for metrics and evaluators
+    """Accumulate embeddings, labels, pairs and subgroups for pair-based tasks.
 
-    Accumulate embeddings, labels, pairs and subgroups for pair-based tasks.
     Keep track of current size to properly handle pairs.
     """
 

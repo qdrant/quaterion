@@ -122,6 +122,21 @@ Samplers
 LOSSES
 ------
 
+Base
+++++
+
+.. py:currentmodule:: quaterion.loss
+
+.. autosummary::
+    :nosignatures:
+
+    ~group_loss.GroupLoss
+    ~pairwise_loss.PairwiseLoss
+    ~similarity_loss.SimilarityLoss
+
+Implementations
++++++++++++++++
+
 .. py:currentmodule:: quaterion.loss
 
 .. autosummary::
@@ -129,10 +144,7 @@ LOSSES
 
     ~arcface_loss.ArcFaceLoss
     ~contrastive_loss.ContrastiveLoss
-    ~group_loss.GroupLoss
     ~multiple_negatives_ranking_loss.MultipleNegativesRankingLoss
-    ~pairwise_loss.PairwiseLoss
-    ~similarity_loss.SimilarityLoss
     ~softmax_loss.SoftmaxLoss
     ~triplet_loss.TripletLoss
 

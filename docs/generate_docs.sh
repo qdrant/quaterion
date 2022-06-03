@@ -8,5 +8,5 @@ cd "$(dirname "$0")/../"
 
 poetry run sphinx-apidoc --force --separate --no-toc -o docs/source quaterion
 poetry build -f wheel
-pip install dist/$(ls -1 dist | grep .whl)
+pip install -U dist/$(ls -1 dist | grep .whl)
 poetry run sphinx-build docs/source docs/html

@@ -6,7 +6,7 @@ from quaterion.dataset import SimilarityGroupSample
 
 
 class SimilarityGroupDataset(Dataset[SimilarityGroupSample]):
-    """Simple wrapper class, which converts standard dataset of classification task into dataset,
+    """Wrapper, which converts standard dataset of classification task into dataset,
     compatible with :class:`~quaterion.dataset.similarity_data_loader.GroupSimilarityDataLoader`.
 
     Args:

@@ -18,8 +18,7 @@ from quaterion.dataset.label_cache_dataset import (
 
 
 class SimilarityDataLoader(DataLoader, Generic[T_co]):
-    """SimilarityDataLoader is a special version of :class:`~torch.utils.data.DataLoader`
-    which works with similarity samples.
+    """Special version of :class:`~torch.utils.data.DataLoader` which works with similarity samples.
 
     SimilarityDataLoader will automatically assign dummy collate_fn for debug purposes,
     it will be overwritten once dataloader is used for training.
@@ -159,6 +158,9 @@ class SimilarityDataLoader(DataLoader, Generic[T_co]):
 
 
 class PairsSimilarityDataLoader(SimilarityDataLoader[SimilarityPairSample]):
+    """DataLoader designed to work with data represented as
+        :class:`~quaterion.dataset.similarity_samples.SimilarityPairSample`.
+    """
     def __init__(self, dataset: Dataset[SimilarityPairSample], **kwargs):
         super().__init__(dataset, **kwargs)
 
@@ -228,6 +230,9 @@ class PairsSimilarityDataLoader(SimilarityDataLoader[SimilarityPairSample]):
 
 
 class GroupSimilarityDataLoader(SimilarityDataLoader[SimilarityGroupSample]):
+    """DataLoader designed to work with data represented as
+        :class:`~quaterion.dataset.similarity_samples.SimilarityGroupSample`.
+    """
     def __init__(self, dataset: Dataset[SimilarityGroupSample], **kwargs):
         super().__init__(dataset, **kwargs)
 

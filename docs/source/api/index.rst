@@ -141,6 +141,9 @@ Extras
 TRAIN
 -----
 
+TrainableModel
+++++++++++++++
+
 .. py:currentmodule:: quaterion.train.trainable_model
 
 .. autosummary::
@@ -148,7 +151,7 @@ TRAIN
 
     TrainableModel
 
-CACHE
+Cache
 +++++
 
 .. py:currentmodule:: quaterion.train.cache

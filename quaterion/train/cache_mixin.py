@@ -182,7 +182,7 @@ class CacheMixin:
         else:
             key_extractors = cache_config.key_extractors
 
-        cache_collater = CacheTrainCollator(
+        cache_collator = CacheTrainCollator(
             pre_collate_fn=train_dataloader.pre_collate_fn,
             encoder_collates={
                 name: encoder.get_collate_fn() for name, encoder in encoders.items()
@@ -192,9 +192,9 @@ class CacheMixin:
             mode=CacheMode.TRAIN,
         )
 
-        train_dataloader.collate_fn = cache_collater
+        train_dataloader.collate_fn = cache_collator
         if val_dataloader is not None:
-            val_dataloader.collate_fn = cache_collater
+            val_dataloader.collate_fn = cache_collator
 
         # Setup different cache key salt for train and val
         train_dataloader.set_salt("train")
@@ -209,7 +209,7 @@ class CacheMixin:
             if is_full_cache_possible:
                 cls._label_cache_train_mode(train_dataloader, val_dataloader)
 
-            cache_collater.mode = CacheMode.FILL
+            cache_collator.mode = CacheMode.FILL
             with warnings.catch_warnings():
                 warnings.filterwarnings(
                     "ignore", category=PossibleUserWarning, message="The dataloader, .*"
@@ -221,7 +221,7 @@ class CacheMixin:
                     val_dataloader=val_dataloader,
                     cache_config=cache_config,
                 )
-                cache_collater.mode = CacheMode.TRAIN
+                cache_collator.mode = CacheMode.TRAIN
                 logger.debug("Caching has been successfully finished")
                 cls.save_cache(
                     cache_config.save_dir,

@@ -5,7 +5,7 @@ from quaterion.eval.group import GroupMetric
 
 
 class RetrievalRPrecision(GroupMetric):
-    """Class to compute the retrieval R-precision score for group based data
+    """Compute the retrieval R-precision score for group based data
 
     Retrieval R-Precision is the ratio of `r/R`, where `R` is the number of the relevant documents
     for a given query in the collection, and `r` is the number of the truly relevant documents

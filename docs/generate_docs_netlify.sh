@@ -13,7 +13,7 @@ poetry build -f wheel
 pip install dist/$(ls -1 dist | grep .whl)
 pip install pytorch-metric-learning==1.3.2
 
-pip install sphinx>=4.4.0
+pip install sphinx>=5.0.1
 pip install "git+https://github.com/qdrant/qdrant_sphinx_theme.git@master#egg=qdrant-sphinx-theme"
 
 sphinx-build docs/source docs/html

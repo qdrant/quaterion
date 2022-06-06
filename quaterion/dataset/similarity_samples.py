@@ -4,7 +4,7 @@ from typing import Any, Union
 
 @dataclass
 class SimilarityPairSample:
-    """
+    """Represents a pair of objects, their similarity and relationship with other pairs.
 
     Examples::
 

@@ -26,7 +26,7 @@ class BaseMetric:
         """Compute metric value
 
         Args:
-            *args, **kwargs - contain embeddings and targets required to compute metric.
+            args, kwargs - contain embeddings and targets required to compute metric.
 
         Returns:
             torch.Tensor - computed metric

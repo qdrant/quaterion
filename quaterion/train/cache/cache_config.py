@@ -27,7 +27,9 @@ class CacheType(str, Enum):
 
 @dataclass
 class CacheConfig:
-    """Class to be used in
+    """Determine cache settings.
+
+    This class should be passed to
     :meth:`~quaterion.train.trainable_model.TrainableModel.configure_caches`
     """
 

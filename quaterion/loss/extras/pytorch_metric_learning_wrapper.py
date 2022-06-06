@@ -8,12 +8,12 @@ try:
 except ImportError:
     import sys
 
-    print("You need to install pytorch_mmetric_learning for this wrapper.")
+    print("You need to install pytorch_metric_learning for this wrapper.")
     sys.exit(1)
 
 
 class PytorchMetricLearningWrapper(GroupLoss):
-    """Provides a simple wrapper to be able to use losses and miners from pytorch-metric-learning.
+    """Provide a simple wrapper to be able to use losses and miners from `pytorch-metric-learning`.
 
     You need to create loss (and optionally miner) instances yourself, and pass those instances
     to the constructor of this wrapper.

@@ -1,3 +1,6 @@
+API References
+~~~~~~~~~~~~~~
+
 DATA
 ----
 
@@ -50,27 +53,8 @@ DISTANCES
 EVAL
 ----
 
-Accumulators
-++++++++++++
-
-.. py:currentmodule:: quaterion.eval.accumulators
-
-.. autosummary::
-    :nosignatures:
-
-    ~accumulator.Accumulator
-    ~group_accumulator.GroupAccumulator
-    ~pair_accumulator.PairAccumulator
-
 Metrics
 +++++++
-
-.. py:currentmodule:: quaterion.eval
-
-.. autosummary::
-    :nosignatures:
-
-    ~base_metric.BaseMetric
 
 Counters
 ********
@@ -114,7 +98,6 @@ Samplers
 .. autosummary::
     :nosignatures:
 
-    ~base_sampler.BaseSampler
     ~group_sampler.GroupSampler
     ~pair_sampler.PairSampler
 
@@ -132,7 +115,6 @@ Base
 
     ~group_loss.GroupLoss
     ~pairwise_loss.PairwiseLoss
-    ~similarity_loss.SimilarityLoss
 
 Implementations
 +++++++++++++++

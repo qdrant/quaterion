@@ -53,11 +53,9 @@ DISTANCES
 EVAL
 ----
 
-Metrics
-+++++++
-
 Counters
-********
+++++++++
+
 .. py:currentmodule:: quaterion.eval
 
 .. autosummary::
@@ -67,7 +65,7 @@ Counters
     ~evaluator.Evaluator
 
 Group metrics
-*************
++++++++++++++
 
 .. py:currentmodule:: quaterion.eval.group
 
@@ -78,7 +76,7 @@ Group metrics
     ~retrieval_r_precision.RetrievalRPrecision
 
 Pair metrics
-*************
+++++++++++++
 
 .. py:currentmodule:: quaterion.eval.pair
 
@@ -142,9 +140,6 @@ Extras
 
 TRAIN
 -----
-
-TrainableModel
-++++++++++++++
 
 .. py:currentmodule:: quaterion.train.trainable_model
 

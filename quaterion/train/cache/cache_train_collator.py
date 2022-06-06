@@ -1,7 +1,7 @@
 from collections import defaultdict
 from typing import Dict, List, Any, Hashable
 
-from quaterion.dataset.train_collater import TrainCollator
+from quaterion.dataset.train_collator import TrainCollator
 from quaterion_models.types import CollateFnType
 
 from quaterion.train.cache.cache_config import KeyExtractorType

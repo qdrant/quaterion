@@ -12,7 +12,7 @@ Submodules
    quaterion.dataset.similarity_data_loader
    quaterion.dataset.similarity_dataset
    quaterion.dataset.similarity_samples
-   quaterion.dataset.train_collater
+   quaterion.dataset.train_collator
 
 Module contents
 ---------------

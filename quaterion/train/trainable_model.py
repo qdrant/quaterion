@@ -10,7 +10,7 @@ from quaterion_models.types import TensorInterchange
 from torch import Tensor
 
 from quaterion.dataset import SimilarityDataLoader
-from quaterion.dataset.train_collater import TrainCollator
+from quaterion.dataset.train_collator import TrainCollator
 from quaterion.eval.attached_metric import AttachedMetric
 from quaterion.loss import SimilarityLoss
 from quaterion.train.cache import (

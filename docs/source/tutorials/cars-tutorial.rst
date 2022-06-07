@@ -342,9 +342,9 @@ backbone in this example:
 
 An important step of machine learning development is proper saving and
 loading of models. Quaterion lets you save your ``SimilarityModel`` with
-```TrainableModel.save_servable()`` <https://quaterion.qdrant.tech/quaterion.train.trainable_model.html#quaterion.train.trainable_model.TrainableModel.save_servable>`_
+`TrainableModel.save_servable() <https://quaterion.qdrant.tech/quaterion.train.trainable_model.html#quaterion.train.trainable_model.TrainableModel.save_servable>`_
 and restore it with
-```SimilarityModel.load()`` <https://quaterion-models.qdrant.tech/quaterion_models.model.html#quaterion_models.model.SimilarityModel.load>`_.
+`SimilarityModel.load() <https://quaterion-models.qdrant.tech/quaterion_models.model.html#quaterion_models.model.SimilarityModel.load>`_.
 To be able to use these two methods, you need to implement ``save()``
 and ``load()`` methods in your ``Encoder``. Additionally, it is also
 important that you define your subclass of ``Encoder`` outside the
@@ -367,10 +367,10 @@ Training
 
 With all essential objects implemented, it is easy to bring them all
 together and run a training loop with the
-```Quaterion.fit()`` <https://quaterion.qdrant.tech/quaterion.main.html#quaterion.main.Quaterion.fit>`_
+`Quaterion.fit() <https://quaterion.qdrant.tech/quaterion.main.html#quaterion.main.Quaterion.fit>`_
 method. It expects: - A ``TrainableModel``, - A
-```pl.Trainer`` <https://pytorch-lightning.readthedocs.io/en/stable/common/trainer.html>`_,
-- A ```SimilarityDataLoader`` <https://quaterion.qdrant.tech/quaterion.dataset.similarity_data_loader.html#quaterion.dataset.similarity_data_loader.SimilarityDataLoader>`_
+`pl.Trainer <https://pytorch-lightning.readthedocs.io/en/stable/common/trainer.html>`_,
+- A `SimilarityDataLoader <https://quaterion.qdrant.tech/quaterion.dataset.similarity_data_loader.html#quaterion.dataset.similarity_data_loader.SimilarityDataLoader>`_
 for training data,
 - And optionally, another ``SimilarityDataLoader``
 for evaluation data.
@@ -449,16 +449,16 @@ has two functions to evaluate both the baseline model and the tuned
 similarity model. We will review only the latter for brevity. In
 addition to the ease of restoring a ``SimilarityModel``, this code
 snippet also shows how to use
-```Evaluator`` <https://quaterion.qdrant.tech/quaterion.eval.evaluator.html#quaterion.eval.evaluator.Evaluator>`_
+`Evaluator <https://quaterion.qdrant.tech/quaterion.eval.evaluator.html#quaterion.eval.evaluator.Evaluator>`_
 to evaluate the performance of a ``SimilarityModel`` on a given dataset
 by given evaluation metrics. Full evaluation of a dataset usually grows
 exponentially, and thus you may want to perform a partial evaluation on
 a sampled subset. In this case, you may use
 `samplers <https://quaterion.qdrant.tech/quaterion.eval.samplers.html>`_
 to limit the evaluation. Similar to ``Quaterion.fit()`` used for training,
-```Quaterion.evaluate()`` <https://quaterion.qdrant.tech/quaterion.main.html#quaterion.main.Quaterion.evaluate>`_
+`Quaterion.evaluate() <https://quaterion.qdrant.tech/quaterion.main.html#quaterion.main.Quaterion.evaluate>`_
 runs a complete evaluation loop. It takes the following as arguments: -
-An ``Evaluator`` instance created with given evaluation metrics,and a ``Sampler``,
+An ``Evaluator`` instance created with given evaluation metrics and a ``Sampler``,
 - The ``SimilarityModel`` to be evaluated,
 - And the evaluation dataset.
 

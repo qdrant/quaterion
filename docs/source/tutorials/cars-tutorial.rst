@@ -25,11 +25,11 @@ and the other half will be in the testing set.
 This will let us test our model with samples from novel classes that it has never seen in the training phase,
 which is what supervised classification cannot achieve but similarity learning can.
 
-In the following code borrowed from `data.py <https://github.com/qdrant/quaterion/blob/master/examples/cars/data.py>`_: - ``get_datasets()``
-function performs the splitting task described above. -
-``get_dataloaders()`` function creates ``GroupSimilarityDataLoader``
-instances from training and testing datasets. - Datasets are regular
-PyTorch datasets that emit ``SimilarityGroupSample`` instances.
+In the following code borrowed from `data.py <https://github.com/qdrant/quaterion/blob/master/examples/cars/data.py>`_:
+
+* ``get_datasets()`` function performs the splitting task described above.
+* ``get_dataloaders()`` function creates ``GroupSimilarityDataLoader`` instances from training and testing datasets.
+* Datasets are regular PyTorch datasets that emit ``SimilarityGroupSample`` instances.
 
 N.B.: Currently, Quaterion has two data types to represent samples in a
 dataset. To learn more about ``SimilarityPairSample``, check out the

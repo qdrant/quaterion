@@ -21,7 +21,94 @@ from quaterion.train.trainable_model import TrainableModel
 
 
 class Quaterion:
-    """A dwarf on a giant's shoulders sees farther of the two"""
+    """A dwarf on a giant's shoulders sees farther of the two
+
+    One of the core entities in the framework.
+    Contains methods to launch the actual training and evaluation processes.
+
+    Examples:
+
+        `Default trainer run`::
+
+            import pytorch_lightning as pl
+
+            from quaterion import Quaterion
+            from quaterion.dataset import PairsSimilarityDataLoader
+            from quaterion.eval.evaluator import Evaluator
+            from quaterion.eval.pair import RetrievalPrecision
+            from quaterion.eval.samplers.pair_sampler import PairSampler
+
+
+            def train(model, train_dataset_path, val_dataset_path):
+                # region data setup
+                train_dataset = YourDataset(train_dataset_path)
+                val_dataset = YourDataset(val_dataset_path)
+                train_dataloader = PairsSimilarityDataLoader(train_dataset, batch_size=1024)
+                val_dataloader = PairsSimilarityDataLoader(val_dataset, batch_size=1024)
+                # endregion
+
+                # region fit
+                # To use trainer with the defaults provided by Quaterion trainer should be
+                # explicitly set to `None`
+                Quaterion.fit(model, trainer=None, train_dataloader, val_dataloader)
+                # endregion
+
+                # region evaluation
+                metrics = {
+                    "rp@1": RetrievalPrecision(k=1)
+                }
+                sampler = PairSampler()
+                evaluator = Evaluator(metrics, sampler)
+                results = Quaterion.evaluate(evaluator, val_dataset, model.model)
+                print(f"results: {results}")
+                # endregion
+
+        `Custom trainer run`::
+
+            # the same imports
+            ...
+
+            def train(model, train_dataset_path, val_dataset_path):
+                # the same data setup region
+                ...
+
+                # region fit
+                trainer = pl.Trainer(
+                    max_epochs=params.get("max_epochs", 500),
+                    auto_select_gpus=True,
+                    log_every_n_steps=50,
+                    gpus=1,
+                )
+                Quaterion.fit(model, trainer, train_dataloader, val_dataloader)
+                # endregion
+
+                # the same evaluation region
+                ...
+
+        `Custom trainer run with Quaterion defaults`::
+
+             # the same imports
+             ...
+
+
+             def train(model, train_dataset_path, val_dataset_path):
+                # the same data setup region
+                ...
+
+                # region fit
+                quaterion_defaults = Quaterion.trainer_defaults()
+                quaterion_defaults['logger'] = pl.loggers.WandbLogger(
+                    name="example_model",
+                    project="example_project",
+                )
+                quaterion_defaults['callbacks'].append(YourCustomCallback())
+                trainer = pl.Trainer(**quaterion_defaults)
+                Quaterion.fit(model, trainer, train_dataloader, val_dataloader)
+                # endregion
+
+                # the same evaluation region
+                ...
+    """
 
     @classmethod
     def fit(
@@ -44,9 +131,10 @@ class Quaterion:
                 stage
             val_dataloader: Optional DataLoader instance to retrieve samples during
                 validation stage
-            ckpt_path: Path/URL of the checkpoint from which training is resumed. If there is
-                no checkpoint file at the path, an exception is raised. If resuming from mid-epoch checkpoint,
-                training will start from the beginning of the next epoch.
+            ckpt_path: Path/URL of the checkpoint from which training is resumed.
+                If there is no checkpoint file at the path, an exception is raised.
+                If resuming from mid-epoch checkpoint, training will start from the beginning of
+                the next epoch.
         """
 
         if isinstance(train_dataloader, PairsSimilarityDataLoader):
@@ -100,8 +188,10 @@ class Quaterion:
         Compute metrics on a dataset
 
         Args:
-            evaluator: Object which holds the configuration of which metrics to use and how to obtain samples for them
-            dataset: Sized object, like list, tuple, torch.utils.data.Dataset, etc. to compute metrics
+            evaluator: Object which holds the configuration of which metrics to use and how to
+                obtain samples for them
+            dataset: Sized object, like list, tuple, torch.utils.data.Dataset, etc. to compute
+                metrics
             model: SimilarityModel instance to perform objects encoding
 
         Returns:

@@ -138,6 +138,16 @@ Extras
 
     ~pytorch_metric_learning_wrapper.PytorchMetricLearningWrapper
 
+MAIN
+----
+
+.. py:currentmodule:: quaterion.main
+
+.. autosummary::
+    :nosignatures:
+
+    Quaterion
+
 TRAIN
 -----
 

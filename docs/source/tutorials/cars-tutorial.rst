@@ -2,7 +2,7 @@ Similar cars search with similarity learning
 ++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 
-The focus of this tutorial is a step-by-step solution of a similarity learning problem with Quaterion.
+The focus of this tutorial is a step-by-step solution to a similarity learning problem with Quaterion.
 Specifically, we will train a similarity model to search for similar cars.
 This will also help us better understand how some of the essential building blocks in Quaterion fit together in a real project.
 Let’s start walking through some of the important parts of the code.
@@ -234,7 +234,7 @@ check out the `NLP Tutorial <https://quaterion.qdrant.tech/tutorials/nlp_tutoria
 
 ``configure_optimizers()`` may be familiar to PyTorch Lightning users,
 but there is a novel ``self.model`` used inside that method. It is an
-instance of ``SimilarityModel`` and automatically created by Quaterion
+instance of ``SimilarityModel`` and is automatically created by Quaterion
 from the return values of ``configure_encoders()`` and
 ``configure_head()``.
 
@@ -269,7 +269,7 @@ to specify cache-related preferences such as:
                cache_type=CacheType.AUTO, save_dir="./cache_dir", batch_size=32
            )
 
-We have just configured training-related settings of a
+We have just configured the training-related settings of a
 ``TrainableModel``. However, evaluation is an integral part of
 experimentation in machine learning, and you may configure evaluation
 metrics by returning one or more

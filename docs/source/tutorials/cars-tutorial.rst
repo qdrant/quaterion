@@ -194,15 +194,15 @@ whose classification layer is replaced by an identity function.
            return CarsEncoder(pre_trained_encoder)
 
 In Quaterion, a
-```SimilarityModel`` <https://quaterion-models.qdrant.tech/quaterion_models.model.html#quaterion_models.model.SimilarityModel>`_
+`SimilarityModel <https://quaterion-models.qdrant.tech/quaterion_models.model.html#quaterion_models.model.SimilarityModel>`_
 is composed of one or more ``Encoder``\ s and an
-```EncoderHead`` <https://quaterion-models.qdrant.tech/quaterion_models.heads.encoder_head.html#quaterion_models.heads.encoder_head.EncoderHead>`_.
-``quaterion_models`` has `several ``EncoderHead``
-implementations <https://quaterion-models.qdrant.tech/quaterion_models.heads.html#module-quaterion_models.heads>`_
+`EncoderHead <https://quaterion-models.qdrant.tech/quaterion_models.heads.encoder_head.html#quaterion_models.heads.encoder_head.EncoderHead>`_.
+``quaterion_models`` has
+`several EncoderHead implementations <https://quaterion-models.qdrant.tech/quaterion_models.heads.html#module-quaterion_models.heads>`_
 with a unified API such as a configurable dropout value. You may use one
 of them or create your own subclass of ``EncoderHead``. In either case,
 you need to return an instance of it from
-```configure_head`` <https://quaterion.qdrant.tech/quaterion.train.trainable_model.html#quaterion.train.trainable_model.TrainableModel.configure_head>`_.
+`configure_head <https://quaterion.qdrant.tech/quaterion.train.trainable_model.html#quaterion.train.trainable_model.TrainableModel.configure_head>`_.
 In this example, we will use a ``SkipConnectionHead``, which is
 lightweight and more resistant to overfitting.
 
@@ -211,13 +211,13 @@ lightweight and more resistant to overfitting.
        def configure_head(self, input_embedding_size) -> EncoderHead:
            return SkipConnectionHead(input_embedding_size, dropout=0.1)
 
-Quaterion has implementations of `some popular loss
-functions <https://quaterion.qdrant.tech/quaterion.loss.html>`_ for
-similarity learning, all of which subclass either
-```GroupLoss`` <https://quaterion.qdrant.tech/quaterion.loss.group_loss.html#quaterion.loss.group_loss.GroupLoss>`_
-or ```PairwiseLoss`` <https://quaterion.qdrant.tech/quaterion.loss.pairwise_loss.html#quaterion.loss.pairwise_loss.PairwiseLoss>`_.
+Quaterion has implementations of
+`some popular loss functions <https://quaterion.qdrant.tech/quaterion.loss.html>`_
+for similarity learning, all of which subclass either
+`GroupLoss <https://quaterion.qdrant.tech/quaterion.loss.group_loss.html#quaterion.loss.group_loss.GroupLoss>`_
+or `PairwiseLoss <https://quaterion.qdrant.tech/quaterion.loss.pairwise_loss.html#quaterion.loss.pairwise_loss.PairwiseLoss>`_.
 In this example, we will use
-```TripletLoss`` <https://quaterion.qdrant.tech/quaterion.loss.triplet_loss.html#quaterion.loss.triplet_loss.TripletLoss>`_,
+`TripletLoss <https://quaterion.qdrant.tech/quaterion.loss.triplet_loss.html#quaterion.loss.triplet_loss.TripletLoss>`_,
 which is a subclass of ``GroupLoss``. In general, subclasses of
 ``GroupLoss`` are used with datasets in which samples are assigned with
 some group (or label). In our example label is a make of the car. Those
@@ -250,17 +250,17 @@ outputs will be computed once and cached in the preferred device for
 direct usage later on. It provides both a considerable speedup and less
 memory footprint. However, it is quite a bit versatile and has several
 knobs to tune. To get the most out of its potential, it’s recommended
-that you check out the `caching
-tutorial <https://quaterion.qdrant.tech/tutorials/cache_tutorial.html>`_. For the sake of making this
-article self-contained, you need to return a
-```CacheConfig`` <https://quaterion.qdrant.tech/quaterion.train.cache.cache_config.html#quaterion.train.cache.cache_config.CacheConfig>`_
+that you check out the
+`cache tutorial <https://quaterion.qdrant.tech/tutorials/cache_tutorial.html>`_.
+For the sake of making this article self-contained, you need to return a
+`CacheConfig <https://quaterion.qdrant.tech/quaterion.train.cache.cache_config.html#quaterion.train.cache.cache_config.CacheConfig>`_
 instance from
-```configure_caches()`` <https://quaterion.qdrant.tech/quaterion.train.trainable_model.html#quaterion.train.trainable_model.TrainableModel.configure_caches>`_
-to specify cache-related preferences such as: -
-```CacheType`` <https://quaterion.qdrant.tech/quaterion.train.cache.cache_config.html#quaterion.train.cache.cache_config.CacheType>`_,
-i.e., whether to store caches on CPU or GPU, - ``save_dir``, i.e., where
-to persist caches for subsequent runs, - ``batch_size``, i.e., batch
-size to be used only when creating caches - the batch size to be used
+`configure_caches() <https://quaterion.qdrant.tech/quaterion.train.trainable_model.html#quaterion.train.trainable_model.TrainableModel.configure_caches>`_
+to specify cache-related preferences such as:
+- `CacheType <https://quaterion.qdrant.tech/quaterion.train.cache.cache_config.html#quaterion.train.cache.cache_config.CacheType>`_,
+i.e., whether to store caches on CPU or GPU,
+- ``save_dir``, i.e., where to persist caches for subsequent runs,
+- ``batch_size``, i.e., batch size to be used only when creating caches - the batch size to be used
 during the actual training might be different.
 
 .. code:: python
@@ -274,7 +274,7 @@ We have just configured training-related settings of a
 ``TrainableModel``. However, evaluation is an integral part of
 experimentation in machine learning, and you may configure evaluation
 metrics by returning one or more
-```AttachedMetric`` <https://quaterion.qdrant.tech/quaterion.eval.attached_metric.html#quaterion.eval.attached_metric.AttachedMetric>`_
+`AttachedMetric <https://quaterion.qdrant.tech/quaterion.eval.attached_metric.html#quaterion.eval.attached_metric.AttachedMetric>`_
 instances from ``configure_metrics()``. Quaterion has several built-in
 `group <https://quaterion.qdrant.tech/quaterion.eval.group.html>`_
 and `pairwise <https://quaterion.qdrant.tech/quaterion.eval.pair.html>`_

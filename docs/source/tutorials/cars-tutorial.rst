@@ -257,11 +257,10 @@ For the sake of making this article self-contained, you need to return a
 instance from
 `configure_caches() <https://quaterion.qdrant.tech/quaterion.train.trainable_model.html#quaterion.train.trainable_model.TrainableModel.configure_caches>`_
 to specify cache-related preferences such as:
-- `CacheType <https://quaterion.qdrant.tech/quaterion.train.cache.cache_config.html#quaterion.train.cache.cache_config.CacheType>`_,
-i.e., whether to store caches on CPU or GPU,
-- ``save_dir``, i.e., where to persist caches for subsequent runs,
-- ``batch_size``, i.e., batch size to be used only when creating caches - the batch size to be used
-during the actual training might be different.
+
+* `CacheType <https://quaterion.qdrant.tech/quaterion.train.cache.cache_config.html#quaterion.train.cache.cache_config.CacheType>`_, i.e., whether to store caches on CPU or GPU,
+* ``save_dir``, i.e., where to persist caches for subsequent runs,
+* ``batch_size``, i.e., batch size to be used only when creating caches - the batch size to be used during the actual training might be different.
 
 .. code:: python
 
@@ -368,12 +367,12 @@ Training
 With all essential objects implemented, it is easy to bring them all
 together and run a training loop with the
 `Quaterion.fit() <https://quaterion.qdrant.tech/quaterion.main.html#quaterion.main.Quaterion.fit>`_
-method. It expects: - A ``TrainableModel``, - A
-`pl.Trainer <https://pytorch-lightning.readthedocs.io/en/stable/common/trainer.html>`_,
-- A `SimilarityDataLoader <https://quaterion.qdrant.tech/quaterion.dataset.similarity_data_loader.html#quaterion.dataset.similarity_data_loader.SimilarityDataLoader>`_
-for training data,
-- And optionally, another ``SimilarityDataLoader``
-for evaluation data.
+method. It expects:
+
+* A ``TrainableModel``,
+* A `pl.Trainer <https://pytorch-lightning.readthedocs.io/en/stable/common/trainer.html>`_,
+* A `SimilarityDataLoader <https://quaterion.qdrant.tech/quaterion.dataset.similarity_data_loader.html#quaterion.dataset.similarity_data_loader.SimilarityDataLoader>`_ for training data,
+* And optionally, another ``SimilarityDataLoader`` for evaluation data.
 
 We need to import a few objects to prepare all of these:
 
@@ -457,10 +456,11 @@ a sampled subset. In this case, you may use
 `samplers <https://quaterion.qdrant.tech/quaterion.eval.samplers.html>`_
 to limit the evaluation. Similar to ``Quaterion.fit()`` used for training,
 `Quaterion.evaluate() <https://quaterion.qdrant.tech/quaterion.main.html#quaterion.main.Quaterion.evaluate>`_
-runs a complete evaluation loop. It takes the following as arguments: -
-An ``Evaluator`` instance created with given evaluation metrics and a ``Sampler``,
-- The ``SimilarityModel`` to be evaluated,
-- And the evaluation dataset.
+runs a complete evaluation loop. It takes the following as arguments:
+
+* An ``Evaluator`` instance created with given evaluation metrics and a ``Sampler``,
+* The ``SimilarityModel`` to be evaluated,
+* And the evaluation dataset.
 
 .. code:: python
 
@@ -489,7 +489,7 @@ In this tutorial, we trained a similarity model to search for similar
 cars from novel categories unseen in the training phase. Then, we
 evaluated it on a test dataset by the Retrieval R-Precision metric. The
 base model scored 0.1207, and our tuned model hit 0.2540, a twice higher
-score. These scored can be seen in the following figure:
+score. These scores can be seen in the following figure:
 
 .. image:: ../../imgs/cars_metrics.png
     :alt: Metrics for the base and tuned models

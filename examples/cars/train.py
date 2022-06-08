@@ -35,6 +35,7 @@ def train(
 
     Quaterion.fit(
         trainable_model=model,
+        trainer=None,
         train_dataloader=train_dataloader,
         val_dataloader=val_dataloader,
     )

@@ -8,6 +8,7 @@ Text tutorial intro
 
 Image tutorial intro
 ====================
+Search for `similar cars <cars-tutorial.html>`_ in novel categories.
 
 Cache tutorial intro
 ====================

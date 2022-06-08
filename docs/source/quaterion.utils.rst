@@ -8,6 +8,7 @@ Submodules
    :maxdepth: 4
 
    quaterion.utils.enums
+   quaterion.utils.progress_bar
    quaterion.utils.utils
 
 Module contents

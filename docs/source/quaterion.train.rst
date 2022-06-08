@@ -8,6 +8,7 @@ Subpackages
    :maxdepth: 4
 
    quaterion.train.cache
+   quaterion.train.callbacks
 
 Submodules
 ----------
@@ -16,8 +17,6 @@ Submodules
    :maxdepth: 4
 
    quaterion.train.cache_mixin
-   quaterion.train.cleanup_callback
-   quaterion.train.metrics_callback
    quaterion.train.trainable_model
 
 Module contents

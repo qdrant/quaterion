@@ -21,93 +21,9 @@ from quaterion.train.trainable_model import TrainableModel
 
 
 class Quaterion:
-    """A dwarf on a giant's shoulders sees farther of the two
+    """Fine-tuning entry point
 
-    One of the core entities in the framework.
     Contains methods to launch the actual training and evaluation processes.
-
-    Examples:
-
-        `Default trainer run`::
-
-            import pytorch_lightning as pl
-
-            from quaterion import Quaterion
-            from quaterion.dataset import PairsSimilarityDataLoader
-            from quaterion.eval.evaluator import Evaluator
-            from quaterion.eval.pair import RetrievalPrecision
-            from quaterion.eval.samplers.pair_sampler import PairSampler
-
-
-            def train(model, train_dataset_path, val_dataset_path):
-                # region data setup
-                train_dataset = YourDataset(train_dataset_path)
-                val_dataset = YourDataset(val_dataset_path)
-                train_dataloader = PairsSimilarityDataLoader(train_dataset, batch_size=1024)
-                val_dataloader = PairsSimilarityDataLoader(val_dataset, batch_size=1024)
-                # endregion
-
-                # region fit
-                # To use trainer with the defaults provided by Quaterion trainer should be
-                # explicitly set to `None`
-                Quaterion.fit(model, trainer=None, train_dataloader, val_dataloader)
-                # endregion
-
-                # region evaluation
-                metrics = {
-                    "rp@1": RetrievalPrecision(k=1)
-                }
-                sampler = PairSampler()
-                evaluator = Evaluator(metrics, sampler)
-                results = Quaterion.evaluate(evaluator, val_dataset, model.model)
-                print(f"results: {results}")
-                # endregion
-
-        `Custom trainer run`::
-
-            # the same imports
-            ...
-
-            def train(model, train_dataset_path, val_dataset_path):
-                # the same data setup region
-                ...
-
-                # region fit
-                trainer = pl.Trainer(
-                    max_epochs=params.get("max_epochs", 500),
-                    auto_select_gpus=True,
-                    log_every_n_steps=50,
-                    gpus=1,
-                )
-                Quaterion.fit(model, trainer, train_dataloader, val_dataloader)
-                # endregion
-
-                # the same evaluation region
-                ...
-
-        `Custom trainer run with Quaterion defaults`::
-
-             # the same imports
-             ...
-
-
-             def train(model, train_dataset_path, val_dataset_path):
-                # the same data setup region
-                ...
-
-                # region fit
-                quaterion_defaults = Quaterion.trainer_defaults()
-                quaterion_defaults['logger'] = pl.loggers.WandbLogger(
-                    name="example_model",
-                    project="example_project",
-                )
-                quaterion_defaults['callbacks'].append(YourCustomCallback())
-                trainer = pl.Trainer(**quaterion_defaults)
-                Quaterion.fit(model, trainer, train_dataloader, val_dataloader)
-                # endregion
-
-                # the same evaluation region
-                ...
     """
 
     @classmethod

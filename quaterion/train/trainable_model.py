@@ -22,7 +22,61 @@ from quaterion.utils.enums import TrainStage
 
 
 class TrainableModel(pl.LightningModule, CacheMixin):
-    """Base class for models to be trained."""
+    """Base class for models to be trained.
+
+    TrainableModel is used to describe how and which components of the model should be trained.
+
+    It assembles model from building blocks like
+    :class:`~quaterion_models.encoders.encoder.Encoder`,
+    :class:`~quaterion_models.heads.encoder_head.EncoderHead`, etc.
+
+    .. code-block:: none
+
+         ┌─────────┐ ┌─────────┐ ┌─────────┐
+         │Encoder 1│ │Encoder 2│ │Encoder 3│
+         └────┬────┘ └────┬────┘ └────┬────┘
+              │           │           │
+              └────────┐  │  ┌────────┘
+                       │  │  │
+                   ┌───┴──┴──┴───┐
+                   │   concat    │
+                   └──────┬──────┘
+                          │
+                   ┌──────┴──────┐
+                   │    Head     │
+                   └─────────────┘
+
+    TrainableModel also handles the majority of the training process routine: training and
+    validation steps, tensors device management, logging, and many more.
+    Most of the training routines are inherited from
+    :class:`~pytorch_lightning.LightningModule`, which is a direct ancestor of TrainableModel.
+
+    To train a model you need to inherit it from TrainableModel and implement required methods and
+    attributes.
+
+    Minimal Example::
+
+        class ExampleModel(TrainableModel):
+            def __init__(self, lr=10e-5, *args, **kwargs):
+                self.lr = lr
+                super().__init__(*args, **kwargs)
+
+            # backbone of the model
+            def configure_encoders(self):
+                return YourAwesomeEncoder()
+
+            # top layer of the model
+            def configure_head(self, input_embedding_size: int):
+                return SkipConnectionHead(input_embedding_size)
+
+            def configure_optimizers(self):
+                return Adam(self.model.parameters(), lr=self.lr)
+
+            def configure_loss(self):
+                return ContrastiveLoss()
+
+
+    """
 
     def __init__(self, *args: Any, **kwargs: Any):
         super().__init__(*args, **kwargs)

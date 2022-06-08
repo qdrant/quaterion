@@ -22,7 +22,10 @@ from quaterion_models import SimilarityModel
 
 
 class Quaterion:
-    """A dwarf on a giant's shoulders sees farther of the two"""
+    """Fine-tuning entry point
+
+    Contains methods to launch the actual training and evaluation processes.
+    """
 
     @classmethod
     def fit(
@@ -48,9 +51,10 @@ class Quaterion:
                 stage
             val_dataloader: Optional DataLoader instance to retrieve samples during
                 validation stage
-            ckpt_path: Path/URL of the checkpoint from which training is resumed. If there is
-                no checkpoint file at the path, an exception is raised. If resuming from mid-epoch checkpoint,
-                training will start from the beginning of the next epoch.
+            ckpt_path: Path/URL of the checkpoint from which training is resumed.
+                If there is no checkpoint file at the path, an exception is raised.
+                If resuming from mid-epoch checkpoint, training will start from the beginning of
+                the next epoch.
         """
 
         if isinstance(train_dataloader, PairsSimilarityDataLoader):
@@ -111,8 +115,10 @@ class Quaterion:
         Compute metrics on a dataset
 
         Args:
-            evaluator: Object which holds the configuration of which metrics to use and how to obtain samples for them
-            dataset: Sized object, like list, tuple, torch.utils.data.Dataset, etc. to compute metrics
+            evaluator: Object which holds the configuration of which metrics to use and how to
+                obtain samples for them
+            dataset: Sized object, like list, tuple, torch.utils.data.Dataset, etc. to compute
+                metrics
             model: SimilarityModel instance to perform objects encoding
 
         Returns:

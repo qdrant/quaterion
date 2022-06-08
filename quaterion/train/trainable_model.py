@@ -24,40 +24,42 @@ from quaterion.utils.enums import TrainStage
 class TrainableModel(pl.LightningModule, CacheMixin):
     """Base class for models to be trained.
 
-    TrainableModel is one of the core entities.
+    TrainableModel is used to describe how and which components of the model should be trained.
 
     It assembles model from building blocks like
     :class:`~quaterion_models.encoders.encoder.Encoder`,
     :class:`~quaterion_models.heads.encoder_head.EncoderHead`, etc.
 
+    .. code-block:: none
+
+         ┌─────────┐ ┌─────────┐ ┌─────────┐
+         │Encoder 1│ │Encoder 2│ │Encoder 3│
+         └────┬────┘ └────┬────┘ └────┬────┘
+              │           │           │
+              └────────┐  │  ┌────────┘
+                       │  │  │
+                   ┌───┴──┴──┴───┐
+                   │   concat    │
+                   └──────┬──────┘
+                          │
+                   ┌──────┴──────┐
+                   │    Head     │
+                   └─────────────┘
+
     TrainableModel also handles the majority of the training process routine: training and
-    validation steps, tensors device management, logging and many more.
+    validation steps, tensors device management, logging, and many more.
     Most of the training routines are inherited from
-    :class:`~pytorch_lightning.LightningModule` which is a direct ancestor of TrainableModel.
+    :class:`~pytorch_lightning.LightningModule`, which is a direct ancestor of TrainableModel.
 
     To train a model you need to inherit it from TrainableModel and implement required methods and
     attributes.
 
-    Example::
-
-        from torch.optimizers import Adam
-        from quaterion_models.heads import SkipConnectionHead
-        from quaterion.loss import ContrastiveLoss
-        from quaterion.eval.pair import RetrievalPrecision
-        from quaterion.train.cache import CacheConfig, CacheType
-
+    Minimal Example::
 
         class ExampleModel(TrainableModel):
             def __init__(self, lr=10e-5, *args, **kwargs):
                 self.lr = lr
                 super().__init__(*args, **kwargs)
-
-            # region required methods
-            def configure_optimizers(self):
-                return Adam(self.model.parameters(), lr=self.lr)
-
-            def configure_loss(self):
-                return ContrastiveLoss()
 
             # backbone of the model
             def configure_encoders(self):
@@ -66,35 +68,14 @@ class TrainableModel(pl.LightningModule, CacheMixin):
             # top layer of the model
             def configure_head(self, input_embedding_size: int):
                 return SkipConnectionHead(input_embedding_size)
-            # endregion
 
-            # region optional methods
-            # embeddings of frozen encoders can be cached to avoid repeatable computations
-            def configure_caches(self):
-                return CacheConfig(CacheType.AUTO, batch_size=256)
+            def configure_optimizers(self):
+                return Adam(self.model.parameters(), lr=self.lr)
 
-            # batch-wise metrics to monitor during the training process
-            # might have significant changes depending on batch size
-            # for more representative results use class:`~quaterion.eval.evaluator.Evaluator`
-            # after the end of training process
-            def configure_metrics(self):
-                return AttachedMetric(
-                    "RetrievalPrecision", RetrievalPrecision(k=1), prog_bar=True, on_epoch=True
-                )
+            def configure_loss(self):
+                return ContrastiveLoss()
 
-            # override this method if any additional batch evaluations are required
-            # it is called on every step (training/validation/test/predict) if these steps weren't
-            # overridden. Otherwise, it should be called in a custom step implementation explicitly
-            def process_results(
-                    self,
-                    embeddings,
-                    targets,
-                    batch_idx: int,
-                    stage,
-                    **kwargs,
-            ):
-                self.print('Part of positive pairs in the batch:', targets['labels'].mean())
-            # endregion
+
     """
 
     def __init__(self, *args: Any, **kwargs: Any):

@@ -5,6 +5,7 @@ set -xe
 # Ensure current path is project root
 cd "$(dirname "$0")/../"
 
+apt install python3-tk
 # install CPU torch, cause it is smaller
 pip install torch --extra-index-url https://download.pytorch.org/whl/cpu
 

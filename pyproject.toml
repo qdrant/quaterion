@@ -1,15 +1,15 @@
 [tool.poetry]
 name = "quaterion"
 version = "0.1.22"
-description = "Metric Learning fine-tuning framework"
-authors = ["generall <andrey@vasnetsov.com>"]
+description = "Similarity Learning fine-tuning framework"
+authors = ["Quaterion Authors <team@quaterion.tech>"]
 packages = [
     {include = "quaterion"},
 ]
 readme = "README.md"
 homepage = "https://github.com/qdrant/quaterion"
 repository = "https://github.com/qdrant/quaterion"
-keywords = ["framework", "metric-learning", "similarity", "deep-learning", "pytorch"]
+keywords = ["framework", "similarity-learning", "metric-learning", "similarity", "deep-learning", "pytorch"]
 
 
 [tool.poetry.dependencies]

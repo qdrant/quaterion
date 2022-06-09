@@ -31,7 +31,7 @@ class Quaterion:
     def fit(
         cls,
         trainable_model: TrainableModel,
-        trainer: Optional[pl.Trainer],
+        trainer: pl.Trainer,
         train_dataloader: SimilarityDataLoader,
         val_dataloader: Optional[SimilarityDataLoader] = None,
         ckpt_path: Optional[str] = None,
@@ -44,7 +44,7 @@ class Quaterion:
             trainable_model: model to fit
             trainer:
                 `pytorch_lightning.Trainer` instance to handle fitting routine internally.
-                If `None` passed, trainer will be created with :meth:`Quaterion.trainer_defaults`.
+                You can start with :meth:`Quaterion.trainer_defaults` and change values where necessary or create one from scratch.
                 The default parameters are intended to serve as a quick start for learning the model, and we
                 encourage users to try different parameters if the default ones do not give a satisfactory result.
             train_dataloader: DataLoader instance to retrieve samples during training
@@ -69,13 +69,6 @@ class Quaterion:
                     "Pair samplers are not implemented yet. "
                     "Try other loss/data loader"
                 )
-
-        if trainer is None:
-            trainer = pl.Trainer(
-                **cls.trainer_defaults(
-                    trainable_model=trainable_model, train_dataloader=train_dataloader
-                )
-            )
 
         trainer.callbacks.append(CleanupCallback())
         trainer.callbacks.append(MetricsCallback())

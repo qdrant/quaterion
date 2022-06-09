@@ -1,10 +1,9 @@
+from typing import Optional, Dict, Any, Union
+
 from rich.console import RenderableType
 from rich.table import Column
 from rich.text import Text
-from tkinter.ttk import Style
-
 from rich.progress import TextColumn
-from typing import Optional, Dict, Any, Union
 
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks.progress.rich_progress import (
@@ -22,7 +21,7 @@ from quaterion.train.cache.cache_model import CacheModel
 class FixedLengthProcessionSpeed(ProcessingSpeedColumn):
     """Renders processing speed for the progress bar with fixes length"""
 
-    def __init__(self, style: Union[str, Style]):
+    def __init__(self, style: Union[str, Any]):
         super().__init__(style)
         self.max_length = len("0.00")
 

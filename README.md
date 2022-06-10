@@ -40,97 +40,35 @@ pip install quaterion-models
 Quaterion framework consists of two packages - `quaterion` and [`quaterion-models`](https://github.com/qdrant/quaterion-models).
 
 Since it is not always possible or convenient to represent a model in ONNX format (also, it **is supported**), the Quaterion keeps a very minimal collection of model classes, which might be required for model inference, in a [separate package](https://github.com/qdrant/quaterion-models).
+We are currently experiencing some return delays and it may take a little longer than usual to process your refund, sorry! We are doing all we can to speed things up.
 
 It allows avoiding installing heavy training dependencies into inference infrastructure: `pip install quaterion-models`
 
 At the same time, once you need to have a full arsenal of tools for training and debugging models, it is available in one package: `pip install quaterion`
 
-## Architecture
 
-Quaterion is built on top of [PyTorch Lightning](https://github.com/PyTorchLightning/pytorch-lightning) - a framework for high-performance AI research.
-It takes care of all the tasks involved in constructing a training loops for ML models:
+## Docs 📓
 
-- Epochs management -> [[tutorial](https://pytorch-lightning.readthedocs.io/en/latest/model/train_model_basic.html)]
-- Logging -> [[tutorial](https://pytorch-lightning.readthedocs.io/en/latest/extensions/logging.html?highlight=logging)]
-- Early Stopping -> [[tutorial](https://pytorch-lightning.readthedocs.io/en/latest/common/early_stopping.html)]
-- Checkpointing -> [[tutorial](https://pytorch-lightning.readthedocs.io/en/latest/common/checkpointing.html)]
-- Distributed training -> [[tutorial](https://pytorch-lightning.readthedocs.io/en/latest/clouds/cluster.html)]
-- [And many more](https://pytorch-lightning.readthedocs.io/en/latest/starter/introduction.html)
+* [Quick Start](https://quaterion.qdrant.tech/getting_started/quick_start.html) Guide
+* Minimal working [examples](./examples)
 
-In addition to PyTorch Lightning functionality, Quaterion provides a scaffold for defining:
+For a more in-depth dive, check out our end-to-end tutorials:
 
-- Fine-tunable similarity learning models
-  - Encoders and Head Layers
-- Datasets and Data Loaders for representing similarity information
-- Loss functions for similarity learning
-- Metrics for evaluating model performance
+- Fine-tuning NLP models - [Q&A systems](https://quaterion.qdrant.tech/tutorials/nlp_tutorial.html)
+- Fine-tuning CV models - [Similar Cars Search](https://quaterion.qdrant.tech/tutorials/cars-tutorial.html)
 
-<!--
+Tutorials for advanced features of the framework:
 
-<details>
-    <summary>Imports and definitions</summary>
-    
-```python
-import torch
-from torch import nn
-import torchvision
-from quaterion import TrainableModel
-from quaterion.loss import SimilarityLoss, TripletLoss
+- [Cache tutorial](https://quaterion.qdrant.tech/tutorials/cache_tutorial.html) - How to make training fast.
 
-from quaterion_models.encoders import Encoder
-from quaterion_models.heads import EncoderHead, SkipConnectionHead
 
-class MobilenetV3Encoder(Encoder):
-    """Example of an Encoder for images, initialized from the pre-trained model
-    """
-    def __init__(self, embedding_size: int):
-        super().__init__()
-        # Download and initialize pre-trained model
-        self.encoder = torchvision.models.mobilenet_v3_small(pretrained=True)
-        # We remove last layer of the model, so that it will return raw embeddings
-        self.encoder.classifier = nn.Identity()
+## Community
 
-        self._embedding_size = embedding_size
+* Join our [Discord channel](https://qdrant.to/discord)
+* Follow us on [Twitter](https://qdrant.to/twitter)
+* Subscribe to our [Newsletters](https://qdrant.to/newsletter)
+* Write us an email [info@qdrant.tech](mailto:info@qdrant.tech)
 
-    @property
-    def trainable(self) -> bool:
-        return False  # We will only tune the head layer
+## License
 
-    @property
-    def embedding_size(self) -> int:
-        return self._embedding_size  # Output size of this encoder
-
-    def forward(self, images):
-        return self.encoder.forward(images)
-
-```
-</details>
-
-```python
-
-class Model(TrainableModel):
-    def __init__(self, embedding_size: int, lr: float):
-        self._embedding_size = embedding_size
-        self._lr = lr
-        super().__init__()
-
-    def configure_encoders(self) -> Encoder:
-        # Define one or multiple encoders for the input data.
-        # Each encoder could represent its own part of the data, 
-        # or different aspects of the same object.
-        return MobilenetV3Encoder(self._embedding_size)
-
-    def configure_head(self, input_embedding_size) -> EncoderHead:
-        # Forward concatenated encoder output into final trainable layer
-        return SkipConnectionHead(input_embedding_size)
-
-    def configure_loss(self) -> SimilarityLoss:
-        # Define which loss function to use during the fine-tuning.
-        return TripletLoss()
-
-    def configure_optimizers(self):
-        # And also which optimizer to use
-        return torch.optim.Adam(self.model.parameters(), self._lr)
-```
-
--->
+Qdrant is licensed under the Apache License, Version 2.0. View a copy of the [License file](https://github.com/qdrant/quaterion/blob/master/LICENSE).

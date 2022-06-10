@@ -82,6 +82,8 @@ There are `PairsSimilarityDataLoader` and `GroupSimilarityDataLoader` for `Simil
 Wrap your dataset into one of the SimilarityDataLoader implementations to make it compatible with similarity learning:
 
 ```python
+# Consumes data in format:
+# {"description": "the thing I use for soup", "label": "spoon"} 
 class JsonDataset(Dataset):
     def __init__(self, path: str):
         super().__init__()
@@ -95,7 +97,8 @@ class JsonDataset(Dataset):
     def __len__(self) -> int:
         return len(self.data)
 
-dataloader = GroupSimilarityDataLoader(JsonDataset('./my_data.json'), batch_size=128)
+train_dataloader = GroupSimilarityDataLoader(JsonDataset('./my_data.json'), batch_size=128)
+val_dataloader = GroupSimilarityDataLoader(JsonDataset('./my_data_val.json'), batch_size=128)
 ```
 
 ## Similarity Model and Encoders
@@ -148,9 +151,13 @@ class DescriptionEncoder(Encoder):
 
     def forward(self, batch) -> Tensor:
         return self.encoder(batch)["sentence_embedding"]
-
+    
+    def collate_descriptions(self, batch: List[Any]) -> Tensor:
+        descriptions = [record['description'] for record in batch]
+        self.transformer.tokenize(descriptions)
+    
     def get_collate_fn(self) -> CollateFnType:
-        return self.transformer.tokenize
+        return self.collate_descriptions
 
     def save(self, output_path: str):
         self.transformer.save(join(output_path, 'transformer'))
@@ -205,7 +212,8 @@ model = Model(lr=0.01)
 Quaterion.fit(
     trainable_model=model,
     trainer=None, # Use default trainer
-    train_dataloader=dataloader,
+    train_dataloader=train_dataloader,
+    val_dataloader=val_dataloader
 )
 ```
 
@@ -221,7 +229,8 @@ trainer = pl.Trainer(**trainer_kwargs)
 Quaterion.fit(
     trainable_model=model,
     trainer=trainer, # Use custom trainer
-    train_dataloader=dataloader,
+    train_dataloader=train_dataloader,
+    val_dataloader=val_dataloader
 )
 ```
 
@@ -235,7 +244,18 @@ model.save_servable("./my_similarity_model")
 
 ## Further reading
 
+Quick Start example is intended to give an idea of the structure of the framework and does not train any real model. 
+It also does not cover important topics such as Caching, Evaluation, choosing loss functions and HeadLayers.
+
+A working and more detailed example code can be found at:
+
 * Minimal working [examples](./examples)
-* [Cache tutorial](https://quaterion.qdrant.tech/tutorials/cache_tutorial.html) - How to make training - warp-speed fast.
+
+For a more in-depth dive, check out our end-to-end tutorials.
+
 * Example: [fine-tuning NLP models](https://quaterion.qdrant.tech/tutorials/nlp_tutorial.html) - Q&A systems
 * Example: [fine-tuning CV models](https://quaterion.qdrant.tech/tutorials/cars-tutorial.html) - similar cars search
+
+Tutorials for advanced features of the framework:
+
+* [Cache tutorial](https://quaterion.qdrant.tech/tutorials/cache_tutorial.html) - How to make training - warp-speed fast.

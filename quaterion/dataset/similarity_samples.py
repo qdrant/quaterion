@@ -49,10 +49,14 @@ class SimilarityPairSample:
     obj_a: Any
     obj_b: Any
     score: float = 1.0
-    # Consider all examples outside this group as negative samples.
-    # By default, all samples belong to group 0 - therefore other samples could
-    # not be used as negative examples.
+    """Similarity score between Object A and B.
+    It is assumed, that `score = 1.0` - means objects are similar,
+    `score = 0.0` objects are completely different. 
+    """
     subgroup: int = 0
+    """Consider all examples outside this group as negative samples.
+    By default, all samples belong to group 0 - therefore other samples could
+    not be used as negative examples."""
 
 
 @dataclass

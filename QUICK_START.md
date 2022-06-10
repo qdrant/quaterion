@@ -154,7 +154,7 @@ class DescriptionEncoder(Encoder):
     
     def collate_descriptions(self, batch: List[Any]) -> Tensor:
         descriptions = [record['description'] for record in batch]
-        self.transformer.tokenize(descriptions)
+        return self.transformer.tokenize(descriptions)
     
     def get_collate_fn(self) -> CollateFnType:
         return self.collate_descriptions

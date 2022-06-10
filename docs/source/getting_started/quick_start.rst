@@ -1,6 +1,24 @@
 Quick Start with Quaterion
 ==========================
 
+Quaterion is built on top of `PyTorch Lightning <https://github.com/PyTorchLightning/pytorch-lightning>`_ - a framework for high-performance AI research.
+It takes care of all the tasks involved in constructing a training loops for ML models:
+
+- Epochs management -> `tutorial <https://pytorch-lightning.readthedocs.io/en/latest/model/train_model_basic.html>`_
+- Logging -> `tutorial <https://pytorch-lightning.readthedocs.io/en/latest/extensions/logging.html?highlight=logging>`_
+- Early Stopping -> `tutorial <https://pytorch-lightning.readthedocs.io/en/latest/common/early_stopping.html>`_
+- Checkpointing -> `tutorial <https://pytorch-lightning.readthedocs.io/en/latest/common/checkpointing.html>`_
+- Distributed training -> `tutorial <https://pytorch-lightning.readthedocs.io/en/latest/clouds/cluster.html>`_
+- `And many more <https://pytorch-lightning.readthedocs.io/en/latest/starter/introduction.html>`_
+
+In addition to PyTorch Lightning functionality, Quaterion provides a scaffold for defining:
+
+- Fine-tunable similarity learning models
+  - Encoders and Head Layers
+- Datasets and Data Loaders for representing similarity information
+- Loss functions for similarity learning
+- Metrics for evaluating model performance
+
 There are a few concepts you need to know to get started with Quaterion:
 
 Similarity Samples and Data Loaders

@@ -36,7 +36,7 @@ The mighty reef unlawfully loves the anchor. The rum trades with fortune, lead t
             <a href="/getting_started/quick_start.html">
                <div class="text-container">
                   <h3>Quick Start</h3>
-                  <p class="body-paragraph">Some caption</p>
+                  <p class="body-paragraph">Quaterion overview</p>
                </div>
             </a>
          </div>

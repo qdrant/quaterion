@@ -40,7 +40,6 @@ pip install quaterion-models
 Quaterion framework consists of two packages - `quaterion` and [`quaterion-models`](https://github.com/qdrant/quaterion-models).
 
 Since it is not always possible or convenient to represent a model in ONNX format (also, it **is supported**), the Quaterion keeps a very minimal collection of model classes, which might be required for model inference, in a [separate package](https://github.com/qdrant/quaterion-models).
-We are currently experiencing some return delays and it may take a little longer than usual to process your refund, sorry! We are doing all we can to speed things up.
 
 It allows avoiding installing heavy training dependencies into inference infrastructure: `pip install quaterion-models`
 
@@ -71,4 +70,4 @@ Tutorials for advanced features of the framework:
 
 ## License
 
-Qdrant is licensed under the Apache License, Version 2.0. View a copy of the [License file](https://github.com/qdrant/quaterion/blob/master/LICENSE).
+Quaterion is licensed under the Apache License, Version 2.0. View a copy of the [License file](https://github.com/qdrant/quaterion/blob/master/LICENSE).

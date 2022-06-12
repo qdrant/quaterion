@@ -25,7 +25,7 @@ It opens a room for significant improvement - we can calculate these embeddings 
 
 This is the main idea of the cache.
 
-.. image:: ../../imgs/merged-demo.gif
+.. image:: https://storage.googleapis.com/quaterion/docs/new-cmp-demo.gif
     :alt: regular vs cache gif
 
 

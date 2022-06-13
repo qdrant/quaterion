@@ -27,8 +27,8 @@ The mighty reef unlawfully loves the anchor. The rum trades with fortune, lead t
          <div class="col-md-6">
             <a href="/getting_started/why_quaterion.html">
                <div class="text-container">
-                  <h3>Why Quaterion</h3>
-                  <p class="body-paragraph">Some caption</p>
+                  <h3>Motivation</h3>
+                  <p class="body-paragraph">When and Why to use Similarity Learning</p>
                </div>
             </a>
          </div>
@@ -46,7 +46,7 @@ The mighty reef unlawfully loves the anchor. The rum trades with fortune, lead t
             <a href="/api/index.html">
                <div class="text-container">
                   <h3>API References</h3>
-                  <p class="body-paragraph">Some caption</p>
+                  <p class="body-paragraph">Detailed list of Quaterion package</p>
                </div>
             </a>
          </div>
@@ -54,7 +54,7 @@ The mighty reef unlawfully loves the anchor. The rum trades with fortune, lead t
             <a href="/tutorials/tutorials.html">
                <div class="text-container">
                   <h3>Tutorials</h3>
-                  <p class="body-paragraph">Some caption</p>
+                  <p class="body-paragraph">Deep Dive in Similarity Learning</p>
                </div>
             </a>
          </div>

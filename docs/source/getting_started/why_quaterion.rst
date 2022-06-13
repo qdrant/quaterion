@@ -22,6 +22,7 @@ And in some cases you won't even need manual markup at all. If the data consists
 On the modelling stage similarity learning is also much flexible - it does not depend on a fixed number of classes, so the new categories could be introduced by just a simple extension of the reference set.
 Same is also true for the deployment stage, where you can introduce new examples without any downtime and redeployment.
 
+And finally, examining the similarities between objects resulting from the model can provide insights into what the model is guided by when making predictions.
 
 When to apply Similarity Learning?
 ==================================
@@ -50,3 +51,5 @@ By focusing on Similarity Learning, Quaterion can better support such specialize
 
 In addition, Quaterion is made with the intention that its primary mission will be fine-tuning the models.
 It makes it compatible even with tasks with only a tiny amount of marked-up data.
+
+Quaterion uses PyTorch Lightning as a backend. It lets you be productive instantly without getting bogged down in the boilerplate. You can sneak a peek at what Quaterion tastes like in the `Quick Start guide <./quick_start.html>`_.

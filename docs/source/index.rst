@@ -76,6 +76,7 @@ The mighty reef unlawfully loves the anchor. The rum trades with fortune, lead t
    tutorials/cache_tutorial
    tutorials/nlp_tutorial
    tutorials/cars-tutorial
+   tutorials/head_layers_skip_connection
 
 .. toctree::
    :maxdepth: 1

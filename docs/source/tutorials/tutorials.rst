@@ -12,3 +12,8 @@ Search for `similar cars <cars-tutorial.html>`_ in novel categories.
 
 Cache tutorial intro
 ====================
+
+Head Layers
+===========
+
+- `Skip Connection <head_layers_skip_connection.html>`_

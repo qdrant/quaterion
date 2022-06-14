@@ -6,19 +6,47 @@
 Welcome to Quaterion's documentation!
 ============================================
 
-Quaterion is wow, courage! Gar, ye scrawny plunder- set sails for love! Where is the rainy skiff? Gulls whine from passions like mighty waves.
+Quaterion is a framework for fine-tuning similarity learning models.
+The framework closes the "last mile" problem in training models for semantic search, recommendations, anomaly detection, extreme classification, matching engines, e.t.c.
+
+It is designed to combine the performance of pre-trained models with specialization for the custom task while avoiding slow and costly training.
+
+Faatures
+---------------
+
+* 🌀 **Warp-speed fast**: With the built-in caching mechanism, Quaterion enables you to train thousands of epochs with huge batch sizes even on *laptop GPU*.
+* 🐈‍ **Small data compatible**: Pre-trained models with specially designed head layers allow you to benefit even from a dataset you can label *in one day*.
+* 🏗️ **Customizable**: Quaterion allows you to re-define any part of the framework, making it flexible even for large-scale and sophisticated training pipelines.
+
 
 Install
 =======
 
+TL;DR:
+
+For training:
+
 .. code-block:: bash
 
-   $ pip install quaterion
+   pip install quaterion
+
+For inference service:
+
+.. code-block:: bash
+
+   pip install quaterion-models
+
+Quaterion framework consists of two packages - `quaterion` and `quaterion-models <https://github.com/qdrant/quaterion-models>`_.
+
+Since it is not always possible or convenient to represent a model in ONNX format (also, it **is supported**), the Quaterion keeps a very minimal collection of model classes, which might be required for model inference, in a `separate package <https://github.com/qdrant/quaterion-models>`_.
+
+It allows avoiding installing heavy training dependencies into inference infrastructure: `pip install quaterion-models`
+
+At the same time, once you need to have a full arsenal of tools for training and debugging models, it is available in one package: `pip install quaterion`
+
 
 Next Steps
 ==========
-
-The mighty reef unlawfully loves the anchor. The rum trades with fortune, lead the bikini atoll until it whines.
 
 .. raw:: html
 
@@ -27,8 +55,8 @@ The mighty reef unlawfully loves the anchor. The rum trades with fortune, lead t
          <div class="col-md-6">
             <a href="/getting_started/why_quaterion.html">
                <div class="text-container">
-                  <h3>Why Quaterion</h3>
-                  <p class="body-paragraph">Some caption</p>
+                  <h3>Motivation</h3>
+                  <p class="body-paragraph">When and Why to use Similarity Learning</p>
                </div>
             </a>
          </div>
@@ -46,7 +74,7 @@ The mighty reef unlawfully loves the anchor. The rum trades with fortune, lead t
             <a href="/api/index.html">
                <div class="text-container">
                   <h3>API References</h3>
-                  <p class="body-paragraph">Some caption</p>
+                  <p class="body-paragraph">Detailed list of Quaterion package</p>
                </div>
             </a>
          </div>
@@ -54,7 +82,7 @@ The mighty reef unlawfully loves the anchor. The rum trades with fortune, lead t
             <a href="/tutorials/tutorials.html">
                <div class="text-container">
                   <h3>Tutorials</h3>
-                  <p class="body-paragraph">Some caption</p>
+                  <p class="body-paragraph">Deep Dive in Similarity Learning</p>
                </div>
             </a>
          </div>
@@ -69,7 +97,7 @@ The mighty reef unlawfully loves the anchor. The rum trades with fortune, lead t
    getting_started/quick_start
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Tutorials
 
    tutorials/tutorials

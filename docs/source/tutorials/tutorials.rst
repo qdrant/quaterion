@@ -2,18 +2,18 @@ List of tutorials
 +++++++++++++++++
 
 
-Text tutorial intro
+Text tutorial
 ===================
 `Answer <nlp_tutorial.html>`_ on cloud provider's frequently asked questions with similarity learning.
 
-Image tutorial intro
+Image tutorial
 ====================
 Search for `similar cars <cars-tutorial.html>`_ in novel categories.
 
-Cache tutorial intro
+Cache tutorial
 ====================
+`Boost <cache_tutorial.html>`_ the fine-tuning speed.
 
 Head Layers
 ===========
-
 - `Skip Connection <head_layers_skip_connection.html>`_

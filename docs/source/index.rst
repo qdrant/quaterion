@@ -97,7 +97,7 @@ Next Steps
    getting_started/quick_start
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Tutorials
 
    tutorials/tutorials

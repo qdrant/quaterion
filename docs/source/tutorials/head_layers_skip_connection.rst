@@ -5,7 +5,7 @@ When fine-tuning models, the question of preserving the predictive ability of th
 It is essential to minimize losses on the target dataset and keep it working in the general case.
 In other words, we need to avoid `catastrophic forgetting <https://en.wikipedia.org/wiki/Catastrophic_interference>`_.
 
-One solution is to freeze the basic model and train only the top layer, followed by possible unfreezing.
+A common yet naive approach is to freeze the base model and train only the newly initialized top layer, followed by possible unfreezing.
 
 However, this does not solve the problem of the head layer itself.
 When randomly initialized, it destroys the useful signal that is coming from the main encoder.

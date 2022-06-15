@@ -3,7 +3,7 @@ Head Layers: Skip Connection
 
 When fine-tuning models, the question of preserving the predictive ability of the original model is particularly acute.
 It is essential to minimize losses on the target dataset and keep it working in the general case.
-In other words - prevent `catastrophic forgetting <https://en.wikipedia.org/wiki/Catastrophic_interference>`_.
+In other words, we need to avoid `catastrophic forgetting <https://en.wikipedia.org/wiki/Catastrophic_interference>`_.
 
 One solution is to freeze the basic model and train only the top layer, followed by possible unfreezing.
 

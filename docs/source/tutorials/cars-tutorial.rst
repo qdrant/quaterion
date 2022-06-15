@@ -18,6 +18,12 @@ In this tutorial, we will use the
 `Stanford Cars <https://pytorch.org/vision/main/generated/torchvision.datasets.StanfordCars.html>`__
 dataset. It has 16185 images of cars from 196 classes,
 and it is split into training and testing subsets with almost a 50-50% split.
+
+.. figure:: https://storage.googleapis.com/quaterion/docs/class_montage.jpg
+    :alt: Example of car images
+
+    Example of car images
+
 To make things even more interesting, however, we will first merge training and testing subsets,
 then we will split it into two again in such a way that
 the half of the 196 classes will be put into the training set
@@ -443,6 +449,11 @@ the current state of the ``SimilarityModel`` instance:
 Evaluation
 ----------
 
+.. figure:: https://storage.googleapis.com/quaterion/docs/original_vs_tuned_cars.png
+    :alt: Comparison on Original vs Fine-Tuned model on retrieval
+
+    Comparison on Original vs Fine-Tuned model on retrieval
+
 Let’s see what we have achieved with these simple steps. `evaluate.py <https://github.com/qdrant/quaterion/blob/master/examples/cars/evaluate.py>`_
 has two functions to evaluate both the baseline model and the tuned
 similarity model. We will review only the latter for brevity. In
@@ -491,5 +502,7 @@ evaluated it on a test dataset by the Retrieval R-Precision metric. The
 base model scored 0.1207, and our tuned model hit 0.2540, a twice higher
 score. These scores can be seen in the following figure:
 
-.. image:: ../../imgs/cars_metrics.png
+.. figure:: ../../imgs/cars_metrics.png
     :alt: Metrics for the base and tuned models
+
+    Metrics for the base and tuned models

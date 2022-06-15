@@ -10,6 +10,10 @@ similarity learning and Quaterion.
 We will use `cloud-faq-dataset <https://github.com/qdrant/dataset-cloud-platform-faq>`_.
 This is a collection of almost 8.5k pairs of questions and answers from F.A.Q. pages of popular cloud providers.
 
+.. figure:: https://storage.googleapis.com/quaterion/docs/faq-example.png
+    :alt: Example of FAQ section
+
+    Example of FAQ section
 
 The usual pipeline in Quaterion includes the following steps:
 
@@ -288,8 +292,10 @@ At the end trained model is saved under `servable` dir.
 
 Here are some of the plots observed during training. As you can see, the loss decreased, while the metrics grew steadily.
 
-.. image:: ../../imgs/loss_mrr_precision.png
+.. figure:: ../../imgs/loss_mrr_precision.png
     :alt: training plots
+
+    Learning curves
 
 Additionally, let's take a look at our model's performance:
 

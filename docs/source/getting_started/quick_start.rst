@@ -322,3 +322,4 @@ Tutorials for advanced features of the framework:
 -  `Cache
    tutorial </tutorials/cache_tutorial.html>`__
    - How to make training - warp-speed fast.
+- `Head Layers: Skip Connection </tutorials/head_layers_skip_connection.html>`_ - How to avoid forgetting while fine-tuning

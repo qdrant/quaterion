@@ -13,3 +13,7 @@ Search for `similar cars <cars-tutorial.html>`_ in novel categories.
 Cache tutorial
 ====================
 `Boost <cache_tutorial.html>`_ the fine-tuning speed.
+
+Head Layers
+===========
+- `Skip Connection <head_layers_skip_connection.html>`_

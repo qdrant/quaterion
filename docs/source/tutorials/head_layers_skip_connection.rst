@@ -12,7 +12,7 @@ When randomly initialized, it destroys the useful signal that is coming from the
 
 This may lead to several problems such as overfitting on the training dataset, being stuck in a local minimum, and unstable loss values among others, failing to effectively tune the parameters of the base model.
 
-One possible solution to these problems is to use the `Skip-Connection <https://quaterion-models.qdrant.tech/quaterion_models.heads.skip_connection_head.html#module-quaterion_models.heads.skip_connection_head>`_ architecture of the final layer.
+One possible solution to these problems is to use the `Skip-Connection <https://quaterion-models.qdrant.tech/quaterion_models.heads.skip_connection_head.html#module-quaterion_models.heads.skip_connection_head>`_ architecture as a final layer.
 
 ::
 

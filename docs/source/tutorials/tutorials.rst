@@ -16,4 +16,8 @@ Cache tutorial
 
 Head Layers
 ===========
-- `Skip Connection <head_layers_skip_connection.html>`_
+- `Skip Connection <head_layers_skip_connection.html>`_ - hot start for pre-trained models fine-tuning.
+
+Embedding Confidence
+====================
+- `Embedding Confidence <embedding_confidence.html>`_ - how do I know that the model is sure about the output vector?

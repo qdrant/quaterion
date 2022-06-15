@@ -32,7 +32,7 @@ One possible solution to these problems is to use the `Skip-Connection <https://
           + <────────┘
           │
 
-The skip-connect layer is similar to the residual block introduced as part of the `ResNet architecture <https://arxiv.org/abs/1512.03385>`_.
+The skip-connection layer is similar to the residual block introduced as a part of the `ResNet architecture <https://arxiv.org/abs/1512.03385>`_.
 
 The layer passes the signal through 2 routes: in one, it remains unchanged, but in the second, it passes through the linear and gated layers.
 The Gated layer works as a switch. If one of its elements is zeroed, the layer will not change the signal in that element.

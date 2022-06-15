@@ -10,7 +10,7 @@ One solution is to freeze the basic model and train only the top layer, followed
 However, this does not solve the problem of the head layer itself.
 When randomly initialized, it destroys the useful signal that is coming from the main encoder.
 
-This leads to overfitting on the training dataset and the inability to effectively tune the parameters of the basic model.
+This may lead to several problems such as overfitting on the training dataset, being stuck in a local minimum, and unstable loss values among others, failing to effectively tune the parameters of the base model.
 
 One possible solution to these problems is to use the `Skip-Connection <https://quaterion-models.qdrant.tech/quaterion_models.heads.skip_connection_head.html#module-quaterion_models.heads.skip_connection_head>`_ architecture of the final layer.
 

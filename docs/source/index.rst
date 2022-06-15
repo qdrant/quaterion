@@ -105,6 +105,7 @@ Next Steps
    tutorials/nlp_tutorial
    tutorials/cars-tutorial
    tutorials/head_layers_skip_connection
+   tutorials/embedding_confidence
 
 .. toctree::
    :maxdepth: 1

@@ -310,16 +310,11 @@ A working and more detailed example code can be found at:
 
 For a more in-depth dive, check out our end-to-end tutorials.
 
--  Example: `fine-tuning NLP
-   models <tutorials/nlp_tutorial.html>`__
-   - Q&A systems
--  Example: `fine-tuning CV
-   models <tutorials/cars-tutorial.html>`__
-   - similar cars search
+-  Example: `fine-tuning NLP models <tutorials/nlp_tutorial.html>`__ - Q&A systems
+-  Example: `fine-tuning CV models <tutorials/cars-tutorial.html>`__ - similar cars search
 
 Tutorials for advanced features of the framework:
 
--  `Cache
-   tutorial </tutorials/cache_tutorial.html>`__
-   - How to make training - warp-speed fast.
+- `Cache tutorial </tutorials/cache_tutorial.html>`__ - How to make training - warp-speed fast.
 - `Head Layers: Skip Connection </tutorials/head_layers_skip_connection.html>`_ - How to avoid forgetting while fine-tuning
+- `Embedding Confidence </tutorials/head_layers_skip_connection.html>`_ - how do I know that the model is sure about the output vector?

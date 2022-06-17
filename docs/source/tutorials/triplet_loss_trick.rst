@@ -24,7 +24,7 @@ if you can avoid the vector space collapse problem.
 
 Let's see why it happens.
 
-The batch-hard strategy computes the triplet loss as the absolute difference of distances between the hardest anchor-positive hardest anchor-negative pairs summed with the margin value.
+The batch-hard strategy computes the triplet loss as the absolute difference of distances between the hardest anchor-positive and hardest anchor-negative pairs summed with the margin value.
 Hardest anchor-positive pairs are the ones that have the maximum distance,
 while the hardest anchor-negatives pairs are the ones that have the minimum distance.
 

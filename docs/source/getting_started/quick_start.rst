@@ -318,4 +318,4 @@ Tutorials for advanced features of the framework:
 - `Cache tutorial </tutorials/cache_tutorial.html>`__ - How to make training - warp-speed fast.
 - `Head Layers: Skip Connection </tutorials/head_layers_skip_connection.html>`_ - How to avoid forgetting while fine-tuning
 - `Embedding Confidence </tutorials/head_layers_skip_connection.html>`_ - how do I know that the model is sure about the output vector?
-- `Vector Collapse <tutorials/triplet_loss_trick.html>`_ - how to prevent vector space collapse in Triplet Loss
+- `Vector Collapse </tutorials/triplet_loss_trick.html>`_ - how to prevent vector space collapse in Triplet Loss

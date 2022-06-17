@@ -11,7 +11,7 @@ The framework closes the "last mile" problem in training models for semantic sea
 
 It is designed to combine the performance of pre-trained models with specialization for the custom task while avoiding slow and costly training.
 
-Faatures
+Features
 ---------------
 
 * 🌀 **Warp-speed fast**: With the built-in caching mechanism, Quaterion enables you to train thousands of epochs with huge batch sizes even on *laptop GPU*.
@@ -106,6 +106,7 @@ Next Steps
    tutorials/cars-tutorial
    tutorials/head_layers_skip_connection
    tutorials/embedding_confidence
+   tutorials/triplet_loss_trick
 
 .. toctree::
    :maxdepth: 1

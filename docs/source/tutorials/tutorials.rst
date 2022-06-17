@@ -21,3 +21,7 @@ Head Layers
 Embedding Confidence
 ====================
 - `Embedding Confidence <embedding_confidence.html>`_ - how do I know that the model is sure about the output vector?
+
+Vector Collapse
+====================
+- `Vector Space Collapse Prevention <triplet_loss_trick.html>`_ - a simple yet effective trick to prevent vector space collapsing in Triplet Loss

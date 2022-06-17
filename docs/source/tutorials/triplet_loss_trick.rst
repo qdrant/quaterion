@@ -8,18 +8,24 @@ you can read `this previous tutorial <https://qdrant.tech/articles/triplet-loss/
 Despite its popularity and success, Triplet Loss suffers from what is called vector collapsing, a common problem in similarity learning.
 A collapse of the vector space is the state when an encoder satisfies the loss function
 by simply mapping all input samples onto a single point (or a very small area) in the vector space
-without truely learning useful features for the task.
+without truly learning useful features for the task.
 When you look at the graph of the loss in such a case,
 you are expected to see a decrease in the loss value for a small number of steps
-followed by a sudden drop to a steady value  which is very close the margin value.
+followed by a sudden drop to a steady value which is very close to the margin value.
 This may be observed in the batch-hard strategy,
 which is usually preferred because it is less greedy and thus performs better than the batch-all strategy
-if you can avoid the vector space collapsing problem.
+if you can avoid the vector space collapse problem.
+
++-------------------------------------------------------------------------------+------------------------------------------------------------------------------------+
+| Collapsed model loss                                                          | Fixed loss                                                                         |
++===============================================================================+====================================================================================+
+| .. image:: https://storage.googleapis.com/quaterion/docs/collapsed-loss.png   | .. image:: https://storage.googleapis.com/quaterion/docs/fixed-loss.png            |
++-------------------------------------------------------------------------------+------------------------------------------------------------------------------------+
 
 Let's see why it happens.
 
-The batch-hard strategy computes the triplet loss as the absolute value of the difference of distances between the hardest anchor-positive pairs and distances between the hardest anchor-negative pairs summed with the margin value,
-where the hardest anchor-positive pairs are the ones that have the maximum distance
+The batch-hard strategy computes the triplet loss as the absolute difference of distances between the hardest anchor-positive and hardest anchor-negative pairs summed with the margin value.
+Hardest anchor-positive pairs are the ones that have the maximum distance,
 while the hardest anchor-negatives pairs are the ones that have the minimum distance.
 
 In its basic form, this value is calculated as in the following:
@@ -31,7 +37,7 @@ In its basic form, this value is calculated as in the following:
        + self._margin
    )
 
-The problem with this equation is that, if the encoder outputs the same vector for all the samples,
+The problem with this equation is that if the encoder outputs the same vector for all the samples,
 then the loss value will be equal to the margin value,
 and it will no longer improve.
 

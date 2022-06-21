@@ -2,6 +2,14 @@
 
 >  A dwarf on a giant's shoulders sees farther of the two 
 
+<a href="https://pypi.org/project/quaterion"><img src="https://img.shields.io/pypi/v/quaterion?label=Version&style=flat-square" alt="Version" /></a>
+
+<a href="https://github.com/qdrant/quaterion/issues"><img src="https://img.shields.io/github/issues/qdrant/quaterion?style=flat-square" alt="Issues" /></a>
+
+![Tests](https://github.com/qdrant/quaterion/actions/workflows/test.yml/badge.svg)
+
+<a href="https://quaterion.qdrant.tech"><img src="https://img.shields.io/badge/Learn-Docs%20%26%20Tutorials-success" alt="Docs & Tutorials" /></a>
+
 Quaterion is a framework for fine-tuning similarity learning models.
 The framework closes the "last mile" problem in training models for semantic search, recommendations, anomaly detection, extreme classification, matching engines, e.t.c.
 

@@ -17,6 +17,7 @@ Features
 * 🌀 **Warp-speed fast**: With the built-in caching mechanism, Quaterion enables you to train thousands of epochs with huge batch sizes even on *laptop GPU*.
 * 🐈‍ **Small data compatible**: Pre-trained models with specially designed head layers allow you to benefit even from a dataset you can label *in one day*.
 * 🏗️ **Customizable**: Quaterion allows you to re-define any part of the framework, making it flexible even for large-scale and sophisticated training pipelines.
+* 🌌 **Scalable**: Quaterion is built on top of `PyTorch Lightning <https://github.com/Lightning-AI/lightning>`_ and inherits all its scalability, cost-efficiency, and reliability perks.
 
 
 Install

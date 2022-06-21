@@ -109,7 +109,7 @@ html_theme_options = {
     "sticky_navigation": True,
     "titles_only": False,
     "qdrant_project": "quaterion",
-    "qdrant_logo": "_static/images/quaterion_logo_horisontal_opt.svg",
+    "qdrant_logo": "/_static/images/quaterion_logo_horisontal_opt.svg",
 }
 
 # default is false

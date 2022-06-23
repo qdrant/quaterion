@@ -75,6 +75,9 @@ For a more in-depth dive, check out our end-to-end tutorials:
 Tutorials for advanced features of the framework:
 
 - [Cache tutorial](https://quaterion.qdrant.tech/tutorials/cache_tutorial.html) - How to make training fast.
+- [Head Layers: Skip Connection](https://quaterion.qdrant.tech/tutorials/head_layers_skip_connection.html) - How to avoid forgetting while fine-tuning
+- [Embedding Confidence](https://quaterion.qdrant.tech/tutorials/embedding_confidence.html) - how do I know that the model is sure about the output vector?
+- [Vector Collapse Prevention](https://quaterion.qdrant.tech/tutorials/triplet_loss_trick.html) - how to prevent vector space collapse in Triplet Loss
 
 
 ## Community

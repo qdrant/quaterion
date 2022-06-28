@@ -110,6 +110,7 @@ html_theme_options = {
     "titles_only": False,
     "qdrant_project": "quaterion",
     "qdrant_logo": "/_static/images/quaterion_logo_horisontal_opt.svg",
+    'qdrant_gtm': "GTM-M9HSV9K"
 }
 
 # default is false

@@ -34,7 +34,7 @@ information.
 Similarity Pairs
 ~~~~~~~~~~~~~~~~
 
-`SimilarityPairSample <quaterion.dataset.similarity_samples.html#quaterion.dataset.similarity_samples.SimilarityPairSample>`__
+`SimilarityPairSample </quaterion.dataset.similarity_samples.SimilarityPairSample>`_
 - is a dataclass used to represent pairwise similarity between objects.
 
 For example, if you want to train a food similarity model:
@@ -82,7 +82,7 @@ Similarity Groups
 ~~~~~~~~~~~~~~~~~
 
 Another handy way to provide similarity information is
-`SimilarityGroupSample <quaterion.dataset.similarity_samples.html#quaterion.dataset.similarity_samples.SimilarityGroupSample>`__.
+`SimilarityGroupSample </quaterion.dataset.similarity_samples.SimilarityGroupSample>`_.
 
 It might be useful in following scenarios:
 
@@ -141,7 +141,7 @@ to make it compatible with similarity learning:
 Similarity Model and Encoders
 -----------------------------
 
-`SimilarityModel <https://quaterion-models.qdrant.tech/quaterion_models.model.html#quaterion_models.model.SimilarityModel>`__
+`SimilarityModel <https://quaterion-models.qdrant.tech/quaterion_models.model.html#quaterion_models.model.SimilarityModel>`_
 - is a model class, which manages all trainable layers.
 
 The similarity model acts like an Encoder, which consists of other
@@ -172,7 +172,7 @@ Each encoder takes raw object data as an input and produces an embedding
 
 The rules for converting the raw input data into a tensor suitable for
 the neural network are defined separately in each encoder’s
-`collate_fn <https://quaterion-models.qdrant.tech/quaterion_models.model.html#quaterion_models.model.SimilarityModel.get_collate_fn>`__
+`collate_fn <https://quaterion-models.qdrant.tech/quaterion_models.model.html#quaterion_models.model.SimilarityModel.get_collate_fn>`_
 function.
 
 Let’s define our simple encoder:
@@ -288,7 +288,7 @@ recommend overriding the default trainer parameters:
    )
 
 Read more about ``pl.Trainer`` at Pytorch Lightning
-`docs <https://pytorch-lightning.readthedocs.io/en/latest/common/trainer.html>`__
+`docs <https://pytorch-lightning.readthedocs.io/en/latest/common/trainer.html>`_
 
 After training is finished, we can save ``SimilarityModel`` for serving:
 
@@ -306,16 +306,16 @@ and HeadLayers.
 
 A working and more detailed example code can be found at:
 
--  Minimal working `examples <https://github.com/qdrant/quaterion/tree/master/examples>`__
+-  Minimal working `examples <https://github.com/qdrant/quaterion/tree/master/examples>`_
 
 For a more in-depth dive, check out our end-to-end tutorials.
 
--  Example: `fine-tuning NLP models <tutorials/nlp_tutorial.html>`__ - Q&A systems
--  Example: `fine-tuning CV models <tutorials/cars-tutorial.html>`__ - similar cars search
+-  Example: `fine-tuning NLP models <tutorials/nlp_tutorial.html>`_ - Q&A systems
+-  Example: `fine-tuning CV models <tutorials/cars-tutorial.html>`_ - similar cars search
 
 Tutorials for advanced features of the framework:
 
-- `Cache tutorial </tutorials/cache_tutorial.html>`__ - How to make training - warp-speed fast.
+- `Cache tutorial </tutorials/cache_tutorial.html>`_ - How to make training - warp-speed fast.
 - `Head Layers: Skip Connection </tutorials/head_layers_skip_connection.html>`_ - How to avoid forgetting while fine-tuning
 - `Embedding Confidence </tutorials/embedding_confidence.html>`_ - how do I know that the model is sure about the output vector?
 - `Vector Collapse </tutorials/triplet_loss_trick.html>`_ - how to prevent vector space collapse in Triplet Loss

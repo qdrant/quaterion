@@ -34,7 +34,7 @@ information.
 Similarity Pairs
 ~~~~~~~~~~~~~~~~
 
-`SimilarityPairSample </quaterion.dataset.similarity_samples.SimilarityPairSample>`_
+`SimilarityPairSample </quaterion.dataset.similarity_samples.html#quaterion.dataset.similarity_samples.SimilarityPairSample>`_
 - is a dataclass used to represent pairwise similarity between objects.
 
 For example, if you want to train a food similarity model:
@@ -82,7 +82,7 @@ Similarity Groups
 ~~~~~~~~~~~~~~~~~
 
 Another handy way to provide similarity information is
-`SimilarityGroupSample </quaterion.dataset.similarity_samples.SimilarityGroupSample>`_.
+`SimilarityGroupSample </quaterion.dataset.similarity_samples.html#quaterion.dataset.similarity_samples.SimilarityGroupSample>`_.
 
 It might be useful in following scenarios:
 
@@ -310,8 +310,8 @@ A working and more detailed example code can be found at:
 
 For a more in-depth dive, check out our end-to-end tutorials.
 
--  Example: `fine-tuning NLP models <tutorials/nlp_tutorial.html>`_ - Q&A systems
--  Example: `fine-tuning CV models <tutorials/cars-tutorial.html>`_ - similar cars search
+-  Example: `fine-tuning NLP models </tutorials/nlp_tutorial.html>`_ - Q&A systems
+-  Example: `fine-tuning CV models </tutorials/cars-tutorial.html>`_ - similar cars search
 
 Tutorials for advanced features of the framework:
 

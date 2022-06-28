@@ -37,7 +37,7 @@ For inference service:
 
    pip install quaterion-models
 
-Quaterion framework consists of two packages - `quaterion` and `quaterion-models <https://github.com/qdrant/quaterion-models>`_.
+Quaterion framework consists of two packages - `quaterion` and `quaterion-models <https://quaterion-models.qdrant.tech/>`_.
 
 Since it is not always possible or convenient to represent a model in ONNX format (also, it **is supported**), the Quaterion keeps a very minimal collection of model classes, which might be required for model inference, in a `separate package <https://github.com/qdrant/quaterion-models>`_.
 
@@ -121,4 +121,3 @@ Indices and tables
 
 * :ref:`genindex`
 * :ref:`modindex`
-* :ref:`search`

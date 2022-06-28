@@ -44,7 +44,7 @@ Example of pairs presented in dataset:
         answer: aws lambda functions powered by aws graviton2 processors are 20% cheaper compared to x86-based lambda functions
 
 Data have to be represented as `SimilaritySample </quaterion.dataset.similarity_samples.html>`_ instances.
-With questions and answers we can use `SimilarityPairSample </quaterion.dataset.similarity_samples.SimilarityPairSample>`_.
+With questions and answers we can use `SimilarityPairSample </quaterion.dataset.similarity_samples.html#quaterion.dataset.similarity_samples.SimilarityPairSample>`_.
 
 .. code-block:: python
 
@@ -321,4 +321,4 @@ Further learning
 In the case you followed the tutorial step-by-step you might be surprised by the speed of the training
 process with Quaterion.
 This is mainly the merit of the cache and frozen encoder.
-Check out our `Awesome cache tutorial </quaterion/docs/html/tutorials/cache_tutorial.html>`_.
+Check out our `cache tutorial </tutorials/cache_tutorial.html>`_.

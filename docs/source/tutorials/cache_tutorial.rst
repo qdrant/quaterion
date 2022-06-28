@@ -32,11 +32,11 @@ This is the main idea of the cache.
 How to use it?
 ==============
 
-`TrainableModel <quaterion.train.trainable_model.TrainableModel>`_ has
-`configure_caches <quaterion.train.trainable_model.html#quaterion.train.trainable_model.TrainableModel.configure_caches>`_
+`TrainableModel </quaterion.train.trainable_model.html#quaterion.train.trainable_model.TrainableModel>`_ has
+`configure_caches </quaterion.train.trainable_model.html#quaterion.train.trainable_model.TrainableModel.configure_caches>`_
 method which you need to override for cache usage.
 
-This method should return `CacheConfig <quaterion.train.cache.cache_config.CacheConfig>`_ instance containing cache settings.
+This method should return `CacheConfig </quaterion.train.cache.cache_config.html#quaterion.train.cache.cache_config.CacheConfig>`_ instance containing cache settings.
 
 .. code-block:: python
     :caption: configure_caches definition
@@ -210,7 +210,7 @@ The multiprocessing environment and the custom key extractor do not allow us to 
 But with text data, it's not that important to avoid `I/O` because strings aren't as heavy as images and won't incur much overhead.
 
 More examples can be found at
-`configure_caches <quaterion.train.trainable_model.html#quaterion.train.trainable_model.TrainableModel.configure_caches>`_
+`configure_caches </quaterion.train.trainable_model.html#quaterion.train.trainable_model.TrainableModel.configure_caches>`_
 documentation.
 
 Full training pipeline utilising cache can be found in `NLP tutorial </tutorials/nlp_tutorial.html>`_.

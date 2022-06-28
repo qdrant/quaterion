@@ -111,7 +111,7 @@ html_theme_options = {
     "qdrant_project": "quaterion",
     "qdrant_logo": "/_static/images/quaterion_logo_horisontal_opt.svg",
     "qdrant_gtm": "GTM-M9HSV9K",
-    "social_preview": "/_static/images/quaterion-preview.png"
+    "social_preview": "/_static/images/quaterion-preview.png",
 }
 
 # default is false

@@ -44,11 +44,6 @@ class Model(TrainableModel):
         optimizer = torch.optim.Adam(self.model.parameters(), self._lr)
         return optimizer
 
-    def configure_caches(self) -> Optional[CacheConfig]:
-        return CacheConfig(
-            cache_type=CacheType.AUTO, save_dir="./cache_dir", batch_size=32
-        )
-
     def configure_metrics(self) -> AttachedMetric:
         return AttachedMetric(
             "rrp",

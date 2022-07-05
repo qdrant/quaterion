@@ -13,7 +13,7 @@ class CarsEncoder(Encoder):
 
     @property
     def trainable(self) -> bool:
-        return False
+        return True
 
     @property
     def embedding_size(self) -> int:

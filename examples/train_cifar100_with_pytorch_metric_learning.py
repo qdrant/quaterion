@@ -112,8 +112,11 @@ if __name__ == "__main__":
     train_dataloader = get_dataloader()
 
     trainer = pl.Trainer(
-        accelerator="auto", devices=1, num_nodes=1, max_epochs=10
-    )
+        accelerator="auto",
+        devices=1,
+        num_nodes=1,
+        max_epochs=10
+        )
 
     Quaterion.fit(
         trainable_model=model,

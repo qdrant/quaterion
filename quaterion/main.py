@@ -163,15 +163,14 @@ class Quaterion:
         Returns:
             kwargs for `pytorch_lightning.Trainer`
         """
-        use_gpu = torch.cuda.is_available()
         defaults = {
             "callbacks": [
                 QuaterionProgressBar(console_kwargs={"tab_size": 4}),
                 EarlyStopping(f"{TrainStage.VALIDATION}_loss"),
                 RichModelSummary(max_depth=3),
             ],
-            "gpus": int(use_gpu),
-            "auto_select_gpus": use_gpu,
+            "accelerator": "auto",
+            "devices": 1,
             "max_epochs": -1,
             "enable_model_summary": False,  # We define our custom model summary
         }

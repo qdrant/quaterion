@@ -141,7 +141,7 @@ model = Model(num_groups=dataset.get_num_industries(), lr=3e-5)
 
 train_dataloader = GroupSimilarityDataLoader(dataset, batch_size=64, shuffle=True)
 
-trainer = pl.Trainer(gpus=1, num_nodes=1, max_epochs=30)
+trainer = pl.Trainer(accelerator="auto", devices=1, num_nodes=1, max_epochs=30)
 
 Quaterion.fit(
     trainable_model=model,

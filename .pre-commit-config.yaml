@@ -28,4 +28,4 @@ repos:
     hooks:
       - id: isort
         name: "Sort Imports"
-        args: [ "--profile black" ]
+        args: ["--profile", "black"]

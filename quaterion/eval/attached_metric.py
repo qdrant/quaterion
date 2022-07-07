@@ -1,7 +1,7 @@
 from typing import Optional
 
-from quaterion.utils.enums import TrainStage
 from quaterion.eval.base_metric import BaseMetric
+from quaterion.utils.enums import TrainStage
 
 
 class AttachedMetric:

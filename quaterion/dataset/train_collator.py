@@ -1,8 +1,10 @@
 from __future__ import annotations
-from typing import List, Tuple, Union, Dict, Any, Callable
 
-from quaterion.dataset import SimilarityPairSample, SimilarityGroupSample
+from typing import Any, Callable, Dict, List, Tuple, Union
+
 from quaterion_models.types import CollateFnType
+
+from quaterion.dataset import SimilarityGroupSample, SimilarityPairSample
 
 
 class TrainCollator:

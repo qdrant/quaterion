@@ -1,12 +1,14 @@
 import argparse
 import os
-import pytorch_lightning as pl
 import shutil
+
+import pytorch_lightning as pl
 import torch
 from pytorch_lightning.callbacks import EarlyStopping, ModelSummary
 
-from examples.cars.config import TRAIN_BATCH_SIZE, IMAGE_SIZE
+from examples.cars.config import IMAGE_SIZE, TRAIN_BATCH_SIZE
 from quaterion import Quaterion
+
 from .data import get_dataloaders
 from .models import Model
 

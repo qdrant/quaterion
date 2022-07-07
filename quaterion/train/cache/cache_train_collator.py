@@ -1,9 +1,9 @@
 from collections import defaultdict
-from typing import Dict, List, Any, Hashable
+from typing import Any, Dict, Hashable, List
 
-from quaterion.dataset.train_collator import TrainCollator
 from quaterion_models.types import CollateFnType
 
+from quaterion.dataset.train_collator import TrainCollator
 from quaterion.train.cache.cache_config import KeyExtractorType
 from quaterion.train.cache.cache_encoder import CacheMode
 

@@ -1,8 +1,7 @@
-from typing import Type, Dict, Any
+from typing import Any, Dict, Type
 
 import torch
-
-from torch import Tensor, LongTensor
+from torch import LongTensor, Tensor
 
 from quaterion.distances import Distance
 from quaterion.loss.pairwise_loss import PairwiseLoss

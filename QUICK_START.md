@@ -2,9 +2,9 @@
 
 There are a few concepts you need to know to get started with Quaterion:
 
-## Similarity Samples and Data Loaders 
+## Similarity Samples and Data Loaders
 
-Unlike traditional classification or regression, 
+Unlike traditional classification or regression,
 similarity learning do not operate with specific target values.
 Instead, it relies on the information about the similarity between objects.
 
@@ -83,7 +83,7 @@ Wrap your dataset into one of the SimilarityDataLoader implementations to make i
 
 ```python
 # Consumes data in format:
-# {"description": "the thing I use for soup", "label": "spoon"} 
+# {"description": "the thing I use for soup", "label": "spoon"}
 class JsonDataset(Dataset):
     def __init__(self, path: str):
         super().__init__()
@@ -151,11 +151,11 @@ class DescriptionEncoder(Encoder):
 
     def forward(self, batch) -> Tensor:
         return self.encoder(batch)["sentence_embedding"]
-    
+
     def collate_descriptions(self, batch: List[Any]) -> Tensor:
         descriptions = [record['description'] for record in batch]
         return self.transformer.tokenize(descriptions)
-    
+
     def get_collate_fn(self) -> CollateFnType:
         return self.collate_descriptions
 
@@ -171,8 +171,8 @@ class DescriptionEncoder(Encoder):
 ```
 
 Encoder is initialized with pre-trained layers `transformer` and `pooling`.
-The initialization of the pre-trained components is defined outside the Encoder class. 
-The encoder is designed to be used as a part of inference service, so it is important to keep training-related code outside. 
+The initialization of the pre-trained components is defined outside the Encoder class.
+The encoder is designed to be used as a part of inference service, so it is important to keep training-related code outside.
 
 ### Trainable Model
 
@@ -236,7 +236,7 @@ Quaterion.fit(
 
 Read more about `pl.Trainer` at Pytorch Lightning [docs](https://pytorch-lightning.readthedocs.io/en/latest/common/trainer.html)
 
-After training is finished, we can save `SimilarityModel` for serving: 
+After training is finished, we can save `SimilarityModel` for serving:
 
 ```python
 model.save_servable("./my_similarity_model")
@@ -244,7 +244,7 @@ model.save_servable("./my_similarity_model")
 
 ## Further reading
 
-Quick Start example is intended to give an idea of the structure of the framework and does not train any real model. 
+Quick Start example is intended to give an idea of the structure of the framework and does not train any real model.
 It also does not cover important topics such as Caching, Evaluation, choosing loss functions and HeadLayers.
 
 A working and more detailed example code can be found at:

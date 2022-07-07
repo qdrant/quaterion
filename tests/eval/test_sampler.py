@@ -4,7 +4,7 @@ from quaterion_models import SimilarityModel
 from quaterion_models.encoders import Encoder
 from quaterion_models.heads import EmptyHead
 
-from quaterion.dataset import SimilarityPairSample, SimilarityGroupSample
+from quaterion.dataset import SimilarityGroupSample, SimilarityPairSample
 from quaterion.distances import Distance
 from quaterion.eval.group import RetrievalRPrecision
 from quaterion.eval.pair import RetrievalReciprocalRank

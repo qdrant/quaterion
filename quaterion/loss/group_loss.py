@@ -1,4 +1,4 @@
-from torch import Tensor, LongTensor
+from torch import LongTensor, Tensor
 
 from quaterion.distances import Distance
 from quaterion.loss.similarity_loss import SimilarityLoss

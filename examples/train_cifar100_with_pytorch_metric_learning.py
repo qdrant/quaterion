@@ -6,17 +6,13 @@ import pytorch_lightning as pl
 import torch
 import torch.nn as nn
 from pytorch_metric_learning import losses, miners
+from quaterion_models.encoders import Encoder
+from quaterion_models.heads import EmptyHead, EncoderHead
 
 from quaterion import Quaterion, TrainableModel
-from quaterion.dataset import (
-    GroupSimilarityDataLoader,
-    SimilarityGroupDataset,
-)
+from quaterion.dataset import GroupSimilarityDataLoader, SimilarityGroupDataset
 from quaterion.loss import SimilarityLoss
 from quaterion.loss.extras import PytorchMetricLearningWrapper
-from quaterion_models.heads import EmptyHead, EncoderHead
-from quaterion_models.encoders import Encoder
-
 
 try:
     import torchvision
@@ -111,7 +107,7 @@ if __name__ == "__main__":
 
     train_dataloader = get_dataloader()
 
-    trainer = pl.Trainer(accelerator="auto", devices=1, num_nodes=1,max_epochs=10)
+    trainer = pl.Trainer(accelerator="auto", devices=1, num_nodes=1, max_epochs=10)
 
     Quaterion.fit(
         trainable_model=model,

@@ -1,9 +1,9 @@
-from typing import Optional, Callable
+from typing import Callable, Optional
 
 import torch
 
-from quaterion.eval.pair import PairMetric
 from quaterion.distances import Distance
+from quaterion.eval.pair import PairMetric
 
 
 class RetrievalPrecision(PairMetric):

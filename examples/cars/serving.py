@@ -1,15 +1,15 @@
 """Prepare vectors for serving
 """
-import json
-
-import PIL.Image
 import argparse
-import numpy as np
+import json
 import os
+
+import numpy as np
+import PIL.Image
 import torch
 import tqdm
 from quaterion_models import SimilarityModel
-from quaterion_models.heads import EncoderHead, EmptyHead
+from quaterion_models.heads import EmptyHead, EncoderHead
 
 from examples.cars.config import IMAGE_SIZE
 from examples.cars.data import get_dataloaders, get_raw_dataset

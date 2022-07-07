@@ -51,7 +51,7 @@ class SimilarityPairSample:
     score: float = 1.0
     """Similarity score between Object A and B.
     It is assumed, that `score = 1.0` - means objects are similar,
-    `score = 0.0` objects are completely different. 
+    `score = 0.0` objects are completely different.
     """
     subgroup: int = 0
     """Consider all examples outside this group as negative samples.

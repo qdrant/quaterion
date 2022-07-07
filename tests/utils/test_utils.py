@@ -1,10 +1,10 @@
+from collections.abc import Iterable
 from typing import Iterator
 
 import pytest
+from torch.utils.data import Dataset, IterableDataset
 
 from quaterion.utils.utils import iter_by_batch
-from collections.abc import Iterable
-from torch.utils.data import Dataset, IterableDataset
 
 
 class FakeIterableDataset(IterableDataset):

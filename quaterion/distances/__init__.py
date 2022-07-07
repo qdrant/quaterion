@@ -2,9 +2,9 @@ from enum import Enum
 
 from quaterion.distances.base_distance import BaseDistance
 from quaterion.distances.cosine import Cosine
+from quaterion.distances.dot_product import DotProduct
 from quaterion.distances.euclidean import Euclidean
 from quaterion.distances.manhattan import Manhattan
-from quaterion.distances.dot_product import DotProduct
 
 
 class Distance(str, Enum):

@@ -50,4 +50,3 @@ Using SkipConnection in Quaterion is as easy as using a regular linear layer:
 
        def configure_head(self, input_embedding_size: int) -> EncoderHead:
            return SkipConnectionHead(input_embedding_size)
-

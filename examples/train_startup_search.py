@@ -1,22 +1,20 @@
 import argparse
 import json
-import random
 import os
-from typing import Dict, Union, List, Any
+import random
+from typing import Any, Dict, List, Union
 
 import pytorch_lightning as pl
 import torch
+from quaterion_models.encoders import Encoder
+from quaterion_models.heads import EncoderHead, GatedHead
+from quaterion_models.types import CollateFnType
 from torch.utils.data import Dataset
 
 from quaterion import Quaterion, TrainableModel
 from quaterion.dataset.similarity_data_loader import (
-    GroupSimilarityDataLoader,
-    SimilarityGroupSample,
-)
-from quaterion.loss import SoftmaxLoss, SimilarityLoss
-from quaterion_models.types import CollateFnType
-from quaterion_models.encoders import Encoder
-from quaterion_models.heads import GatedHead, EncoderHead
+    GroupSimilarityDataLoader, SimilarityGroupSample)
+from quaterion.loss import SimilarityLoss, SoftmaxLoss
 
 try:
     from sentence_transformers import SentenceTransformer

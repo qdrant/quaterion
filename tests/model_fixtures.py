@@ -1,4 +1,4 @@
-from typing import Union, Dict
+from typing import Dict, Union
 
 import torch
 from quaterion_models.encoders import Encoder
@@ -8,10 +8,9 @@ from torch import Tensor
 from torch.utils.data import Dataset
 from torch.utils.data.dataset import T_co
 
-
 from quaterion import TrainableModel
 from quaterion.dataset import SimilarityPairSample
-from quaterion.loss import SimilarityLoss, ContrastiveLoss
+from quaterion.loss import ContrastiveLoss, SimilarityLoss
 
 
 class FakeEncoder(Encoder):

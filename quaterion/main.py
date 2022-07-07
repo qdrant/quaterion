@@ -9,10 +9,7 @@ from quaterion_models import SimilarityModel
 from torch.utils.data import Dataset
 
 from quaterion.dataset.similarity_data_loader import (
-    GroupSimilarityDataLoader,
-    PairsSimilarityDataLoader,
-    SimilarityDataLoader,
-)
+    GroupSimilarityDataLoader, PairsSimilarityDataLoader, SimilarityDataLoader)
 from quaterion.eval.evaluator import Evaluator
 from quaterion.loss import GroupLoss, PairwiseLoss
 from quaterion.train.cache import CacheType

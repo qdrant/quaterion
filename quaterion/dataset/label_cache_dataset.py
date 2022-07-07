@@ -7,12 +7,11 @@ from typing import Sized
 from torch.utils.data import Dataset
 from torch.utils.data.dataset import IterableDataset
 
-from quaterion.dataset.indexing_dataset import IndexingDataset, IndexingIterableDataset
-from quaterion.dataset.similarity_samples import (
-    SimilarityGroupSample,
-    SimilarityPairSample,
-    SimilaritySample,
-)
+from quaterion.dataset.indexing_dataset import (IndexingDataset,
+                                                IndexingIterableDataset)
+from quaterion.dataset.similarity_samples import (SimilarityGroupSample,
+                                                  SimilarityPairSample,
+                                                  SimilaritySample)
 
 
 class LabelCacheMode(Enum):

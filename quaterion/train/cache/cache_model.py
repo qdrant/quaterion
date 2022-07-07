@@ -2,7 +2,8 @@ from typing import Dict, Optional
 
 import pytorch_lightning as pl
 import torch
-from pytorch_lightning.utilities.types import EVAL_DATALOADERS, TRAIN_DATALOADERS
+from pytorch_lightning.utilities.types import (EVAL_DATALOADERS,
+                                               TRAIN_DATALOADERS)
 
 from quaterion.train.cache import CacheEncoder
 

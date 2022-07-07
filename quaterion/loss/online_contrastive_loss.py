@@ -5,11 +5,8 @@ import torch.nn.functional as F
 
 from quaterion.distances import Distance
 from quaterion.loss.group_loss import GroupLoss
-from quaterion.utils import (
-    get_anchor_negative_mask,
-    get_anchor_positive_mask,
-    max_value_of_dtype,
-)
+from quaterion.utils import (get_anchor_negative_mask,
+                             get_anchor_positive_mask, max_value_of_dtype)
 
 
 class OnlineContrastiveLoss(GroupLoss):

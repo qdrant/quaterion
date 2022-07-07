@@ -1,10 +1,9 @@
 from enum import Enum
-from typing import Hashable, Any, List, Callable, Union, Tuple
-
-from torch import Tensor
+from typing import Any, Callable, Hashable, List, Tuple, Union
 
 from quaterion_models.encoders import Encoder
-from quaterion_models.types import TensorInterchange, CollateFnType
+from quaterion_models.types import CollateFnType, TensorInterchange
+from torch import Tensor
 
 KeyExtractorType = Callable[[Any], Hashable]
 

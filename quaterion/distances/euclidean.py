@@ -1,8 +1,8 @@
 from typing import Optional
 
 import torch
-from torch import Tensor
 import torch.nn.functional as F
+from torch import Tensor
 
 from quaterion.distances.base_distance import BaseDistance
 

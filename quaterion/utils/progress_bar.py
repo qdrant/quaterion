@@ -1,19 +1,18 @@
-from typing import Optional, Dict, Any, Union
-
-from rich.console import RenderableType
-from rich.table import Column
-from rich.text import Text
-from rich.progress import TextColumn
+from typing import Any, Dict, Optional, Union
 
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks.progress.rich_progress import (
-    RichProgressBar,
-    RichProgressBarTheme,
-    CustomBarColumn,
     BatchesProcessedColumn,
+    CustomBarColumn,
     CustomTimeColumn,
     ProcessingSpeedColumn,
+    RichProgressBar,
+    RichProgressBarTheme,
 )
+from rich.console import RenderableType
+from rich.progress import TextColumn
+from rich.table import Column
+from rich.text import Text
 
 from quaterion.train.cache.cache_model import CacheModel
 

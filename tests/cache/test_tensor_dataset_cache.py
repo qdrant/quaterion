@@ -1,18 +1,18 @@
 import os.path
+import tempfile
+from typing import Dict, Optional, Union
 
 import pytorch_lightning as pl
-import tempfile
 import torch
 from pytorch_lightning.callbacks.model_checkpoint import ModelCheckpoint
 from quaterion_models.encoders import Encoder
 from quaterion_models.heads import EncoderHead, GatedHead
 from torch import nn
-from typing import Union, Dict, Optional
 
 from quaterion import Quaterion, TrainableModel
 from quaterion.dataset import GroupSimilarityDataLoader
 from quaterion.dataset.similarity_dataset import SimilarityGroupDataset
-from quaterion.loss import SimilarityLoss, OnlineContrastiveLoss
+from quaterion.loss import OnlineContrastiveLoss, SimilarityLoss
 from quaterion.train.cache import CacheConfig, CacheType
 
 

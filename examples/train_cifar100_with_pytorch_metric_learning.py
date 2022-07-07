@@ -6,17 +6,13 @@ import pytorch_lightning as pl
 import torch
 import torch.nn as nn
 from pytorch_metric_learning import losses, miners
+from quaterion_models.encoders import Encoder
+from quaterion_models.heads import EmptyHead, EncoderHead
 
 from quaterion import Quaterion, TrainableModel
-from quaterion.dataset import (
-    GroupSimilarityDataLoader,
-    SimilarityGroupDataset,
-)
+from quaterion.dataset import GroupSimilarityDataLoader, SimilarityGroupDataset
 from quaterion.loss import SimilarityLoss
 from quaterion.loss.extras import PytorchMetricLearningWrapper
-from quaterion_models.heads import EmptyHead, EncoderHead
-from quaterion_models.encoders import Encoder
-
 
 try:
     import torchvision

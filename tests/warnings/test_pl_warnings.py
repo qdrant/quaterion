@@ -1,5 +1,4 @@
 import pytest
-
 import pytorch_lightning as pl
 
 from quaterion.dataset.similarity_data_loader import PairsSimilarityDataLoader

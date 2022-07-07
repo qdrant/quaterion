@@ -13,7 +13,7 @@
     <a href="https://quaterion.qdrant.tech"><img src="https://img.shields.io/badge/Learn-Docs%20%26%20Tutorials-success" alt="Docs & Tutorials" /></a>
 </p>
 
->  A dwarf on a giant's shoulders sees farther of the two 
+>  A dwarf on a giant's shoulders sees farther of the two
 
 Quaterion is a framework for fine-tuning similarity learning models.
 The framework closes the "last mile" problem in training models for semantic search, recommendations, anomaly detection, extreme classification, matching engines, e.t.c.
@@ -35,7 +35,7 @@ It is designed to combine the performance of pre-trained models with specializat
 * 🏗️ **Customizable**: Quaterion allows you to re-define any part of the framework, making it flexible even for large-scale and sophisticated training pipelines.
 
 
-* 🌌 **Scalable**: Quaterion is built on top of [PyTorch Lightning](https://github.com/Lightning-AI/lightning) and inherits all its scalability, cost-efficiency, and reliability perks. 
+* 🌌 **Scalable**: Quaterion is built on top of [PyTorch Lightning](https://github.com/Lightning-AI/lightning) and inherits all its scalability, cost-efficiency, and reliability perks.
 
 ## Installation
 

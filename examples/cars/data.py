@@ -1,16 +1,14 @@
-import numpy as np
 import os
 import pickle
+from typing import Callable
+
+import numpy as np
 import tqdm
+from pytorch_lightning import seed_everything
 from torch.utils.data import Dataset, Subset
 from torchvision import datasets, transforms
-from typing import Callable
-from pytorch_lightning import seed_everything
 
-from quaterion.dataset import (
-    GroupSimilarityDataLoader,
-    SimilarityGroupSample,
-)
+from quaterion.dataset import GroupSimilarityDataLoader, SimilarityGroupSample
 
 # set seed to deterministically sample train and test categories later on
 seed_everything(seed=42)

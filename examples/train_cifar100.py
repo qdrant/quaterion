@@ -5,19 +5,12 @@ from typing import Dict, Union
 import pytorch_lightning as pl
 import torch
 import torch.nn as nn
-from quaterion import Quaterion, TrainableModel
-from quaterion.dataset import (
-    GroupSimilarityDataLoader,
-    SimilarityGroupDataset,
-)
-from quaterion.loss import (
-    OnlineContrastiveLoss,
-    TripletLoss,
-    SimilarityLoss,
-)
-from quaterion_models.heads import EmptyHead, EncoderHead
 from quaterion_models.encoders import Encoder
+from quaterion_models.heads import EmptyHead, EncoderHead
 
+from quaterion import Quaterion, TrainableModel
+from quaterion.dataset import GroupSimilarityDataLoader, SimilarityGroupDataset
+from quaterion.loss import OnlineContrastiveLoss, SimilarityLoss, TripletLoss
 
 try:
     import torchvision

@@ -1,9 +1,8 @@
 import pytest
-
 import torch
 from quaterion_models import SimilarityModel
-from quaterion_models.heads import EmptyHead
 from quaterion_models.encoders import Encoder
+from quaterion_models.heads import EmptyHead
 
 from quaterion.dataset import SimilarityPairSample
 from quaterion.distances import Distance

@@ -14,7 +14,7 @@ on:
   workflow_dispatch:
   push:
     # Pattern matched against refs/tags
-    tags:        
+    tags:
       - 'v*'           # Push events to every version tag
 
 

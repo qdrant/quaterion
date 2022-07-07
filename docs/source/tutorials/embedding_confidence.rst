@@ -45,4 +45,3 @@ Quaterion provides an ready-to-use Head Layer that implements Feature Groups emb
                 output_size_per_group=128,
                 input_embedding_size=input_embedding_size
             )
-

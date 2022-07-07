@@ -1,10 +1,10 @@
 import random
-from typing import Tuple, Any, Sized, Iterator
+from typing import Any, Iterator, Sized, Tuple
 
 import mmh3
 import torch
 from torch.utils.data import Dataset
-from torch.utils.data.dataset import T_co, IterableDataset
+from torch.utils.data.dataset import IterableDataset, T_co
 
 
 def _hashit(obj: Any, salt):

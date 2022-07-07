@@ -1,12 +1,10 @@
 import pickle
-
 from typing import Hashable, List
 
 import torch
-
-from torch import Tensor
 from quaterion_models.encoders import Encoder
-from quaterion_models.types import TensorInterchange, CollateFnType
+from quaterion_models.types import CollateFnType, TensorInterchange
+from torch import Tensor
 
 from quaterion.train.cache.cache_config import CacheType
 from quaterion.train.cache.cache_encoder import CacheEncoder

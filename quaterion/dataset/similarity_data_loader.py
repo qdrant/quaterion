@@ -4,13 +4,16 @@ import torch
 from torch.utils.data import DataLoader, Dataset, IterableDataset
 from torch.utils.data.dataloader import T_co
 
-from quaterion.dataset.indexing_dataset import (IndexingDataset,
-                                                IndexingIterableDataset)
-from quaterion.dataset.label_cache_dataset import (LabelCacheDataset,
-                                                   LabelCacheIterableDataset,
-                                                   LabelCacheMode)
-from quaterion.dataset.similarity_samples import (SimilarityGroupSample,
-                                                  SimilarityPairSample)
+from quaterion.dataset.indexing_dataset import IndexingDataset, IndexingIterableDataset
+from quaterion.dataset.label_cache_dataset import (
+    LabelCacheDataset,
+    LabelCacheIterableDataset,
+    LabelCacheMode,
+)
+from quaterion.dataset.similarity_samples import (
+    SimilarityGroupSample,
+    SimilarityPairSample,
+)
 
 
 class SimilarityDataLoader(DataLoader, Generic[T_co]):

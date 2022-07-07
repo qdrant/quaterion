@@ -2,8 +2,13 @@ from typing import Any, Dict, Optional, Union
 
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks.progress.rich_progress import (
-    BatchesProcessedColumn, CustomBarColumn, CustomTimeColumn,
-    ProcessingSpeedColumn, RichProgressBar, RichProgressBarTheme)
+    BatchesProcessedColumn,
+    CustomBarColumn,
+    CustomTimeColumn,
+    ProcessingSpeedColumn,
+    RichProgressBar,
+    RichProgressBarTheme,
+)
 from rich.console import RenderableType
 from rich.progress import TextColumn
 from rich.table import Column

@@ -1,5 +1,6 @@
 import argparse
 import os
+
 import torch
 import torch.nn as nn
 import torchvision
@@ -12,6 +13,7 @@ from quaterion import Quaterion
 from quaterion.eval.evaluator import Evaluator
 from quaterion.eval.group import RetrievalRPrecision
 from quaterion.eval.samplers.group_sampler import GroupSampler
+
 from .data import get_datasets
 
 BATCH_SIZE = 32

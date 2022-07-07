@@ -1,20 +1,15 @@
 import os
 import warnings
-
-from typing import (
-    Union,
-    Dict,
-    Optional,
-)
+from typing import Dict, Optional, Union
 
 import pytorch_lightning as pl
 import torch.cuda
-from pytorch_lightning.utilities.warnings import PossibleUserWarning
 from loguru import logger
+from pytorch_lightning.utilities.warnings import PossibleUserWarning
 from quaterion_models.encoders import Encoder
 from torch.utils.data import DataLoader
 
-from quaterion.train.cache.cache_train_collator import CacheTrainCollator
+from quaterion.dataset.label_cache_dataset import LabelCacheMode
 from quaterion.dataset.similarity_data_loader import SimilarityDataLoader
 from quaterion.train.cache import (
     CacheConfig,
@@ -24,7 +19,7 @@ from quaterion.train.cache import (
 )
 from quaterion.train.cache.cache_encoder import CacheMode
 from quaterion.train.cache.cache_model import CacheModel
-from quaterion.dataset.label_cache_dataset import LabelCacheMode
+from quaterion.train.cache.cache_train_collator import CacheTrainCollator
 
 
 class CacheMixin:

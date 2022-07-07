@@ -1,11 +1,11 @@
-from typing import Dict, Sized, Union, Iterable
+from typing import Dict, Iterable, Sized, Union
 
 import torch
-from torch.utils.data import Dataset
 from quaterion_models import SimilarityModel
+from torch.utils.data import Dataset
 
-from quaterion.eval.samplers import BaseSampler
 from quaterion.eval.base_metric import BaseMetric
+from quaterion.eval.samplers import BaseSampler
 
 
 class Evaluator:

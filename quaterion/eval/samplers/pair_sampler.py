@@ -1,14 +1,14 @@
 import random
-from typing import Tuple, Union
 from collections.abc import Sized
+from typing import Tuple, Union
 
 import torch
+from quaterion_models import SimilarityModel
 
+from quaterion.dataset.similarity_data_loader import PairsSimilarityDataLoader
 from quaterion.eval.accumulators import PairAccumulator
 from quaterion.eval.pair import PairMetric
 from quaterion.eval.samplers import BaseSampler
-from quaterion_models import SimilarityModel
-from quaterion.dataset.similarity_data_loader import PairsSimilarityDataLoader
 from quaterion.utils.utils import iter_by_batch
 
 

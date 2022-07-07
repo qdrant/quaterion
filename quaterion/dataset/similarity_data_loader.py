@@ -1,19 +1,18 @@
-from typing import Any, List, Generic, Tuple, Dict, Union
+from typing import Any, Dict, Generic, List, Tuple, Union
 
 import torch
-from torch.utils.data import DataLoader
-from torch.utils.data import Dataset, IterableDataset
+from torch.utils.data import DataLoader, Dataset, IterableDataset
 from torch.utils.data.dataloader import T_co
 
-from quaterion.dataset.indexing_dataset import IndexingIterableDataset, IndexingDataset
-from quaterion.dataset.similarity_samples import (
-    SimilarityPairSample,
-    SimilarityGroupSample,
-)
+from quaterion.dataset.indexing_dataset import IndexingDataset, IndexingIterableDataset
 from quaterion.dataset.label_cache_dataset import (
     LabelCacheDataset,
     LabelCacheIterableDataset,
     LabelCacheMode,
+)
+from quaterion.dataset.similarity_samples import (
+    SimilarityGroupSample,
+    SimilarityPairSample,
 )
 
 

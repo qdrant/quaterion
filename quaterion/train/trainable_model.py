@@ -1,8 +1,8 @@
 from __future__ import annotations
-from typing import Dict, Any, Union, Optional, List
+
+from typing import Any, Dict, List, Optional, Union
 
 import pytorch_lightning as pl
-
 from quaterion_models import SimilarityModel
 from quaterion_models.encoders import Encoder
 from quaterion_models.heads import EncoderHead
@@ -13,10 +13,7 @@ from quaterion.dataset import SimilarityDataLoader
 from quaterion.dataset.train_collator import TrainCollator
 from quaterion.eval.attached_metric import AttachedMetric
 from quaterion.loss import SimilarityLoss
-from quaterion.train.cache import (
-    CacheConfig,
-    CacheType,
-)
+from quaterion.train.cache import CacheConfig, CacheType
 from quaterion.train.cache_mixin import CacheMixin
 from quaterion.utils.enums import TrainStage
 

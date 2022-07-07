@@ -2,6 +2,7 @@ from typing import Optional
 
 import torch
 import torch.nn.functional as F
+
 from quaterion.distances import Distance
 from quaterion.loss.group_loss import GroupLoss
 from quaterion.utils import (

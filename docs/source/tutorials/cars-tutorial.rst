@@ -418,8 +418,8 @@ the current state of the ``SimilarityModel`` instance:
            lr=lr,
            mining=mining,
        )
-       
-       
+
+
        train_dataloader, val_dataloader = get_dataloaders(
            batch_size=batch_size, input_size=input_size, shuffle=shuffle
        )

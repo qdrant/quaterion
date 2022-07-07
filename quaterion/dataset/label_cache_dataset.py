@@ -1,15 +1,18 @@
-import os.path
-
 import dataclasses
+import os.path
 import pickle
 from enum import Enum
-from torch.utils.data import Dataset
-from torch.utils.data.dataset import IterableDataset
 from typing import Sized
 
+from torch.utils.data import Dataset
+from torch.utils.data.dataset import IterableDataset
+
 from quaterion.dataset.indexing_dataset import IndexingDataset, IndexingIterableDataset
-from quaterion.dataset.similarity_samples import SimilarityGroupSample
-from quaterion.dataset.similarity_samples import SimilaritySample, SimilarityPairSample
+from quaterion.dataset.similarity_samples import (
+    SimilarityGroupSample,
+    SimilarityPairSample,
+    SimilaritySample,
+)
 
 
 class LabelCacheMode(Enum):

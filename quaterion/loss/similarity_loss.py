@@ -1,7 +1,8 @@
 from typing import Any, Dict
 
-from quaterion.distances import Distance
 from torch import nn
+
+from quaterion.distances import Distance
 
 
 class SimilarityLoss(nn.Module):

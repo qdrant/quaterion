@@ -1,8 +1,8 @@
 from typing import Sized, Tuple, Union
 
 import torch
-from torch import Tensor
 from quaterion_models import SimilarityModel
+from torch import Tensor
 
 from quaterion.eval.base_metric import BaseMetric
 

@@ -1,13 +1,12 @@
-from typing import Union, Dict, List
+from typing import Dict, List, Union
 
 import pytest
+from quaterion_models.encoders import Encoder
+from quaterion_models.heads import EncoderHead
 from quaterion_models.types import TensorInterchange
 from torch import Tensor
 
 from quaterion.eval.attached_metric import AttachedMetric
-from quaterion_models.encoders import Encoder
-from quaterion_models.heads import EncoderHead
-
 from quaterion.eval.pair import RetrievalPrecision, RetrievalReciprocalRank
 from quaterion.loss import SimilarityLoss
 from quaterion.train.trainable_model import TrainableModel

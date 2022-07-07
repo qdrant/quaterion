@@ -1,13 +1,11 @@
 from typing import Optional
 
 import pytorch_lightning as pl
-from quaterion.dataset import PairsSimilarityDataLoader
-from quaterion.train.cache import (
-    CacheConfig,
-    InMemoryCacheEncoder,
-)
 from quaterion_models.model import DEFAULT_ENCODER_KEY
-from tests.model_fixtures import FakeTrainableModel, FakePairDataset
+
+from quaterion.dataset import PairsSimilarityDataLoader
+from quaterion.train.cache import CacheConfig, InMemoryCacheEncoder
+from tests.model_fixtures import FakePairDataset, FakeTrainableModel
 
 
 class FakeCachableTrainableModel(FakeTrainableModel):

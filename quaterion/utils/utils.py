@@ -1,7 +1,7 @@
-import tqdm
-from typing import Union, Sized, Iterable
+from typing import Iterable, Sized, Union
 
 import torch
+import tqdm
 from torch.utils.data import Dataset
 
 

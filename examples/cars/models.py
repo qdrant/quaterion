@@ -1,8 +1,9 @@
+from typing import Dict, Optional, Union
+
 import torch
 from quaterion_models.encoders import Encoder
 from quaterion_models.heads import EncoderHead, SkipConnectionHead
 from torch import nn
-from typing import Dict, Union, Optional
 
 from quaterion import TrainableModel
 from quaterion.eval.attached_metric import AttachedMetric

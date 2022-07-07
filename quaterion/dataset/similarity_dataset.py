@@ -2,7 +2,7 @@ from typing import Sized
 
 from torch.utils.data import Dataset
 
-from quaterion.dataset import SimilarityGroupSample
+from quaterion.dataset.similarity_samples import SimilarityGroupSample
 
 
 class SimilarityGroupDataset(Dataset[SimilarityGroupSample]):

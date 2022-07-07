@@ -169,10 +169,7 @@ class Quaterion:
                 EarlyStopping(f"{TrainStage.VALIDATION}_loss"),
                 RichModelSummary(max_depth=3),
             ],
-            "accelerator": "auto",
-            "devices": 1,
-            "max_epochs": -1,
-            "enable_model_summary": False,  # We define our custom model summary
+            "accelerator": "auto", "devices": 1, "max_epochs": -1, "enable_model_summary": False,  # We define our custom model summary
         }
 
         # Adjust default parameters according to the dataloader configuration

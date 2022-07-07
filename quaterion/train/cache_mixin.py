@@ -11,8 +11,12 @@ from torch.utils.data import DataLoader
 
 from quaterion.dataset.label_cache_dataset import LabelCacheMode
 from quaterion.dataset.similarity_data_loader import SimilarityDataLoader
-from quaterion.train.cache import (CacheConfig, CacheEncoder, CacheType,
-                                   InMemoryCacheEncoder)
+from quaterion.train.cache import (
+    CacheConfig,
+    CacheEncoder,
+    CacheType,
+    InMemoryCacheEncoder,
+)
 from quaterion.train.cache.cache_encoder import CacheMode
 from quaterion.train.cache.cache_model import CacheModel
 from quaterion.train.cache.cache_train_collator import CacheTrainCollator

@@ -13,7 +13,9 @@ from torch.utils.data import Dataset
 
 from quaterion import Quaterion, TrainableModel
 from quaterion.dataset.similarity_data_loader import (
-    GroupSimilarityDataLoader, SimilarityGroupSample)
+    GroupSimilarityDataLoader,
+    SimilarityGroupSample,
+)
 from quaterion.loss import SimilarityLoss, SoftmaxLoss
 
 try:

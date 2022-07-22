@@ -1,3 +1,5 @@
+import copy
+import re
 from typing import Dict, List, Union
 
 import pytest
@@ -104,3 +106,23 @@ def test_attached_metric():
 
     with pytest.raises(AttributeError):
         getattr(metric, "non_existent_method")
+
+
+def test_lookup():
+    metric = AttachedMetric("DummyMetric", RetrievalPrecision())
+    metric_copy = copy.copy(metric)
+    metric_deepcopy = copy.deepcopy(metric)
+
+    assert metric_copy.k == metric.k
+    assert metric_deepcopy.k == metric.k
+
+    assert metric_copy.log_options == metric.log_options
+    assert metric_deepcopy.log_options == metric.log_options
+
+    with pytest.raises(
+        AttributeError,
+        match=re.escape(
+            f"`AttachedMetric` object (<{metric.name}>) has no attribute <non_existing_attr>"
+        ),
+    ):
+        _ = metric.non_existing_attr

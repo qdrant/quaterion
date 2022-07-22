@@ -44,7 +44,7 @@ class AttachedMetric:
         }
 
     def __getattr__(self, item: str):
-        prevent_lookup = {'_metric', 'name'}
+        prevent_lookup = {"_metric", "name"}
         if item in prevent_lookup:
             raise AttributeError(
                 "Prevents recursion. "

@@ -1,6 +1,6 @@
+import copy
 import re
 from typing import Dict, List, Union
-import copy
 
 import pytest
 from quaterion_models.encoders import Encoder
@@ -109,10 +109,7 @@ def test_attached_metric():
 
 
 def test_lookup():
-    metric = AttachedMetric(
-        "DummyMetric",
-        RetrievalPrecision()
-    )
+    metric = AttachedMetric("DummyMetric", RetrievalPrecision())
     metric_copy = copy.copy(metric)
     metric_deepcopy = copy.deepcopy(metric)
 
@@ -122,5 +119,10 @@ def test_lookup():
     assert metric_copy.log_options == metric.log_options
     assert metric_deepcopy.log_options == metric.log_options
 
-    with pytest.raises(AttributeError, match=re.escape(f'`AttachedMetric` object (<{metric.name}>) has no attribute <non_existing_attr>')):
+    with pytest.raises(
+        AttributeError,
+        match=re.escape(
+            f"`AttachedMetric` object (<{metric.name}>) has no attribute <non_existing_attr>"
+        ),
+    ):
         _ = metric.non_existing_attr

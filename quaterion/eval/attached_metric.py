@@ -44,9 +44,16 @@ class AttachedMetric:
         }
 
     def __getattr__(self, item: str):
+        prevent_lookup = {'_metric', 'name'}
+        if item in prevent_lookup:
+            raise AttributeError(
+                "Prevents recursion. "
+                "Tried to access the field which has to be presented in an initialized instance."
+            )
+
         try:
             return getattr(self._metric, item)
         except AttributeError as ae:
             raise AttributeError(
-                f"`AttachedMetric` object (<{self.name}>) has no attribute {item}"
+                f"`AttachedMetric` object (<{self.name}>) has no attribute <{item}>"
             ) from ae

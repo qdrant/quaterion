@@ -142,3 +142,6 @@ lightning_logs/
 
 # pkl files
 *.pkl
+
+# dataset and model downloads
+torchvision/

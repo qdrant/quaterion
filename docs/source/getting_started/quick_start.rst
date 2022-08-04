@@ -119,12 +119,16 @@ Wrap your dataset into one of the SimilarityDataLoader implementations
 to make it compatible with similarity learning:
 
 .. code:: python
+
     import json
+    
     from torch.utils.data import Dataset
+    
     from quaterion.dataset.similarity_data_loader import (
-    GroupSimilarityDataLoader,
-    SimilarityGroupSample,
+      GroupSimilarityDataLoader,
+      SimilarityGroupSample,
     )
+    
    # Consumes data in format:
    # {"description": "the thing I use for soup", "label": "spoon"}
    class JsonDataset(Dataset):
@@ -183,6 +187,7 @@ function.
 Let’s define our simple encoder:
 
 .. code:: python
+
     from os.path import join
     from os import makedirs
     from typing import Any, Dict, List, Union
@@ -312,6 +317,8 @@ recommend overriding the default trainer parameters:
 
 .. code:: python
 
+   import pytorch_lightning as pl
+   
    trainer_kwargs = Quaterion.trainer_defaults()
    trainer_kwargs['min_epochs'] = 10
    trainer_kwargs['callbacks'].append(YourCustomCallback())

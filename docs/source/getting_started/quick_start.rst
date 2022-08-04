@@ -120,6 +120,15 @@ to make it compatible with similarity learning:
 
 .. code:: python
 
+    import json
+
+    from torch.utils.data import Dataset
+
+    from quaterion.dataset.similarity_data_loader import (
+      GroupSimilarityDataLoader,
+      SimilarityGroupSample,
+    )
+
    # Consumes data in format:
    # {"description": "the thing I use for soup", "label": "spoon"}
    class JsonDataset(Dataset):
@@ -179,8 +188,22 @@ Let’s define our simple encoder:
 
 .. code:: python
 
-   class DescriptionEncoder(Encoder):
-       def __init__(self, transformer: models.Transformer, pooling: models.Pooling):
+    from os.path import join
+    from os import makedirs
+    from typing import Any, Dict, List, Union
+
+    from sentence_transformers import SentenceTransformer
+    from sentence_transformers.models import Transformer, Pooling
+
+    import torch.nn as nn
+    from torch import Tensor
+
+    from quaterion_models.heads import EncoderHead, SkipConnectionHead
+    from quaterion_models.encoders import Encoder
+    from quaterion_models.types import CollateFnType
+
+    class DescriptionEncoder(Encoder):
+       def __init__(self, transformer: Transformer, pooling: Pooling):
            super().__init__()
            self.transformer = transformer
            self.pooling = pooling
@@ -204,9 +227,23 @@ Let’s define our simple encoder:
        def get_collate_fn(self) -> CollateFnType:
            return self.collate_descriptions
 
-       def save(self, output_path: str):
-           self.transformer.save(join(output_path, 'transformer'))
-           self.pooling.save(join(output_path, 'pooling'))
+        @staticmethod
+        def _pooling_path(path: str) -> str:
+            return join(path, "pooling")
+
+        @staticmethod
+        def _transformer_path(path: str) -> str:
+            return join(path, "transformer")
+
+        def save(self, output_path: str):
+            transformer_path = self._transformer_path(output_path)
+            makedirs(transformer_path, exist_ok=True)
+
+            pooling_path = self._pooling_path(output_path)
+            makedirs(pooling_path, exist_ok=True)
+
+            self.transformer.save(transformer_path)
+            self.pooling.save(pooling_path)
 
        @classmethod
        def load(cls, input_path: str) -> Encoder:
@@ -229,7 +266,12 @@ of ``SimilarityModel`` as well as parameters for training.
 
 .. code:: python
 
-   class Model(TrainableModel):
+    from quaterion.loss import SimilarityLoss, TripletLoss
+    from quaterion import Quaterion, TrainableModel
+
+    from torch.optim import Adam
+
+    class Model(TrainableModel):
        def __init__(self, lr: float):
            self._lr = lr
            super().__init__()
@@ -246,7 +288,7 @@ of ``SimilarityModel`` as well as parameters for training.
            return TripletLoss()
 
        def configure_optimizers(self):
-           return torch.optim.Adam( self.model.parameters(), lr=self._lr)
+           return Adam(self.model.parameters(), lr=self._lr)
 
 ``TrainableModel`` is a descendant of
 `pl.LightningModule <https://pytorch-lightning.readthedocs.io/en/latest/common/lightning_module.html>`_
@@ -274,6 +316,8 @@ likely need to change the training parameters, in which case we
 recommend overriding the default trainer parameters:
 
 .. code:: python
+
+   import pytorch_lightning as pl
 
    trainer_kwargs = Quaterion.trainer_defaults()
    trainer_kwargs['min_epochs'] = 10

@@ -15,6 +15,7 @@ from quaterion.eval.attached_metric import AttachedMetric
 from quaterion.loss import SimilarityLoss
 from quaterion.train.cache import CacheConfig, CacheType
 from quaterion.train.cache_mixin import CacheMixin
+from quaterion.xbm import XbmConfig, XbmBuffer
 from quaterion.utils.enums import TrainStage
 
 
@@ -196,7 +197,7 @@ class TrainableModel(pl.LightningModule, CacheMixin):
 
         `Do not use cache (default)`::
 
-            return None
+           < return None
 
         `Configure cache automatically for all non-trainable encoders`::
 
@@ -238,6 +239,22 @@ class TrainableModel(pl.LightningModule, CacheMixin):
             a model
         """
         raise NotImplementedError()
+
+    def configure_xbm(self) -> XbmConfig:
+        """Method to enable and configure Cross-Batch Memory (XBM).
+
+        XBM is a method relies on the idea of "slow drift" of embeddings in the course
+        of training. It keeps recent `N` embeddings and target values in a ring buffer
+        where `N` is much greater than the batch size. Then, it calculates a scaled loss
+        with the values in this buffer and adds it to the regular loss. This enables to mine
+        a large number of hard negatives.
+
+        See the paper for more details: https://arxiv.org/pdf/1912.06798.pdf
+
+        To enable it in a training process, you must return an instance of :class:`~quaterion.xbm.xbm_config.XbmConfig`.
+        The default return value is `None`, i.e., no XBM applied.
+        """
+        pass
 
     def process_results(
         self,

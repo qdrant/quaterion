@@ -15,8 +15,8 @@ from quaterion.eval.attached_metric import AttachedMetric
 from quaterion.loss import SimilarityLoss
 from quaterion.train.cache import CacheConfig, CacheType
 from quaterion.train.cache_mixin import CacheMixin
+from quaterion.train.xbm import XbmBuffer, XbmConfig
 from quaterion.utils.enums import TrainStage
-from quaterion.xbm import XbmBuffer, XbmConfig
 
 
 class TrainableModel(pl.LightningModule, CacheMixin):
@@ -251,7 +251,7 @@ class TrainableModel(pl.LightningModule, CacheMixin):
 
         See the paper for more details: https://arxiv.org/pdf/1912.06798.pdf
 
-        To enable it in a training process, you must return an instance of :class:`~quaterion.xbm.xbm_config.XbmConfig`.
+        To enable it in a training process, you must return an instance of :class:`~quaterion.train.xbm.xbm_config.XbmConfig`.
         The default return value is `None`, i.e., no XBM applied.
         """
         pass

@@ -15,8 +15,8 @@ from quaterion.eval.attached_metric import AttachedMetric
 from quaterion.loss import SimilarityLoss
 from quaterion.train.cache import CacheConfig, CacheType
 from quaterion.train.cache_mixin import CacheMixin
-from quaterion.xbm import XbmConfig, XbmBuffer
 from quaterion.utils.enums import TrainStage
+from quaterion.xbm import XbmBuffer, XbmConfig
 
 
 class TrainableModel(pl.LightningModule, CacheMixin):

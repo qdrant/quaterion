@@ -1,8 +1,9 @@
 from typing import Tuple
-from .xbm_config import XbmConfig
 
 import torch
 from torch import FloatTensor, LongTensor
+
+from .xbm_config import XbmConfig
 
 
 class XbmBuffer:

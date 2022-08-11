@@ -42,7 +42,7 @@ class SoftmaxLoss(GroupLoss):
             groups: shape: (batch_size,) - Group ids, associated with embeddings
             memory_embeddings: shape: (memory_buffer_size, vector_length) - Embeddings stored
                 in a ring buffer. Used only for XBM
-            memory_groups: (memory_buffer_size,) - Groups ids associated with `memory_embeddings`.
+            memory_groups: shape: (memory_buffer_size,) - Groups ids associated with `memory_embeddings`.
                 Used only for XBM
 
         Returns:

@@ -2,6 +2,7 @@ from typing import Optional
 
 import torch
 import torch.nn.functional as F
+from torch import Tensor, LongTensor
 
 from quaterion.distances import Distance
 from quaterion.loss.group_loss import GroupLoss
@@ -55,17 +56,30 @@ class TripletLoss(GroupLoss):
         return config
 
     def forward(
-        self, embeddings: torch.Tensor, groups: torch.LongTensor
-    ) -> torch.Tensor:
+        self,
+        embeddings: Tensor,
+        groups: LongTensor,
+        memory_embeddings: Optional[Tensor] = None,
+        memory_groups: Optional[LongTensor] = None,
+    ) -> Tensor:
         """Calculates Triplet Loss with specified embeddings and labels.
 
         Args:
-            embeddings (torch.Tensor): Batch of embeddings. Shape: (batch_size, embedding_dim)
-            groups (torch.LongTensor): Batch of labels associated with `embeddings`. Shape: (batch_size,)
+            embeddings: shape: (batch_size, vector_length) - Batch of embeddings.
+            groups: shape: (batch_size,) - Batch of labels associated with `embeddings`
+            memory_embeddings: shape: (memory_buffer_size, vector_length) - Embeddings stored
+                in a ring buffer. Used only for XBM
+            memory_groups: shape: (memory_buffer_size,) - Groups ids associated with `memory_embeddings`.
+                Used only for XBM
 
         Returns:
             torch.Tensor: Scalar loss value.
         """
+        if memory_embeddings is not None or memory_groups is not None:
+            return self._compute_xbm_loss(
+                embeddings, groups, memory_embeddings, memory_groups
+            )
+
         # Shape: (batch_size, batch_size)
         dists = self.distance_metric.distance_matrix(embeddings)
 

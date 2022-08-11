@@ -1,6 +1,7 @@
 from typing import Optional
 
 import torch
+from torch import LongTensor, Tensor
 import torch.nn.functional as F
 
 from quaterion.distances import Distance
@@ -62,14 +63,21 @@ class OnlineContrastiveLoss(GroupLoss):
         return config
 
     def forward(
-        self, embeddings: torch.Tensor, groups: torch.LongTensor
-    ) -> torch.Tensor:
+        self,
+        embeddings: Tensor,
+        groups: LongTensor,
+        memory_embeddings: Optional[Tensor] = None,
+        memory_groups: Optional[LongTensor] = None,
+    ) -> Tensor:
         """Calculates Contrastive Loss by making pairs on-the-fly.
 
         Args:
-            embeddings (torch.Tensor): Batch of embeddings. Shape: (batch_size, embedding_dim)
-            groups (torch.LongTensor): Batch of labels associated with `embeddings`.
-                Shape: (batch_size,)
+            embeddings: Shape: (batch_size, vector_length) - Batch of embeddings
+            groups shape: (batch_size,) Batch of labels associated with `embeddings`
+            memory_embeddings: shape: (memory_buffer_size, vector_length) - Embeddings stored
+                in a ring buffer. Used only for XBM
+            memory_groups: shape: (memory_buffer_size,) - Groups ids associated with `memory_embeddings`.
+                Used only for XBM
 
         Returns:
             torch.Tensor: Scalar loss value.

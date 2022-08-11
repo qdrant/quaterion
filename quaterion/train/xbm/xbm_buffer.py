@@ -15,16 +15,16 @@ class XbmBuffer:
         config: Config class to configure XBM settings.
     """
 
-    def __init__(self, config: XbmConfig):
+    def __init__(self, config: XbmConfig, embedding_size: int):
         if config.device == XbmDevice.AUTO:
             device = "cuda" if torch.cuda.is_available() else "cpu"
         else:
             device = config.device
-
+            
         self._cfg = config
 
         self._embeddings = torch.zeros(
-            (self._cfg.buffer_size, self._cfg.embedding_size)
+            (self._cfg.buffer_size, embedding_size)
         ).to(device)
         self._targets = torch.zeros(self._cfg.buffer_size, dtype=torch.long).to(device)
         self._pointer = 0

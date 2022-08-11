@@ -24,8 +24,6 @@ class XbmConfig:
     :meth:`~quaterion.train.trainable_model.TrainableModel.configure_xbm`
     """
 
-    embedding_size: int
-    """Dimensionality of embeddings outputted by the encoder"""
 
     weight: Optional[float] = 1.0
     """Value to scale the buffer loss before adding it to the final loss"""

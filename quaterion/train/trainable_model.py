@@ -12,7 +12,7 @@ from torch import Tensor
 from quaterion.dataset import SimilarityDataLoader
 from quaterion.dataset.train_collator import TrainCollator
 from quaterion.eval.attached_metric import AttachedMetric
-from quaterion.loss import SimilarityLoss
+from quaterion.loss import GroupLoss, SimilarityLoss
 from quaterion.train.cache import CacheConfig, CacheType
 from quaterion.train.cache_mixin import CacheMixin
 from quaterion.train.xbm import XbmConfig
@@ -96,11 +96,8 @@ class TrainableModel(pl.LightningModule, CacheMixin):
         self._loss = self.configure_loss()
 
         self._xbm_config = self.configure_xbm()
-        self._enable_xbm: bool = (
-            self._xbm_config is not None
-        )  # enable xbm only if a XbmConfig is returned
-        if self._enable_xbm:
-            self._xbm_buffer = XbmBuffer(self._xbm_config)
+        if self._xbm_config is not None:
+            self._xbm_buffer = XbmBuffer(XbmConfig, embedding_size=head.output_size)
 
     def configure_metrics(self) -> Union[AttachedMetric, List[AttachedMetric]]:
         """Method to configure batch-wise metrics for a training process
@@ -205,7 +202,7 @@ class TrainableModel(pl.LightningModule, CacheMixin):
 
         `Do not use cache (default)`::
 
-           < return None
+            return None
 
         `Configure cache automatically for all non-trainable encoders`::
 
@@ -345,19 +342,7 @@ class TrainableModel(pl.LightningModule, CacheMixin):
 
         embeddings = self.model(features)
         loss = self.loss(embeddings=embeddings, **targets)
-
-        if (
-            stage == TrainStage.TRAIN
-            and self._enable_xbm
-            and self.trainer.global_step > self._xbm_config.start_iteration
-        ):
-            self._xbm_buffer.queue(embeddings.detach(), targets["groups"].detach())
-
-            memory_embeddings, memory_groups = self._xbm_buffer.get()
-            memory_loss = self.loss(
-                embeddings, targets["groups"], memory_embeddings, memory_groups
-            )
-            loss = loss + self._xbm_config.weight * memory_loss
+        loss = self._maybe_compute_xbm_loss(stage, loss, embeddings, targets)
 
         self.log(f"{stage}_loss", loss, batch_size=embeddings.shape[0])
 
@@ -374,6 +359,33 @@ class TrainableModel(pl.LightningModule, CacheMixin):
             stage=stage,
             **kwargs,
         )
+
+        return loss
+
+    def _maybe_compute_xbm_loss(
+        self,
+        stage: TrainStage,
+        loss: Tensor,
+        embeddings: Tensor,
+        targets: Dict[str, Any],
+    ) -> Tensor:
+        if (
+            stage == TrainStage.TRAIN
+            and self._xbm_config is not None
+            and self.trainer.global_step > self._xbm_config.start_iteration
+        ):
+            if not isinstance(self.loss, GroupLoss):
+                raise NotImplementedError(
+                    "XBM is currently supported only with GroupLoss instances"
+                )
+
+            self._xbm_buffer.queue(embeddings.detach(), targets["groups"].detach())
+
+            memory_embeddings, memory_groups = self._xbm_buffer.get()
+            memory_loss = self.loss(
+                embeddings, targets["groups"], memory_embeddings, memory_groups
+            )
+            loss = loss + self._xbm_config.weight * memory_loss
 
         return loss
 

@@ -207,7 +207,7 @@ class TripletLoss(GroupLoss):
                 loss.append(pos_loss + neg_loss)
             else:
                 loss.append(0)
-        
+
         loss = sum(loss) / batch_size
 
         return loss

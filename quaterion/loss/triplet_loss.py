@@ -2,7 +2,7 @@ from typing import Optional
 
 import torch
 import torch.nn.functional as F
-from torch import Tensor, LongTensor
+from torch import LongTensor, Tensor
 
 from quaterion.distances import Distance
 from quaterion.loss.group_loss import GroupLoss

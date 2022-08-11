@@ -2,7 +2,7 @@ from typing import Optional
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch import Tensor, LongTensor
+from torch import LongTensor, Tensor
 
 from quaterion.loss.group_loss import GroupLoss
 
@@ -53,10 +53,10 @@ class ArcFaceLoss(GroupLoss):
             embeddings: shape: (batch_size, vector_length) - Output embeddings from the
                 encoder.
             groups: shape: (batch_size,) - Group ids associated with embeddings.
-            memory_embeddings: shape: (memory_buffer_size, vector_length). Embeddings stored
-                in a ring buffer. Used only for XBM.
-            memory_groups: (memory_buffer_size,). Groups ids associated with `memory_embeddings`.
-                Used only for XBM.
+            memory_embeddings: shape: (memory_buffer_size, vector_length) - Embeddings stored
+                in a ring buffer. Used only for XBM
+            memory_groups: (memory_buffer_size,) - Groups ids associated with `memory_embeddings`.
+                Used only for XBM
 
         Returns:
             Tensor: loss value.

@@ -82,6 +82,11 @@ class OnlineContrastiveLoss(GroupLoss):
         Returns:
             torch.Tensor: Scalar loss value.
         """
+        if memory_embeddings is not None or memory_groups is not None:
+            return self._compute_xbm_loss(
+                embeddings, groups, memory_embeddings, memory_groups
+            )
+
         # Shape: (batch_size, batch_size)
         dists = self.distance_metric.distance_matrix(embeddings)
 

@@ -15,7 +15,8 @@ from quaterion.eval.attached_metric import AttachedMetric
 from quaterion.loss import SimilarityLoss
 from quaterion.train.cache import CacheConfig, CacheType
 from quaterion.train.cache_mixin import CacheMixin
-from quaterion.train.xbm import XbmBuffer, XbmConfig
+from quaterion.train.xbm import XbmConfig
+from quaterion.train.xbm.xbm_buffer import XbmBuffer
 from quaterion.utils.enums import TrainStage
 
 
@@ -93,6 +94,13 @@ class TrainableModel(pl.LightningModule, CacheMixin):
 
         self._model = SimilarityModel(encoders=encoders, head=head)
         self._loss = self.configure_loss()
+
+        self._xbm_config = self.configure_xbm()
+        self._enable_xbm: bool = (
+            self._xbm_config is not None
+        )  # enable xbm only if a XbmConfig is returned
+        if self._enable_xbm:
+            self._xbm_buffer = XbmBuffer(self._xbm_config)
 
     def configure_metrics(self) -> Union[AttachedMetric, List[AttachedMetric]]:
         """Method to configure batch-wise metrics for a training process
@@ -337,6 +345,20 @@ class TrainableModel(pl.LightningModule, CacheMixin):
 
         embeddings = self.model(features)
         loss = self.loss(embeddings=embeddings, **targets)
+
+        if (
+            stage == TrainStage.TRAIN
+            and self._enable_xbm
+            and self.trainer.global_step > self._xbm_config.start_iteration
+        ):
+            self._xbm_buffer.queue(embeddings.detach(), targets["groups"].detach())
+
+            memory_embeddings, memory_groups = self._xbm_buffer.get()
+            memory_loss = self.loss(
+                embeddings, targets["groups"], memory_embeddings, memory_groups
+            )
+            loss = loss + self._xbm_config.weight * memory_loss
+
         self.log(f"{stage}_loss", loss, batch_size=embeddings.shape[0])
 
         self._evaluate(

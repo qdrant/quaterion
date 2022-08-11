@@ -28,6 +28,16 @@ class TestTripletLoss:
         loss = TripletLoss(mining="hard")
 
         loss_res = loss.forward(embeddings=self.embeddings, groups=self.groups)
-        print(loss_res)
 
         assert loss_res.shape == torch.Size([])
+
+    def test_xbm(self):
+        loss = TripletLoss(mining="hard")
+        memory_embeddings = torch.rand(size=(100, 3), dtype=torch.float)
+        memory_groups = torch.randint(low=1, high=10, size=(100,), dtype=torch.long)
+        regular_loss = loss.forward(self.embeddings, self.groups)
+        xbm_loss = loss.forward(
+            self.embeddings, self.groups, memory_embeddings, memory_groups
+        )
+
+        assert regular_loss.shape == xbm_loss.shape and regular_loss != xbm_loss

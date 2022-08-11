@@ -24,9 +24,9 @@ class XbmBuffer:
         self._cfg = config
 
         self._embeddings = torch.zeros(
-            self._cfg.buffer_size, self._cfg.embedding_size
+            (self._cfg.buffer_size, self._cfg.embedding_size)
         ).to(device)
-        self._targets = torch.zeros(self._cfg.buffer_size, torch.long).to(device)
+        self._targets = torch.zeros(self._cfg.buffer_size, dtype=torch.long).to(device)
         self._pointer = 0
         self._is_full = False
 

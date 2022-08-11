@@ -172,6 +172,7 @@ class TripletLoss(GroupLoss):
         pos_mask = groups.expand(
             memory_groups.shape[0], batch_size
         ).t() == memory_groups.expand(batch_size, memory_groups.shape[0])
+        pos_mask = pos_mask.float()
         neg_mask = 1 - pos_mask
         pos_mask[:, :batch_size] = pos_mask[:, :batch_size] - eyes_
 

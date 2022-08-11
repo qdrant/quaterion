@@ -51,9 +51,9 @@ class GroupLoss(SimilarityLoss):
             embeddings: shape: (batch_size, vector_length) - Output embeddings from the
                 encoder.
             groups: shape: (batch_size,) - Group ids associated with embeddings.
-            memory_embeddings: shape: (memory_buffer_size, vector_length). Embeddings stored
-                in a ring buffer.
-            memory_groups: (memory_buffer_size,). Groups ids associated with `memory_embeddings`.
+            memory_embeddings: shape: (memory_buffer_size, vector_length) - Embeddings stored
+                in a ring buffer
+            memory_groups: shape: (memory_buffer_size,) - Groups ids associated with `memory_embeddings`
 
         Returns:
             Tensor: zero-size tensor, XBM loss value.

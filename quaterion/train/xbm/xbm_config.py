@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Optional
 
+
 class XbmDevice(str, Enum):
     """Device selection for placement of the buffer"""
 

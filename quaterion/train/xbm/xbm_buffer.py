@@ -1,7 +1,7 @@
 from typing import Tuple
 
 import torch
-from torch import Tensor, LongTensor
+from torch import LongTensor, Tensor
 
 from .xbm_config import XbmConfig, XbmDevice
 

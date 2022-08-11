@@ -1,4 +1,5 @@
 from typing import Optional
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -26,7 +27,13 @@ class SoftmaxLoss(GroupLoss):
         self.kernel = nn.Parameter(torch.FloatTensor(embedding_size, num_groups))
         nn.init.normal_(self.kernel, std=0.01)
 
-    def forward(self, embeddings: Tensor, groups: LongTensor, memory_embeddings: Optional[Tensor] = None, memory_groups: Optional[LongTensor] = None) -> Tensor:
+    def forward(
+        self,
+        embeddings: Tensor,
+        groups: LongTensor,
+        memory_embeddings: Optional[Tensor] = None,
+        memory_groups: Optional[LongTensor] = None,
+    ) -> Tensor:
         """Compute loss value.
 
         Args:
@@ -42,8 +49,10 @@ class SoftmaxLoss(GroupLoss):
             Tensor: zero-size tensor, loss value
         """
         if memory_embeddings is not None or memory_groups is not None:
-            return self._compute_xbm_loss(embeddings, groups, memory_embeddings, memory_groups)
-            
+            return self._compute_xbm_loss(
+                embeddings, groups, memory_embeddings, memory_groups
+            )
+
         # shape: (batch_size, num_groups)
         logits = torch.mm(embeddings, self.kernel) / self.temperature
 

@@ -1,4 +1,5 @@
 from typing import Optional
+
 from torch import LongTensor, Tensor
 
 from quaterion.distances import Distance
@@ -38,7 +39,11 @@ class GroupLoss(SimilarityLoss):
         raise NotImplementedError()
 
     def _compute_xbm_loss(
-        self, embeddings: Tensor, groups: LongTensor, memory_embeddings: Tensor, memory_groups: LongTensor
+        self,
+        embeddings: Tensor,
+        groups: LongTensor,
+        memory_embeddings: Tensor,
+        memory_groups: LongTensor,
     ) -> Tensor:
         """Implement XBM loss computation for this loss.
 

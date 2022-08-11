@@ -1,8 +1,8 @@
 from typing import Optional
 
 import torch
-from torch import LongTensor, Tensor
 import torch.nn.functional as F
+from torch import LongTensor, Tensor
 
 from quaterion.distances import Distance
 from quaterion.loss.group_loss import GroupLoss

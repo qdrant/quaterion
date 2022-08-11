@@ -1,4 +1,5 @@
 from typing import Optional
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -46,7 +47,13 @@ class ArcFaceLoss(GroupLoss):
         self.scale = scale
         self.margin = margin
 
-    def forward(self, embeddings: Tensor, groups: LongTensor, memory_embeddings: Optional[Tensor] = None, memory_groups: Optional[LongTensor] = None) -> Tensor:
+    def forward(
+        self,
+        embeddings: Tensor,
+        groups: LongTensor,
+        memory_embeddings: Optional[Tensor] = None,
+        memory_groups: Optional[LongTensor] = None,
+    ) -> Tensor:
         """Compute loss value
 
         Args:
@@ -62,7 +69,9 @@ class ArcFaceLoss(GroupLoss):
             Tensor: loss value.
         """
         if memory_embeddings is not None or memory_groups is not None:
-            return self._compute_xbm_loss(embeddings, groups, memory_embeddings, memory_groups)
+            return self._compute_xbm_loss(
+                embeddings, groups, memory_embeddings, memory_groups
+            )
 
         embeddings = l2_norm(embeddings, 1)
         kernel_norm = l2_norm(self.kernel, 0)

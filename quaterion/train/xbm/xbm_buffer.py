@@ -1,9 +1,9 @@
 from typing import Tuple
 
 import torch
-from torch import FloatTensor, LongTensor
+from torch import Tensor, LongTensor
 
-from .xbm_config import XbmConfig
+from .xbm_config import XbmConfig, XbmDevice
 
 
 class XbmBuffer:
@@ -16,9 +16,17 @@ class XbmBuffer:
     """
 
     def __init__(self, config: XbmConfig):
+        if config.device == XbmDevice.AUTO:
+            device = "cuda" if torch.cuda.is_available() else "cpu"
+        else:
+            device = config.device
+
         self._cfg = config
-        self._embeddings = torch.zeros(self._cfg.buffer_size, self._cfg.embedding_size)
-        self._targets = torch.zeros(self._cfg.buffer_size, torch.long)
+
+        self._embeddings = torch.zeros(
+            self._cfg.buffer_size, self._cfg.embedding_size
+        ).to(device)
+        self._targets = torch.zeros(self._cfg.buffer_size, torch.long).to(device)
         self._pointer = 0
         self._is_full = False
 
@@ -26,13 +34,13 @@ class XbmBuffer:
     def is_full(self) -> bool:
         return self._is_full
 
-    def get(self) -> Tuple[FloatTensor, LongTensor]:
+    def get(self) -> Tuple[Tensor, LongTensor]:
         if self.is_full:
             return self._embeddings, self._targets
         else:
             return self._embeddings[: self._pointer], self._targets[: self._pointer]
 
-    def queue(self, embeddings: FloatTensor, targets: LongTensor) -> None:
+    def queue(self, embeddings: Tensor, targets: LongTensor) -> None:
         """Queue batch embeddings and targets in the buffer.
 
         Args:

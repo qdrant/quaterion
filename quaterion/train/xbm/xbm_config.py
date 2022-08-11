@@ -1,5 +1,18 @@
 from dataclasses import dataclass
+from enum import Enum
 from typing import Optional
+
+class XbmDevice(str, Enum):
+    """Device selection for placement of the buffer"""
+
+    CPU = "cpu"
+    """Buffer created in CPU"""
+
+    CUDA = "cuda"
+    """Buffer created in GPU"""
+
+    AUTO = "auto"
+    """Buffer created in GPU if available. In CPU, otherwise."""
 
 
 @dataclass
@@ -21,3 +34,6 @@ class XbmConfig:
 
     start_iteration: Optional[int] = 1000
     """Iteration sttep to start considering the buffer loss"""
+
+    device: Optional[XbmDevice] = XbmDevice.AUTO
+    """Placement of the buffer"""

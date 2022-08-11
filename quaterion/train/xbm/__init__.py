@@ -1,2 +1,2 @@
 from .xbm_buffer import XbmBuffer
-from .xbm_config import XbmConfig
+from .xbm_config import XbmConfig, XbmDevice

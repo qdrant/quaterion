@@ -163,7 +163,7 @@ class TripletLoss(GroupLoss):
 
         # Compute similarity matrix
         # shape: (batch_size, memory_buffer_size)
-        sim_mat = torch.matmul(embeddings, memory_embeddings.t())
+        sim_mat = self.distance_metric.similarity_matrix(embeddings, memory_embeddings)
 
         # split the positive and negative pairs
         # shape: (batch_size, batch_size)

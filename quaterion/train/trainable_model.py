@@ -258,6 +258,9 @@ class TrainableModel(pl.LightningModule, CacheMixin):
 
         To enable it in a training process, you must return an instance of :class:`~quaterion.train.xbm.xbm_config.XbmConfig`.
         The default return value is `None`, i.e., no XBM applied.
+
+        Note:
+            XBM is currently supported only with :class:`~quaterion.loss.group_loss.GroupLoss` instances.
         """
         pass
 

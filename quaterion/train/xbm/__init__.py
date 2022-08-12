@@ -1,1 +1,1 @@
-from .xbm_config import XbmConfig, XbmDevice
+from quaterion.train.xbm.xbm_config import XbmConfig, XbmDevice

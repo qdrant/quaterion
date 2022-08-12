@@ -31,7 +31,7 @@ class XbmConfig:
     """Size of the memory buffer that holds embeddings from previous batches"""
 
     start_iteration: Optional[int] = 1000
-    """Iteration sttep to start considering the buffer loss"""
+    """Iteration step to start considering the buffer loss"""
 
     device: Optional[XbmDevice] = XbmDevice.AUTO
     """Placement of the buffer"""

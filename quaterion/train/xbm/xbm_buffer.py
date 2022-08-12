@@ -3,7 +3,7 @@ from typing import Tuple
 import torch
 from torch import LongTensor, Tensor
 
-from .xbm_config import XbmConfig, XbmDevice
+from quaterion.train.xbm.xbm_config import XbmConfig, XbmDevice
 
 
 class XbmBuffer:

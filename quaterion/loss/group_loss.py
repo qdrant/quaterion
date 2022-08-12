@@ -58,4 +58,6 @@ class GroupLoss(SimilarityLoss):
         Returns:
             Tensor: zero-size tensor, XBM loss value.
         """
-        raise NotImplementedError(f"XBM is not implemented for {self.__class__.name}")
+        raise NotImplementedError(
+            f"XBM is not implemented for {self.__class__.__name__}"
+        )

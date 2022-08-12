@@ -75,7 +75,7 @@ class TripletLoss(GroupLoss):
         Returns:
             torch.Tensor: Scalar loss value.
         """
-        if memory_embeddings is not None or memory_groups is not None:
+        if memory_embeddings is not None and memory_groups is not None:
             return self._compute_xbm_loss(
                 embeddings, groups, memory_embeddings, memory_groups
             )

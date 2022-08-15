@@ -97,7 +97,9 @@ class TrainableModel(pl.LightningModule, CacheMixin):
 
         self._xbm_config = self.configure_xbm()
         if self._xbm_config is not None:
-            self._xbm_buffer = XbmBuffer(XbmConfig, embedding_size=head.output_size)
+            self._xbm_buffer = XbmBuffer(
+                self._xbm_config, embedding_size=head.output_size
+            )
 
     def configure_metrics(self) -> Union[AttachedMetric, List[AttachedMetric]]:
         """Method to configure batch-wise metrics for a training process

@@ -86,7 +86,7 @@ class Model(TrainableModel):
         return TripletLoss(mining=self._mining)
 
     def configure_xbm(self) -> XbmConfig:
-        return XbmConfig(weight=0.1)
+        return XbmConfig(weight=0.1, start_iteration=500)
 
     def configure_metrics(self) -> Union[AttachedMetric, List[AttachedMetric]]:
         return AttachedMetric(
@@ -94,7 +94,9 @@ class Model(TrainableModel):
         )
 
     def configure_optimizers(self):
-        optimizer = torch.optim.Adam(self.model.parameters(), self._lr)
+        optimizer = torch.optim.Adam(
+            self.model.parameters(), self._lr, weight_decay=0.0005
+        )
         return optimizer
 
 

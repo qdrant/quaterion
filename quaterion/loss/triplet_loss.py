@@ -195,7 +195,7 @@ class TripletLoss(GroupLoss):
                 pos_pair = pos_pair_[select_pos_pair_idx]
 
                 select_neg_pair_idx = torch.nonzero(
-                    neg_pair_ > max(0.6, pos_pair_[-1]) - self._margin
+                    neg_pair_ > max(self._margin, pos_pair_[-1]) - self._margin
                 ).view(-1)
                 neg_pair = neg_pair_[select_neg_pair_idx]
 

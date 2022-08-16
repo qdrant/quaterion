@@ -166,15 +166,28 @@ class TripletLoss(GroupLoss):
         sim_mat = self.distance_metric.similarity_matrix(embeddings, memory_embeddings)
 
         # split the positive and negative pairs
+
+        # this eye will be used to mask out identical pairs inside pos_mask later on.
         # shape: (batch_size, batch_size)
         eyes_ = torch.eye(batch_size, dtype=torch.uint8).to(embeddings.device)
 
-        pos_mask = groups.expand(
-            memory_groups.shape[0], batch_size
-        ).t() == memory_groups.expand(batch_size, memory_groups.shape[0])
-        pos_mask = pos_mask.float()
+        # calculate a mask to express positive pairs
+        # shape: (batch_size, memory_length)
+        pos_mask = (
+            groups.expand(memory_groups.shape[0], batch_size).t()
+            == memory_groups.expand(batch_size, memory_groups.shape[0])
+        ).float()
+
+        # inverse the positive mask to get a mask of negatives
         neg_mask = 1 - pos_mask
-        pos_mask[:, :batch_size] = pos_mask[:, :batch_size] - eyes_
+
+        # mask out positive pairs coming from identical embeddings.
+        # TODO: this implementation is too naive
+        # because the place of the diagonal overlapping with the identical pairs is constantly changing.
+        # We need a modular arithmetic operation here to find the correct place of the diagonal.
+        # I'll handle it shortly.
+        start_index = pos_mask.shape[1] - batch_size
+        pos_mask[:, start_index : start_index + batch_size] -= eyes_
 
         loss = list()
         neg_count = list()

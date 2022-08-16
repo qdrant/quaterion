@@ -384,13 +384,13 @@ class TrainableModel(pl.LightningModule, CacheMixin):
                     "XBM is currently supported only with GroupLoss instances"
                 )
 
-            self._xbm_buffer.queue(embeddings.detach(), targets["groups"].detach())
-
             memory_embeddings, memory_groups = self._xbm_buffer.get()
             memory_loss = self.loss(
                 embeddings, targets["groups"], memory_embeddings, memory_groups
             )
             loss = loss + self._xbm_config.weight * memory_loss
+
+            self._xbm_buffer.queue(embeddings.detach(), targets["groups"].detach())
 
         return loss
 

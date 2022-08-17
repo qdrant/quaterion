@@ -182,37 +182,22 @@ class TripletLoss(GroupLoss):
         # inverse the positive mask to get a mask of negatives
         neg_mask = 1 - pos_mask
 
-        loss = list()
+        pos_pair_ = sim_mat * pos_mask
+        neg_pair_ = sim_mat * neg_mask
+        neg_pair_max = neg_pair_.max(dim=-1)[0]
+        pos_pair_max = pos_pair_.max(dim=-1)[0]
+        pos_pair_max = torch.max(
+            pos_pair_max, torch.tensor(self._margin, device=pos_pair_max.device)
+        )
 
-        for i in range(batch_size):
-            pos_pair_idx = torch.nonzero(pos_mask[i, :]).view(-1)
-            if pos_pair_idx.shape[0] > 0:
-                pos_pair_ = sim_mat[i, pos_pair_idx]
-                pos_pair_ = torch.sort(pos_pair_)[0]
+        select_pos_pair_mask = pos_pair_ < neg_pair_max.unsqueeze(1) + self._margin
+        pos_pair = pos_pair_ * select_pos_pair_mask.float()
 
-                neg_pair_idx = torch.nonzero(neg_mask[i, :]).view(-1)
-                neg_pair_ = sim_mat[i, neg_pair_idx]
-                neg_pair_ = torch.sort(neg_pair_)[0]
-
-                select_pos_pair_idx = torch.nonzero(
-                    pos_pair_ < neg_pair_[-1] + self._margin
-                ).view(-1)
-                pos_pair = pos_pair_[select_pos_pair_idx]
-
-                select_neg_pair_idx = torch.nonzero(
-                    neg_pair_ > max(self._margin, pos_pair_[-1]) - self._margin
-                ).view(-1)
-                neg_pair = neg_pair_[select_neg_pair_idx]
-
-                pos_loss = torch.sum(1 - pos_pair)
-                if len(neg_pair) >= 1:
-                    neg_loss = torch.sum(neg_pair)
-                else:
-                    neg_loss = 0
-                loss.append(pos_loss + neg_loss)
-            else:
-                loss.append(0)
-
-        loss = sum(loss) / batch_size
+        select_neg_pair_mask = neg_pair_ > pos_pair_max.unsqueeze(1) - self._margin
+        neg_pair = neg_pair_ * select_neg_pair_mask
+        pos_loss = (1 - pos_pair).sum(dim=-1)
+        neg_loss = neg_pair.sum(dim=-1)
+        loss = pos_loss + neg_loss
+        loss = loss.mean()
 
         return loss

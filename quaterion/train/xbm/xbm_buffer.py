@@ -50,14 +50,25 @@ class XbmBuffer:
         """
         batch_size = len(targets)
 
-        if self._pointer + batch_size > self._cfg.buffer_size:
+        temp_size = self._pointer + batch_size
+
+        if temp_size > self._cfg.buffer_size:
+            excess = temp_size - self._cfg.buffer_size
+            self._embeddings[-(batch_size - excess) :] = embeddings[excess:]
+            self._targets[-(batch_size - excess) :] = targets[excess:]
+            self._embeddings[:excess] = embeddings[:excess]
+            self._targets[:excess] = targets[:excess]
+            self._pointer = excess
+
+        elif temp_size == self._cfg.buffer_size:
             self._embeddings[-batch_size:] = embeddings
             self._targets[-batch_size:] = targets
             self._pointer = 0
-            if not self.is_full:
-                self._is_full = True
 
         else:
             self._embeddings[self._pointer : self._pointer + batch_size] = embeddings
             self._targets[self._pointer : self._pointer + batch_size] = targets
             self._pointer += batch_size
+
+        if temp_size >= self._cfg.buffer_size and not self.is_full:
+            self._is_full = True

@@ -182,22 +182,51 @@ class TripletLoss(GroupLoss):
         # inverse the positive mask to get a mask of negatives
         neg_mask = 1 - pos_mask
 
+        # extract similarity scores for positive pairs by masking out negative pairs
         pos_pair_ = sim_mat * pos_mask
-        neg_pair_ = sim_mat * neg_mask
-        neg_pair_max = neg_pair_.max(dim=-1)[0]
-        pos_pair_max = pos_pair_.max(dim=-1)[0]
-        pos_pair_max = torch.max(
-            pos_pair_max, torch.tensor(self._margin, device=pos_pair_max.device)
-        )
 
+        # extract similarity scores for negative pairs by masking out positive pairs
+        neg_pair_ = sim_mat * neg_mask
+
+        # get the maximum similarity score among their negative pairs for each sample in the batch
+        # i.e., worst negatives
+        # shape: (batch_size,)
+        neg_pair_max = neg_pair_.max(dim=-1)[0]
+
+        # get the minimum similarity score among their positive pairs for each sample in the batch
+        # i.e., worst positives
+        # shape: (batch_size,)
+        pos_pair_min = pos_pair_.min(dim=-1)[0]
+
+        # calculate a mask to express positive pairs that do not have a greater similarity score
+        # than its negative pair with the maximum similarity score by at least the margin value
+        # shape: (batch_size, memory_length)
         select_pos_pair_mask = pos_pair_ < neg_pair_max.unsqueeze(1) + self._margin
+
+        # extract the similarity scores for the selected positive pairs
         pos_pair = pos_pair_ * select_pos_pair_mask.float()
 
-        select_neg_pair_mask = neg_pair_ > pos_pair_max.unsqueeze(1) - self._margin
+        # calculate a mask to express negative pairs that do not have a smaller similarity score
+        # than its positive pair with the minimum similarity score by at least the margin
+        # shape: (batch_size, memory_length)
+        select_neg_pair_mask = neg_pair_ > pos_pair_min.unsqueeze(1) - self._margin
+
+        # extract the similarity scores for the selected negative pairs
         neg_pair = neg_pair_ * select_neg_pair_mask
+
+        # calculate loss values for positive and negative pairs separately
+
+        # we want to maximize similarity scores for positive pairs
+        # thus minimizing the inverse of positive similarity scores as a loss value
         pos_loss = (1 - pos_pair).sum(dim=-1)
+
+        # minimize the similarity scores for negative pairs as a loss value
         neg_loss = neg_pair.sum(dim=-1)
+
+        # combine losses for positive and negative pairs
         loss = pos_loss + neg_loss
+
+        # get a scalar loss value
         loss = loss.mean()
 
         return loss

@@ -10,6 +10,7 @@ from quaterion.utils import (
     get_anchor_negative_mask,
     get_anchor_positive_mask,
     get_triplet_mask,
+    max_value_of_dtype,
 )
 
 
@@ -196,6 +197,9 @@ class TripletLoss(GroupLoss):
         # get the minimum similarity score among their positive pairs for each sample in the batch
         # i.e., worst positives
         # shape: (batch_size,)
+        pos_pair_[neg_mask.bool()] = max_value_of_dtype(
+            pos_pair_.dtype
+        )  # set invalid positive pairs to a maximum value to avoid taking them into account when getting minimum values
         pos_pair_min = pos_pair_.min(dim=-1)[0]
 
         # calculate a mask to express positive pairs that do not have a greater similarity score
@@ -218,7 +222,11 @@ class TripletLoss(GroupLoss):
 
         # we want to maximize similarity scores for positive pairs
         # thus minimizing the inverse of positive similarity scores as a loss value
-        pos_loss = (1 - pos_pair).sum(dim=-1)
+        inverse_pos_pair = 1 - pos_pair
+        inverse_pos_pair[
+            inverse_pos_pair == 1
+        ] = 0.0  # inverse of invalid positive pairs will be equal to 1, so we need to set them back to 0 to prevent their contribution to the sum below
+        pos_loss = inverse_pos_pair.sum(dim=-1)
 
         # minimize the similarity scores for negative pairs as a loss value
         neg_loss = neg_pair.sum(dim=-1)

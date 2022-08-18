@@ -13,6 +13,7 @@ class XbmBuffer:
 
     Args:
         config: Config class to configure XBM settings.
+        embedding_size: Output dimension of `EncoderHead` configured for this model.
     """
 
     def __init__(self, config: XbmConfig, embedding_size: int):

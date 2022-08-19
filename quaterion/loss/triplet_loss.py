@@ -7,7 +7,6 @@ from torch import LongTensor, Tensor
 from quaterion.distances import Distance
 from quaterion.loss.group_loss import GroupLoss
 from quaterion.utils import (
-    get_anchor_negative_mask,
     get_anchor_positive_mask,
     get_triplet_mask,
     max_value_of_dtype,
@@ -56,6 +55,58 @@ class TripletLoss(GroupLoss):
 
         return config
 
+    def _hard_triplet_loss(
+            self,
+            embeddings_a: Tensor,
+            groups_a: LongTensor,
+            embeddings_b: Tensor,
+            groups_b: LongTensor
+    ) -> Tensor:
+        """
+        Calculates Triplet Loss with hard mining between two sets of embeddings.
+
+        Args:
+            embeddings_a: (batch_size_a, vector_length) - Batch of embeddings.
+            groups_a: (batch_size_a,) - Batch of labels associated with `embeddings_a`
+            embeddings_b: (batch_size_b, vector_length) - Batch of embeddings.
+            groups_b: (batch_size_b,) - Batch of labels associated with `embeddings_b`
+
+        Returns:
+            torch.Tensor: Scalar loss value.
+        """
+        # Shape: (batch_size_a, batch_size_b)
+        dists = self.distance_metric.distance_matrix(embeddings_a, embeddings_b)
+        # get the hardest positive for each anchor
+        anchor_positive_mask = get_anchor_positive_mask(groups_a, groups_b).float()
+        anchor_positive_dists = (
+                anchor_positive_mask * dists
+        )  # invalid pairs set to 0
+        # Shape: (batch_size,)
+        hardest_positive_dists = anchor_positive_dists.max(dim=1)[0]
+
+        # get the hardest negative for each anchor
+        anchor_negative_mask = 1. - anchor_positive_mask
+        # add maximum of each row to invalid pairs to make sure not to count loss values from
+        # those indices when we apply minimum function later on
+        anchor_negative_dists = dists + dists.max(dim=1, keepdim=True)[0] * (
+                1.0 - anchor_negative_mask
+        )
+        hardest_negative_dists = anchor_negative_dists.min(dim=1)[0]
+
+        # combine hardest positives and hardest negatives
+        triplet_loss = F.relu(
+            # Division by the minimal distance between negative samples scales target distances
+            # # and prevents vector collapse
+            (hardest_positive_dists - hardest_negative_dists)
+            / hardest_negative_dists.mean()
+            + self._margin
+        )
+
+        # get scalar loss value
+        triplet_loss = triplet_loss.mean()
+
+        return triplet_loss
+
     def forward(
         self,
         embeddings: Tensor,
@@ -71,10 +122,10 @@ class TripletLoss(GroupLoss):
             torch.Tensor: Scalar loss value.
         """
 
-        # Shape: (batch_size, batch_size)
-        dists = self.distance_metric.distance_matrix(embeddings)
-
         if self._mining == "all":
+            # Shape: (batch_size, batch_size)
+            dists = self.distance_metric.distance_matrix(embeddings)
+
             # Calculate loss for all possible triplets first, then filter by group mask
             # Shape: (batch_size, batch_size, 1)
             anchor_positive_dists = dists.unsqueeze(2)
@@ -98,35 +149,9 @@ class TripletLoss(GroupLoss):
             triplet_loss = torch.sum(triplet_loss) / (num_positive_triplets + 1e-16)
 
         else:  # batch-hard triplet mining
-
-            # get the hardest positive for each anchor
-            anchor_positive_mask = get_anchor_positive_mask(groups).float()
-            anchor_positive_dists = (
-                anchor_positive_mask * dists
-            )  # invalid pairs set to 0
-            # Shape: (batch_size,)
-            hardest_positive_dists = anchor_positive_dists.max(dim=1)[0]
-
-            # get the hardest negative for each anchor
-            anchor_negative_mask = get_anchor_negative_mask(groups).float()
-            # add maximum of each row to invalid pairs to make sure not to count loss values from
-            # those indices when we apply minimum function later on
-            anchor_negative_dists = dists + dists.max(dim=1, keepdim=True)[0] * (
-                1.0 - anchor_negative_mask
+            triplet_loss = self._hard_triplet_loss(
+                embeddings, groups, embeddings, groups
             )
-            hardest_negative_dists = anchor_negative_dists.min(dim=1)[0]
-
-            # combine hardest positives and hardest negatives
-            triplet_loss = F.relu(
-                # Division by the minimal distance between negative samples scales target distances
-                # # and prevents vector collapse
-                (hardest_positive_dists - hardest_negative_dists)
-                / hardest_negative_dists.mean()
-                + self._margin
-            )
-
-            # get scalar loss value
-            triplet_loss = triplet_loss.mean()
 
         return triplet_loss
 
@@ -155,76 +180,6 @@ class TripletLoss(GroupLoss):
                 0, device=embeddings.device
             )  # no XBM loss if memory is empty
 
-        batch_size = embeddings.size(0)
-
-        # Compute similarity matrix
-        # shape: (batch_size, memory_buffer_size)
-        sim_mat = self.distance_metric.similarity_matrix(embeddings, memory_embeddings)
-
-        # split the positive and negative pairs
-
-        # calculate a mask to express positive pairs
-        # shape: (batch_size, memory_length)
-        pos_mask = (
-            groups.expand(memory_groups.shape[0], batch_size).t()
-            == memory_groups.expand(batch_size, memory_groups.shape[0])
-        ).float()
-
-        # inverse the positive mask to get a mask of negatives
-        neg_mask = 1 - pos_mask
-
-        # extract similarity scores for positive pairs by masking out negative pairs
-        pos_pair_ = sim_mat * pos_mask
-
-        # extract similarity scores for negative pairs by masking out positive pairs
-        neg_pair_ = sim_mat * neg_mask
-
-        # get the maximum similarity score among their negative pairs for each sample in the batch
-        # i.e., worst negatives
-        # shape: (batch_size,)
-        neg_pair_max = neg_pair_.max(dim=-1)[0]
-
-        # get the minimum similarity score among their positive pairs for each sample in the batch
-        # i.e., worst positives
-        # shape: (batch_size,)
-        pos_pair_[neg_mask.bool()] = max_value_of_dtype(
-            pos_pair_.dtype
-        )  # set invalid positive pairs to a maximum value to avoid taking them into account when getting minimum values
-        pos_pair_min = pos_pair_.min(dim=-1)[0]
-
-        # calculate a mask to express positive pairs that do not have a greater similarity score
-        # than its negative pair with the maximum similarity score by at least the margin value
-        # shape: (batch_size, memory_length)
-        select_pos_pair_mask = pos_pair_ < neg_pair_max.unsqueeze(1) + self._margin
-
-        # extract the similarity scores for the selected positive pairs
-        pos_pair = pos_pair_ * select_pos_pair_mask.float()
-
-        # calculate a mask to express negative pairs that do not have a smaller similarity score
-        # than its positive pair with the minimum similarity score by at least the margin
-        # shape: (batch_size, memory_length)
-        select_neg_pair_mask = neg_pair_ > pos_pair_min.unsqueeze(1) - self._margin
-
-        # extract the similarity scores for the selected negative pairs
-        neg_pair = neg_pair_ * select_neg_pair_mask
-
-        # calculate loss values for positive and negative pairs separately
-
-        # we want to maximize similarity scores for positive pairs
-        # thus minimizing the inverse of positive similarity scores as a loss value
-        inverse_pos_pair = 1 - pos_pair
-        inverse_pos_pair[
-            inverse_pos_pair == 1
-        ] = 0.0  # inverse of invalid positive pairs will be equal to 1, so we need to set them back to 0 to prevent their contribution to the sum below
-        pos_loss = inverse_pos_pair.sum(dim=-1)
-
-        # minimize the similarity scores for negative pairs as a loss value
-        neg_loss = neg_pair.sum(dim=-1)
-
-        # combine losses for positive and negative pairs
-        loss = pos_loss + neg_loss
-
-        # get a scalar loss value
-        loss = loss.mean()
-
-        return loss
+        return self._hard_triplet_loss(
+            embeddings, groups, memory_embeddings, memory_groups
+        )

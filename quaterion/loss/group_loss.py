@@ -20,25 +20,20 @@ class GroupLoss(SimilarityLoss):
     def forward(
         self,
         embeddings: Tensor,
-        groups: LongTensor,
-        memory_embeddings: Optional[Tensor] = None,
-        memory_groups: Optional[LongTensor] = None,
+        groups: LongTensor
     ) -> Tensor:
         """
 
         Args:
             embeddings: shape: (batch_size, vector_length)
             groups: shape: (batch_size,) - Groups, associated with `embeddings`
-            memory_embeddings: shape: (memory_buffer_size, vector_length) - Used only for XBM
-            memory_groups: shape: (memory_buffer_size,) - Groups, associated with
-                `memory_embeddings`. Used only for XBM.
 
         Returns:
             Tensor: zero-size tensor, loss value
         """
         raise NotImplementedError()
 
-    def _compute_xbm_loss(
+    def xbm_loss(
         self,
         embeddings: Tensor,
         groups: LongTensor,

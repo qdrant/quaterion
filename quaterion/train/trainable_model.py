@@ -379,18 +379,20 @@ class TrainableModel(pl.LightningModule, CacheMixin):
             and self._xbm_config is not None
             and self.trainer.global_step > self._xbm_config.start_iteration
         ):
-            if not isinstance(self.loss, GroupLoss):
+            loss_obj = self.loss  # Assign to tmp variable for better type inference
+            if isinstance(loss_obj, GroupLoss):
+
+                memory_embeddings, memory_groups = self._xbm_buffer.get()
+                memory_loss = loss_obj.xbm_loss(
+                    embeddings, targets["groups"], memory_embeddings, memory_groups
+                )
+                loss = loss + self._xbm_config.weight * memory_loss
+
+                self._xbm_buffer.queue(embeddings.detach(), targets["groups"].detach())
+            else:
                 raise NotImplementedError(
                     "XBM is currently supported only with GroupLoss instances"
                 )
-
-            memory_embeddings, memory_groups = self._xbm_buffer.get()
-            memory_loss = self.loss(
-                embeddings, targets["groups"], memory_embeddings, memory_groups
-            )
-            loss = loss + self._xbm_config.weight * memory_loss
-
-            self._xbm_buffer.queue(embeddings.detach(), targets["groups"].detach())
 
         return loss
 

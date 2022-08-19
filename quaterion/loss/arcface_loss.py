@@ -51,8 +51,6 @@ class ArcFaceLoss(GroupLoss):
         self,
         embeddings: Tensor,
         groups: LongTensor,
-        memory_embeddings: Optional[Tensor] = None,
-        memory_groups: Optional[LongTensor] = None,
     ) -> Tensor:
         """Compute loss value
 
@@ -60,18 +58,10 @@ class ArcFaceLoss(GroupLoss):
             embeddings: shape: (batch_size, vector_length) - Output embeddings from the
                 encoder.
             groups: shape: (batch_size,) - Group ids associated with embeddings.
-            memory_embeddings: shape: (memory_buffer_size, vector_length) - Embeddings stored
-                in a ring buffer. Used only for XBM
-            memory_groups: (memory_buffer_size,) - Groups ids associated with `memory_embeddings`.
-                Used only for XBM
 
         Returns:
             Tensor: loss value.
         """
-        if memory_embeddings is not None and memory_groups is not None:
-            return self._compute_xbm_loss(
-                embeddings, groups, memory_embeddings, memory_groups
-            )
 
         embeddings = l2_norm(embeddings, 1)
         kernel_norm = l2_norm(self.kernel, 0)

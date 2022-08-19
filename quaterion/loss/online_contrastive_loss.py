@@ -66,26 +66,16 @@ class OnlineContrastiveLoss(GroupLoss):
         self,
         embeddings: Tensor,
         groups: LongTensor,
-        memory_embeddings: Optional[Tensor] = None,
-        memory_groups: Optional[LongTensor] = None,
     ) -> Tensor:
         """Calculates Contrastive Loss by making pairs on-the-fly.
 
         Args:
             embeddings: Shape: (batch_size, vector_length) - Batch of embeddings
-            groups shape: (batch_size,) Batch of labels associated with `embeddings`
-            memory_embeddings: shape: (memory_buffer_size, vector_length) - Embeddings stored
-                in a ring buffer. Used only for XBM
-            memory_groups: shape: (memory_buffer_size,) - Groups ids associated with `memory_embeddings`.
-                Used only for XBM
+            groups: Shape (batch_size,) Batch of labels associated with `embeddings`
 
         Returns:
             torch.Tensor: Scalar loss value.
         """
-        if memory_embeddings is not None and memory_groups is not None:
-            return self._compute_xbm_loss(
-                embeddings, groups, memory_embeddings, memory_groups
-            )
 
         # Shape: (batch_size, batch_size)
         dists = self.distance_metric.distance_matrix(embeddings)

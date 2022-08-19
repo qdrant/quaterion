@@ -6,10 +6,7 @@ from torch import LongTensor, Tensor
 
 from quaterion.distances import Distance
 from quaterion.loss.group_loss import GroupLoss
-from quaterion.utils import (
-    get_anchor_positive_mask,
-    max_value_of_dtype,
-)
+from quaterion.utils import get_anchor_positive_mask, max_value_of_dtype
 
 
 class OnlineContrastiveLoss(GroupLoss):
@@ -83,7 +80,9 @@ class OnlineContrastiveLoss(GroupLoss):
         # to set invalid ones to 0
         anchor_positive_mask = get_anchor_positive_mask(groups, groups)
 
-        anchor_positive_dists = anchor_positive_mask.float() * dists  # invalid pairs set to 0
+        anchor_positive_dists = (
+            anchor_positive_mask.float() * dists
+        )  # invalid pairs set to 0
 
         # get a mask for valid anchor-negative pairs, and apply it to distance matrix
         # # to set invalid ones to a maximum value of dtype

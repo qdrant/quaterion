@@ -56,11 +56,11 @@ class TripletLoss(GroupLoss):
         return config
 
     def _hard_triplet_loss(
-            self,
-            embeddings_a: Tensor,
-            groups_a: LongTensor,
-            embeddings_b: Tensor,
-            groups_b: LongTensor
+        self,
+        embeddings_a: Tensor,
+        groups_a: LongTensor,
+        embeddings_b: Tensor,
+        groups_b: LongTensor,
     ) -> Tensor:
         """
         Calculates Triplet Loss with hard mining between two sets of embeddings.
@@ -78,18 +78,16 @@ class TripletLoss(GroupLoss):
         dists = self.distance_metric.distance_matrix(embeddings_a, embeddings_b)
         # get the hardest positive for each anchor
         anchor_positive_mask = get_anchor_positive_mask(groups_a, groups_b).float()
-        anchor_positive_dists = (
-                anchor_positive_mask * dists
-        )  # invalid pairs set to 0
+        anchor_positive_dists = anchor_positive_mask * dists  # invalid pairs set to 0
         # Shape: (batch_size,)
         hardest_positive_dists = anchor_positive_dists.max(dim=1)[0]
 
         # get the hardest negative for each anchor
-        anchor_negative_mask = 1. - anchor_positive_mask
+        anchor_negative_mask = 1.0 - anchor_positive_mask
         # add maximum of each row to invalid pairs to make sure not to count loss values from
         # those indices when we apply minimum function later on
         anchor_negative_dists = dists + dists.max(dim=1, keepdim=True)[0] * (
-                1.0 - anchor_negative_mask
+            1.0 - anchor_negative_mask
         )
         hardest_negative_dists = anchor_negative_dists.min(dim=1)[0]
 

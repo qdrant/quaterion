@@ -17,11 +17,7 @@ class GroupLoss(SimilarityLoss):
     def __init__(self, distance_metric_name: Distance = Distance.COSINE):
         super(GroupLoss, self).__init__(distance_metric_name=distance_metric_name)
 
-    def forward(
-        self,
-        embeddings: Tensor,
-        groups: LongTensor
-    ) -> Tensor:
+    def forward(self, embeddings: Tensor, groups: LongTensor) -> Tensor:
         """
 
         Args:

@@ -11,6 +11,7 @@ from quaterion.utils import (
     get_triplet_mask,
     max_value_of_dtype,
 )
+from quaterion.utils.utils import get_anchor_negative_mask
 
 
 class TripletLoss(GroupLoss):
@@ -83,7 +84,7 @@ class TripletLoss(GroupLoss):
         hardest_positive_dists = anchor_positive_dists.max(dim=1)[0]
 
         # get the hardest negative for each anchor
-        anchor_negative_mask = 1.0 - anchor_positive_mask
+        anchor_negative_mask = get_anchor_negative_mask(groups_a, groups_b).float()
         # add maximum of each row to invalid pairs to make sure not to count loss values from
         # those indices when we apply minimum function later on
         anchor_negative_dists = dists + dists.max(dim=1, keepdim=True)[0] * (

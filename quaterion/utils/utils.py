@@ -118,12 +118,22 @@ def get_anchor_positive_mask(
         labels_b (torch.Tensor): Labels associated with embeddings in the batch B. Shape: (batch_size_b,)
 
     Returns:
-        torch.Tensor: Anchor-positive mask. Shape: (batch_size, batch_size)
+        torch.Tensor: Anchor-positive mask. Shape: (batch_size_a, batch_size_b)
     """
     # Shape: (batch_size_a, batch_size_b)
     mask = labels_a.expand(labels_b.shape[0], labels_a.shape[0]).t() == labels_b.expand(
         labels_a.shape[0], labels_b.shape[0]
     )
+
+    if torch.equal(
+        labels_a, labels_b
+    ):  # handle identical batches of labels for regular loss
+        # shape: (batch_size_a, batch_size_a)
+        indices_equal = torch.eye(
+            labels_a.size()[0], dtype=torch.bool, device=labels_a.device
+        )
+        indices_not_equal = torch.logical_not(indices_equal)
+        mask = torch.logical_and(indices_not_equal, mask)
 
     return mask
 

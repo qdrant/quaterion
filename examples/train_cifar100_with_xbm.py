@@ -86,7 +86,7 @@ class Model(TrainableModel):
         return TripletLoss(mining=self._mining)
 
     def configure_xbm(self) -> XbmConfig:
-        return XbmConfig(weight=0.1)
+        return XbmConfig()
 
     def configure_metrics(self) -> Union[AttachedMetric, List[AttachedMetric]]:
         return AttachedMetric(

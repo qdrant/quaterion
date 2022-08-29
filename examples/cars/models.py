@@ -39,7 +39,7 @@ class Model(TrainableModel):
         return SkipConnectionHead(input_embedding_size, dropout=0.1)
 
     def configure_loss(self) -> SimilarityLoss:
-        return TripletLoss(mining=self._mining, margin=0.6)
+        return TripletLoss(mining=self._mining, margin=0.5)
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.model.parameters(), self._lr)

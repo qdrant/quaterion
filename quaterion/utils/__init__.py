@@ -5,4 +5,6 @@ from quaterion.utils.utils import (
     info_value_of_dtype,
     max_value_of_dtype,
     min_value_of_dtype,
+    get_masked_maximum,
+    get_masked_minimum,
 )

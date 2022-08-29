@@ -83,9 +83,10 @@ class Model(TrainableModel):
         return EmptyHead(input_embedding_size)
 
     def configure_loss(self) -> SimilarityLoss:
-        return TripletLoss(mining=self._mining)
+        return TripletLoss(mining="semi_hard")
 
     def configure_xbm(self) -> XbmConfig:
+        return None
         return XbmConfig()
 
     def configure_metrics(self) -> Union[AttachedMetric, List[AttachedMetric]]:

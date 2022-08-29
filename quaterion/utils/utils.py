@@ -199,3 +199,43 @@ def iter_by_batch(
         if len(batch) > 0:
             yield batch
         return
+
+
+def get_masked_maximum(
+    dists: torch.Tensor, mask: torch.Tensor, dim: int = 1
+) -> torch.Tensor:
+    """Utility function for semi hard mining.
+
+    Args:
+        dists: Tiled distance matrix.
+        mask: Tiled mask.
+        dim: Dimension to operate on.
+
+    Returns:
+        torch.Tensor - masked maximums.
+    """
+    axis_minimums, _ = dists.min(dim, keepdims=True)
+    masked_maximums = (dists - axis_minimums) * mask
+    masked_maximums, _ = masked_maximums.max(dim, keepdims=True)
+    masked_maximums += axis_minimums
+
+    return masked_maximums
+
+
+def get_masked_minimum(dists, mask, dim=1):
+    """Utility function for semi hard mining.
+
+    Args:
+        dists: Tiled distance matrix.
+        mask: Tiled mask.
+        dim: Dimension to operate on.
+
+    Returns:
+        torch.Tensor - masked maximums.
+    """
+    axis_maximums, _ = dists.max(dim, keepdims=True)
+    masked_minimums = (dists - axis_maximums) * mask
+    masked_minimums, _ = masked_minimums.min(dim, keepdims=True)
+    masked_minimums += axis_maximums
+
+    return masked_minimums

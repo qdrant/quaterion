@@ -9,6 +9,7 @@ Subpackages
 
    quaterion.train.cache
    quaterion.train.callbacks
+   quaterion.train.xbm
 
 Submodules
 ----------

@@ -12,9 +12,11 @@ from torch import Tensor
 from quaterion.dataset import SimilarityDataLoader
 from quaterion.dataset.train_collator import TrainCollator
 from quaterion.eval.attached_metric import AttachedMetric
-from quaterion.loss import SimilarityLoss
+from quaterion.loss import GroupLoss, SimilarityLoss
 from quaterion.train.cache import CacheConfig, CacheType
 from quaterion.train.cache_mixin import CacheMixin
+from quaterion.train.xbm import XbmConfig
+from quaterion.train.xbm.xbm_buffer import XbmBuffer
 from quaterion.utils.enums import TrainStage
 
 
@@ -92,6 +94,12 @@ class TrainableModel(pl.LightningModule, CacheMixin):
 
         self._model = SimilarityModel(encoders=encoders, head=head)
         self._loss = self.configure_loss()
+
+        self._xbm_config = self.configure_xbm()
+        if self._xbm_config is not None:
+            self._xbm_buffer = XbmBuffer(
+                self._xbm_config, embedding_size=head.output_size
+            )
 
     def configure_metrics(self) -> Union[AttachedMetric, List[AttachedMetric]]:
         """Method to configure batch-wise metrics for a training process
@@ -239,6 +247,25 @@ class TrainableModel(pl.LightningModule, CacheMixin):
         """
         raise NotImplementedError()
 
+    def configure_xbm(self) -> XbmConfig:
+        """Method to enable and configure Cross-Batch Memory (XBM).
+
+        XBM is a method relies on the idea of "slow drift" of embeddings in the course
+        of training. It keeps recent `N` embeddings and target values in a ring buffer
+        where `N` is much greater than the batch size. Then, it calculates a scaled loss
+        with the values in this buffer and adds it to the regular loss. This enables to mine
+        a large number of hard negatives.
+
+        See the paper for more details: https://arxiv.org/pdf/1912.06798.pdf
+
+        To enable it in a training process, you must return an instance of :class:`~quaterion.train.xbm.xbm_config.XbmConfig`.
+        The default return value is `None`, i.e., no XBM applied.
+
+        Note:
+            XBM is currently supported only with :class:`~quaterion.loss.group_loss.GroupLoss` instances.
+        """
+        pass
+
     def process_results(
         self,
         embeddings: Tensor,
@@ -320,6 +347,8 @@ class TrainableModel(pl.LightningModule, CacheMixin):
 
         embeddings = self.model(features)
         loss = self.loss(embeddings=embeddings, **targets)
+        loss = self._maybe_compute_xbm_loss(stage, loss, embeddings, targets)
+
         self.log(f"{stage}_loss", loss, batch_size=embeddings.shape[0])
 
         self._evaluate(
@@ -335,6 +364,35 @@ class TrainableModel(pl.LightningModule, CacheMixin):
             stage=stage,
             **kwargs,
         )
+
+        return loss
+
+    def _maybe_compute_xbm_loss(
+        self,
+        stage: TrainStage,
+        loss: Tensor,
+        embeddings: Tensor,
+        targets: Dict[str, Any],
+    ) -> Tensor:
+        if (
+            stage == TrainStage.TRAIN
+            and self._xbm_config is not None
+            and self.trainer.global_step > self._xbm_config.start_iteration
+        ):
+            loss_obj = self.loss  # Assign to tmp variable for better type inference
+            if isinstance(loss_obj, GroupLoss):
+
+                memory_embeddings, memory_groups = self._xbm_buffer.get()
+                memory_loss = loss_obj.xbm_loss(
+                    embeddings, targets["groups"], memory_embeddings, memory_groups
+                )
+                loss = loss + self._xbm_config.weight * memory_loss
+
+                self._xbm_buffer.queue(embeddings.detach(), targets["groups"].detach())
+            else:
+                raise NotImplementedError(
+                    "XBM is currently supported only with GroupLoss instances"
+                )
 
         return loss
 

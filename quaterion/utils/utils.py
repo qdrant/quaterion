@@ -108,43 +108,52 @@ def get_triplet_mask(labels: torch.Tensor) -> torch.Tensor:
     return mask
 
 
-def get_anchor_positive_mask(labels: torch.Tensor) -> torch.Tensor:
+def get_anchor_positive_mask(
+    labels_a: torch.Tensor, labels_b: torch.Tensor
+) -> torch.BoolTensor:
     """Creates a 2D mask of valid anchor-positive pairs.
 
     Args:
-        labels (torch.Tensor): Labels associated with embeddings in the batch. Shape: (batch_size,)
+        labels_a (torch.Tensor): Labels associated with embeddings in the batch A. Shape: (batch_size_a,)
+        labels_b (torch.Tensor): Labels associated with embeddings in the batch B. Shape: (batch_size_b,)
 
     Returns:
-        torch.Tensor: Anchor-positive mask. Shape: (batch_size, batch_size)
+        torch.Tensor: Anchor-positive mask. Shape: (batch_size_a, batch_size_b)
     """
-    # get a mask for distinct i and j indices
-    # Shape: (batch_size, batch_size)
-    indices_equal = torch.eye(labels.size()[0], dtype=torch.bool, device=labels.device)
-    indices_not_equal = torch.logical_not(indices_equal)
+    # Shape: (batch_size_a, batch_size_b)
+    mask = labels_a.expand(labels_b.shape[0], labels_a.shape[0]).t() == labels_b.expand(
+        labels_a.shape[0], labels_b.shape[0]
+    )
 
-    # get a mask for labels[i] == labels[j]
-    # Shape: (batch_size, batch_size)
-    labels_equal = labels.unsqueeze(0) == labels.unsqueeze(1)
-
-    # combine masks
-    mask = torch.logical_and(indices_not_equal, labels_equal)
+    if torch.equal(
+        labels_a, labels_b
+    ):  # handle identical batches of labels for regular loss
+        # shape: (batch_size_a, batch_size_a)
+        indices_equal = torch.eye(
+            labels_a.size()[0], dtype=torch.bool, device=labels_a.device
+        )
+        indices_not_equal = torch.logical_not(indices_equal)
+        mask = torch.logical_and(indices_not_equal, mask)
 
     return mask
 
 
-def get_anchor_negative_mask(labels: torch.Tensor) -> torch.Tensor:
+def get_anchor_negative_mask(
+    labels_a: torch.Tensor, labels_b: torch.Tensor
+) -> torch.BoolTensor:
     """Creates a 2D mask of valid anchor-negative pairs.
 
     Args:
-        labels (torch.Tensor): Labels associated with embeddings in the batch. Shape: (batch_size,)
+        labels_a (torch.Tensor): Labels associated with embeddings in the batch A. Shape: (batch_size_a,)
+        labels_b (torch.Tensor): Labels associated with embeddings in the batch B. Shape: (batch_size_b,)
 
     Returns:
-        torch.Tensor: Anchor-negative mask. Shape: (batch_size, batch_size)
+        torch.Tensor: Anchor-negative mask. Shape: (batch_size_a, batch_size_b)
     """
-    # get a mask for labels[i] != labels[k]
-    # Shape: (batch_size, batch_size)
-    labels_equal = labels.unsqueeze(0) == labels.unsqueeze(1)
-    mask = torch.logical_not(labels_equal)
+    # Shape: (batch_size_a, batch_size_b)
+    mask = labels_a.expand(labels_b.shape[0], labels_a.shape[0]).t() != labels_b.expand(
+        labels_a.shape[0], labels_b.shape[0]
+    )
 
     return mask
 
@@ -190,3 +199,43 @@ def iter_by_batch(
         if len(batch) > 0:
             yield batch
         return
+
+
+def get_masked_maximum(
+    dists: torch.Tensor, mask: torch.Tensor, dim: int = 1
+) -> torch.Tensor:
+    """Utility function for semi hard mining.
+
+    Args:
+        dists: Tiled distance matrix.
+        mask: Tiled mask.
+        dim: Dimension to operate on.
+
+    Returns:
+        torch.Tensor - masked maximums.
+    """
+    axis_minimums, _ = dists.min(dim, keepdims=True)
+    masked_maximums = (dists - axis_minimums) * mask
+    masked_maximums, _ = masked_maximums.max(dim, keepdims=True)
+    masked_maximums += axis_minimums
+
+    return masked_maximums
+
+
+def get_masked_minimum(dists, mask, dim=1):
+    """Utility function for semi hard mining.
+
+    Args:
+        dists: Tiled distance matrix.
+        mask: Tiled mask.
+        dim: Dimension to operate on.
+
+    Returns:
+        torch.Tensor - masked maximums.
+    """
+    axis_maximums, _ = dists.max(dim, keepdims=True)
+    masked_minimums = (dists - axis_maximums) * mask
+    masked_minimums, _ = masked_minimums.min(dim, keepdims=True)
+    masked_minimums += axis_maximums
+
+    return masked_minimums

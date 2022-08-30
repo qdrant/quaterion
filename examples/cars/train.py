@@ -71,7 +71,7 @@ if __name__ == "__main__":
     ap.add_argument(
         "--mining",
         default="hard",
-        choices=("all", "hard"),
+        choices=("all", "hard", "semi_hard"),
         help="Type of mining for Triplet Loss",
     )
 

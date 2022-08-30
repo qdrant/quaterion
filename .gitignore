@@ -145,3 +145,4 @@ lightning_logs/
 
 # dataset and model downloads
 torchvision/
+cache_dir/

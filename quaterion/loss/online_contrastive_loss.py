@@ -2,14 +2,11 @@ from typing import Optional
 
 import torch
 import torch.nn.functional as F
+from torch import LongTensor, Tensor
 
 from quaterion.distances import Distance
 from quaterion.loss.group_loss import GroupLoss
-from quaterion.utils import (
-    get_anchor_negative_mask,
-    get_anchor_positive_mask,
-    max_value_of_dtype,
-)
+from quaterion.utils import get_anchor_positive_mask, max_value_of_dtype
 
 
 class OnlineContrastiveLoss(GroupLoss):
@@ -62,30 +59,34 @@ class OnlineContrastiveLoss(GroupLoss):
         return config
 
     def forward(
-        self, embeddings: torch.Tensor, groups: torch.LongTensor
-    ) -> torch.Tensor:
+        self,
+        embeddings: Tensor,
+        groups: LongTensor,
+    ) -> Tensor:
         """Calculates Contrastive Loss by making pairs on-the-fly.
 
         Args:
-            embeddings (torch.Tensor): Batch of embeddings. Shape: (batch_size, embedding_dim)
-            groups (torch.LongTensor): Batch of labels associated with `embeddings`.
-                Shape: (batch_size,)
+            embeddings: Shape: (batch_size, vector_length) - Batch of embeddings
+            groups: Shape (batch_size,) Batch of labels associated with `embeddings`
 
         Returns:
             torch.Tensor: Scalar loss value.
         """
+
         # Shape: (batch_size, batch_size)
         dists = self.distance_metric.distance_matrix(embeddings)
 
         # get a mask for valid anchor-positive pairs and apply it to the distance matrix
         # to set invalid ones to 0
-        anchor_positive_mask = get_anchor_positive_mask(groups).float()
+        anchor_positive_mask = get_anchor_positive_mask(groups, groups)
 
-        anchor_positive_dists = anchor_positive_mask * dists  # invalid pairs set to 0
+        anchor_positive_dists = (
+            anchor_positive_mask.float() * dists
+        )  # invalid pairs set to 0
 
         # get a mask for valid anchor-negative pairs, and apply it to distance matrix
         # # to set invalid ones to a maximum value of dtype
-        anchor_negative_mask = get_anchor_negative_mask(groups)
+        anchor_negative_mask = ~anchor_positive_mask
         anchor_negative_dists = dists
         anchor_negative_dists[~anchor_negative_mask] = max_value_of_dtype(
             anchor_negative_dists.dtype

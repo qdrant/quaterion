@@ -1,7 +1,9 @@
+from typing import Optional
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch import Tensor
+from torch import LongTensor, Tensor
 
 from quaterion.loss.group_loss import GroupLoss
 
@@ -45,7 +47,11 @@ class ArcFaceLoss(GroupLoss):
         self.scale = scale
         self.margin = margin
 
-    def forward(self, embeddings, groups) -> Tensor:
+    def forward(
+        self,
+        embeddings: Tensor,
+        groups: LongTensor,
+    ) -> Tensor:
         """Compute loss value
 
         Args:
@@ -56,6 +62,7 @@ class ArcFaceLoss(GroupLoss):
         Returns:
             Tensor: loss value.
         """
+
         embeddings = l2_norm(embeddings, 1)
         kernel_norm = l2_norm(self.kernel, 0)
 

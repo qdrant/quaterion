@@ -28,7 +28,7 @@ class TripletLoss(GroupLoss):
             :class:`~quaterion.distances.Distance`. Optional, defaults to
             :attr:`~quaterion.distances.Distance.COSINE`.
         mining (str, optional): Triplet mining strategy. One of
-            `"all"`, `"hard"`. Defaults to `"hard"`.
+            `"all"`, `"hard"`, `"semi_hard"`. Defaults to `"hard"`.
     """
 
     def __init__(

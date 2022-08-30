@@ -8,10 +8,10 @@ from quaterion.distances import Distance
 from quaterion.loss.group_loss import GroupLoss
 from quaterion.utils import (
     get_anchor_positive_mask,
-    get_triplet_mask,
-    max_value_of_dtype,
     get_masked_maximum,
     get_masked_minimum,
+    get_triplet_mask,
+    max_value_of_dtype,
 )
 from quaterion.utils.utils import get_anchor_negative_mask
 

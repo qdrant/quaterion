@@ -145,30 +145,31 @@ class TripletLoss(GroupLoss):
         anchor_positive_pairs = groups_a == groups_b.unsqueeze(1).t()
         anchor_negative_pairs = ~anchor_positive_pairs
 
-        batch_size = torch.numel(groups_a)
+        batch_size_a = torch.numel(groups_a)
+        batch_size_b = torch.numel(groups_b)
 
         # compute the mask to express the semi-hard-negatives
         # WARNING: `torch.repeat()` copies the underlying data
         # so it consumes more memory
-        dists_tile = dists.repeat([batch_size, 1])
-        mask = anchor_negative_pairs.repeat([batch_size, 1]) & (
+        dists_tile = dists.repeat([batch_size_b, 1])
+        mask = anchor_negative_pairs.repeat([batch_size_b, 1]) & (
             dists_tile > torch.reshape(dists.t(), [-1, 1])
         )
 
         mask_final = torch.reshape(
-            torch.sum(mask, 1, keepdims=True) > 0.0, [batch_size, batch_size]
+            torch.sum(mask, 1, keepdims=True) > 0.0, [batch_size_b, batch_size_a]
         )
         mask_final = mask_final.t()
 
         # negatives_outside: smallest D(a, n) where D(a, n) > D(a, p).
         negatives_outside = torch.reshape(
-            get_masked_minimum(dists_tile, mask), [batch_size, batch_size]
+            get_masked_minimum(dists_tile, mask), [batch_size_b, batch_size_a]
         )
         negatives_outside = negatives_outside.t()
 
         # negatives_inside: largest D(a, n).
         negatives_inside = get_masked_maximum(dists, anchor_negative_pairs)
-        negatives_inside = negatives_inside.repeat([1, batch_size])
+        negatives_inside = negatives_inside.repeat([1, batch_size_b])
 
         # select either semi-hard negative or the largest negative
         # based on the condition the mask previously computed
@@ -179,8 +180,12 @@ class TripletLoss(GroupLoss):
         loss_matrix = (dists - semi_hard_negatives) + self._margin
 
         # the paper takes all the positives accept the diagonal
-        mask_positives = anchor_positive_pairs.float() - torch.eye(
-            batch_size, device=groups_a.device
+        # this is only relevant where it's running for the regular loss
+        mask_positives = (
+            anchor_positive_pairs.float()
+            - torch.eye(batch_size_a, device=groups_a.device)
+            if torch.allclose(groups_a, groups_b)
+            else anchor_positive_pairs
         )
 
         # average by the number of positives

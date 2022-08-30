@@ -86,7 +86,6 @@ class Model(TrainableModel):
         return TripletLoss(mining="semi_hard")
 
     def configure_xbm(self) -> XbmConfig:
-        return None
         return XbmConfig()
 
     def configure_metrics(self) -> Union[AttachedMetric, List[AttachedMetric]]:
@@ -112,7 +111,7 @@ if __name__ == "__main__":
     ap.add_argument(
         "--mining",
         default="hard",
-        choices=("all", "hard"),
+        choices=("hard", "semi_hard"),
         help="Type of mining for the Triplet Loss funcion",
     )
 

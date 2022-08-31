@@ -94,7 +94,7 @@ class TripletLoss(GroupLoss):
         hardest_negative_dists = anchor_negative_dists.min(dim=1)[0]
 
         # combine hardest positives and hardest negatives
-        triplet_loss = ( # SoftPlus is a smooth approximation to the ReLU function and is always positive
+        triplet_loss = (  # SoftPlus is a smooth approximation to the ReLU function and is always positive
             F.softplus(hardest_positive_dists - hardest_negative_dists)
             if self._soft
             else F.relu(

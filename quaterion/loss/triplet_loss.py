@@ -19,22 +19,21 @@ from quaterion.utils.utils import get_anchor_negative_mask
 class TripletLoss(GroupLoss):
     """Implements Triplet Loss as defined in https://arxiv.org/abs/1503.03832
 
-    It supports batch-all and batch-hard strategies for online triplet mining.
+    It supports batch-all, batch-hard and batch-semihard strategies for online triplet mining.
 
     Args:
         margin: Margin value to push negative examples
-            apart. Optional, defaults to `0.5`.
+            apart.
         distance_metric_name: Name of the distance function, e.g.,
-            :class:`~quaterion.distances.Distance`. Optional, defaults to
-            :attr:`~quaterion.distances.Distance.COSINE`.
-        mining (str, optional): Triplet mining strategy. One of
-            `"all"`, `"hard"`, `"semi_hard"`. Defaults to `"hard"`.
+            :class:`~quaterion.distances.Distance`.
+        mining: Triplet mining strategy. One of
+            `"all"`, `"hard"`, `"semi_hard"`.
     """
 
     def __init__(
         self,
-        margin: Optional[float] = 1.0,
-        distance_metric_name: Distance = Distance.COSINE,
+        margin: Optional[float] = 0.5,
+        distance_metric_name: Optional[Distance] = Distance.COSINE,
         mining: Optional[str] = "hard",
     ):
         mining_types = ["all", "hard", "semi_hard"]

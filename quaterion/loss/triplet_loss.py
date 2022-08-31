@@ -28,6 +28,7 @@ class TripletLoss(GroupLoss):
             :class:`~quaterion.distances.Distance`.
         mining: Triplet mining strategy. One of
             `"all"`, `"hard"`, `"semi_hard"`.
+        soft: If `True`, use soft margin variant of Hard Triplet Loss. Ignored in all other cases.
     """
 
     def __init__(
@@ -35,6 +36,7 @@ class TripletLoss(GroupLoss):
         margin: Optional[float] = 0.5,
         distance_metric_name: Optional[Distance] = Distance.COSINE,
         mining: Optional[str] = "hard",
+        soft: Optional[bool] = False,
     ):
         mining_types = ["all", "hard", "semi_hard"]
         if mining not in mining_types:
@@ -45,14 +47,12 @@ class TripletLoss(GroupLoss):
 
         self._margin = margin
         self._mining = mining
+        self._soft = soft
 
     def get_config_dict(self):
         config = super().get_config_dict()
         config.update(
-            {
-                "margin": self._margin,
-                "mining": self._mining,
-            }
+            {"margin": self._margin, "mining": self._mining, "soft": self._soft}
         )
 
         return config
@@ -94,12 +94,16 @@ class TripletLoss(GroupLoss):
         hardest_negative_dists = anchor_negative_dists.min(dim=1)[0]
 
         # combine hardest positives and hardest negatives
-        triplet_loss = F.relu(
-            # Division by the minimal distance between negative samples scales target distances
-            # # and prevents vector collapse
-            (hardest_positive_dists - hardest_negative_dists)
-            / hardest_negative_dists.mean()
-            + self._margin
+        triplet_loss = ( # SoftPlus is a smooth approximation to the ReLU function and is always positive
+            F.softplus(hardest_positive_dists - hardest_negative_dists)
+            if self._soft
+            else F.relu(
+                # Division by the minimal distance between negative samples scales target distances
+                # # and prevents vector collapse
+                (hardest_positive_dists - hardest_negative_dists)
+                / hardest_negative_dists.mean()
+                + self._margin
+            )
         )
 
         # get scalar loss value

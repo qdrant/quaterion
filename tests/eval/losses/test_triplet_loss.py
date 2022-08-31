@@ -62,4 +62,4 @@ class TestTripletLoss:
             groups_b=groups_b,
         )
 
-        print(loss_res)
+        assert loss_res.shape == torch.Size([])

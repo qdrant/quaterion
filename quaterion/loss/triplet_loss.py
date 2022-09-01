@@ -19,23 +19,24 @@ from quaterion.utils.utils import get_anchor_negative_mask
 class TripletLoss(GroupLoss):
     """Implements Triplet Loss as defined in https://arxiv.org/abs/1503.03832
 
-    It supports batch-all and batch-hard strategies for online triplet mining.
+    It supports batch-all, batch-hard and batch-semihard strategies for online triplet mining.
 
     Args:
         margin: Margin value to push negative examples
-            apart. Optional, defaults to `0.5`.
+            apart.
         distance_metric_name: Name of the distance function, e.g.,
-            :class:`~quaterion.distances.Distance`. Optional, defaults to
-            :attr:`~quaterion.distances.Distance.COSINE`.
-        mining (str, optional): Triplet mining strategy. One of
-            `"all"`, `"hard"`, `"semi_hard"`. Defaults to `"hard"`.
+            :class:`~quaterion.distances.Distance`.
+        mining: Triplet mining strategy. One of
+            `"all"`, `"hard"`, `"semi_hard"`.
+        soft: If `True`, use soft margin variant of Hard Triplet Loss. Ignored in all other cases.
     """
 
     def __init__(
         self,
-        margin: Optional[float] = 1.0,
-        distance_metric_name: Distance = Distance.COSINE,
+        margin: Optional[float] = 0.5,
+        distance_metric_name: Optional[Distance] = Distance.COSINE,
         mining: Optional[str] = "hard",
+        soft: Optional[bool] = False,
     ):
         mining_types = ["all", "hard", "semi_hard"]
         if mining not in mining_types:
@@ -46,14 +47,12 @@ class TripletLoss(GroupLoss):
 
         self._margin = margin
         self._mining = mining
+        self._soft = soft
 
     def get_config_dict(self):
         config = super().get_config_dict()
         config.update(
-            {
-                "margin": self._margin,
-                "mining": self._mining,
-            }
+            {"margin": self._margin, "mining": self._mining, "soft": self._soft}
         )
 
         return config
@@ -95,12 +94,16 @@ class TripletLoss(GroupLoss):
         hardest_negative_dists = anchor_negative_dists.min(dim=1)[0]
 
         # combine hardest positives and hardest negatives
-        triplet_loss = F.relu(
-            # Division by the minimal distance between negative samples scales target distances
-            # # and prevents vector collapse
-            (hardest_positive_dists - hardest_negative_dists)
-            / hardest_negative_dists.mean()
-            + self._margin
+        triplet_loss = (  # SoftPlus is a smooth approximation to the ReLU function and is always positive
+            F.softplus(hardest_positive_dists - hardest_negative_dists)
+            if self._soft
+            else F.relu(
+                # Division by the minimal distance between negative samples scales target distances
+                # # and prevents vector collapse
+                (hardest_positive_dists - hardest_negative_dists)
+                / hardest_negative_dists.mean()
+                + self._margin
+            )
         )
 
         # get scalar loss value

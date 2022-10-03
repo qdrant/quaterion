@@ -47,14 +47,16 @@ class CacheModel(pl.LightningModule):
             torch.Tensor: loss mock
         """
         features, _labels = batch
+        features_data = features["data"]
+        features_meta = features["meta"]
         for encoder_name, encoder in self.encoders.items():
-            if encoder_name not in features:
+            if encoder_name not in features_data:
                 continue
-            keys, encoder_features = features.get(encoder_name)
+            keys, encoder_features = features_data.get(encoder_name)
             if len(keys) == 0:
                 # empty batch possible if all unique object already cached
                 continue
-            encoder.fill_cache(keys, encoder_features)
+            encoder.fill_cache(keys, encoder_features, features_meta[encoder_name])
 
         return torch.Tensor([1])
 

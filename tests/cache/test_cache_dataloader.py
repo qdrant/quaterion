@@ -40,15 +40,20 @@ def test_cache_dataloader():
     assert isinstance(encoder, InMemoryCacheEncoder)
     assert len(encoder._cache) == len(dataset.data) * 2
 
-    cached_ids, labels = next(iter(dataloader))
-    print("cached_batch: ", cached_ids)
+    cached_batch, labels = next(iter(dataloader))
+    cached_data = cached_batch["data"]
+    cached_meta = cached_batch["meta"]
+    print("cached_batch: ", cached_data)
+    print("cached_meta: ", cached_meta)
+
+    assert len(cached_data[DEFAULT_ENCODER_KEY]) == len(cached_meta)
 
     # check that batch for cache contains only IDs
-    assert isinstance(cached_ids[DEFAULT_ENCODER_KEY], list)
-    assert len(cached_ids[DEFAULT_ENCODER_KEY]) == batch_size * 2
-    assert isinstance(cached_ids[DEFAULT_ENCODER_KEY][0], int)
+    assert isinstance(cached_data[DEFAULT_ENCODER_KEY], list)
+    assert len(cached_data[DEFAULT_ENCODER_KEY]) == batch_size * 2
+    assert isinstance(cached_data[DEFAULT_ENCODER_KEY][0], int)
 
-    cached_result = cache_trainable_model.model.forward(cached_ids)
+    cached_result = cache_trainable_model.model.forward(cached_batch)
     print("cached_result: ", cached_result)
 
     # Same, without cache

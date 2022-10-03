@@ -1,7 +1,7 @@
 from collections import defaultdict
 from typing import Any, Dict, Hashable, List
 
-from quaterion_models.types import CollateFnType
+from quaterion_models.types import CollateFnType, MetaExtractorFnType
 
 from quaterion.dataset.train_collator import TrainCollator
 from quaterion.train.cache.cache_config import KeyExtractorType
@@ -12,21 +12,22 @@ class CacheTrainCollator(TrainCollator):
     """:meta private:"""
 
     def __init__(
-        self,
-        pre_collate_fn,
-        encoder_collates: Dict[str, "CollateFnType"],
-        key_extractors: Dict[str, "KeyExtractorType"],
-        cachable_encoders: List[str],
-        mode: CacheMode,
+            self,
+            pre_collate_fn,
+            encoder_collates: Dict[str, "CollateFnType"],
+            meta_extractors: Dict[str, "MetaExtractorFnType"],
+            key_extractors: Dict[str, "KeyExtractorType"],
+            cachable_encoders: List[str],
+            mode: CacheMode,
     ):
-        super().__init__(pre_collate_fn, encoder_collates)
+        super().__init__(pre_collate_fn, encoder_collates, meta_extractors)
         self.cachable_encoders = cachable_encoders
         self.mode = mode
         self.key_extractors = key_extractors
         self.seen_keys = defaultdict(set)
 
     def extract_keys(
-        self, ids: List[int], features: List[Any], encoder_name
+            self, ids: List[int], features: List[Any], encoder_name
     ) -> List[Hashable]:
         """
         If custom `key_extractor` is specified for the encoder - use it instead of sequential
@@ -47,7 +48,7 @@ class CacheTrainCollator(TrainCollator):
         return [key_extractor(feature) for feature in features]
 
     def pre_encoder_collate(
-        self, features: List[Any], ids: List[int] = None, encoder_name: str = None
+            self, features: List[Any], ids: List[int] = None, encoder_name: str = None
     ):
         """
         Default implementation of per-encoder batch preparation, might be overridden
@@ -78,3 +79,14 @@ class CacheTrainCollator(TrainCollator):
             return keys
 
         raise NotImplementedError(f"Cache mode {self.mode} is not implemented")
+
+    def process_meta(self, meta: Dict[str, List]) -> Any:
+        if self.mode == CacheMode.FILL:
+            # On the cache fill stage we need to know meta per encoder mapping
+            # To make proper cache filling
+            return meta
+        elif self.mode == CacheMode.TRAIN:
+            # On the train stage we fall back to the default behavior
+            return super().process_meta(meta)
+        else:
+            raise NotImplementedError(f"Cache mode {self.mode} is not implemented")

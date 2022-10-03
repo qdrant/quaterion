@@ -1,4 +1,4 @@
-from typing import Dict, Union
+from typing import Dict, Union, List, Any
 
 import torch
 from quaterion_models.encoders import Encoder
@@ -29,6 +29,12 @@ class FakeEncoder(Encoder):
             "grapefruit".strip(): torch.tensor([0.0, 0.0, 1.0, 0.0, 0.0, 0.0]),
             "mandarin  ".strip(): torch.tensor([0.0, 1.0, 0.0, 0.0, 0.0, 0.0]),
         }
+
+    @classmethod
+    def extract_meta(cls, batch: List[Any]) -> List[dict]:
+        return [{
+            "first_letter": name[0],
+        } for name in batch]
 
     @property
     def trainable(self) -> bool:

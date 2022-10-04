@@ -12,13 +12,13 @@ class CacheTrainCollator(TrainCollator):
     """:meta private:"""
 
     def __init__(
-            self,
-            pre_collate_fn,
-            encoder_collates: Dict[str, "CollateFnType"],
-            meta_extractors: Dict[str, "MetaExtractorFnType"],
-            key_extractors: Dict[str, "KeyExtractorType"],
-            cachable_encoders: List[str],
-            mode: CacheMode,
+        self,
+        pre_collate_fn,
+        encoder_collates: Dict[str, "CollateFnType"],
+        meta_extractors: Dict[str, "MetaExtractorFnType"],
+        key_extractors: Dict[str, "KeyExtractorType"],
+        cachable_encoders: List[str],
+        mode: CacheMode,
     ):
         super().__init__(pre_collate_fn, encoder_collates, meta_extractors)
         self.cachable_encoders = cachable_encoders
@@ -27,7 +27,7 @@ class CacheTrainCollator(TrainCollator):
         self.seen_keys = defaultdict(set)
 
     def extract_keys(
-            self, ids: List[int], features: List[Any], encoder_name
+        self, ids: List[int], features: List[Any], encoder_name
     ) -> List[Hashable]:
         """
         If custom `key_extractor` is specified for the encoder - use it instead of sequential
@@ -48,7 +48,7 @@ class CacheTrainCollator(TrainCollator):
         return [key_extractor(feature) for feature in features]
 
     def pre_encoder_collate(
-            self, features: List[Any], ids: List[int] = None, encoder_name: str = None
+        self, features: List[Any], ids: List[int] = None, encoder_name: str = None
     ):
         """
         Default implementation of per-encoder batch preparation, might be overridden

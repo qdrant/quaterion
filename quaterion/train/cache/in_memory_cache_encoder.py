@@ -1,5 +1,5 @@
 import pickle
-from typing import Hashable, List, Any, Union
+from typing import Any, Hashable, List, Union
 
 import torch
 from quaterion_models.encoders import Encoder
@@ -17,9 +17,9 @@ class InMemoryCacheEncoder(CacheEncoder):
     """
 
     def __init__(
-            self,
-            encoder: Encoder,
-            cache_type=CacheType.AUTO,
+        self,
+        encoder: Encoder,
+        cache_type=CacheType.AUTO,
     ):
         super().__init__(encoder)
         self._cache = None
@@ -76,7 +76,9 @@ class InMemoryCacheEncoder(CacheEncoder):
     def is_filled(self) -> bool:
         return self._cache is not None
 
-    def fill_cache(self, keys: List[Hashable], data: "TensorInterchange", meta: List[Any]) -> None:
+    def fill_cache(
+        self, keys: List[Hashable], data: "TensorInterchange", meta: List[Any]
+    ) -> None:
         embeddings = self._encoder(data)
         if self.cache_type == CacheType.CPU:
             embeddings = embeddings.to("cpu")
@@ -102,7 +104,10 @@ class InMemoryCacheEncoder(CacheEncoder):
         self._tmp = []
 
     def save_cache(self, path):
-        pickle.dump([self._cache.to("cpu"), self._offset_map, self._meta_cache], open(path, "wb"))
+        pickle.dump(
+            [self._cache.to("cpu"), self._offset_map, self._meta_cache],
+            open(path, "wb"),
+        )
 
     def load_cache(self, path):
         self._cache, self._offset_map, self._meta_cache = pickle.load(open(path, "rb"))

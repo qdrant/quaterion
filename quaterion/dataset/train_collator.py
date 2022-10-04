@@ -3,9 +3,9 @@ from __future__ import annotations
 from typing import Any, Callable, Dict, List, Tuple, Union
 
 from quaterion_models.types import CollateFnType, MetaExtractorFnType
+from quaterion_models.utils.meta import merge_meta
 
 from quaterion.dataset import SimilarityGroupSample, SimilarityPairSample
-from quaterion_models.utils.meta import merge_meta
 
 
 class TrainCollator:
@@ -23,28 +23,29 @@ class TrainCollator:
     """
 
     def __init__(
-            self,
-            pre_collate_fn: Callable,
-            encoder_collates: Dict[str, CollateFnType],
-            meta_extractors: Dict[str, MetaExtractorFnType]
+        self,
+        pre_collate_fn: Callable,
+        encoder_collates: Dict[str, CollateFnType],
+        meta_extractors: Dict[str, MetaExtractorFnType],
     ):
         self.pre_collate_fn = pre_collate_fn
         self.encoder_collates = encoder_collates
         self.meta_extractors = meta_extractors
 
     def pre_encoder_collate(
-            self, features: List[Any], ids: List[int] = None, encoder_name: str = None
+        self, features: List[Any], ids: List[int] = None, encoder_name: str = None
     ):
         """
         Default implementation of per-encoder batch preparation, might be overridden
         """
         return features
+
     def process_meta(self, meta: Dict[str, List]) -> Any:
         return merge_meta(meta)
 
     def __call__(
-            self,
-            batch: List[Tuple[int, Union[SimilarityPairSample, SimilarityGroupSample]]],
+        self,
+        batch: List[Tuple[int, Union[SimilarityPairSample, SimilarityGroupSample]]],
     ):
         ids, features, labels = self.pre_collate_fn(batch)
 
@@ -55,7 +56,4 @@ class TrainCollator:
             encoder_collate_result[encoder_name] = collate_fn(encoder_features)
             meta[encoder_name] = self.meta_extractors[encoder_name](encoder_features)
 
-        return {
-                   "data": encoder_collate_result,
-                   "meta": self.process_meta(meta)
-               }, labels
+        return {"data": encoder_collate_result, "meta": self.process_meta(meta)}, labels

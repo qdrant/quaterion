@@ -2,7 +2,7 @@ from enum import Enum
 from typing import Any, Callable, Hashable, List, Tuple, Union
 
 from quaterion_models.encoders import Encoder
-from quaterion_models.types import CollateFnType, TensorInterchange, MetaExtractorFnType
+from quaterion_models.types import CollateFnType, MetaExtractorFnType, TensorInterchange
 from torch import Tensor
 
 KeyExtractorType = Callable[[Any], Hashable]
@@ -138,7 +138,9 @@ class CacheEncoder(Encoder):
         """Check if cache already filled"""
         raise NotImplementedError()
 
-    def fill_cache(self, keys: List[Hashable], data: "TensorInterchange", meta: List[Any]) -> None:
+    def fill_cache(
+        self, keys: List[Hashable], data: "TensorInterchange", meta: List[Any]
+    ) -> None:
         """Apply wrapped encoder to data and store processed data on
         corresponding device.
 

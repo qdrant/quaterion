@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "quaterion"
-version = "0.1.30"
+version = "0.1.31"
 description = "Similarity Learning fine-tuning framework"
 authors = ["Quaterion Authors <team@quaterion.tech>"]
 packages = [

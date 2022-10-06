@@ -2,7 +2,7 @@ from typing import Any, Dict, List, Union
 
 import torch
 from quaterion_models.encoders import Encoder, SwitchEncoder
-from quaterion_models.heads import EncoderHead, EmptyHead, GatedHead, SwitchHead
+from quaterion_models.heads import EmptyHead, EncoderHead, GatedHead, SwitchHead
 from quaterion_models.types import TensorInterchange
 from torch import Tensor
 from torch.utils.data import Dataset
@@ -134,6 +134,9 @@ class FakeTrainableModelWithSwitchEncoder(FakeTrainableModel):
 
     def configure_head(self, input_embedding_size: int) -> EncoderHead:
         return SwitchHead(
-            {"positive": GatedHead(input_embedding_size), "negative": GatedHead(input_embedding_size)},
+            {
+                "positive": GatedHead(input_embedding_size),
+                "negative": GatedHead(input_embedding_size),
+            },
             input_embedding_size,
         )

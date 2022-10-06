@@ -1,8 +1,9 @@
 import pytorch_lightning as pl
+
 from quaterion import Quaterion
 from quaterion.dataset import PairsSimilarityDataLoader
 
-from .model_fixtures import FakeTrainableModelWithSwitchEncoder, FakePairDataset
+from .model_fixtures import FakePairDataset, FakeTrainableModelWithSwitchEncoder
 
 
 class TestSwitchEncoder:

@@ -1,8 +1,8 @@
 from typing import Any, Dict, List, Union
 
 import torch
-from quaterion_models.encoders import Encoder
-from quaterion_models.heads import EncoderHead, GatedHead
+from quaterion_models.encoders import Encoder, SwitchEncoder
+from quaterion_models.heads import EncoderHead, EmptyHead, GatedHead, SwitchHead
 from quaterion_models.types import TensorInterchange
 from torch import Tensor
 from torch.utils.data import Dataset
@@ -103,3 +103,37 @@ class FakeTrainableModel(TrainableModel):
 
     def configure_optimizers(self):
         return torch.optim.Adam(params=self.model.parameters(), lr=0.001)
+
+
+class FakeEncoderWithNegativeOutput(FakeEncoder):
+    def forward(self, batch: TensorInterchange) -> Tensor:
+        return -torch.stack([self.tensors[word] for word in batch])
+
+    @classmethod
+    def load(cls, input_path: str) -> "Encoder":
+        return FakeEncoderWithNegativeOutput()
+
+
+class FakeSwitchEncoder(SwitchEncoder):
+    @classmethod
+    def encoder_selection(cls, record: Any) -> str:
+        if record.startswith("m"):
+            return "positive"
+        else:
+            return "negative"
+
+
+class FakeTrainableModelWithSwitchEncoder(FakeTrainableModel):
+    def configure_encoders(self) -> Union[Encoder, Dict[str, Encoder]]:
+        return FakeSwitchEncoder(
+            options={
+                "positive": FakeEncoder(),
+                "negative": FakeEncoderWithNegativeOutput(),
+            }
+        )
+
+    def configure_head(self, input_embedding_size: int) -> EncoderHead:
+        return SwitchHead(
+            {"positive": GatedHead(input_embedding_size), "negative": GatedHead(input_embedding_size)},
+            input_embedding_size,
+        )

@@ -2,7 +2,7 @@ from enum import Enum
 from typing import Any, Callable, Hashable, List, Tuple, Union
 
 from quaterion_models.encoders import Encoder
-from quaterion_models.types import CollateFnType, TensorInterchange
+from quaterion_models.types import CollateFnType, MetaExtractorFnType, TensorInterchange
 from torch import Tensor
 
 KeyExtractorType = Callable[[Any], Hashable]
@@ -57,6 +57,24 @@ class CacheEncoder(Encoder):
             int: Size of resulting embedding.
         """
         return self._encoder.embedding_size
+
+    def cache_extract_meta(self, batch: List[Any]) -> List[dict]:
+        """Extracts meta information from batch.
+
+        Args:
+            batch: batch of data
+        Returns:
+            List[dict]: list of meta information
+        """
+        raise NotImplementedError()
+
+    def get_meta_extractor(self) -> MetaExtractorFnType:
+        """Provides function that extracts meta information from batch.
+
+        Returns:
+             MetaExtractorFnType: meta extractor function
+        """
+        return self.cache_extract_meta
 
     def cache_collate(
         self, batch: Union[Tuple[List[Hashable], List[Any]], List[Hashable]]
@@ -120,13 +138,16 @@ class CacheEncoder(Encoder):
         """Check if cache already filled"""
         raise NotImplementedError()
 
-    def fill_cache(self, keys: List[Hashable], data: "TensorInterchange") -> None:
+    def fill_cache(
+        self, keys: List[Hashable], data: "TensorInterchange", meta: List[Any]
+    ) -> None:
         """Apply wrapped encoder to data and store processed data on
         corresponding device.
 
         Args:
             keys: Hash keys which should be associated with resulting vectors
             data: Tuple of keys and batches suitable for encoder
+            meta: List of batch meta information
 
         """
         raise NotImplementedError()

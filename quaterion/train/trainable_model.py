@@ -452,10 +452,15 @@ class TrainableModel(pl.LightningModule, CacheMixin):
             (key, encoder.get_collate_fn())
             for key, encoder in self.model.encoders.items()
         )
+        meta_extractors = dict(
+            (key, encoder.get_meta_extractor())
+            for key, encoder in self.model.encoders.items()
+        )
 
         collator = TrainCollator(
             pre_collate_fn=dataloader.collate_fn,
             encoder_collates=encoder_collate_fns,
+            meta_extractors=meta_extractors,
         )
 
         dataloader.collate_fn = collator

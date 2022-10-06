@@ -182,6 +182,9 @@ class CacheMixin:
             encoder_collates={
                 name: encoder.get_collate_fn() for name, encoder in encoders.items()
             },
+            meta_extractors={
+                name: encoder.get_meta_extractor() for name, encoder in encoders.items()
+            },
             key_extractors=key_extractors,
             cachable_encoders=list(cache_encoders.keys()),
             mode=CacheMode.TRAIN,

@@ -1,3 +1,11 @@
+"""TODO
+The XBM feature is still experimental and should not be considered as production ready.
+Currently, its usage of memory grows exponentially,
+and this limits its ability to be used with larger batch and/or buffer sizes.
+This will be fixed in an update soon.
+Take this example as a demonstration of the API for now.
+"""
+
 import argparse
 import os
 from typing import Dict, List, Union

@@ -45,7 +45,7 @@ def get_dataloader():
     dataset = SimilarityGroupDataset(
         datasets.CIFAR100(root=path, download=True, transform=transform)
     )
-    dataloader = GroupSimilarityDataLoader(dataset, batch_size=512, shuffle=True)
+    dataloader = GroupSimilarityDataLoader(dataset, batch_size=128, shuffle=True)
     return dataloader
 
 
@@ -86,7 +86,7 @@ class Model(TrainableModel):
         return TripletLoss(mining="semi_hard")
 
     def configure_xbm(self) -> XbmConfig:
-        return XbmConfig()
+        return XbmConfig(start_iteration=100, buffer_size=1024)
 
     def configure_metrics(self) -> Union[AttachedMetric, List[AttachedMetric]]:
         return AttachedMetric(

@@ -86,7 +86,7 @@ class Model(TrainableModel):
         return TripletLoss(mining="semi_hard")
 
     def configure_xbm(self) -> XbmConfig:
-        return XbmConfig(start_iteration=100, buffer_size=1024)
+        return XbmConfig(buffer_size=1024)
 
     def configure_metrics(self) -> Union[AttachedMetric, List[AttachedMetric]]:
         return AttachedMetric(
@@ -108,19 +108,11 @@ if __name__ == "__main__":
 
     ap.add_argument("--lr", type=float, default=1e-4, help="Learning rate")
 
-    ap.add_argument(
-        "--mining",
-        default="hard",
-        choices=("hard", "semi_hard"),
-        help="Type of mining for the Triplet Loss funcion",
-    )
-
     args = ap.parse_args()
 
     model = Model(
         embedding_size=args.embedding_size,
         lr=args.lr,
-        mining=args.mining,
     )
 
     train_dataloader = get_dataloader()

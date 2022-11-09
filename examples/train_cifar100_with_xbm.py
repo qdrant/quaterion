@@ -1,3 +1,11 @@
+"""TODO
+The XBM feature is still experimental and should not be considered as production ready.
+Currently, its usage of memory grows exponentially,
+and this limits its ability to be used with larger batch and/or buffer sizes.
+This will be fixed in an update soon.
+Take this example as a demonstration of the API for now.
+"""
+
 import argparse
 import os
 from typing import Dict, List, Union
@@ -45,7 +53,7 @@ def get_dataloader():
     dataset = SimilarityGroupDataset(
         datasets.CIFAR100(root=path, download=True, transform=transform)
     )
-    dataloader = GroupSimilarityDataLoader(dataset, batch_size=512, shuffle=True)
+    dataloader = GroupSimilarityDataLoader(dataset, batch_size=128, shuffle=True)
     return dataloader
 
 
@@ -86,7 +94,7 @@ class Model(TrainableModel):
         return TripletLoss(mining="semi_hard")
 
     def configure_xbm(self) -> XbmConfig:
-        return XbmConfig()
+        return XbmConfig(buffer_size=1024)
 
     def configure_metrics(self) -> Union[AttachedMetric, List[AttachedMetric]]:
         return AttachedMetric(
@@ -108,19 +116,11 @@ if __name__ == "__main__":
 
     ap.add_argument("--lr", type=float, default=1e-4, help="Learning rate")
 
-    ap.add_argument(
-        "--mining",
-        default="hard",
-        choices=("hard", "semi_hard"),
-        help="Type of mining for the Triplet Loss funcion",
-    )
-
     args = ap.parse_args()
 
     model = Model(
         embedding_size=args.embedding_size,
         lr=args.lr,
-        mining=args.mining,
     )
 
     train_dataloader = get_dataloader()

@@ -1,9 +1,7 @@
-"""TODO
-The XBM feature is still experimental and should not be considered as production ready.
-Currently, its usage of memory grows exponentially,
-and this limits its ability to be used with larger batch and/or buffer sizes.
-This will be fixed in an update soon.
-Take this example as a demonstration of the API for now.
+"""NOTE:
+This sample script is design to fit in the memory of a 4GB GPU.
+You can increase the XBM buffer size that can fit your GPU's memory
+        to get most out of the XBM feature.
 """
 
 import argparse
@@ -53,7 +51,8 @@ def get_dataloader():
     dataset = SimilarityGroupDataset(
         datasets.CIFAR100(root=path, download=True, transform=transform)
     )
-    dataloader = GroupSimilarityDataLoader(dataset, batch_size=128, shuffle=True)
+    dataloader = GroupSimilarityDataLoader(
+        dataset, batch_size=64, shuffle=True)
     return dataloader
 
 
@@ -78,10 +77,9 @@ class MobilenetV3Encoder(Encoder):
 
 
 class Model(TrainableModel):
-    def __init__(self, embedding_size: int, lr: float, mining: str):
+    def __init__(self, embedding_size: int, lr: float):
         self._embedding_size = embedding_size
         self._lr = lr
-        self._mining = mining
         super().__init__()
 
     def configure_encoders(self) -> Union[Encoder, Dict[str, Encoder]]:
@@ -94,7 +92,7 @@ class Model(TrainableModel):
         return TripletLoss(mining="semi_hard")
 
     def configure_xbm(self) -> XbmConfig:
-        return XbmConfig(buffer_size=1024)
+        return XbmConfig(buffer_size=2048)
 
     def configure_metrics(self) -> Union[AttachedMetric, List[AttachedMetric]]:
         return AttachedMetric(
@@ -125,7 +123,8 @@ if __name__ == "__main__":
 
     train_dataloader = get_dataloader()
 
-    trainer = pl.Trainer(accelerator="auto", devices=1, num_nodes=1, max_epochs=20)
+    trainer = pl.Trainer(accelerator="auto", devices=1,
+                         num_nodes=1, max_epochs=20)
 
     Quaterion.fit(
         trainable_model=model,

@@ -51,8 +51,7 @@ def get_dataloader():
     dataset = SimilarityGroupDataset(
         datasets.CIFAR100(root=path, download=True, transform=transform)
     )
-    dataloader = GroupSimilarityDataLoader(
-        dataset, batch_size=64, shuffle=True)
+    dataloader = GroupSimilarityDataLoader(dataset, batch_size=64, shuffle=True)
     return dataloader
 
 
@@ -123,8 +122,7 @@ if __name__ == "__main__":
 
     train_dataloader = get_dataloader()
 
-    trainer = pl.Trainer(accelerator="auto", devices=1,
-                         num_nodes=1, max_epochs=20)
+    trainer = pl.Trainer(accelerator="auto", devices=1, num_nodes=1, max_epochs=20)
 
     Quaterion.fit(
         trainable_model=model,

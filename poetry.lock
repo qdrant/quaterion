@@ -824,7 +824,7 @@ resolved_reference = "a90cdd5925783c2b0ed3b8d39897cd4eaf942e2a"
 
 [[package]]
 name = "quaterion-models"
-version = "0.1.17"
+version = "0.1.19"
 description = "The collection of building blocks to build fine-tunable similarity learning models"
 category = "main"
 optional = false

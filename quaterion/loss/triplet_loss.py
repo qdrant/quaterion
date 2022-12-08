@@ -138,73 +138,33 @@ class TripletLoss(GroupLoss):
         Returns:
             Tensor: zero-size tensor, XBM loss value.
         """
-        # compute the distance matrix
+
+        # Calculate the pairwise distances between all embeddings
         # shape: (batch_size_a, batch_size_b)
-        dists = self.distance_metric.distance_matrix(embeddings_a, embeddings_b)
+        distances = self.distance_metric.distance_matrix(embeddings_a, embeddings_b)
 
-        # compute masks to express the positive and negative pairs
-        # shape: (batch_size_a, batch_size_b)
-        groups_a = groups_a.unsqueeze(1)
-        anchor_positive_pairs = groups_a == groups_b.unsqueeze(1).t()
-        anchor_negative_pairs = ~anchor_positive_pairs
+        # Find the indices of all positive and negative pairs
+        positive_indices = groups_a[:, None] == groups_b[None, :]
+        negative_indices = groups_a[:, None] != groups_b[None, :]
 
-        batch_size_a = torch.numel(groups_a)
-        batch_size_b = torch.numel(groups_b)
+        # Calculate the distance between the anchor and positive examples
+        pos_distance = torch.masked_select(distances, positive_indices)
 
-        # compute the mask to express the semi-hard-negatives
-        # WARNING: `torch.repeat()` copies the underlying data
-        # so it consumes more memory
-        dists_tile = dists.repeat([batch_size_b, 1])
-        mask = anchor_negative_pairs.repeat([batch_size_b, 1]) & (
-            dists_tile > torch.reshape(dists.t(), [-1, 1])
-        )
+        # Calculate the distance between the anchor and negative examples
+        neg_distance = torch.masked_select(distances, negative_indices)
 
-        mask_final = torch.reshape(
-            torch.sum(mask, 1, keepdims=True) > 0.0, [batch_size_b, batch_size_a]
-        )
-        mask_final = mask_final.t()
+        # Calculate the basic triplet loss
+        basic_loss = pos_distance[:, None] - neg_distance[None, :] + self._margin
 
-        # negatives_outside: smallest D(a, n) where D(a, n) > D(a, p).
-        negatives_outside = torch.reshape(
-            get_masked_minimum(dists_tile, mask), [batch_size_b, batch_size_a]
-        )
-        negatives_outside = negatives_outside.t()
+        # Zero out the loss for negative distances larger than the positive distance
+        zero_loss = torch.clamp(basic_loss, min=0.0)
 
-        # negatives_inside: largest D(a, n).
-        negatives_inside = get_masked_maximum(dists, anchor_negative_pairs)
-        negatives_inside = negatives_inside.repeat([1, batch_size_b])
+        # Zero out the loss for distances larger than the margin
+        semi_hard_loss = torch.clamp(zero_loss, max=self._margin)
 
-        # select either semi-hard negative or the largest negative
-        # based on the condition the mask previously computed
-        semi_hard_negatives = torch.where(
-            mask_final, negatives_outside, negatives_inside
-        )
+        loss = torch.mean(semi_hard_loss)
 
-        loss_matrix = (dists - semi_hard_negatives) + self._margin
-
-        # the paper takes all the positives accept the diagonal
-        # this is only relevant where it's running for the regular loss
-        mask_positives = (
-            anchor_positive_pairs.float()
-            - torch.eye(batch_size_a, device=groups_a.device)
-            if torch.allclose(groups_a, groups_b)
-            else anchor_positive_pairs
-        )
-
-        # average by the number of positives
-        num_positives = torch.sum(mask_positives)
-
-        triplet_loss = (
-            torch.sum(
-                torch.max(
-                    loss_matrix * mask_positives,
-                    torch.tensor([0.0], device=groups_a.device),
-                )
-            )
-            / num_positives
-        )
-
-        return triplet_loss
+        return loss
 
     def forward(
         self,

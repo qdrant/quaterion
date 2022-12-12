@@ -32,27 +32,7 @@ class Euclidean(BaseDistance):
         if y is None:
             y = x
 
-        dot_product = torch.mm(x, y.transpose(0, 1))
-
-        # get L2 norm by diagonal. Shape: (batch_size,)
-        square_norm = torch.diagonal(dot_product)
-        # calculate distances. Shape: (batch_size, batch_size)
-        distance_matrix = (
-            square_norm.unsqueeze(0) - 2.0 * dot_product + square_norm.unsqueeze(1)
-        )
-        # get rid of negative distances due to calculation errors
-        distance_matrix = F.relu(distance_matrix)
-
-        # handle numerical stability to avoid None gradients during backpropogation
-        mask = (distance_matrix == 0.0).float()
-        distance_matrix = distance_matrix + mask * 1e-16
-
-        distance_matrix = torch.sqrt(distance_matrix)
-
-        # Undo trick for numerical stability
-        distance_matrix = distance_matrix * (1.0 - mask)
-
-        return distance_matrix
+        return torch.cdist(x, y)
 
     @staticmethod
     def similarity_matrix(x: Tensor, y: Optional[Tensor] = None) -> Tensor:

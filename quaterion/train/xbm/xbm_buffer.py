@@ -27,8 +27,7 @@ class XbmBuffer:
         self._embeddings = torch.zeros((self._cfg.buffer_size, embedding_size)).to(
             device
         )
-        self._targets = torch.zeros(
-            self._cfg.buffer_size, dtype=torch.long).to(device)
+        self._targets = torch.zeros(self._cfg.buffer_size, dtype=torch.long).to(device)
         self._pointer = 0
         self._is_full = False
 
@@ -40,7 +39,10 @@ class XbmBuffer:
         if self.is_full:
             return self._embeddings.clone(), self._targets.clone()
         else:
-            return self._embeddings[: self._pointer].clone(), self._targets[: self._pointer].clone()
+            return (
+                self._embeddings[: self._pointer].clone(),
+                self._targets[: self._pointer].clone(),
+            )
 
     def queue(self, embeddings: Tensor, targets: LongTensor) -> None:
         """Queue batch embeddings and targets in the buffer.
@@ -55,8 +57,8 @@ class XbmBuffer:
 
         if temp_size > self._cfg.buffer_size:
             excess = temp_size - self._cfg.buffer_size
-            self._embeddings[-(batch_size - excess):] = embeddings[excess:]
-            self._targets[-(batch_size - excess):] = targets[excess:]
+            self._embeddings[-(batch_size - excess) :] = embeddings[excess:]
+            self._targets[-(batch_size - excess) :] = targets[excess:]
             self._embeddings[:excess] = embeddings[:excess]
             self._targets[:excess] = targets[:excess]
             self._pointer = excess
@@ -67,9 +69,8 @@ class XbmBuffer:
             self._pointer = 0
 
         else:
-            self._embeddings[self._pointer: self._pointer +
-                             batch_size] = embeddings
-            self._targets[self._pointer: self._pointer + batch_size] = targets
+            self._embeddings[self._pointer : self._pointer + batch_size] = embeddings
+            self._targets[self._pointer : self._pointer + batch_size] = targets
             self._pointer += batch_size
 
         if temp_size >= self._cfg.buffer_size and not self.is_full:

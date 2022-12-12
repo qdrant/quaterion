@@ -9,8 +9,6 @@ import shutil
 
 import pytorch_lightning as pl
 import torch
-from torch.autograd import set_detect_anomaly
-set_detect_anomaly(True)
 
 
 def train(

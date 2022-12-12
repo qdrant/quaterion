@@ -85,7 +85,8 @@ class TrainableModel(pl.LightningModule, CacheMixin):
             cache_type=CacheType.NONE
         )
 
-        head = self.configure_head(SimilarityModel.get_encoders_output_size(encoders))
+        head = self.configure_head(
+            SimilarityModel.get_encoders_output_size(encoders))
 
         metrics = self.configure_metrics()
         self.attached_metrics: List[AttachedMetric] = (
@@ -314,7 +315,8 @@ class TrainableModel(pl.LightningModule, CacheMixin):
             **kwargs: keyword arguments to be passed into :meth:`~process_results`
         """
         stage = TrainStage.VALIDATION
-        self._common_step(batch=batch, batch_idx=batch_idx, stage=stage, **kwargs)
+        self._common_step(batch=batch, batch_idx=batch_idx,
+                          stage=stage, **kwargs)
         return None
 
     def test_step(self, batch, batch_idx, **kwargs) -> Optional[Tensor]:
@@ -327,7 +329,8 @@ class TrainableModel(pl.LightningModule, CacheMixin):
             **kwargs: keyword arguments to be passed into :meth:`~process_results`
         """
         stage = TrainStage.TEST
-        self._common_step(batch=batch, batch_idx=batch_idx, stage=stage, **kwargs)
+        self._common_step(batch=batch, batch_idx=batch_idx,
+                          stage=stage, **kwargs)
         return None
 
     def _common_step(self, batch, batch_idx, stage: TrainStage, **kwargs) -> Tensor:
@@ -388,7 +391,8 @@ class TrainableModel(pl.LightningModule, CacheMixin):
                 )
                 loss = loss + self._xbm_config.weight * memory_loss
 
-                self._xbm_buffer.queue(embeddings.detach(), targets["groups"].detach())
+                self._xbm_buffer.queue(
+                    embeddings.detach(), targets["groups"].detach())
             else:
                 raise NotImplementedError(
                     "XBM is currently supported only with GroupLoss instances"

@@ -43,7 +43,8 @@ class TripletLoss(GroupLoss):
             raise ValueError(
                 f"Unrecognized mining strategy: {mining}. Must be one of {', '.join(mining_types)}"
             )
-        super(TripletLoss, self).__init__(distance_metric_name=distance_metric_name)
+        super(TripletLoss, self).__init__(
+            distance_metric_name=distance_metric_name)
 
         self._margin = margin
         self._mining = mining
@@ -77,15 +78,18 @@ class TripletLoss(GroupLoss):
             torch.Tensor: Scalar loss value.
         """
         # Shape: (batch_size_a, batch_size_b)
-        dists = self.distance_metric.distance_matrix(embeddings_a, embeddings_b)
+        dists = self.distance_metric.distance_matrix(
+            embeddings_a, embeddings_b)
         # get the hardest positive for each anchor
-        anchor_positive_mask = get_anchor_positive_mask(groups_a, groups_b).float()
+        anchor_positive_mask = get_anchor_positive_mask(
+            groups_a, groups_b).float()
         anchor_positive_dists = anchor_positive_mask * dists  # invalid pairs set to 0
         # Shape: (batch_size,)
         hardest_positive_dists = anchor_positive_dists.max(dim=1)[0]
 
         # get the hardest negative for each anchor
-        anchor_negative_mask = get_anchor_negative_mask(groups_a, groups_b).float()
+        anchor_negative_mask = get_anchor_negative_mask(
+            groups_a, groups_b).float()
         # add maximum of each row to invalid pairs to make sure not to count loss values from
         # those indices when we apply minimum function later on
         anchor_negative_dists = dists + dists.max(dim=1, keepdim=True)[0] * (
@@ -141,7 +145,8 @@ class TripletLoss(GroupLoss):
 
         # Calculate the pairwise distances between all embeddings
         # shape: (batch_size_a, batch_size_b)
-        distances = self.distance_metric.distance_matrix(embeddings_a, embeddings_b)
+        distances = self.distance_metric.distance_matrix(
+            embeddings_a, embeddings_b)
 
         # Find the indices of all positive and negative pairs
         positive_indices = groups_a[:, None] == groups_b[None, :]
@@ -154,7 +159,8 @@ class TripletLoss(GroupLoss):
         neg_distance = torch.masked_select(distances, negative_indices)
 
         # Calculate the basic triplet loss
-        basic_loss = pos_distance[:, None] - neg_distance[None, :] + self._margin
+        basic_loss = pos_distance[:, None] - \
+            neg_distance[None, :] + self._margin
 
         # Zero out the loss for negative distances larger than the positive distance
         zero_loss = torch.clamp(basic_loss, min=0.0)
@@ -205,7 +211,8 @@ class TripletLoss(GroupLoss):
             num_positive_triplets = torch.sum((triplet_loss > 1e-16).float())
 
             # get scalar loss value
-            triplet_loss = torch.sum(triplet_loss) / (num_positive_triplets + 1e-16)
+            triplet_loss = torch.sum(triplet_loss) / \
+                (num_positive_triplets + 1e-16)
 
         elif self._mining == "hard":
             triplet_loss = self._hard_triplet_loss(

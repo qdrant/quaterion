@@ -1,16 +1,16 @@
+from .models import Model
+from .data import get_dataloaders
+from quaterion import Quaterion
+from examples.cars.config import IMAGE_SIZE, TRAIN_BATCH_SIZE
+from pytorch_lightning.callbacks import EarlyStopping, ModelSummary
 import argparse
 import os
 import shutil
 
 import pytorch_lightning as pl
 import torch
-from pytorch_lightning.callbacks import EarlyStopping, ModelSummary
-
-from examples.cars.config import IMAGE_SIZE, TRAIN_BATCH_SIZE
-from quaterion import Quaterion
-
-from .data import get_dataloaders
-from .models import Model
+from torch.autograd import set_detect_anomaly
+set_detect_anomaly(True)
 
 
 def train(

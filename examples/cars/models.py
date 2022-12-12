@@ -10,6 +10,7 @@ from quaterion.eval.attached_metric import AttachedMetric
 from quaterion.eval.group import RetrievalRPrecision
 from quaterion.loss import SimilarityLoss, TripletLoss
 from quaterion.train.cache import CacheConfig, CacheType
+from quaterion.train.xbm import XbmConfig
 
 try:
     import torchvision

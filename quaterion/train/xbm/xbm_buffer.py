@@ -37,9 +37,12 @@ class XbmBuffer:
 
     def get(self) -> Tuple[Tensor, LongTensor]:
         if self.is_full:
-            return self._embeddings, self._targets
+            return self._embeddings.clone(), self._targets.clone()
         else:
-            return self._embeddings[: self._pointer], self._targets[: self._pointer]
+            return (
+                self._embeddings[: self._pointer].clone(),
+                self._targets[: self._pointer].clone(),
+            )
 
     def queue(self, embeddings: Tensor, targets: LongTensor) -> None:
         """Queue batch embeddings and targets in the buffer.

@@ -51,7 +51,8 @@ class PairSampler(BaseSampler):
         for input_batch in iter_by_batch(
             dataset, self.encode_batch_size // 2, self.log_progress
         ):
-            batch_labels = PairsSimilarityDataLoader.collate_labels(input_batch)
+            batch_labels = PairsSimilarityDataLoader.collate_labels(
+                input_batch)
 
             objects_a, objects_b = [], []
             for similarity_sample in input_batch:
@@ -62,7 +63,8 @@ class PairSampler(BaseSampler):
             embeddings = model.encode(
                 features, batch_size=self.encode_batch_size, to_numpy=False
             )
-            self.accumulator.update(embeddings, **batch_labels, device=self.device)
+            self.accumulator.update(
+                embeddings, **batch_labels, device=self.device)
 
         self.accumulator.set_filled()
 
@@ -126,7 +128,8 @@ class PairSampler(BaseSampler):
                 .view(-1, 1)
                 .to(device)
             )
-            self_mask = torch.cat([self_mask, sample_indices.view(-1, 1)], dim=1)
+            self_mask = torch.cat(
+                [self_mask, sample_indices.view(-1, 1).to(device)], dim=1)
             distance_matrix[self_mask[:, 0], self_mask[:, 1]] = (
                 distance_matrix.max() + 1
             )

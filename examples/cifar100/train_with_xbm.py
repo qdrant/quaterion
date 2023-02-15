@@ -10,69 +10,16 @@ from typing import Dict, List, Union
 
 import pytorch_lightning as pl
 import torch
-import torch.nn as nn
 from quaterion_models.encoders import Encoder
 from quaterion_models.heads import EmptyHead, EncoderHead
 
 from quaterion import Quaterion, TrainableModel
-from quaterion.dataset import GroupSimilarityDataLoader, SimilarityGroupDataset
 from quaterion.eval.attached_metric import AttachedMetric
 from quaterion.eval.group import RetrievalRPrecision
 from quaterion.loss import SimilarityLoss, TripletLoss
 from quaterion.train.xbm import XbmConfig
 
-try:
-    import torchvision
-    import torchvision.datasets as datasets
-    import torchvision.transforms as transforms
-except ImportError:
-    import sys
-
-    print("You need to install torchvision for this example")
-    sys.exit(1)
-
-
-def get_dataloader():
-    # Use Mean and std values for the ImageNet dataset as the base model was pretrained on it.
-    # taken from https://www.geeksforgeeks.org/how-to-normalize-images-in-pytorch/
-    mean = [0.485, 0.456, 0.406]
-    std = [0.229, 0.224, 0.225]
-    path = os.path.join(os.path.expanduser("~"), "torchvision", "datasets")
-
-    transform = transforms.Compose(
-        [
-            transforms.RandomCrop(32, padding=4),
-            transforms.RandomHorizontalFlip(),
-            transforms.ToTensor(),
-            transforms.Normalize(mean, std),
-        ]
-    )
-
-    dataset = SimilarityGroupDataset(
-        datasets.CIFAR100(root=path, download=True, transform=transform)
-    )
-    dataloader = GroupSimilarityDataLoader(dataset, batch_size=64, shuffle=True)
-    return dataloader
-
-
-class MobilenetV3Encoder(Encoder):
-    def __init__(self, embedding_size: int):
-        super().__init__()
-        self.encoder = torchvision.models.mobilenet_v3_small(pretrained=True)
-        self.encoder.classifier = nn.Sequential(nn.Linear(576, embedding_size))
-
-        self._embedding_size = embedding_size
-
-    @property
-    def trainable(self) -> bool:
-        return True
-
-    @property
-    def embedding_size(self) -> int:
-        return self._embedding_size
-
-    def forward(self, images):
-        return self.encoder.forward(images)
+from .cifar100 import get_dataloaders, MobilenetV3Encoder
 
 
 class Model(TrainableModel):
@@ -111,6 +58,9 @@ if __name__ == "__main__":
         "--embedding-size", type=int, default=128, help="Size of the embedding vector"
     )
 
+    ap.add_argument("--epochs", type=int, default=30,
+                    help="Maximum number of epochs to train")
+
     ap.add_argument("--lr", type=float, default=1e-4, help="Learning rate")
 
     args = ap.parse_args()
@@ -120,12 +70,15 @@ if __name__ == "__main__":
         lr=args.lr,
     )
 
-    train_dataloader = get_dataloader()
+    train_dataloader, val_dataloader = get_dataloaders(batch_size=64)
 
-    trainer = pl.Trainer(accelerator="auto", devices=1, num_nodes=1, max_epochs=20)
+    trainer_kwargs = Quaterion.trainer_defaults(model, train_dataloader)
+    trainer_kwargs['max_epochs'] = args.epochs
+    trainer = pl.Trainer(**trainer_kwargs)
 
     Quaterion.fit(
         trainable_model=model,
         trainer=trainer,
         train_dataloader=train_dataloader,
+        val_dataloader=val_dataloader,
     )

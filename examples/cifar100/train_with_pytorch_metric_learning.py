@@ -11,7 +11,7 @@ from quaterion import Quaterion, TrainableModel
 from quaterion.loss import SimilarityLoss
 from quaterion.loss.extras import PytorchMetricLearningWrapper
 
-from .cifar100 import get_dataloaders, MobilenetV3Encoder
+from .cifar100 import MobilenetV3Encoder, get_dataloaders
 
 
 class Model(TrainableModel):
@@ -27,8 +27,7 @@ class Model(TrainableModel):
         return EmptyHead(input_embedding_size)
 
     def configure_loss(self) -> SimilarityLoss:
-        loss = losses.ArcFaceLoss(
-            embedding_size=self._embedding_size, num_classes=100)
+        loss = losses.ArcFaceLoss(embedding_size=self._embedding_size, num_classes=100)
         miner = miners.MultiSimilarityMiner()
         return PytorchMetricLearningWrapper(loss, miner)
 
@@ -55,7 +54,7 @@ if __name__ == "__main__":
     train_dataloader, val_dataloader = get_dataloaders()
 
     trainer_kwargs = Quaterion.trainer_defaults(model, train_dataloader)
-    trainer_kwargs['max_epochs'] = 10
+    trainer_kwargs["max_epochs"] = 10
     trainer = pl.Trainer(**trainer_kwargs)
 
     Quaterion.fit(

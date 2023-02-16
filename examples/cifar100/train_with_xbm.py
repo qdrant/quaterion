@@ -19,7 +19,7 @@ from quaterion.eval.group import RetrievalRPrecision
 from quaterion.loss import SimilarityLoss, TripletLoss
 from quaterion.train.xbm import XbmConfig
 
-from .cifar100 import get_dataloaders, MobilenetV3Encoder
+from .cifar100 import MobilenetV3Encoder, get_dataloaders
 
 
 class Model(TrainableModel):
@@ -58,8 +58,9 @@ if __name__ == "__main__":
         "--embedding-size", type=int, default=128, help="Size of the embedding vector"
     )
 
-    ap.add_argument("--epochs", type=int, default=30,
-                    help="Maximum number of epochs to train")
+    ap.add_argument(
+        "--epochs", type=int, default=30, help="Maximum number of epochs to train"
+    )
 
     ap.add_argument("--lr", type=float, default=1e-4, help="Learning rate")
 
@@ -73,7 +74,7 @@ if __name__ == "__main__":
     train_dataloader, val_dataloader = get_dataloaders(batch_size=64)
 
     trainer_kwargs = Quaterion.trainer_defaults(model, train_dataloader)
-    trainer_kwargs['max_epochs'] = args.epochs
+    trainer_kwargs["max_epochs"] = args.epochs
     trainer = pl.Trainer(**trainer_kwargs)
 
     Quaterion.fit(

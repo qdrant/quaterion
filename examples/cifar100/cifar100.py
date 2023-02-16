@@ -2,6 +2,7 @@ import os
 
 import torch.nn as nn
 from quaterion_models.encoders import Encoder
+
 from quaterion.dataset import GroupSimilarityDataLoader, SimilarityGroupDataset
 
 try:
@@ -38,18 +39,22 @@ def get_dataloaders(batch_size: int = 128):
     )
 
     train_dataset = SimilarityGroupDataset(
-        datasets.CIFAR100(root=path, download=True,
-                          train=True, transform=train_transform)
+        datasets.CIFAR100(
+            root=path, download=True, train=True, transform=train_transform
+        )
     )
     train_dataloader = GroupSimilarityDataLoader(
-        train_dataset, batch_size=batch_size, shuffle=True)
+        train_dataset, batch_size=batch_size, shuffle=True
+    )
 
     val_dataset = SimilarityGroupDataset(
-        datasets.CIFAR100(root=path, download=True,
-                          train=False, transform=val_transform)
+        datasets.CIFAR100(
+            root=path, download=True, train=False, transform=val_transform
+        )
     )
     val_dataloader = GroupSimilarityDataLoader(
-        val_dataset, batch_size=256, shuffle=False)
+        val_dataset, batch_size=256, shuffle=False
+    )
 
     return train_dataloader, val_dataloader
 

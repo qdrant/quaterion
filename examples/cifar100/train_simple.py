@@ -9,7 +9,7 @@ from quaterion_models.heads import EmptyHead, EncoderHead
 from quaterion import Quaterion, TrainableModel
 from quaterion.loss import OnlineContrastiveLoss, SimilarityLoss, TripletLoss
 
-from .cifar100 import get_dataloaders, MobilenetV3Encoder
+from .cifar100 import MobilenetV3Encoder, get_dataloaders
 
 
 class Model(TrainableModel):
@@ -53,8 +53,9 @@ if __name__ == "__main__":
         help="Loss function",
     )
 
-    ap.add_argument("--epochs", type=int, default=30,
-                    help="Maximum number of epochs to train")
+    ap.add_argument(
+        "--epochs", type=int, default=30, help="Maximum number of epochs to train"
+    )
 
     ap.add_argument(
         "--mining",
@@ -75,7 +76,7 @@ if __name__ == "__main__":
     train_dataloader, val_dataloader = get_dataloaders()
 
     trainer_kwargs = Quaterion.trainer_defaults(model, train_dataloader)
-    trainer_kwargs['max_epochs'] = args.epochs
+    trainer_kwargs["max_epochs"] = args.epochs
     trainer = pl.Trainer(**trainer_kwargs)
 
     Quaterion.fit(

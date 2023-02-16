@@ -6,6 +6,7 @@ from typing import Dict, Union
 
 import pytorch_lightning as pl
 import torch
+from quaterion_models.encoders import Encoder
 from quaterion_models.heads import EncoderHead, GatedHead
 from torch.utils.data import Dataset
 
@@ -15,7 +16,6 @@ from quaterion.dataset.similarity_data_loader import (
     SimilarityGroupSample,
 )
 from quaterion.loss import SimilarityLoss, SoftmaxLoss
-from quaterion_models.encoders import Encoder
 
 from .encoder import StartupEncoder
 
@@ -79,7 +79,10 @@ class Model(TrainableModel):
 
 ap = argparse.ArgumentParser()
 ap.add_argument(
-    "--dataset", "-d", help="Path to dataset file", default=os.path.join(os.path.dirname(__file__), "web_summit_startups.jsonl")
+    "--dataset",
+    "-d",
+    help="Path to dataset file",
+    default=os.path.join(os.path.dirname(__file__), "web_summit_startups.jsonl"),
 )
 args = ap.parse_args()
 
@@ -92,8 +95,7 @@ dataset = StartupsDataset(path=args.dataset, max_samples=640)
 
 model = Model(num_groups=dataset.get_num_industries(), lr=3e-5)
 
-train_dataloader = GroupSimilarityDataLoader(
-    dataset, batch_size=64, shuffle=True)
+train_dataloader = GroupSimilarityDataLoader(dataset, batch_size=64, shuffle=True)
 
 trainer = pl.Trainer(accelerator="auto", devices=1, num_nodes=1, max_epochs=30)
 

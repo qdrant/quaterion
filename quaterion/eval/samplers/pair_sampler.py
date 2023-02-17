@@ -126,7 +126,9 @@ class PairSampler(BaseSampler):
                 .view(-1, 1)
                 .to(device)
             )
-            self_mask = torch.cat([self_mask, sample_indices.view(-1, 1)], dim=1)
+            self_mask = torch.cat(
+                [self_mask, sample_indices.view(-1, 1).to(device)], dim=1
+            )
             distance_matrix[self_mask[:, 0], self_mask[:, 1]] = (
                 distance_matrix.max() + 1
             )

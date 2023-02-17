@@ -2,13 +2,12 @@ import argparse
 import json
 import os
 import random
-from typing import Any, Dict, List, Union
+from typing import Dict, Union
 
 import pytorch_lightning as pl
 import torch
 from quaterion_models.encoders import Encoder
 from quaterion_models.heads import EncoderHead, GatedHead
-from quaterion_models.types import CollateFnType
 from torch.utils.data import Dataset
 
 from quaterion import Quaterion, TrainableModel
@@ -18,14 +17,7 @@ from quaterion.dataset.similarity_data_loader import (
 )
 from quaterion.loss import SimilarityLoss, SoftmaxLoss
 
-try:
-    from sentence_transformers import SentenceTransformer
-except ImportError:
-    import sys
-
-    print("You need to install sentence-transformers for this example")
-    sys.exit(1)
-
+from .encoder import StartupEncoder
 
 random.seed(42)
 
@@ -51,45 +43,6 @@ class StartupsDataset(Dataset):
 
     def get_num_industries(self) -> int:
         return len(self._label2idx)
-
-
-class StartupEncoder(Encoder):
-    def __init__(self, pretrained_name: str):
-        super().__init__()
-        self.encoder = SentenceTransformer(pretrained_name)
-
-        self._pretrained_name = pretrained_name
-
-    @property
-    def trainable(self) -> bool:
-        return False
-
-    @property
-    def embedding_size(self) -> int:
-        return self.encoder.get_sentence_embedding_dimension()
-
-    def get_collate_fn(self) -> CollateFnType:
-        return self.extract_texts
-
-    def extract_texts(self, batch: List[Union[str, Dict[str, Any]]]):
-        if isinstance(batch[0], str):
-            return batch
-        elif isinstance(batch[0], Dict):
-            return [item["description"] for item in batch]
-        else:
-            raise TypeError("Expecting list of strings or dicts as inputs")
-
-    def forward(self, inputs):
-        return self.encoder.encode(
-            inputs, convert_to_numpy=False, convert_to_tensor=True
-        )
-
-    def save(self, output_path: str):
-        self.encoder.save(os.path.join(output_path, self._pretrained_name))
-
-    @classmethod
-    def load(cls, input_path: str) -> "Encoder":
-        return StartupEncoder(input_path)
 
 
 class Model(TrainableModel):
@@ -126,7 +79,10 @@ class Model(TrainableModel):
 
 ap = argparse.ArgumentParser()
 ap.add_argument(
-    "--dataset", "-d", help="Path to dataset file", default="web_summit_startups.jsonl "
+    "--dataset",
+    "-d",
+    help="Path to dataset file",
+    default=os.path.join(os.path.dirname(__file__), "web_summit_startups.jsonl"),
 )
 args = ap.parse_args()
 

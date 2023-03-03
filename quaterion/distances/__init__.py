@@ -5,7 +5,7 @@ from quaterion.distances.cosine import Cosine
 from quaterion.distances.dot_product import DotProduct
 from quaterion.distances.euclidean import Euclidean
 from quaterion.distances.manhattan import Manhattan
-
+from quaterion.distances.jaccard import Jaccard
 
 class Distance(str, Enum):
     """An enumerator to pass distance metric names across the package."""
@@ -14,6 +14,7 @@ class Distance(str, Enum):
     COSINE = "cosine"
     DOT_PRODUCT = "dot_product"
     MANHATTAN = "manhattan"
+    JACCARD = "jaccard"
 
     @staticmethod
     def get_by_name(name: str) -> BaseDistance:
@@ -26,6 +27,7 @@ class Distance(str, Enum):
             "euclidean": Euclidean,
             "manhattan": Manhattan,
             "dot_product": DotProduct,
+            "jaccard": Jaccard,
         }
 
         try:

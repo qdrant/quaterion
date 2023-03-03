@@ -13,7 +13,7 @@ class Jaccard(BaseDistance):
     Note:
         The implementation of Weighted Jaccard
         (https://en.wikipedia.org/wiki/Jaccard_index#Weighted_Jaccard_similarity_and_distance)
-        supports Tensors with postivie float values.
+        supports Tensors with positive float values.
     """
 
     @staticmethod

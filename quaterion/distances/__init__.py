@@ -4,8 +4,9 @@ from quaterion.distances.base_distance import BaseDistance
 from quaterion.distances.cosine import Cosine
 from quaterion.distances.dot_product import DotProduct
 from quaterion.distances.euclidean import Euclidean
-from quaterion.distances.manhattan import Manhattan
 from quaterion.distances.jaccard import Jaccard
+from quaterion.distances.manhattan import Manhattan
+
 
 class Distance(str, Enum):
     """An enumerator to pass distance metric names across the package."""

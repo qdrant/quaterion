@@ -37,10 +37,10 @@ class TestDistances:
             "similarity_matrix": torch.tensor([[16.25, -16.25], [-16.25, 16.25]]),
             "distance_matrix": torch.tensor([[-16.25, 16.25], [16.25, -16.25]]),
         },
-       "jaccard": {
-           "similarity_matrix": torch.tensor([[1.0000, 0.5556], [0.5556, 1.0000]]),
-           "distance_matrix": torch.tensor([[0.0000, 0.4444], [0.4444, 0.0000]]),
-       }
+        "jaccard": {
+            "similarity_matrix": torch.tensor([[1.0000, 0.5556], [0.5556, 1.0000]]),
+            "distance_matrix": torch.tensor([[0.0000, 0.4444], [0.4444, 0.0000]]),
+        },
     }
 
     @pytest.mark.parametrize(

@@ -1,15 +1,12 @@
 from typing import Optional
-from quaterion.distances import Distance
 
 import torch
 import torch.nn.functional as F
 from torch import LongTensor, Tensor
 
+from quaterion.distances import Distance
 from quaterion.loss.group_loss import GroupLoss
-from quaterion.utils import (
-    get_anchor_positive_mask,
-    get_anchor_negative_mask,
-)
+from quaterion.utils import get_anchor_negative_mask, get_anchor_positive_mask
 
 
 class CircleLoss(GroupLoss):

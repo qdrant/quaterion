@@ -18,7 +18,7 @@ class TestCircleLoss:
     groups = torch.LongTensor([1, 2, 3, 3, 2, 1])
 
     def test_batch_all(self):
-        loss = CircleLoss(margin=0.5, scale_factor = 2)
+        loss = CircleLoss(margin=0.5, scale_factor=2)
 
         loss_res = loss.forward(embeddings=self.embeddings, groups=self.groups)
 

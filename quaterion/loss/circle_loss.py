@@ -16,7 +16,12 @@ class CircleLoss(GroupLoss):
         scale_factor: scale factor γ determines the largest scale of each similarity score.
     """
 
-    def __init__(self, margin: Optional[float], scale_factor: Optional[float], distance_metric_name: Optional[Distance] = Distance.COSINE):
+    def __init__(
+        self,
+        margin: Optional[float],
+        scale_factor: Optional[float],
+        distance_metric_name: Optional[Distance] = Distance.COSINE,
+    ):
         super(GroupLoss, self).__init__()
         self.margin = margin
         self.scale_factor = scale_factor
@@ -49,10 +54,12 @@ class CircleLoss(GroupLoss):
         # get alpha-positive and alpha-negative weights as described in https://arxiv.org/abs/2002.10857.
         ap = torch.clamp_min(self.op + sp.detach(), min=0)
         an = torch.clamp_min(self.on + sn.detach(), min=0)
-        
-        exp_p = - ap * self.scale_factor * (sp - self.delta_positive)
-        exp_n = an * self.scale_factor * (sn-self.delta_negative)
 
-        circle_loss = F.softplus(torch.logsumexp(exp_n, dim=0) + torch.logsumexp(exp_p, dim=0))
+        exp_p = -ap * self.scale_factor * (sp - self.delta_positive)
+        exp_n = an * self.scale_factor * (sn - self.delta_negative)
+
+        circle_loss = F.softplus(
+            torch.logsumexp(exp_n, dim=0) + torch.logsumexp(exp_p, dim=0)
+        )
 
         return circle_loss

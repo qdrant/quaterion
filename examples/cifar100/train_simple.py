@@ -7,7 +7,7 @@ from quaterion_models.encoders import Encoder
 from quaterion_models.heads import EmptyHead, EncoderHead
 
 from quaterion import Quaterion, TrainableModel
-from quaterion.loss import OnlineContrastiveLoss, SimilarityLoss, TripletLoss, CircleLoss
+from quaterion.loss import OnlineContrastiveLoss, SimilarityLoss, TripletLoss
 
 from .cifar100 import MobilenetV3Encoder, get_dataloaders
 
@@ -27,7 +27,6 @@ class Model(TrainableModel):
         return EmptyHead(input_embedding_size)
 
     def configure_loss(self) -> SimilarityLoss:
-        return CircleLoss()
         return (
             OnlineContrastiveLoss(mining=self._mining)
             if self._loss_fn == "contrastive"

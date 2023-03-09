@@ -1,4 +1,5 @@
 from quaterion.loss.arcface_loss import ArcFaceLoss
+from quaterion.loss.circle_loss import CircleLoss
 from quaterion.loss.contrastive_loss import ContrastiveLoss
 from quaterion.loss.group_loss import GroupLoss
 from quaterion.loss.multiple_negatives_ranking_loss import MultipleNegativesRankingLoss

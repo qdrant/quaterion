@@ -127,6 +127,7 @@ Implementations
     ~multiple_negatives_ranking_loss.MultipleNegativesRankingLoss
     ~softmax_loss.SoftmaxLoss
     ~triplet_loss.TripletLoss
+    ~circle_loss.CircleLoss
 
 Extras
 ++++++

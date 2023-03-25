@@ -1,4 +1,4 @@
-from typing import Iterable, Sized, Union
+from typing import Iterable, Optional, Sized, Union
 
 import torch
 import tqdm
@@ -109,17 +109,21 @@ def get_triplet_mask(labels: torch.Tensor) -> torch.Tensor:
 
 
 def get_anchor_positive_mask(
-    labels_a: torch.Tensor, labels_b: torch.Tensor
+    labels_a: torch.Tensor, labels_b: Optional[torch.Tensor] = None
 ) -> torch.BoolTensor:
     """Creates a 2D mask of valid anchor-positive pairs.
 
     Args:
         labels_a (torch.Tensor): Labels associated with embeddings in the batch A. Shape: (batch_size_a,)
         labels_b (torch.Tensor): Labels associated with embeddings in the batch B. Shape: (batch_size_b,)
+        If `labels_b is None`, it assigns `labels_a` to `labels_b`.
 
     Returns:
         torch.Tensor: Anchor-positive mask. Shape: (batch_size_a, batch_size_b)
     """
+    if labels_b is None:
+        labels_b = labels_a
+
     # Shape: (batch_size_a, batch_size_b)
     mask = labels_a.expand(labels_b.shape[0], labels_a.shape[0]).t() == labels_b.expand(
         labels_a.shape[0], labels_b.shape[0]
@@ -139,17 +143,21 @@ def get_anchor_positive_mask(
 
 
 def get_anchor_negative_mask(
-    labels_a: torch.Tensor, labels_b: torch.Tensor
+    labels_a: torch.Tensor, labels_b: Optional[torch.Tensor] = None
 ) -> torch.BoolTensor:
     """Creates a 2D mask of valid anchor-negative pairs.
 
     Args:
         labels_a (torch.Tensor): Labels associated with embeddings in the batch A. Shape: (batch_size_a,)
-        labels_b (torch.Tensor): Labels associated with embeddings in the batch B. Shape: (batch_size_b,)
+        labels_b (torch.Tensor): Labels associated with embeddings in the batch B. Shape: (batch_size_b,).
+        If `labels_b is None`, it assigns `labels_a` to `labels_b`.
 
     Returns:
         torch.Tensor: Anchor-negative mask. Shape: (batch_size_a, batch_size_b)
     """
+    if labels_b is None:
+        labels_b = labels_a
+
     # Shape: (batch_size_a, batch_size_b)
     mask = labels_a.expand(labels_b.shape[0], labels_a.shape[0]).t() != labels_b.expand(
         labels_a.shape[0], labels_b.shape[0]

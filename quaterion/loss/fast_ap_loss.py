@@ -37,11 +37,10 @@ class FastAPLoss(GroupLoss):
         Returns:
             Dict[str, Any]: JSON-serializable dict of params
         """
-        config = self.get_config_dict()
+        config = super().get_config_dict()
         config.update(
             {
-                "num_bins": self.num_bins,
-                "distance_metric_name": self.distance_metric_name,
+                "num_bins": self.num_bins
             }
         )
 
@@ -66,30 +65,32 @@ class FastAPLoss(GroupLoss):
         batch_size = groups.size()[0]  # batch size
         assert embeddings.size()[0] == batch_size, _warn
 
+        device = embeddings.device  # get the device of the embeddings tensor
+
         # 1. get positive and negative masks
-        pos_mask = get_anchor_positive_mask(groups)  # (batch_size, batch_size)
-        neg_mask = get_anchor_negative_mask(groups)  # (batch_size, batch_size)
+        pos_mask = get_anchor_positive_mask(groups).to(device)  # (batch_size, batch_size)
+        neg_mask = get_anchor_negative_mask(groups).to(device)  # (batch_size, batch_size)
         n_pos = torch.sum(pos_mask, dim=1)  # Sum over all columns (for each row)
 
         # 2. compute distances from embeddings squared Euclidean distance matrix
-        embeddings = F.normalize(embeddings, p=2, dim=1)  # normalize embeddings
+        embeddings = F.normalize(embeddings, p=2, dim=1).to(device)  # normalize embeddings
         dist_matrix = (
-            self.distance_metric.distance_matrix(embeddings) ** 2
+            self.distance_metric.distance_matrix(embeddings).to(device) ** 2
         )  # (batch_size, batch_size)
 
         # 3. estimate discrete histograms
-        histogram_delta = torch.tensor(4.0 / self.num_bins)
-        mid_points = torch.linspace(0.0, 4.0, steps=self.num_bins + 1).view(-1, 1, 1)
+        histogram_delta = torch.tensor(4.0 / self.num_bins, device=device)
+        mid_points = torch.linspace(0.0, 4.0, steps=self.num_bins + 1, device=device).view(-1, 1, 1)
 
         pulse = F.relu(
             input=1 - torch.abs(dist_matrix - mid_points) / histogram_delta
-        )  # max(0, input)
+        ).to(device)  # max(0, input)
 
-        pos_hist = torch.t(torch.sum(pulse * pos_mask, dim=2))  # positive histograms
-        neg_hist = torch.t(torch.sum(pulse * neg_mask, dim=2))  # negative histograms
+        pos_hist = torch.t(torch.sum(pulse * pos_mask, dim=2)).to(device)  # positive histograms
+        neg_hist = torch.t(torch.sum(pulse * neg_mask, dim=2)).to(device)  # negative histograms
 
-        total_pos_hist = torch.cumsum(pos_hist, dim=1)
-        total_hist = torch.cumsum(pos_hist + neg_hist, dim=1)
+        total_pos_hist = torch.cumsum(pos_hist, dim=1).to(device)
+        total_hist = torch.cumsum(pos_hist + neg_hist, dim=1).to(device)
 
         # 4. compute FastAP
         FastAP = pos_hist * total_pos_hist / total_hist

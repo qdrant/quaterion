@@ -24,10 +24,7 @@ class FastAPLoss(GroupLoss):
         num_bins:The number of soft histogram bins for calculating average precision. The paper suggests using 10.
     """
 
-    def __init__(
-        self,
-        num_bins: Optional[int] = 10
-    ):
+    def __init__(self, num_bins: Optional[int] = 10):
         # Eucledian distance is the only compatible distance metric for FastAP Loss
         super(GroupLoss, self).__init__(distance_metric_name=Distance.EUCLIDEAN)
         self.num_bins = num_bins

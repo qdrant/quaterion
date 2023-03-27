@@ -22,16 +22,14 @@ class FastAPLoss(GroupLoss):
 
     Args:
         num_bins:The number of soft histogram bins for calculating average precision. The paper suggests using 10.
-        distance_metric_name: Name of the function, e.g., :class:`~quaterion.distances.Distance`.
-            Optional, defaults to :attr:`~quaterion.distances.Distance.EUCLIDEAN`.
     """
 
     def __init__(
         self,
-        num_bins: Optional[int] = 10,
-        distance_metric_name: Optional[Distance] = Distance.EUCLIDEAN,
+        num_bins: Optional[int] = 10
     ):
-        super(GroupLoss, self).__init__(distance_metric_name=distance_metric_name)
+        # Eucledian distance is the only compatible distance metric for FastAP Loss
+        super(GroupLoss, self).__init__(distance_metric_name=Distance.EUCLIDEAN)
         self.num_bins = num_bins
 
     def get_config_dict(self) -> Dict[str, Any]:
@@ -83,7 +81,6 @@ class FastAPLoss(GroupLoss):
         )  # (batch_size, batch_size)
 
         # 3. estimate discrete histograms
-        # TODO: Learn if distance power can be greater than 2. If so, maximum histogram value can be greater than 4.
         histogram_delta = torch.tensor(4.0 / self.num_bins)
         mid_points = torch.linspace(0.0, 4.0, steps=self.num_bins + 1).view(-1, 1, 1)
 

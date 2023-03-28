@@ -11,11 +11,13 @@ from quaterion.utils import get_anchor_negative_mask, get_anchor_positive_mask
 
 class CircleLoss(GroupLoss):
     """Implements Circle Loss as defined in https://arxiv.org/abs/2002.10857.
+
     Args:
         margin: Margin value to push negative examples.
         scale_factor: scale factor γ determines the largest scale of each similarity score.
 
-    Refer to sections 4.1 and 4.5 in the paper for default values and evaluation of margin and scaling_factor hyperparameters.
+    Note:
+        Refer to sections 4.1 and 4.5 in the paper for default values and evaluation of margin and scaling_factor hyperparameters.
     """
 
     def __init__(
@@ -24,7 +26,8 @@ class CircleLoss(GroupLoss):
         scale_factor: Optional[float] = 256,
         distance_metric_name: Optional[Distance] = Distance.COSINE,
     ):
-        super(GroupLoss, self).__init__(distance_metric_name=distance_metric_name)
+        super(GroupLoss, self).__init__(
+            distance_metric_name=distance_metric_name)
         self.margin = margin
         self.scale_factor = scale_factor
         self.op = 1 + self.margin

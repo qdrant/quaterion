@@ -26,8 +26,7 @@ class CircleLoss(GroupLoss):
         scale_factor: Optional[float] = 256,
         distance_metric_name: Optional[Distance] = Distance.COSINE,
     ):
-        super(GroupLoss, self).__init__(
-            distance_metric_name=distance_metric_name)
+        super(GroupLoss, self).__init__(distance_metric_name=distance_metric_name)
         self.margin = margin
         self.scale_factor = scale_factor
         self.op = 1 + self.margin

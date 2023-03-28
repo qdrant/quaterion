@@ -6,10 +6,11 @@ from pytorch_lightning.trainer.states import TrainerFn
 from quaterion.train.trainable_model import TrainableModel
 
 
-try: # fix for version >= 1.9.0
+try:  # fix for version >= 1.9.0
     from pytorch_lightning import Callback
 except ImportError:
     from pytorch_lightning.callbacks.base import Callback
+
 
 class CleanupCallback(Callback):
     def teardown(

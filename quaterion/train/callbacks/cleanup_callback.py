@@ -1,11 +1,15 @@
 from typing import Optional
 
 import pytorch_lightning as pl
-from pytorch_lightning.callbacks.base import Callback
 from pytorch_lightning.trainer.states import TrainerFn
 
 from quaterion.train.trainable_model import TrainableModel
 
+
+try: # fix for version >= 1.9.0
+    from pytorch_lightning.callbacks.base import Callback
+except ImportError:
+    from pytorch_lightning import Callback
 
 class CleanupCallback(Callback):
     def teardown(

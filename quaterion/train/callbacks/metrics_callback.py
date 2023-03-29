@@ -1,5 +1,9 @@
 import pytorch_lightning as pl
-from pytorch_lightning.callbacks.base import Callback
+
+try:  # fix for version >= 1.9.0
+    from pytorch_lightning import Callback
+except ImportError:
+    from pytorch_lightning.callbacks.base import Callback
 
 
 class MetricsCallback(Callback):

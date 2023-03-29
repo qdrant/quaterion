@@ -247,3 +247,18 @@ def get_masked_minimum(dists, mask, dim=1):
     masked_minimums += axis_maximums
 
     return masked_minimums
+
+
+def l2_norm(inputs: torch.Tensor, dim: int = 0) -> torch.Tensor:
+    """Apply L2 normalization to tensor
+
+    Args:
+        inputs: Input tensor.
+        dim: Dimension to operate on.
+
+    Returns:
+        torch.Tensor: L2-normalized tensor
+    """
+    outputs = inputs / torch.norm(inputs, 2, dim, True)
+
+    return outputs

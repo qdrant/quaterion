@@ -129,6 +129,7 @@ Implementations
     ~triplet_loss.TripletLoss
     ~circle_loss.CircleLoss
     ~fastap_loss.FastAPLoss
+    ~cos_face_loss.CosFaceLoss
 
 Extras
 ++++++

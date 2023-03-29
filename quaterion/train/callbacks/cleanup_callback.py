@@ -26,7 +26,7 @@ class CleanupCallback(Callback):
                 trainer.reset_train_val_dataloaders()
             except NotImplementedError:
                 trainer.reset_train_dataloader()
-                trainer.reset_test_dataloader
+                trainer.reset_test_dataloader()
 
             # Restore Data Loaders if they were modified for cache
             train_dataloader = trainer.train_dataloader.loaders

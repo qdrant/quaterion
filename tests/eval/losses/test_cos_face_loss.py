@@ -15,7 +15,7 @@ class TestCosFaceLoss:
         ]
     )
 
-    groups = torch.LongTensor([1, 2, 3, 3, 2, 1])
+    groups = torch.LongTensor([1, 2, 0, 0, 2, 1])
 
     def test_batch_all(self):
         loss = CosFaceLoss(self.embeddings.size()[1], 3)

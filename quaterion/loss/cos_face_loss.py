@@ -45,8 +45,9 @@ class CosFaceLoss(GroupLoss):
         Returns:
             Tensor: loss value.
         """
-        assert groups.ge(0).all() and groups.lt(self.kernel.size(1)).all(), \
-            f"Invalid group ids: all the values must be between 0 (inclusive) and num_groups (exclusive), but given:  {groups}"
+        assert (
+            groups.ge(0).all() and groups.lt(self.kernel.size(1)).all()
+        ), f"Invalid group ids: all the values must be between 0 (inclusive) and num_groups (exclusive), but given:  {groups}"
 
         embeddings = l2_norm(embeddings, 1)
         kernel_norm = l2_norm(self.kernel, 0)

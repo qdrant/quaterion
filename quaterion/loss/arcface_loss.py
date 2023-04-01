@@ -4,6 +4,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch import LongTensor, Tensor
+from torch import linalg as LA
 
 from quaterion.loss.group_loss import GroupLoss
 
@@ -18,7 +19,7 @@ def l2_norm(inputs: torch.Tensor, dim: int = 0) -> torch.Tensor:
     Returns:
         torch.Tensor: L2-normalized tensor
     """
-    outputs = inputs / torch.norm(inputs, 2, dim, True)
+    outputs = inputs / LA.norm(inputs, 2, dim, True)
 
     return outputs
 

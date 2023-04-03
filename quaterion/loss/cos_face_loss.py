@@ -6,11 +6,12 @@ import torch.nn.functional as F
 from torch import LongTensor, Tensor
 
 from quaterion.loss.group_loss import GroupLoss
-from quaterion.utils.utils import l2_norm
+from quaterion.utils import l2_norm
 
 
-class ArcFaceLoss(GroupLoss):
-    """Additive Angular Margin Loss as defined in https://arxiv.org/abs/1801.07698
+class CosFaceLoss(GroupLoss):
+
+    """Large Margin Cosine Loss as defined in https://arxiv.org/pdf/1801.09414.pdf
 
     Args:
         embedding_size: Output dimension of the encoder.
@@ -23,9 +24,10 @@ class ArcFaceLoss(GroupLoss):
         self,
         embedding_size: int,
         num_groups: int,
-        scale: float = 64.0,
-        margin: float = 0.5,
+        margin: Optional[float] = 0.35,
+        scale: Optional[float] = 64.0,
     ):
+
         super(GroupLoss, self).__init__()
 
         self.kernel = nn.Parameter(torch.FloatTensor(embedding_size, num_groups))
@@ -33,18 +35,13 @@ class ArcFaceLoss(GroupLoss):
         self.scale = scale
         self.margin = margin
 
-    def forward(
-        self,
-        embeddings: Tensor,
-        groups: LongTensor,
-    ) -> Tensor:
-        """Compute loss value
+    def forward(self, embeddings: Tensor, groups: LongTensor) -> Tensor:
 
+        """Compute loss value
         Args:
             embeddings: shape: (batch_size, vector_length) - Output embeddings from the
                 encoder.
             groups: shape: (batch_size,) - Group ids associated with embeddings.
-
         Returns:
             Tensor: loss value.
         """
@@ -64,12 +61,13 @@ class ArcFaceLoss(GroupLoss):
         index = torch.where(groups != -1)[0]
 
         # Shape: (batch_size, num_groups)
-        m_hot = torch.zeros(
+        margins = torch.zeros(
             index.size()[0], cos_theta.size()[1], device=cos_theta.device
         )
-        m_hot.scatter_(1, groups[index, None], self.margin)
-        cos_theta.acos_()
-        cos_theta[index] += m_hot
+        margins.scatter_(1, groups[index, None], self.margin)
+
+        cos_theta[index] -= margins
+
         cos_theta.cos_().mul_(self.scale)
 
         # calculate scalar loss

@@ -27,7 +27,6 @@ class CosFaceLoss(GroupLoss):
         margin: Optional[float] = 0.35,
         scale: Optional[float] = 64.0,
     ):
-
         super(GroupLoss, self).__init__()
 
         self.kernel = nn.Parameter(torch.FloatTensor(embedding_size, num_groups))
@@ -36,7 +35,6 @@ class CosFaceLoss(GroupLoss):
         self.margin = margin
 
     def forward(self, embeddings: Tensor, groups: LongTensor) -> Tensor:
-
         """Compute loss value
         Args:
             embeddings: shape: (batch_size, vector_length) - Output embeddings from the

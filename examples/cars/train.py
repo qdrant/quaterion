@@ -22,7 +22,6 @@ def train(
     shuffle: bool,
     save_dir: str,
 ):
-
     model = Model(
         lr=lr,
         mining=mining,

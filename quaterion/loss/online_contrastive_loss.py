@@ -93,7 +93,6 @@ class OnlineContrastiveLoss(GroupLoss):
         )
 
         if self._mining == "all":
-
             num_positive_pairs = anchor_positive_mask.sum()
             positive_loss = anchor_positive_dists.sum() / torch.max(
                 num_positive_pairs, torch.tensor(1e-16)
@@ -106,7 +105,6 @@ class OnlineContrastiveLoss(GroupLoss):
             ).sum() / torch.max(num_negative_pairs, torch.tensor(1e-16))
 
         else:  # batch-hard pair mining
-
             # get the hardest positive for each anchor
             # shape: (batch_size,)
             hardest_positive_dists = anchor_positive_dists.max(dim=1)[0]

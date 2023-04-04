@@ -381,7 +381,6 @@ class TrainableModel(pl.LightningModule, CacheMixin):
         ):
             loss_obj = self.loss  # Assign to tmp variable for better type inference
             if isinstance(loss_obj, GroupLoss):
-
                 memory_embeddings, memory_groups = self._xbm_buffer.get()
                 memory_loss = loss_obj.xbm_loss(
                     embeddings, targets["groups"], memory_embeddings, memory_groups

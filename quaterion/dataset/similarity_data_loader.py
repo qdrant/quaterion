@@ -31,7 +31,6 @@ class SimilarityDataLoader(DataLoader, Generic[T_co]):
     """
 
     def __init__(self, dataset: Dataset, **kwargs):
-
         if "collate_fn" not in kwargs:
             kwargs["collate_fn"] = self.__class__.pre_collate_fn
         self._original_dataset = dataset

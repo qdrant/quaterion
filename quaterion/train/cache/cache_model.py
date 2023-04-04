@@ -24,7 +24,6 @@ class CacheModel(pl.LightningModule):
         self,
         encoders: Dict[str, CacheEncoder],
     ):
-
         super().__init__()
         self.encoders = encoders
         for key, encoder in self.encoders.items():

@@ -8,6 +8,7 @@ from quaterion.distances import Distance
 from quaterion.loss.group_loss import GroupLoss
 from quaterion.utils import get_centroids, get_triplet_mask
 
+
 class CentroidTripletLoss(GroupLoss):
     """Implements Centroid Triplet Loss.
 
@@ -21,7 +22,9 @@ class CentroidTripletLoss(GroupLoss):
         margin: Optional[float] = 0.5,
         distance_metric_name: Optional[Distance] = Distance.COSINE,
     ):
-        super(CentroidTripletLoss, self).__init__(distance_metric_name=distance_metric_name)
+        super(CentroidTripletLoss, self).__init__(
+            distance_metric_name=distance_metric_name
+        )
         self._margin = margin
 
     def get_config_dict(self):

@@ -54,6 +54,29 @@ class CentroidTripletLoss(GroupLoss):
         masked_dists = centroid_dists * triplet_mask.float()
 
         # Compute the triplet loss using centroids and masked distances
-        # ...
+        triplet_loss = 0.0
+        
+        # Find the hardest positive and negative distances for each anchor centroid
+        for i in range(len(centroids)):
+            anchor_centroid = centroids[i]
+
+            # Mask distances for the current anchor
+            masked_anchor_dists = masked_dists[i]
+
+            # Positive distances (from the same group as the anchor)
+            positive_dists = masked_anchor_dists[groups == groups[i]]
+
+            # Negative distances (from different groups than the anchor)
+            negative_dists = masked_anchor_dists[groups != groups[i]]
+
+            # Find the hardest positive and negative distances
+            hardest_positive_dist = torch.max(positive_dists)
+            hardest_negative_dist = torch.min(negative_dists)
+
+            # Compute the triplet loss for the current anchor
+            triplet_loss += torch.max(hardest_positive_dist - hardest_negative_dist + self._margin, torch.tensor(0.0))
+
+        # Compute the mean triplet loss across the batch
+        triplet_loss /= len(centroids)
 
         return triplet_loss

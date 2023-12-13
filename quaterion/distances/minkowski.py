@@ -1,14 +1,17 @@
 from typing import Optional
+
 import torch
 from torch import Tensor
+
 from quaterion.distances.base_distance import BaseDistance
+
 
 class Minkowski(BaseDistance):
     """Compute Minkowski distances (and its interpretation as similarities)."""
 
     @staticmethod
     def distance(x: Tensor, y: Tensor, p: int = 2) -> Tensor:
-        return torch.pow(torch.sum(torch.pow(torch.abs(x - y), p), dim=-1), 1/p)
+        return torch.pow(torch.sum(torch.pow(torch.abs(x - y), p), dim=-1), 1 / p)
 
     @staticmethod
     def similarity(x: Tensor, y: Tensor, p: int = 2) -> Tensor:
@@ -23,6 +26,7 @@ class Minkowski(BaseDistance):
     @staticmethod
     def similarity_matrix(x: Tensor, y: Optional[Tensor] = None, p: int = 2) -> Tensor:
         return 1 / (1 + Minkowski.distance_matrix(x, y, p))
+
 
 # Example usage:
 tensor_x = torch.tensor([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])

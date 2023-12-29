@@ -128,8 +128,9 @@ Implementations
     ~softmax_loss.SoftmaxLoss
     ~triplet_loss.TripletLoss
     ~circle_loss.CircleLoss
-    ~fastap_loss.FastAPLoss
+    ~fast_ap_loss.FastAPLoss
     ~cos_face_loss.CosFaceLoss
+    ~center_loss.CenterLoss
 
 Extras
 ++++++

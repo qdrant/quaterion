@@ -1,4 +1,5 @@
 from quaterion.loss.arcface_loss import ArcFaceLoss
+from quaterion.loss.center_loss import CenterLoss
 from quaterion.loss.circle_loss import CircleLoss
 from quaterion.loss.contrastive_loss import ContrastiveLoss
 from quaterion.loss.cos_face_loss import CosFaceLoss

@@ -49,6 +49,7 @@ DISTANCES
     ~dot_product.DotProduct
     ~euclidean.Euclidean
     ~manhattan.Manhattan
+    ~jaccard.Jaccard
 
 EVAL
 ----

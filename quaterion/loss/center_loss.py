@@ -3,10 +3,11 @@ from typing import Optional
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch import Tensor, LongTensor
+from torch import LongTensor, Tensor
 
 from quaterion.loss.group_loss import GroupLoss
 from quaterion.utils import l2_norm
+
 
 class CenterLoss(GroupLoss):
     """
@@ -22,10 +23,7 @@ class CenterLoss(GroupLoss):
     """
 
     def __init__(
-        self,
-        embedding_size: int,
-        num_groups: int,
-        lambda_c: Optional[float] = 0.5
+        self, embedding_size: int, num_groups: int, lambda_c: Optional[float] = 0.5
     ):
         super(GroupLoss, self).__init__()
         self.num_groups = num_groups

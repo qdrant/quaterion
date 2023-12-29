@@ -1,5 +1,7 @@
 import torch
+
 from quaterion.loss import CenterLoss
+
 
 class TestCenterLoss:
     embeddings = torch.Tensor(
@@ -17,11 +19,14 @@ class TestCenterLoss:
     def test_batch_all(self):
         # Initialize the CenterLoss
         loss = CenterLoss(embedding_size=self.embeddings.size()[1], num_groups=3)
-        
+
         # Calculate the loss
         loss_res = loss.forward(embeddings=self.embeddings, groups=self.groups)
 
         # Assertions to check the output shape and type
-        assert isinstance(loss_res, torch.Tensor), "Loss result should be a torch.Tensor"
-        assert loss_res.shape == torch.Size([]), "Loss result should be a scalar (0-dimension tensor)"
-
+        assert isinstance(
+            loss_res, torch.Tensor
+        ), "Loss result should be a torch.Tensor"
+        assert loss_res.shape == torch.Size(
+            []
+        ), "Loss result should be a scalar (0-dimension tensor)"

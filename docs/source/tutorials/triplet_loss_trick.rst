@@ -1,5 +1,5 @@
 Triplet Loss: Vector Collapse Prevention
-============================
+========================================
 
 Triplet Loss is one of the most widely known loss functions in similarity learning.
 If you want to deep-dive into the details of its implementations and advantages,

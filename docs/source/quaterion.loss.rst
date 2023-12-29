@@ -16,7 +16,11 @@ Submodules
    :maxdepth: 4
 
    quaterion.loss.arcface_loss
+   quaterion.loss.center_loss
+   quaterion.loss.circle_loss
    quaterion.loss.contrastive_loss
+   quaterion.loss.cos_face_loss
+   quaterion.loss.fast_ap_loss
    quaterion.loss.group_loss
    quaterion.loss.multiple_negatives_ranking_loss
    quaterion.loss.online_contrastive_loss

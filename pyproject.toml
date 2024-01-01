@@ -14,7 +14,10 @@ keywords = ["framework", "similarity-learning", "metric-learning", "similarity",
 
 [tool.poetry.dependencies]
 python = ">=3.8,<3.11"
-torch = ">=1.8.2"
+torch = [
+    {version = ">=1.8.2", markers = "sys_platform != 'darwin'"},
+    {version = ">=1.8.2,<1.13.0", markers = "sys_platform == 'darwin'"}  # crashes on torch==1.13.0, tries to install nvidia modules
+]
 pytorch-lightning = "^1.6.4"
 quaterion-models = "^0.1.17"
 loguru = "^0.5.3"

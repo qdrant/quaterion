@@ -12,6 +12,13 @@ class TestDistances:
         ]
     )
 
+    x_2 = torch.tensor(
+        [
+            [1.0, 1.5, 2.0, 3.0],
+            [0.5, 2.5, 2.5, 1.0],
+        ]
+    )
+
     x_dim = x.size()[0]
     expected = {
         "cosine": {
@@ -29,6 +36,10 @@ class TestDistances:
         "dot_product": {
             "similarity_matrix": torch.tensor([[16.25, -16.25], [-16.25, 16.25]]),
             "distance_matrix": torch.tensor([[-16.25, 16.25], [16.25, -16.25]]),
+        },
+        "jaccard": {
+            "similarity_matrix": torch.tensor([[1.0000, 0.5556], [0.5556, 1.0000]]),
+            "distance_matrix": torch.tensor([[0.0000, 0.4444], [0.4444, 0.0000]]),
         },
     }
 
